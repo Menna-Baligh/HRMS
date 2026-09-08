@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Resources\UserResource;
 use App\Services\Auth\LoginService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 class AuthController extends Controller
 {
@@ -18,17 +21,20 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request): JsonResponse
     {
-        $result = $this->loginService->login($request->validated());
+        try {
+            $result = $this->loginService->login($request->validated());
+            $result['user'] = new UserResource($result['user']);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Login successfully',
-            'data'    => [
-                'access_token' => $result['access_token'],
-                'token_type'   => $result['token_type'],
-                'expires_in'   => $result['expires_in'],
-                'user'         => new UserResource($result['user']),
-            ],
-        ], Response::HTTP_OK);
+            return ResponseHelper::success(data: $result, message: 'Login successfully');
+        } catch (ValidationException $e) {
+            return ResponseHelper::error(
+                errors: $e->errors(),
+                message: 'Validation error',
+                statusCode: Response::HTTP_UNPROCESSABLE_ENTITY,
+            );
+        } catch (Throwable $e) {
+            report($e);
+            return ResponseHelper::error(message: 'Something went wrong', statusCode: Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }
