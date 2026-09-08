@@ -15,7 +15,7 @@ class ResponseHelper
         ], $statusCode);
     }
 
-    public static function error(mixed $errors = null , ?string $message = null, int $statusCode = 400): JsonResponse
+    public static function error(mixed $errors = null, ?string $message = null, int $statusCode = 400): JsonResponse
     {
         return response()->json([
             'success' => false,

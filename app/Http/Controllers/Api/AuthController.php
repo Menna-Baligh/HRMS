@@ -34,6 +34,7 @@ class AuthController extends Controller
             );
         } catch (Throwable $e) {
             report($e);
+
             return ResponseHelper::error(message: 'Something went wrong', statusCode: Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
