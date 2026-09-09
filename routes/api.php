@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\Api\GoogleAuthController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\EmployeeController;
+use App\Http\Controllers\Api\GoogleAuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -16,6 +17,8 @@ Route::prefix('auth')->group(function () {
         Route::get('/redirect', [GoogleAuthController::class, 'redirect']);
         Route::get('/callback', [GoogleAuthController::class, 'callback']);
     });
-
 });
-
+Route::middleware(['auth:api'])->group(function () {
+    Route::post('/employees', [EmployeeController::class, 'store'])
+        ->middleware('permission:create employee');
+});
