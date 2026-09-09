@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Employee;
 use App\Models\User;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
@@ -51,5 +52,24 @@ class EmployeeService
     {
         $employee->update(array_filter($data, fn ($value) => $value !== null));
         return $employee->load(['user', 'department', 'manager.user']);
+    }
+    public function updateProfile(User $user, array $data): Employee
+    {
+        return DB::transaction(function () use ($user, $data) {
+            $userData = array_intersect_key($data, array_flip(['name', 'avatar']));
+            if (!empty($userData)) {
+                $user->update($userData);
+                $user->refresh();
+            }
+            $employeeData = array_intersect_key($data, array_flip(['phone', 'address']));
+            $employee = $user->employee;
+            if (!$employee) {
+                throw new ModelNotFoundException('Employee profile not found for this user.');
+            }
+            if (!empty($employeeData)) {
+                $employee->update($employeeData);
+            }
+            return $employee->load(['user', 'department', 'manager.user']);
+        });
     }
 }

@@ -6,6 +6,7 @@ use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeHrFieldsRequest;
+use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Resources\EmployeeResource;
 use App\Services\EmployeeService;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -91,6 +92,31 @@ class EmployeeController extends Controller
             report($e);
             return ResponseHelper::error(
                 message: 'Failed to update HR fields',
+                statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+    public function updateProfile(UpdateProfileRequest $request): JsonResponse
+    {
+        try {
+            $updatedEmployee = $this->employeeService->updateProfile(
+                auth()->user(),
+                $request->validated()
+            );
+
+            return ResponseHelper::success(
+                data: new EmployeeResource($updatedEmployee->user),
+                message: 'Profile updated successfully'
+            );
+        } catch (ModelNotFoundException $e) {
+            return ResponseHelper::error(
+                message: $e->getMessage(),
+                statusCode: Response::HTTP_NOT_FOUND
+            );
+        } catch (Throwable $e) {
+            report($e);
+            return ResponseHelper::error(
+                message: 'Failed to update profile',
                 statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }

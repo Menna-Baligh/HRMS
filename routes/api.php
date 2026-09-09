@@ -19,9 +19,8 @@ Route::prefix('auth')->group(function () {
     });
 });
 Route::middleware(['auth:api'])->group(function () {
-    Route::post('/employees', [EmployeeController::class, 'store'])
-        ->middleware('permission:create employee');
-
+    Route::post('/employees', [EmployeeController::class, 'store'])->middleware('permission:create employee');
+    Route::patch('/employees/profile', [EmployeeController::class, 'updateProfile']);
     Route::get('/employees/{id}', [EmployeeController::class, 'show']);
     Route::patch('/employees/{id}/hr-fields', [EmployeeController::class, 'updateHrFields'])->middleware('permission:edit hr fields');
 });
