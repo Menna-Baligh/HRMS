@@ -17,7 +17,6 @@ class GoogleAuthController extends Controller
         protected GoogleAuthService $googleAuthService
     ) {}
 
-
     public function redirect(): JsonResponse
     {
         try {
@@ -29,13 +28,13 @@ class GoogleAuthController extends Controller
             );
         } catch (Throwable $e) {
             report($e);
+
             return ResponseHelper::error(
                 message: 'Could not generate Google login URL',
                 statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
     }
-
 
     public function callback(): JsonResponse
     {
