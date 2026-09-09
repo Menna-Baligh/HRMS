@@ -4,6 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
+    "content-hash": "22b08f4e721762e1554b3921ed98d29c",
     "content-hash": "2dbd61af2c92bd10ffe304d5caf399f2",
     "packages": [
         {
@@ -1263,6 +1264,27 @@
             "time": "2026-08-24T17:13:02+00:00"
         },
         {
+            "name": "ichtrojan/laravel-otp",
+            "version": "v2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ichtrojan/laravel-otp.git",
+                "reference": "0c12316ccf6f051cac81d6be418ad6f68689d4b9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ichtrojan/laravel-otp/zipball/0c12316ccf6f051cac81d6be418ad6f68689d4b9",
+                "reference": "0c12316ccf6f051cac81d6be418ad6f68689d4b9",
+                "shasum": ""
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "Otp": "Ichtrojan\\Otp\\Otp"
+                    },
+                    "providers": [
+                        "Ichtrojan\\Otp\\OtpServiceProvider"
             "name": "knuckleswtf/scribe",
             "version": "5.11.0",
             "source": {
@@ -1318,6 +1340,8 @@
                 }
             },
             "autoload": {
+                "psr-4": {
+                    "Ichtrojan\\Otp\\": "src/"
                 "files": [
                     "src/Config/helpers.php"
                 ],
@@ -1332,6 +1356,16 @@
             ],
             "authors": [
                 {
+                    "name": "Michael Okoh",
+                    "email": "michael@okoh.co.uk"
+                }
+            ],
+            "description": "A simple package to generate and validate OTPs",
+            "support": {
+                "issues": "https://github.com/ichtrojan/laravel-otp/issues",
+                "source": "https://github.com/ichtrojan/laravel-otp/tree/v2.0.0"
+            },
+            "time": "2023-12-24T22:16:55+00:00"
                     "name": "Shalvah"
                 }
             ],
@@ -11115,5 +11149,5 @@
         "php": "^8.3"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }
