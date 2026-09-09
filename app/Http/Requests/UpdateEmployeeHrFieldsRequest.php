@@ -30,4 +30,15 @@ class UpdateEmployeeHrFieldsRequest extends FormRequest
             'manager_id'      => ['nullable', 'exists:employees,id'],
         ];
     }
+    public function messages(): array
+    {
+        return [
+            'job_title.string' => 'The job title must be a string.',
+            'job_title.max' => 'The job title may not be greater than 255 characters.',
+            'employment_type.in' => 'The selected employment type is invalid. It must be one of: Full-time, Part-time, Contract.',
+            'status.in' => 'The selected status is invalid. It must be either active or inactive.',
+            'department_id.exists' => 'The selected department does not exist.',
+            'manager_id.exists' => 'The selected manager does not exist.',
+        ];
+    }
 }
