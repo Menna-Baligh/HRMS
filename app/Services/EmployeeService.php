@@ -47,4 +47,9 @@ class EmployeeService
     {
         return Employee::with(['user', 'department', 'manager.user'])->findOrFail($id);
     }
+    public function updateHrFields(Employee $employee, array $data): Employee
+    {
+        $employee->update(array_filter($data, fn ($value) => $value !== null));
+        return $employee->load(['user', 'department', 'manager.user']);
+    }
 }

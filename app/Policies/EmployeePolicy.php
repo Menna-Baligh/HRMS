@@ -23,4 +23,8 @@ class EmployeePolicy
 
         return false;
     }
+    public function updateHrFields(User $authUser): bool
+    {
+        return $authUser->hasRole(['Owner', 'HR']);
+    }
 }
