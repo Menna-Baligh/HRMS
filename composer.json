@@ -11,9 +11,13 @@
     "require": {
         "php": "^8.3",
         "ichtrojan/laravel-otp": "^2.0",
+        "knuckleswtf/scribe": "^5.11",
         "laravel/framework": "^13.17",
         "laravel/sanctum": "^4.0",
+        "laravel/socialite": "^5.31",
+        "laravel/telescope": "^5.23",
         "laravel/tinker": "^3.0",
+        "scalar/laravel": "^0.4.0",
         "tymon/jwt-auth": "^2.3"
     },
     "require-dev": {

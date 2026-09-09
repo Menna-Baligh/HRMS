@@ -1,0 +1,324 @@
+openapi: 3.0.3
+info:
+  title: HR API Documentation
+  version: 1.0.0
+paths:
+  /api/auth/login:
+    post:
+      summary: Login
+      operationId: login
+      tags:
+        - Authentication
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+            example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: employee@example.com
+                password:
+                  type: string
+                  example: password
+      responses:
+        "200":
+          description: Login successful, returns token payload and user resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      access_token:
+                        type: string
+                      token_type:
+                        type: string
+                      expires_in:
+                        type: string
+                      user:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          name:
+                            type: string
+                          email:
+                            type: string
+                          phone:
+                            type: string
+                            nullable: true
+                          avatar:
+                            type: string
+                            nullable: true
+                          role:
+                            type: string
+              example:
+                success: true
+                message: Login successfully
+                data:
+                  access_token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3ODg4NjA0NzksImV4cCI6MTc4ODk0Njg3OSwibmJmIjoxNzg4ODYwNDc5LCJqdGkiOiI4ZERjNW1YUURoWHZSUUN2Iiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.gk2rVSgLGfCCfbx3PniTWxIqBzgahTEr7fGmyAzE_wc
+                  token_type: bearer
+                  expires_in: 24 hours
+                  user:
+                    id: 1
+                    name: Test Employee
+                    email: employee@example.com
+                    phone: null
+                    avatar: null
+                    role: Employee
+        "422":
+          description: Validation errors (missing fields or invalid credentials).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  errors:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: string
+              examples:
+                missingPassword:
+                  summary: Missing Password
+                  value:
+                    success: false
+                    message: Validation error
+                    errors:
+                      password:
+                        - The password field is required.
+                invalidCredentials:
+                  summary: Invalid Credentials
+                  value:
+                    success: false
+                    message: Validation error
+                    errors:
+                      email:
+                        - These credentials do not match our records.
+
+  /api/auth/logout:
+    post:
+      summary: Logout
+      operationId: logout
+      tags:
+        - Authentication
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+            example: application/json
+      responses:
+        '200':
+          description: Successfully logged out.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items: {}
+              example:
+                success: true
+                message: Logged out successfully
+                data: []
+        '401':
+          description: Missing, expired, or invalid token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  errors:
+                    type: string
+                    nullable: true
+              example:
+                success: false
+                message: Unauthenticated
+                errors: null
+
+  /api/auth/google/redirect:
+    get:
+      summary: Google Login Redirect
+      operationId: googleRedirect
+      tags:
+        - Authentication
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+            example: application/json
+      responses:
+        "200":
+          description: Google redirect URL generated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      url:
+                        type: string
+              example:
+                success: true
+                message: Google redirect URL generated successfully
+                data:
+                  url: https://accounts.google.com/o/oauth2/v2/auth?client_id=123456789.apps.googleusercontent.com&redirect_uri=http%3A%2F%2Flocalhost%3A8000%2Fapi%2Fauth%2Fgoogle%2Fcallback&response_type=code&scope=openid+profile+email
+
+  /api/auth/google/callback:
+    get:
+      summary: Google Login Callback
+      operationId: googleCallback
+      tags:
+        - Authentication
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+            example: application/json
+        - in: query
+          name: code
+          required: false
+          description: Authorization code provided by Google OAuth.
+          schema:
+            type: string
+        - in: query
+          name: state
+          required: false
+          description: State parameter for CSRF mitigation.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Logged in with Google successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      access_token:
+                        type: string
+                      token_type:
+                        type: string
+                      expires_in:
+                        type: string
+                      user:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          name:
+                            type: string
+                          email:
+                            type: string
+                          phone:
+                            type: string
+                            nullable: true
+                          avatar:
+                            type: string
+                            nullable: true
+                          role:
+                            type: string
+
+              example:
+                success: true
+                message: Logged in with Google successfully
+                data:
+                  access_token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
+                  token_type: bearer
+                  expires_in: 1 hours
+                  user:
+                    id: 1
+                    name: Company Owner
+                    email: owner@example.com
+                    phone: null
+                    avatar: null
+                    role: Owner
+                    
+        "422":
+          description: Validation or process error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  errors:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: string
+              example:
+                success: false
+                message: Google authentication failed
+                errors:
+                  email:
+                    - Google authentication failed
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
