@@ -2,20 +2,19 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ForgetPasswordRequest;
+use App\Http\Requests\LoginRequest;
 use App\Http\Requests\ResendOtpRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\UserRegisterRequest;
 use App\Http\Requests\VerifyForgotPasswordOtpRequest;
-use App\Services\Auth\ForgotPasswordService;
-use App\Services\Auth\RegisterService;
-use App\Helpers\ResponseHelper;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\LoginRequest;
 use App\Http\Resources\UserResource;
+use App\Services\Auth\ForgotPasswordService;
 use App\Services\Auth\LoginService;
 use App\Services\Auth\LogoutService;
+use App\Services\Auth\RegisterService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,9 +25,9 @@ class AuthController extends Controller
     public function __construct(
         protected RegisterService $registerService,
         protected ForgotPasswordService $forgotPasswordService,
-       protected LoginService $loginService,
+        protected LoginService $loginService,
         protected LogoutService $logoutService
-         
+
     ) {}
 
     public function register(UserRegisterRequest $request)
@@ -49,11 +48,12 @@ class AuthController extends Controller
         $data = $this->forgotPasswordService->sendOtp(
             $request->validated('email')
         );
+
         return response()->json([
-            'success'=>'true',
+            'success' => 'true',
             'message' => 'OTP sent successfully.',
-            'data'=>$data
-                ]);
+            'data' => $data,
+        ]);
 
     }
 
@@ -65,9 +65,9 @@ class AuthController extends Controller
         );
 
         return response()->json([
-            'success'=>'true',
-            'message'=>'OTP verified successfully',
-            'data'=>$data
+            'success' => 'true',
+            'message' => 'OTP verified successfully',
+            'data' => $data,
         ]);
 
     }
@@ -75,13 +75,13 @@ class AuthController extends Controller
     public function resetPassword(ResetPasswordRequest $request)
     {
         $this->forgotPasswordService->resetPassword(
-             $request->validated('reset_token'), 
-             $request->validated('password')  
-               );
+            $request->validated('reset_token'),
+            $request->validated('password')
+        );
 
         return response()->json([
-            'success'=>'true',
-            'message'=>'password reset successfully.'
+            'success' => 'true',
+            'message' => 'password reset successfully.',
         ]);
     }
 
@@ -92,16 +92,12 @@ class AuthController extends Controller
         );
 
         return response()->json([
-            'success'=>'true',
-            'message'=>'OTP resnd successfully',
-            'data'=>$data
+            'success' => 'true',
+            'message' => 'OTP resnd successfully',
+            'data' => $data,
         ]);
 
     }
-
-       
-
-    ) {}
 
     public function login(LoginRequest $request): JsonResponse
     {

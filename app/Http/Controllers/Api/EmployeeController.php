@@ -41,16 +41,18 @@ class EmployeeController extends Controller
             );
         }
     }
+
     public function show(int $id): JsonResponse
     {
         try {
             $employee = $this->employeeService->getEmployeeById($id);
             Gate::authorize('view', $employee);
+
             return ResponseHelper::success(
                 data: new EmployeeResource($employee->user),
                 message: 'Employee details retrieved successfully'
             );
-        }catch(AuthorizationException $e) {
+        } catch (AuthorizationException $e) {
             return ResponseHelper::error(
                 message: 'You are not authorized to view this employee profile.',
                 statusCode: Response::HTTP_FORBIDDEN
@@ -62,18 +64,21 @@ class EmployeeController extends Controller
             );
         } catch (Throwable $e) {
             report($e);
+
             return ResponseHelper::error(
                 message: 'Failed to retrieve employee details',
                 statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
     }
+
     public function updateHrFields(UpdateEmployeeHrFieldsRequest $request, int $id): JsonResponse
     {
         try {
             $employee = $this->employeeService->getEmployeeById($id);
             Gate::authorize('updateHrFields', $employee);
             $updatedEmployee = $this->employeeService->updateHrFields($employee, $request->validated());
+
             return ResponseHelper::success(
                 data: new EmployeeResource($updatedEmployee->user),
                 message: 'Employee HR fields updated successfully'
@@ -90,12 +95,14 @@ class EmployeeController extends Controller
             );
         } catch (Throwable $e) {
             report($e);
+
             return ResponseHelper::error(
                 message: 'Failed to update HR fields',
                 statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
     }
+
     public function updateProfile(UpdateProfileRequest $request): JsonResponse
     {
         try {
@@ -115,6 +122,7 @@ class EmployeeController extends Controller
             );
         } catch (Throwable $e) {
             report($e);
+
             return ResponseHelper::error(
                 message: 'Failed to update profile',
                 statusCode: Response::HTTP_INTERNAL_SERVER_ERROR

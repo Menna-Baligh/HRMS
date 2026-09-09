@@ -21,7 +21,7 @@ class EmployeeService
             ]);
 
             $user->assignRole($data['role']);
-            if (!empty($data['permissions'])) {
+            if (! empty($data['permissions'])) {
                 $user->givePermissionTo($data['permissions']);
             }
 
@@ -47,31 +47,36 @@ class EmployeeService
 
         return 'EMP-'.date('Y').'-'.str_pad($nextId, 5, '0', STR_PAD_LEFT);
     }
+
     public function getEmployeeById(int $id): Employee
     {
         return Employee::with(['user', 'department', 'manager.user'])->findOrFail($id);
     }
+
     public function updateHrFields(Employee $employee, array $data): Employee
     {
         $employee->update(array_filter($data, fn ($value) => $value !== null));
+
         return $employee->load(['user', 'department', 'manager.user']);
     }
+
     public function updateProfile(User $user, array $data): Employee
     {
         return DB::transaction(function () use ($user, $data) {
             $userData = array_intersect_key($data, array_flip(['name', 'avatar']));
-            if (!empty($userData)) {
+            if (! empty($userData)) {
                 $user->update($userData);
                 $user->refresh();
             }
             $employeeData = array_intersect_key($data, array_flip(['phone', 'address']));
             $employee = $user->employee;
-            if (!$employee) {
+            if (! $employee) {
                 throw new ModelNotFoundException('Employee profile not found for this user.');
             }
-            if (!empty($employeeData)) {
+            if (! empty($employeeData)) {
                 $employee->update($employeeData);
             }
+
             return $employee->load(['user', 'department', 'manager.user']);
         });
     }
