@@ -21,4 +21,6 @@ Route::prefix('auth')->group(function () {
 Route::middleware(['auth:api'])->group(function () {
     Route::post('/employees', [EmployeeController::class, 'store'])
         ->middleware('permission:create employee');
+        
+    Route::get('/employees/{id}', [EmployeeController::class, 'show']);
 });

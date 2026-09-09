@@ -43,4 +43,8 @@ class EmployeeService
 
         return 'EMP-'.date('Y').'-'.str_pad($nextId, 5, '0', STR_PAD_LEFT);
     }
+    public function getEmployeeById(int $id): Employee
+    {
+        return Employee::with(['user', 'department', 'manager.user'])->findOrFail($id);
+    }
 }
