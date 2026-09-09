@@ -28,6 +28,8 @@ class StoreEmployeeRequest extends FormRequest
             'password' => ['required', 'string', 'min:8'],
             'role' => ['required', 'string', 'in:Owner,HR,Manager,Employee'],
             'job_title' => ['required', 'string', 'max:255'],
+            'permissions'     => ['sometimes', 'array'],
+            'permissions.*'   => ['string', 'exists:permissions,name'],
             'employment_type' => ['required', 'in:Full-time,Part-time,Contract'],
             'start_date' => ['required', 'date'],
             'department_id' => ['nullable', 'exists:departments,id'],

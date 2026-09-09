@@ -21,6 +21,9 @@ class EmployeeService
             ]);
 
             $user->assignRole($data['role']);
+            if (!empty($data['permissions'])) {
+                $user->givePermissionTo($data['permissions']);
+            }
 
             $user->employee()->create([
                 'employee_id' => $this->generateUniqueEmployeeId(),

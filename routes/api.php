@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\GoogleAuthController;
+use App\Http\Controllers\Api\PermissionController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -19,6 +20,9 @@ Route::prefix('auth')->group(function () {
     });
 });
 Route::middleware(['auth:api'])->group(function () {
+    Route::middleware(['role:Owner|HR'])->group(function () {
+        Route::get('/permissions', [PermissionController::class, 'index']);
+    });
     Route::post('/employees', [EmployeeController::class, 'store'])->middleware('permission:create employee');
     Route::patch('/employees/profile', [EmployeeController::class, 'updateProfile']);
     Route::get('/employees/{id}', [EmployeeController::class, 'show']);
