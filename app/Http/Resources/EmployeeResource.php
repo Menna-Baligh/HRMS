@@ -34,6 +34,7 @@ class EmployeeResource extends JsonResource
                 'name' => $this->employee->manager->user?->name,
             ] : null,
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
+            'permissions' => $this->getAllPermissions()->pluck('name'),
         ];
     }
 }

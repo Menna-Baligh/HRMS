@@ -21,6 +21,7 @@ class UserResource extends JsonResource
             'phone' => $this->phone,
             'avatar' => $this->avatar,
             'role' => $this->role,
+            'permissions' => $this->getAllPermissions()->pluck('name'),
         ];
     }
 }
