@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\GoogleAuthController;
 use App\Http\Controllers\Api\PermissionController;
+use App\Http\Controllers\Api\ManagerController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -45,4 +46,6 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
     Route::post('/departments', [DepartmentController::class, 'store'])->middleware('permission:department.create');
     Route::patch('/departments/{id}', [DepartmentController::class, 'update'])->middleware('permission:department.edit');
     Route::patch('/departments/{id}/change-status', [DepartmentController::class, 'changeStatus'])->middleware('permission:department.change-status');
+
+    Route::get('/managers/employees', [ManagerController::class, 'employees'])->middleware('permission:manager.view-employees');
 });

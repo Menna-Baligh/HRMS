@@ -17,4 +17,6 @@ enum PermissionEnum: string
     case DEPARTMENT_CREATE = 'department.create';
     case DEPARTMENT_EDIT = 'department.edit';
     case DEPARTMENT_CHANGE_STATUS = 'department.change-status';
+
+    case MANAGER_VIEW_EMPLOYEES = 'manager.view-employees';
 }
