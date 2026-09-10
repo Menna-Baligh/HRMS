@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\GoogleAuthController;
 use App\Http\Controllers\Api\PermissionController;
@@ -39,4 +40,9 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
     Route::patch('/employees/{id}/hr-fields', [EmployeeController::class, 'updateHrFields'])->middleware('permission:edit hr fields');
     Route::patch('/employees/{id}/change-account-status', [EmployeeController::class, 'changeAccountStatus'])->middleware('permission:employee.change-account-status');
     Route::get('/employees', [EmployeeController::class, 'index'])->middleware('permission:employee.view-all');
+
+    Route::get('/departments', [DepartmentController::class, 'index'])->middleware('permission:department.view');
+    Route::post('/departments', [DepartmentController::class, 'store'])->middleware('permission:department.create');
+    Route::patch('/departments/{id}', [DepartmentController::class, 'update'])->middleware('permission:department.edit');
+    Route::patch('/departments/{id}/change-status', [DepartmentController::class, 'changeStatus'])->middleware('permission:department.change-status');
 });
