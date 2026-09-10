@@ -11,7 +11,7 @@ use App\Http\Requests\VerifyForgotPasswordOtpRequest;
 use App\Services\Auth\ForgotPasswordService;
 use App\Services\Auth\RegisterService;
 use App\Helpers\ResponseHelper;
-use App\Http\Controllers\Controller;
+// use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Resources\UserResource;
 use App\Services\Auth\LoginService;
@@ -101,7 +101,7 @@ class AuthController extends Controller
 
        
 
-    ) {}
+    
 
     public function login(LoginRequest $request): JsonResponse
     {
