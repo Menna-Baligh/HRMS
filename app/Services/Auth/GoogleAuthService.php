@@ -1,9 +1,9 @@
 <?php
+
 namespace App\Services\Auth;
 
 use App\Models\User;
 use Laravel\Socialite\Facades\Socialite;
-use Throwable;
 
 class GoogleAuthService
 {
@@ -15,25 +15,25 @@ class GoogleAuthService
             ->getTargetUrl();
     }
 
-
     public function handleGoogleCallback(): array
     {
         $googleUser = Socialite::driver('google')->stateless()->user();
 
         $user = User::where('email', $googleUser->getEmail())->first();
 
-        if (!$user) {
+        if (! $user) {
             $user = User::create([
-                'name'              => $googleUser->getName(),
-                'email'             => $googleUser->getEmail(),
-                'role'              => 'Owner',
-                'provider'          => 'google',
-                'provider_id'       => $googleUser->getId(),
+                'name' => $googleUser->getName(),
+                'email' => $googleUser->getEmail(),
+                'role' => 'Owner',
+                'provider' => 'google',
+                'provider_id' => $googleUser->getId(),
                 'email_verified_at' => now(),
             ]);
+            $user->assignRole('Owner');
         } else {
             $user->update([
-                'provider'    => 'google',
+                'provider' => 'google',
                 'provider_id' => $googleUser->getId(),
             ]);
         }
@@ -42,9 +42,9 @@ class GoogleAuthService
 
         return [
             'access_token' => $token,
-            'token_type'   => 'bearer',
-            'expires_in'   => (int) auth('api')->factory()->getTTL() / 60 . ' hours',
-            'user'         => $user,
+            'token_type' => 'bearer',
+            'expires_in' => (int) auth('api')->factory()->getTTL() / 60 .' hours',
+            'user' => $user,
         ];
     }
 }
