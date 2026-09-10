@@ -26,7 +26,7 @@ class StoreEmployeeRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8'],
-            'role' => ['required', 'string', 'in:Owner,HR,Manager,Employee'],
+            'role' => ['required', 'string', 'in:HR,Manager,Employee'],
             'job_title' => ['required', 'string', 'max:255'],
             'permissions' => ['sometimes', 'array'],
             'permissions.*' => ['string', 'exists:permissions,name'],
@@ -43,7 +43,7 @@ class StoreEmployeeRequest extends FormRequest
     {
         return [
             'email.unique' => 'The email address is already in use.',
-            'role.in' => 'The selected role is invalid. Allowed roles are: Owner, HR, Manager, Employee.',
+            'role.in' => 'The selected role is invalid. Allowed roles are: HR, Manager, Employee.',
             'employment_type.in' => 'The selected employment type is invalid. Allowed types are: Full-time, Part-time, Contract.',
         ];
     }

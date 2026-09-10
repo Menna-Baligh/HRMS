@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\ValidationException;
 
 class EmployeeService
 {
@@ -81,5 +82,18 @@ class EmployeeService
 
             return $employee->load(['user', 'department', 'manager.user']);
         });
+    }
+    public function changeAccountStatus(int $employeeId): User
+    {
+        $employee = Employee::with('user')->findOrFail($employeeId);
+        $user = $employee->user;
+        if ($user->id === auth('api')->id()) {
+            throw ValidationException::withMessages([
+                'employee' => 'You cannot change the status of your own account.',
+            ]);
+        }
+        $newStatus = $employee->status === 'active' ? 'inactive' : 'active';
+        $employee->update(['status' => $newStatus]);
+        return $user;
     }
 }

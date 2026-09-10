@@ -29,7 +29,7 @@ Route::prefix('auth')->group(function () {
         Route::get('/callback', [GoogleAuthController::class, 'callback']);
     });
 });
-Route::middleware(['auth:api'])->group(function () {
+Route::middleware(['auth:api', 'check.active'])->group(function () {
     Route::middleware(['role:Owner|HR'])->group(function () {
         Route::get('/permissions', [PermissionController::class, 'index']);
     });
@@ -37,4 +37,5 @@ Route::middleware(['auth:api'])->group(function () {
     Route::patch('/employees/profile', [EmployeeController::class, 'updateProfile']);
     Route::get('/employees/{id}', [EmployeeController::class, 'show']);
     Route::patch('/employees/{id}/hr-fields', [EmployeeController::class, 'updateHrFields'])->middleware('permission:edit hr fields');
+    Route::patch('/employees/{id}/change-account-status', [EmployeeController::class, 'changeAccountStatus'])->middleware('permission:employee.change-account-status');
 });

@@ -129,4 +129,17 @@ class EmployeeController extends Controller
             );
         }
     }
+    public function changeAccountStatus(int $id, EmployeeService $employeeService): JsonResponse
+    {
+        $user = $employeeService->changeAccountStatus($id);
+
+        $message = $user->employee->status === 'active'
+            ? 'Employee account has been activated successfully.'
+            : 'Employee account has been deactivated successfully.';
+
+        return ResponseHelper::success(
+            data: $user->load('employee'),
+            message: $message
+        );
+    }
 }
