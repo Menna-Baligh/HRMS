@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Mail\EmployeeInvitationMail;
+use App\Models\Department;
 use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -40,6 +41,10 @@ class EmployeeService
                 'address' => $data['address'] ?? null,
                 'status' => 'inactive',
             ]);
+            if (empty($data['manager_id']) && !empty($data['department_id']) && $data['role'] === 'Employee') {
+                $department = Department::find($data['department_id']);
+                $data['manager_id'] = $department?->manager_id;
+            }
             Mail::to($user->email)->send(new EmployeeInvitationMail($user));
             return $user->load('employee.department', 'employee.manager');
         });

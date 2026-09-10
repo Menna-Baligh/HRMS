@@ -44,4 +44,8 @@ class Employee extends Model
     {
         return $this->hasMany(Employee::class, 'manager_id');
     }
+    public function managedDepartments()
+    {
+        return $this->hasMany(Department::class, 'manager_id');
+    }
 }
