@@ -3,6 +3,7 @@
 namespace App\Services\Auth;
 
 use App\Models\User;
+use Illuminate\Validation\ValidationException;
 use Laravel\Socialite\Facades\Socialite;
 
 class GoogleAuthService
@@ -20,6 +21,12 @@ class GoogleAuthService
         $googleUser = Socialite::driver('google')->stateless()->user();
 
         $user = User::where('email', $googleUser->getEmail())->first();
+
+        if ($user && $user->employee && $user->employee->status === 'inactive') {
+            throw ValidationException::withMessages([
+                'email' => 'Your account is inactive. Please activate your account first.',
+            ]);
+        }
 
         if (! $user) {
             $user = User::create([

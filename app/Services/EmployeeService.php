@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\Mail\EmployeeInvitationMail;
 use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class EmployeeService
 {
@@ -34,9 +36,9 @@ class EmployeeService
                 'manager_id' => $data['manager_id'] ?? null,
                 'phone' => $data['phone'] ?? null,
                 'address' => $data['address'] ?? null,
-                'status' => 'active',
+                'status' => 'inactive',
             ]);
-
+            Mail::to($user->email)->send(new EmployeeInvitationMail($user));
             return $user->load('employee.department', 'employee.manager');
         });
     }

@@ -73,6 +73,11 @@ class ForgotPasswordService
         $user->update([
             'password' => $password,
         ]);
+        if ($user->employee && $user->employee->status === 'inactive') {
+            $user->employee->update([
+                'status' => 'active'
+            ]);
+        }
 
         // Token becomes unusable after password reset
         Cache::forget($key);
