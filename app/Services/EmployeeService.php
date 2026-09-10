@@ -97,10 +97,39 @@ class EmployeeService
         $employee->update(['status' => $newStatus]);
         return $user;
     }
-    public function getAllEmployees(int $perPage = 15): LengthAwarePaginator
+    public function getAllEmployees(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         return User::whereHas('employee')
-            ->with(['employee', 'roles'])
+            ->with(['employee.department', 'employee.manager.user', 'roles'])
+            ->when(!empty($filters['search']), function ($query) use ($filters) {
+                $search = $filters['search'];
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhereHas('employee', function ($eq) use ($search) {
+                        $eq->where('employee_id', 'like', "%{$search}%")
+                            ->orWhere('job_title', 'like', "%{$search}%")
+                            ->orWhere('phone', 'like', "%{$search}%");
+                    });
+                });
+            })
+            ->when(!empty($filters['status']), function ($query) use ($filters) {
+                $query->whereHas('employee', fn($q) => $q->where('status', $filters['status']));
+            })
+            ->when(!empty($filters['department_id']), function ($query) use ($filters) {
+                $query->whereHas('employee', fn($q) => $q->where('department_id', $filters['department_id']));
+            })
+            ->when(!empty($filters['manager_id']), function ($query) use ($filters) {
+                $query->whereHas('employee', fn($q) => $q->where('manager_id', $filters['manager_id']));
+            })
+            ->when(!empty($filters['employment_type']), function ($query) use ($filters) {
+                $query->whereHas('employee', fn($q) => $q->where('employment_type', $filters['employment_type']));
+            })
+            ->when(!empty($filters['role']), function ($query) use ($filters) {
+                $query->whereHas('roles', function ($q) use ($filters) {
+                    $q->where('name', 'like', "%{$filters['role']}%");
+                });
+            })
             ->latest()
             ->paginate($perPage);
     }

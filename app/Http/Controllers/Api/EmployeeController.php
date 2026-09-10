@@ -146,8 +146,16 @@ class EmployeeController extends Controller
     }
     public function index(Request $request): JsonResponse
     {
+        $filters = $request->only([
+            'search',
+            'status',
+            'department_id',
+            'manager_id',
+            'employment_type',
+            'role',
+        ]);
         $perPage = (int) $request->get('per_page', 15);
-        $employees = $this->employeeService->getAllEmployees($perPage);
+        $employees = $this->employeeService->getAllEmployees($filters, $perPage);
         $paginatedData = UserResource::collection($employees)->response()->getData(true);
         return ResponseHelper::success(
             data: $paginatedData,
