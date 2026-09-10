@@ -75,7 +75,7 @@ class ForgotPasswordService
         ]);
         if ($user->employee && $user->employee->status === 'inactive') {
             $user->employee->update([
-                'status' => 'active'
+                'status' => 'active',
             ]);
         }
 

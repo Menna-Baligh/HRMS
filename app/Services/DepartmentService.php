@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\Department;
@@ -10,14 +11,14 @@ class DepartmentService
     {
         return Department::with(['manager.user'])
             ->withCount('employees')
-            ->when(!empty($filters['search']), function ($query) use ($filters) {
+            ->when(! empty($filters['search']), function ($query) use ($filters) {
                 $search = $filters['search'];
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
+                        ->orWhere('description', 'like', "%{$search}%");
                 });
             })
-            ->when(!empty($filters['status']), function ($query) use ($filters) {
+            ->when(! empty($filters['status']), function ($query) use ($filters) {
                 $query->where('status', $filters['status']);
             })
             ->latest()
@@ -32,6 +33,7 @@ class DepartmentService
             'manager_id' => $data['manager_id'] ?? null,
             'status' => 'active',
         ]);
+
         return $department->load('manager.user');
     }
 
@@ -48,6 +50,7 @@ class DepartmentService
         $department = Department::findOrFail($id);
         $newStatus = $department->status === 'active' ? 'inactive' : 'active';
         $department->update(['status' => $newStatus]);
+
         return $department->load('manager.user');
     }
 }

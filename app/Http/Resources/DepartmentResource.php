@@ -25,7 +25,7 @@ class DepartmentResource extends JsonResource
                 'email' => $this->manager->user?->email,
                 'job_title' => $this->manager->job_title,
             ] : null,
-            'employees_count' => $this->whenCounted('employees', $this->employees_count, fn() => $this->employees()->count()),
+            'employees_count' => $this->whenCounted('employees', $this->employees_count, fn () => $this->employees()->count()),
             'created_at' => $this->created_at?->toDateTimeString(),
         ];
     }

@@ -131,6 +131,7 @@ class EmployeeController extends Controller
             );
         }
     }
+
     public function changeAccountStatus(int $id): JsonResponse
     {
         $user = $this->employeeService->changeAccountStatus($id);
@@ -144,6 +145,7 @@ class EmployeeController extends Controller
             message: $message
         );
     }
+
     public function index(Request $request): JsonResponse
     {
         $filters = $request->only([
@@ -157,6 +159,7 @@ class EmployeeController extends Controller
         $perPage = (int) $request->get('per_page', 15);
         $employees = $this->employeeService->getAllEmployees($filters, $perPage);
         $paginatedData = UserResource::collection($employees)->response()->getData(true);
+
         return ResponseHelper::success(
             data: $paginatedData,
             message: 'Employees retrieved successfully'

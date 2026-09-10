@@ -35,7 +35,7 @@ class DepartmentController extends Controller
 
         return ResponseHelper::success(
             data: new DepartmentResource($department),
-            message:'Department created successfully',
+            message: 'Department created successfully',
             statusCode: Response::HTTP_CREATED
         );
     }

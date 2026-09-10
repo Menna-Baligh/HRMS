@@ -20,6 +20,7 @@ class CheckActiveStatus
 
         if ($user && $user->employee && $user->employee->status === 'inactive') {
             auth('api')->logout();
+
             return ResponseHelper::error(
                 message: 'Your account is inactive. Please activate your account first or contact your administrator.',
                 statusCode: Response::HTTP_FORBIDDEN

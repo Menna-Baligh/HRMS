@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
 use App\Helpers\ResponseHelper;
@@ -28,6 +29,7 @@ class ManagerController extends Controller
         $perPage = (int) $request->get('per_page', 15);
         $employees = $this->employeeService->getAllEmployees($filters, $perPage);
         $paginatedData = UserResource::collection($employees)->response()->getData(true);
+
         return ResponseHelper::success(
             data: $paginatedData,
             message: 'Manager employees retrieved successfully.'
