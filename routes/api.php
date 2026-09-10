@@ -6,7 +6,10 @@ use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\GoogleAuthController;
 use App\Http\Controllers\Api\ManagerController;
 use App\Http\Controllers\Api\PermissionController;
+use App\Http\Controllers\CompanyLocations\CompanyLocationController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
 
 Route::prefix('auth')->group(function () {
     // Route::post('/login', [AuthController::class,'login'])
@@ -17,6 +20,24 @@ Route::prefix('auth')->group(function () {
     Route::post('/forgot-password/reset', [AuthController::class, 'resetPassword'])->middleware('throttle:5,1');
     Route::post('/forgot-password/resend-otp', [AuthController::class, 'resendOtp'])->middleware('throttle:5,1');
 });
+
+
+// Company Location 
+
+// Create company location
+Route::post('company/location',[CompanyLocationController::class, 'store']);
+
+// Update company location
+Route::put('company/location/{id}',[CompanyLocationController::class, 'update']);
+
+// Deactivate company location
+Route::patch('company/location/{id}/deactivate',[CompanyLocationController::class, 'deactivate']);
+
+// Activate company location
+Route::patch('company/location/{id}/activate',[CompanyLocationController::class, 'activate']);
+// Get active company location
+Route::get('company/location/active',[CompanyLocationController::class, 'activeLocation']);
+
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])
