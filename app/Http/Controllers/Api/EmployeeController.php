@@ -8,10 +8,12 @@ use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeHrFieldsRequest;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Resources\EmployeeResource;
+use App\Http\Resources\UserResource;
 use App\Services\EmployeeService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
@@ -129,17 +131,27 @@ class EmployeeController extends Controller
             );
         }
     }
-    public function changeAccountStatus(int $id, EmployeeService $employeeService): JsonResponse
+    public function changeAccountStatus(int $id): JsonResponse
     {
-        $user = $employeeService->changeAccountStatus($id);
+        $user = $this->employeeService->changeAccountStatus($id);
 
         $message = $user->employee->status === 'active'
             ? 'Employee account has been activated successfully.'
             : 'Employee account has been deactivated successfully.';
 
         return ResponseHelper::success(
-            data: $user->load('employee'),
+            data: new EmployeeResource($user),
             message: $message
+        );
+    }
+    public function index(Request $request): JsonResponse
+    {
+        $perPage = (int) $request->get('per_page', 15);
+        $employees = $this->employeeService->getAllEmployees($perPage);
+        $paginatedData = UserResource::collection($employees)->response()->getData(true);
+        return ResponseHelper::success(
+            data: $paginatedData,
+            message: 'Employees retrieved successfully'
         );
     }
 }

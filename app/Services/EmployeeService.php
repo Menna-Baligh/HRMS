@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Mail\EmployeeInvitationMail;
 use App\Models\Employee;
 use App\Models\User;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -95,5 +96,12 @@ class EmployeeService
         $newStatus = $employee->status === 'active' ? 'inactive' : 'active';
         $employee->update(['status' => $newStatus]);
         return $user;
+    }
+    public function getAllEmployees(int $perPage = 15): LengthAwarePaginator
+    {
+        return User::whereHas('employee')
+            ->with(['employee', 'roles'])
+            ->latest()
+            ->paginate($perPage);
     }
 }
