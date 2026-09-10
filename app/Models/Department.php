@@ -15,6 +15,7 @@ class Department extends Model
         'name',
         'description',
         'status',
+        'manager_id',
     ];
 
     public function employees(): HasMany

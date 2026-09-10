@@ -12,4 +12,9 @@ enum PermissionEnum: string
     case EMPLOYEE_CHANGE_ACCOUNT_STATUS = 'employee.change-account-status';
 
     case EMPLOYEE_VIEW_ALL = 'employee.view-all';
+
+    case DEPARTMENT_VIEW = 'department.view';
+    case DEPARTMENT_CREATE = 'department.create';
+    case DEPARTMENT_EDIT = 'department.edit';
+    case DEPARTMENT_CHANGE_STATUS = 'department.change-status';
 }
