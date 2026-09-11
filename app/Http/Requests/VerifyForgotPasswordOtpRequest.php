@@ -23,15 +23,15 @@ class VerifyForgotPasswordOtpRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email'=>[
+            'email' => [
                 'required',
-                'email'
+                'email',
             ],
-            'otp'=>[
+            'otp' => [
                 'required',
                 'string',
-                'size:6'
-            ]
+                'size:6',
+            ],
         ];
     }
 }

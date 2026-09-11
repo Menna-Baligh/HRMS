@@ -15,7 +15,7 @@ class EmployeeResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
+            'id' => $this->employee->id,
             'employee_id' => $this->employee?->employee_id,
             'name' => $this->name,
             'email' => $this->email,
@@ -34,6 +34,7 @@ class EmployeeResource extends JsonResource
                 'name' => $this->employee->manager->user?->name,
             ] : null,
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
+            'permissions' => $this->getAllPermissions()->pluck('name'),
         ];
     }
 }

@@ -8,10 +8,12 @@ use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeHrFieldsRequest;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Resources\EmployeeResource;
+use App\Http\Resources\UserResource;
 use App\Services\EmployeeService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
@@ -41,16 +43,18 @@ class EmployeeController extends Controller
             );
         }
     }
+
     public function show(int $id): JsonResponse
     {
         try {
             $employee = $this->employeeService->getEmployeeById($id);
             Gate::authorize('view', $employee);
+
             return ResponseHelper::success(
                 data: new EmployeeResource($employee->user),
                 message: 'Employee details retrieved successfully'
             );
-        }catch(AuthorizationException $e) {
+        } catch (AuthorizationException $e) {
             return ResponseHelper::error(
                 message: 'You are not authorized to view this employee profile.',
                 statusCode: Response::HTTP_FORBIDDEN
@@ -62,18 +66,21 @@ class EmployeeController extends Controller
             );
         } catch (Throwable $e) {
             report($e);
+
             return ResponseHelper::error(
                 message: 'Failed to retrieve employee details',
                 statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
     }
+
     public function updateHrFields(UpdateEmployeeHrFieldsRequest $request, int $id): JsonResponse
     {
         try {
             $employee = $this->employeeService->getEmployeeById($id);
             Gate::authorize('updateHrFields', $employee);
             $updatedEmployee = $this->employeeService->updateHrFields($employee, $request->validated());
+
             return ResponseHelper::success(
                 data: new EmployeeResource($updatedEmployee->user),
                 message: 'Employee HR fields updated successfully'
@@ -90,12 +97,14 @@ class EmployeeController extends Controller
             );
         } catch (Throwable $e) {
             report($e);
+
             return ResponseHelper::error(
                 message: 'Failed to update HR fields',
                 statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
     }
+
     public function updateProfile(UpdateProfileRequest $request): JsonResponse
     {
         try {
@@ -115,10 +124,45 @@ class EmployeeController extends Controller
             );
         } catch (Throwable $e) {
             report($e);
+
             return ResponseHelper::error(
                 message: 'Failed to update profile',
                 statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
+    }
+
+    public function changeAccountStatus(int $id): JsonResponse
+    {
+        $user = $this->employeeService->changeAccountStatus($id);
+
+        $message = $user->employee->status === 'active'
+            ? 'Employee account has been activated successfully.'
+            : 'Employee account has been deactivated successfully.';
+
+        return ResponseHelper::success(
+            data: new EmployeeResource($user),
+            message: $message
+        );
+    }
+
+    public function index(Request $request): JsonResponse
+    {
+        $filters = $request->only([
+            'search',
+            'status',
+            'department_id',
+            'manager_id',
+            'employment_type',
+            'role',
+        ]);
+        $perPage = (int) $request->get('per_page', 15);
+        $employees = $this->employeeService->getAllEmployees($filters, $perPage);
+        $paginatedData = UserResource::collection($employees)->response()->getData(true);
+
+        return ResponseHelper::success(
+            data: $paginatedData,
+            message: 'Employees retrieved successfully'
+        );
     }
 }

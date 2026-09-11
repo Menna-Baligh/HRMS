@@ -1,16 +1,19 @@
 <?php
 
 use App\Helpers\ResponseHelper;
+use App\Http\Middleware\CheckActiveStatus;
 use App\Http\Middleware\ForceJsonResponse;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 use Spatie\Permission\Middleware\RoleMiddleware;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -24,6 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => RoleMiddleware::class,
             'permission' => PermissionMiddleware::class,
+            'check.active' => CheckActiveStatus::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
@@ -41,6 +45,23 @@ return Application::configure(basePath: dirname(__DIR__))
                 return ResponseHelper::error(
                     message: 'You do not have the required role to perform this action.',
                     statusCode: Response::HTTP_FORBIDDEN
+                );
+            }
+        });
+        $exceptions->render(function (ValidationException $e, $request) {
+            if ($request->is('api/*') || $request->wantsJson()) {
+                return ResponseHelper::error(
+                    message: $e->validator->errors()->first(),
+                    errors: $e->errors(),
+                    statusCode: Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+            }
+        });
+        $exceptions->render(function (NotFoundHttpException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return ResponseHelper::error(
+                    message: 'The requested resource was not found.',
+                    statusCode: Response::HTTP_NOT_FOUND
                 );
             }
         });

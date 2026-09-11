@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Enums\PermissionEnum;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 
 class RolesAndPermissionsSeeder extends Seeder
@@ -16,8 +15,8 @@ class RolesAndPermissionsSeeder extends Seeder
 
         foreach (PermissionEnum::cases() as $permission) {
             Permission::firstOrCreate([
-                'name'       => $permission->value,
-                'guard_name' => 'api'
+                'name' => $permission->value,
+                'guard_name' => 'api',
             ]);
         }
     }

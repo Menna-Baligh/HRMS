@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class ForgetPasswordRequest extends FormRequest
+class StoreDepartmentRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,10 +23,9 @@ class ForgetPasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => [
-                'required',
-                'email',
-            ],
+            'name' => ['required', 'string', 'max:255', 'unique:departments,name'],
+            'description' => ['nullable', 'string', 'max:1000'],
+            'manager_id' => ['nullable', 'integer', 'exists:employees,id'],
         ];
     }
 }

@@ -10,7 +10,7 @@ class OtpService
 
     public function __construct()
     {
-        $this->otp = new Otp();
+        $this->otp = new Otp;
     }
 
     public function generate(string $email): string
@@ -22,7 +22,7 @@ class OtpService
             10
         );
 
-        if (!$response->status) {
+        if (! $response->status) {
             throw new \RuntimeException(
                 $response->message ?? 'Failed to generate OTP.'
             );
