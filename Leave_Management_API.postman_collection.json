@@ -1,0 +1,553 @@
+{
+	"info": {
+		"_postman_id": "8f2d5e67-93ab-4ef1-a889-leave-mgmt-v1",
+		"name": "Leave Management API (HRMS)",
+		"description": "Comprehensive Postman collection for HRMS Leave Management module including JWT Auth, Leave Types, Balances, Multi-stage Approvals, Decision History, Manager/HR Queues, and Calendar.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8000/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "leave_type_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "leave_request_id",
+			"value": "1",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Authentication",
+			"item": [
+				{
+					"name": "Login as Employee",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var jsonData = pm.response.json();",
+									"if (jsonData.access_token) {",
+									"    pm.collectionVariables.set(\"token\", jsonData.access_token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"employee@example.com\",\n    \"password\": \"password\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Login as Manager",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var jsonData = pm.response.json();",
+									"if (jsonData.access_token) {",
+									"    pm.collectionVariables.set(\"token\", jsonData.access_token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"manager@example.com\",\n    \"password\": \"password\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Login as HR",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var jsonData = pm.response.json();",
+									"if (jsonData.access_token) {",
+									"    pm.collectionVariables.set(\"token\", jsonData.access_token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"hr@example.com\",\n    \"password\": \"password\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Current User (Me)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/me",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "me"]
+						}
+					}
+				},
+				{
+					"name": "Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.access_token) {",
+									"    pm.collectionVariables.set(\"token\", jsonData.access_token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/refresh",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "refresh"]
+						}
+					}
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/logout",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "logout"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Leave Types",
+			"item": [
+				{
+					"name": "List Leave Types",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/leave-types",
+							"host": ["{{baseUrl}}"],
+							"path": ["leave-types"]
+						}
+					}
+				},
+				{
+					"name": "Create Leave Type (HR / Owner)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Created\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"var jsonData = pm.response.json();",
+									"if (jsonData.data && jsonData.data.id) {",
+									"    pm.collectionVariables.set(\"leave_type_id\", jsonData.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Paternity Leave\",\n    \"description\": \"Parental leave for fathers\",\n    \"is_active\": true,\n    \"requires_balance\": true,\n    \"requires_attachment\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/leave-types",
+							"host": ["{{baseUrl}}"],
+							"path": ["leave-types"]
+						}
+					}
+				},
+				{
+					"name": "Get Leave Type Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/leave-types/{{leave_type_id}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["leave-types", "{{leave_type_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Update Leave Type",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"Updated parental leave description\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/leave-types/{{leave_type_id}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["leave-types", "{{leave_type_id}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Leave Balances",
+			"item": [
+				{
+					"name": "Get My Leave Balances",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/leave-balances",
+							"host": ["{{baseUrl}}"],
+							"path": ["leave-balances"]
+						}
+					}
+				},
+				{
+					"name": "HR: Get Employee Balances by User ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/leave-balances?user_id=4&year=2026",
+							"host": ["{{baseUrl}}"],
+							"path": ["leave-balances"],
+							"query": [
+								{ "key": "user_id", "value": "4" },
+								{ "key": "year", "value": "2026" }
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Leave Requests (Employee)",
+			"item": [
+				{
+					"name": "Submit Leave Request (Annual Leave)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Created 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"var jsonData = pm.response.json();",
+									"if (jsonData.data && jsonData.data.id) {",
+									"    pm.collectionVariables.set(\"leave_request_id\", jsonData.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"leave_type_id\": 1,\n    \"start_date\": \"2026-10-01\",\n    \"end_date\": \"2026-10-03\",\n    \"reason\": \"Family summer vacation\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/leave-requests",
+							"host": ["{{baseUrl}}"],
+							"path": ["leave-requests"]
+						}
+					}
+				},
+				{
+					"name": "List My Leave Requests",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/leave-requests",
+							"host": ["{{baseUrl}}"],
+							"path": ["leave-requests"]
+						}
+					}
+				},
+				{
+					"name": "Get Single Leave Request",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/leave-requests/{{leave_request_id}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["leave-requests", "{{leave_request_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Cancel Leave Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/leave-requests/{{leave_request_id}}/cancel",
+							"host": ["{{baseUrl}}"],
+							"path": ["leave-requests", "{{leave_request_id}}", "cancel"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Approval Workflow",
+			"item": [
+				{
+					"name": "Manager: Approve Leave Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"note\": \"Approved by department manager. Team coverage verified.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/leave-requests/{{leave_request_id}}/approve-manager",
+							"host": ["{{baseUrl}}"],
+							"path": ["leave-requests", "{{leave_request_id}}", "approve-manager"]
+						}
+					}
+				},
+				{
+					"name": "HR: Final Approve Leave Request (Balance Deducted Here)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"note\": \"HR Final Approval granted. Balance successfully deducted.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/leave-requests/{{leave_request_id}}/approve-hr",
+							"host": ["{{baseUrl}}"],
+							"path": ["leave-requests", "{{leave_request_id}}", "approve-hr"]
+						}
+					}
+				},
+				{
+					"name": "Reject Leave Request (Manager or HR)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rejection_reason\": \"Critical project milestone delivery on these dates.\",\n    \"note\": \"Discuss alternate dates with team lead.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/leave-requests/{{leave_request_id}}/reject",
+							"host": ["{{baseUrl}}"],
+							"path": ["leave-requests", "{{leave_request_id}}", "reject"]
+						}
+					}
+				},
+				{
+					"name": "Get Decision Audit History",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/leave-requests/{{leave_request_id}}/history",
+							"host": ["{{baseUrl}}"],
+							"path": ["leave-requests", "{{leave_request_id}}", "history"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "6. Queues & Monitoring",
+			"item": [
+				{
+					"name": "Manager Queue (Team Members Only)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/manager/leave-requests",
+							"host": ["{{baseUrl}}"],
+							"path": ["manager", "leave-requests"]
+						}
+					}
+				},
+				{
+					"name": "HR Queue (All Leaves with Filters)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/hr/leave-requests?status=approved_by_manager&per_page=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["hr", "leave-requests"],
+							"query": [
+								{ "key": "status", "value": "approved_by_manager" },
+								{ "key": "per_page", "value": "20" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Leave Calendar (Approved Leaves)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/calendar/leaves?start_date=2026-10-01&end_date=2026-10-31",
+							"host": ["{{baseUrl}}"],
+							"path": ["calendar", "leaves"],
+							"query": [
+								{ "key": "start_date", "value": "2026-10-01" },
+								{ "key": "end_date", "value": "2026-10-31" }
+							]
+						}
+					}
+				}
+			]
+		}
+	]
+}
