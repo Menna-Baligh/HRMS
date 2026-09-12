@@ -2366,6 +2366,2232 @@ paths:
                     success: false
                     message: User does not have the right permissions.
                     errors: null
+  /attendance/today:
+    get:
+      summary: Retrieve today's attendance status and location check for the authenticated employee
+      operationId: getTodayAttendance
+      tags:
+        - Flutter
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: query
+          name: latitude
+          required: false
+          schema:
+            type: number
+            format: float
+            minimum: -90
+            maximum: 90
+          example: 30.0444
+        - in: query
+          name: longitude
+          required: false
+          schema:
+            type: number
+            format: float
+            minimum: -180
+            maximum: 180
+          example: 31.2357
+      responses:
+        '200':
+          description: Today attendance retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Today attendance retrieved successfully.
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: On shift
+                      check_in_time:
+                        type: string
+                        nullable: true
+                        example: "09:05 AM"
+                      check_out_time:
+                        type: string
+                        nullable: true
+                        example: null
+                      worked_seconds:
+                        type: integer
+                        example: 7200
+                      distance_meters:
+                        type: number
+                        format: float
+                        nullable: true
+                        example: 25.5
+                      is_inside_radius:
+                        type: boolean
+                        example: true
+                      can_check_in:
+                        type: boolean
+                        example: false
+                      can_check_out:
+                        type: boolean
+                        example: true
+              example:
+                success: true
+                message: Today attendance retrieved successfully.
+                data:
+                  status: On shift
+                  check_in_time: "09:05 AM"
+                  check_out_time: null
+                  worked_seconds: 7200
+                  distance_meters: 25.5
+                  is_inside_radius: true
+                  can_check_in: false
+                  can_check_out: true
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: Unauthenticated
+                errors: null
+        '404':
+          description: Employee profile not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Employee profile not found.
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: Employee profile not found.
+                errors: null
+        '422':
+          description: Validation error for latitude or longitude
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Validation error
+                  errors:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: string
+              example:
+                success: false
+                message: Validation error
+                errors:
+                  latitude:
+                    - The latitude must be between -90 and 90.
+
+  /attendance/check-in:
+    post:
+      summary: Perform check-in for the authenticated employee
+      operationId: checkIn
+      tags:
+        - Flutter
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - latitude
+                - longitude
+              properties:
+                latitude:
+                  type: number
+                  format: float
+                  minimum: -90
+                  maximum: 90
+                  example: 30.0444
+                longitude:
+                  type: number
+                  format: float
+                  minimum: -180
+                  maximum: 180
+                  example: 31.2357
+      responses:
+        '201':
+          description: Checked in successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Checked in successfully.
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 10
+                      employee_id:
+                        type: integer
+                        example: 1
+                      date:
+                        type: string
+                        format: date
+                        example: "2026-09-12"
+                      check_in:
+                        type: string
+                        nullable: true
+                        example: "09:05 AM"
+                      check_out:
+                        type: string
+                        nullable: true
+                        example: null
+                      status:
+                        type: string
+                        example: Present
+                      worked_seconds:
+                        type: integer
+                        nullable: true
+                        example: null
+                      is_exception:
+                        type: boolean
+                        example: false
+              example:
+                success: true
+                message: Checked in successfully.
+                data:
+                  id: 10
+                  employee_id: 1
+                  date: "2026-09-12"
+                  check_in: "09:05 AM"
+                  check_out: null
+                  status: Present
+                  worked_seconds: null
+                  is_exception: false
+        '400':
+          description: Bad request (Unhandled exception)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Bad request error message
+                  errors:
+                    nullable: true
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: Unauthenticated
+                errors: null
+        '404':
+          description: Employee profile not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Employee profile not found.
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: Employee profile not found.
+                errors: null
+        '422':
+          description: Process error (e.g. duplicate check-in, outside radius, location not configured) or validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                  errors:
+                    nullable: true
+              examples:
+                duplicateCheckin:
+                  summary: Duplicate Check-in
+                  value:
+                    success: false
+                    message: You have already checked in today.
+                    errors: null
+                outsideRadius:
+                  summary: Outside Radius
+                  value:
+                    success: false
+                    message: You are outside the allowed company location radius.
+                    errors: null
+                locationNotConfigured:
+                  summary: Location Not Configured
+                  value:
+                    success: false
+                    message: Company location is not assigned or active for your profile.
+                    errors: null
+
+  /attendance/check-out:
+    post:
+      summary: Perform check-out for the authenticated employee
+      operationId: checkOut
+      tags:
+        - Flutter
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - latitude
+                - longitude
+              properties:
+                latitude:
+                  type: number
+                  format: float
+                  minimum: -90
+                  maximum: 90
+                  example: 30.0444
+                longitude:
+                  type: number
+                  format: float
+                  minimum: -180
+                  maximum: 180
+                  example: 31.2357
+      responses:
+        '200':
+          description: Checked out successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Checked out successfully.
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 10
+                      employee_id:
+                        type: integer
+                        example: 1
+                      date:
+                        type: string
+                        format: date
+                        example: "2026-09-12"
+                      check_in:
+                        type: string
+                        nullable: true
+                        example: "09:05 AM"
+                      check_out:
+                        type: string
+                        nullable: true
+                        example: "05:00 PM"
+                      status:
+                        type: string
+                        example: Present
+                      worked_seconds:
+                        type: integer
+                        example: 28400
+                      is_exception:
+                        type: boolean
+                        example: false
+              example:
+                success: true
+                message: Checked out successfully.
+                data:
+                  id: 10
+                  employee_id: 1
+                  date: "2026-09-12"
+                  check_in: "09:05 AM"
+                  check_out: "05:00 PM"
+                  status: Present
+                  worked_seconds: 28400
+                  is_exception: false
+        '400':
+          description: Bad request (Unhandled exception)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Bad request error message
+                  errors:
+                    nullable: true
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: Unauthenticated
+                errors: null
+        '404':
+          description: Employee profile not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Employee profile not found.
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: Employee profile not found.
+                errors: null
+        '422':
+          description: Process error (e.g. no open check-in, already checked out, outside radius) or validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                  errors:
+                    nullable: true
+              examples:
+                noOpenCheckin:
+                  summary: No Open Check-in
+                  value:
+                    success: false
+                    message: No active check-in record found for today.
+                    errors: null
+                alreadyCheckedOut:
+                  summary: Already Checked Out
+                  value:
+                    success: false
+                    message: You have already checked out today.
+                    errors: null
+                outsideRadius:
+                  summary: Outside Radius
+                  value:
+                    success: false
+                    message: You are outside the allowed company location radius.
+                    errors: null
+
+  /attendance/history:
+    get:
+      summary: Retrieve paginated attendance history for the authenticated employee
+      operationId: getAttendanceHistory
+      tags:
+        - Flutter
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: query
+          name: month
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+          example: 9
+        - in: query
+          name: year
+          required: false
+          schema:
+            type: integer
+            minimum: 2020
+          example: 2026
+        - in: query
+          name: per_page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 15
+          example: 15
+      responses:
+        '200':
+          description: Attendance history retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Attendance history retrieved successfully.
+                  data:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 10
+                            date:
+                              type: string
+                              format: date
+                              example: "2026-09-12"
+                            day_name:
+                              type: string
+                              example: Saturday
+                            check_in:
+                              type: string
+                              nullable: true
+                              example: "09:05 AM"
+                            check_out:
+                              type: string
+                              nullable: true
+                              example: "05:00 PM"
+                            status:
+                              type: string
+                              example: Present
+                            worked_seconds:
+                              type: integer
+                              example: 28400
+                            worked_hours_formatted:
+                              type: string
+                              example: "7h 53m"
+                            is_exception:
+                              type: boolean
+                              example: false
+                      first_page_url:
+                        type: string
+                      from:
+                        type: integer
+                        nullable: true
+                      last_page:
+                        type: integer
+                      last_page_url:
+                        type: string
+                      links:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            url:
+                              type: string
+                              nullable: true
+                            label:
+                              type: string
+                            active:
+                              type: boolean
+                      next_page_url:
+                        type: string
+                        nullable: true
+                      path:
+                        type: string
+                      per_page:
+                        type: integer
+                        example: 15
+                      prev_page_url:
+                        type: string
+                        nullable: true
+                      to:
+                        type: integer
+                        nullable: true
+                      total:
+                        type: integer
+                        example: 1
+              example:
+                success: true
+                message: Attendance history retrieved successfully.
+                data:
+                  current_page: 1
+                  data:
+                    - id: 10
+                      date: "2026-09-12"
+                      day_name: Saturday
+                      check_in: "09:05 AM"
+                      check_out: "05:00 PM"
+                      status: Present
+                      worked_seconds: 28400
+                      worked_hours_formatted: "7h 53m"
+                      is_exception: false
+                  first_page_url: "http://localhost:8000/api/attendance/history?page=1"
+                  from: 1
+                  last_page: 1
+                  last_page_url: "http://localhost:8000/api/attendance/history?page=1"
+                  links:
+                    - url: null
+                      label: "&laquo; Previous"
+                      active: false
+                    - url: "http://localhost:8000/api/attendance/history?page=1"
+                      label: "1"
+                      active: true
+                    - url: null
+                      label: "Next &raquo;"
+                      active: false
+                  next_page_url: null
+                  path: "http://localhost:8000/api/attendance/history"
+                  per_page: 15
+                  prev_page_url: null
+                  to: 1
+                  total: 1
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: Unauthenticated
+                errors: null
+        '404':
+          description: Employee profile not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Employee profile not found.
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: Employee profile not found.
+                errors: null
+  /manager/attendance/today:
+    get:
+      summary: Retrieve today's team attendance summary, weekly chart, and team members attendance list
+      operationId: getManagerTeamAttendanceToday
+      tags:
+        - Managers
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: query
+          name: date
+          required: false
+          description: Target date in Y-m-d format
+          schema:
+            type: string
+            format: date
+          example: "2026-09-12"
+        - in: query
+          name: status
+          required: false
+          description: Filter team members by attendance status
+          schema:
+            type: string
+            enum: [Present, Late, Absent, On Shift]
+          example: Present
+        - in: query
+          name: search
+          required: false
+          description: Search employee by user name
+          schema:
+            type: string
+            maxLength: 100
+          example: John
+        - in: query
+          name: per_page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 15
+          example: 15
+      responses:
+        '200':
+          description: Manager team attendance retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Manager team attendance retrieved successfully.
+                  data:
+                    type: object
+                    properties:
+                      selected_date:
+                        type: string
+                        format: date
+                        example: "2026-09-12"
+                      summary:
+                        type: object
+                        properties:
+                          present:
+                            type: integer
+                            example: 5
+                          late:
+                            type: integer
+                            example: 1
+                          absent:
+                            type: integer
+                            example: 2
+                          avg_hours:
+                            type: string
+                            example: "7.5h"
+                          on_shift:
+                            type: integer
+                            example: 4
+                          total_team:
+                            type: integer
+                            example: 8
+                      weekly_chart:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            day:
+                              type: string
+                              example: Mon
+                            date:
+                              type: string
+                              format: date
+                              example: "2026-09-07"
+                            present:
+                              type: integer
+                              example: 5
+                            late:
+                              type: integer
+                              example: 1
+                            absent:
+                              type: integer
+                              example: 2
+                      team:
+                        type: object
+                        properties:
+                          current_page:
+                            type: integer
+                            example: 1
+                          data:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                employee_id:
+                                  type: integer
+                                  example: 1
+                                name:
+                                  type: string
+                                  example: John Doe
+                                job_title:
+                                  type: string
+                                  example: Software Engineer
+                                avatar:
+                                  type: string
+                                  nullable: true
+                                  example: null
+                                attendance_id:
+                                  type: integer
+                                  nullable: true
+                                  example: 10
+                                check_in:
+                                  type: string
+                                  example: "09:00"
+                                check_out:
+                                  type: string
+                                  example: "17:00"
+                                status:
+                                  type: string
+                                  example: Present
+                                worked_hours_formatted:
+                                  type: string
+                                  example: "8.0h"
+                                worked_seconds:
+                                  type: integer
+                                  example: 28800
+                                is_exception:
+                                  type: boolean
+                                  example: false
+                          first_page_url:
+                            type: string
+                          from:
+                            type: integer
+                            nullable: true
+                          last_page:
+                            type: integer
+                          last_page_url:
+                            type: string
+                          links:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                url:
+                                  type: string
+                                  nullable: true
+                                label:
+                                  type: string
+                                active:
+                                  type: boolean
+                          next_page_url:
+                            type: string
+                            nullable: true
+                          path:
+                            type: string
+                          per_page:
+                            type: integer
+                            example: 15
+                          prev_page_url:
+                            type: string
+                            nullable: true
+                          to:
+                            type: integer
+                            nullable: true
+                          total:
+                            type: integer
+                            example: 1
+              example:
+                success: true
+                message: Manager team attendance retrieved successfully.
+                data:
+                  selected_date: "2026-09-12"
+                  summary:
+                    present: 5
+                    late: 1
+                    absent: 2
+                    avg_hours: "7.5h"
+                    on_shift: 4
+                    total_team: 8
+                  weekly_chart:
+                    - day: Mon
+                      date: "2026-09-07"
+                      present: 5
+                      late: 1
+                      absent: 2
+                    - day: Tue
+                      date: "2026-09-08"
+                      present: 6
+                      late: 0
+                      absent: 2
+                  team:
+                    current_page: 1
+                    data:
+                      - employee_id: 1
+                        name: John Doe
+                        job_title: Software Engineer
+                        avatar: null
+                        attendance_id: 10
+                        check_in: "09:00"
+                        check_out: "17:00"
+                        status: Present
+                        worked_hours_formatted: "8.0h"
+                        worked_seconds: 28800
+                        is_exception: false
+                    first_page_url: "http://localhost:8000/api/manager/attendance/today?page=1"
+                    from: 1
+                    last_page: 1
+                    last_page_url: "http://localhost:8000/api/manager/attendance/today?page=1"
+                    links:
+                      - url: null
+                        label: "&laquo; Previous"
+                        active: false
+                      - url: "http://localhost:8000/api/manager/attendance/today?page=1"
+                        label: "1"
+                        active: true
+                      - url: null
+                        label: "Next &raquo;"
+                        active: false
+                    next_page_url: null
+                    path: "http://localhost:8000/api/manager/attendance/today"
+                    per_page: 15
+                    prev_page_url: null
+                    to: 1
+                    total: 1
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: Unauthenticated
+                errors: null
+        '403':
+          description: Forbidden - User does not have Manager, Owner, or HR role
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: User does not have the right roles.
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: User does not have the right roles.
+                errors: null
+        '404':
+          description: Manager profile not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Manager profile not found.
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: Manager profile not found.
+                errors: null
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Validation error
+                  errors:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: string
+              example:
+                success: false
+                message: Validation error
+                errors:
+                  date:
+                    - The date does not match the format Y-m-d.
+
+  /manager/attendance/{employeeId}:
+    get:
+      summary: Retrieve attendance details for a specific employee managed by the authenticated manager
+      operationId: getManagerEmployeeAttendanceDetail
+      tags:
+        - Managers
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: path
+          name: employeeId
+          required: true
+          schema:
+            type: integer
+          description: ID of the employee
+          example: 1
+        - in: query
+          name: date
+          required: false
+          description: Target date in Y-m-d format
+          schema:
+            type: string
+            format: date
+          example: "2026-09-12"
+      responses:
+        '200':
+          description: Employee attendance details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Employee attendance details retrieved successfully.
+                  data:
+                    type: object
+                    properties:
+                      employee:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          name:
+                            type: string
+                            example: John Doe
+                          job_title:
+                            type: string
+                            example: Software Engineer
+                          email:
+                            type: string
+                            format: email
+                            example: john@example.com
+                          location_name:
+                            type: string
+                            nullable: true
+                            example: Headquarters
+                      attendance:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            nullable: true
+                            example: 10
+                          date:
+                            type: string
+                            format: date
+                            example: "2026-09-12"
+                          check_in:
+                            type: string
+                            nullable: true
+                            example: "09:05 AM"
+                          check_in_location:
+                            type: object
+                            nullable: true
+                            properties:
+                              latitude:
+                                type: number
+                                format: float
+                                example: 30.0444
+                              longitude:
+                                type: number
+                                format: float
+                                example: 31.2357
+                          check_out:
+                            type: string
+                            nullable: true
+                            example: "05:00 PM"
+                          check_out_location:
+                            type: object
+                            nullable: true
+                            properties:
+                              latitude:
+                                type: number
+                                format: float
+                                example: 30.0444
+                              longitude:
+                                type: number
+                                format: float
+                                example: 31.2357
+                          status:
+                            type: string
+                            example: Present
+                          worked_seconds:
+                            type: integer
+                            example: 28500
+                          worked_hours_formatted:
+                            type: string
+                            example: "7.9h"
+                          is_exception:
+                            type: boolean
+                            example: false
+                          exception_reason:
+                            type: string
+                            nullable: true
+                            example: null
+              example:
+                success: true
+                message: Employee attendance details retrieved successfully.
+                data:
+                  employee:
+                    id: 1
+                    name: John Doe
+                    job_title: Software Engineer
+                    email: john@example.com
+                    location_name: Headquarters
+                  attendance:
+                    id: 10
+                    date: "2026-09-12"
+                    check_in: "09:05 AM"
+                    check_in_location:
+                      latitude: 30.0444
+                      longitude: 31.2357
+                    check_out: "05:00 PM"
+                    check_out_location:
+                      latitude: 30.0444
+                      longitude: 31.2357
+                    status: Present
+                    worked_seconds: 28500
+                    worked_hours_formatted: "7.9h"
+                    is_exception: false
+                    exception_reason: null
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: Unauthenticated
+                errors: null
+        '403':
+          description: Forbidden - Not assigned to team or invalid role
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Employee not found or not assigned to your team.
+                  errors:
+                    nullable: true
+              examples:
+                notAssignedToTeam:
+                  summary: Employee Not Assigned to Team
+                  value:
+                    success: false
+                    message: Employee not found or not assigned to your team.
+                    errors: null
+                invalidRole:
+                  summary: Invalid Role
+                  value:
+                    success: false
+                    message: User does not have the right roles.
+                    errors: null
+        '404':
+          description: Manager profile not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Manager profile not found.
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: Manager profile not found.
+                errors: null
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Validation error
+                  errors:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: string
+              example:
+                success: false
+                message: Validation error
+                errors:
+                  date:
+                    - The date does not match the format Y-m-d.
+  /hr/attendance/daily:
+    get:
+      summary: Retrieve daily company attendance overview and employee list
+      operationId: getHrDailyAttendance
+      tags:
+        - Attendance
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: query
+          name: date
+          required: false
+          description: Target date in Y-m-d format
+          schema:
+            type: string
+            format: date
+          example: "2026-09-12"
+        - in: query
+          name: department_id
+          required: false
+          schema:
+            type: integer
+          example: 1
+        - in: query
+          name: manager_id
+          required: false
+          schema:
+            type: integer
+          example: 2
+        - in: query
+          name: status
+          required: false
+          schema:
+            type: string
+            enum: [Present, Late, Absent, On Shift]
+          example: Present
+        - in: query
+          name: search
+          required: false
+          description: Search employee by name
+          schema:
+            type: string
+            maxLength: 100
+          example: John
+        - in: query
+          name: per_page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 15
+          example: 15
+      responses:
+        '200':
+          description: Company daily attendance retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Company daily attendance retrieved successfully.
+                  data:
+                    type: object
+                    properties:
+                      date:
+                        type: string
+                        format: date
+                        example: "2026-09-12"
+                      summary:
+                        type: object
+                        properties:
+                          total_employees:
+                            type: integer
+                            example: 50
+                          present:
+                            type: integer
+                            example: 40
+                          late:
+                            type: integer
+                            example: 5
+                          absent:
+                            type: integer
+                            example: 5
+                      employees:
+                        type: object
+                        properties:
+                          current_page:
+                            type: integer
+                            example: 1
+                          data:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                employee_id:
+                                  type: integer
+                                  example: 1
+                                name:
+                                  type: string
+                                  example: John Doe
+                                employee_code:
+                                  type: string
+                                  example: "EMP-2026-00001"
+                                job_title:
+                                  type: string
+                                  example: Software Engineer
+                                department:
+                                  type: string
+                                  example: Engineering
+                                manager_name:
+                                  type: string
+                                  example: Sarah Manager
+                                attendance_id:
+                                  type: integer
+                                  nullable: true
+                                  example: 105
+                                check_in:
+                                  type: string
+                                  example: "09:00 AM"
+                                check_out:
+                                  type: string
+                                  example: "05:00 PM"
+                                status:
+                                  type: string
+                                  example: Present
+                                worked_hours:
+                                  type: string
+                                  example: "8.0h"
+                                is_exception:
+                                  type: boolean
+                                  example: false
+                          first_page_url:
+                            type: string
+                          from:
+                            type: integer
+                            nullable: true
+                          last_page:
+                            type: integer
+                          last_page_url:
+                            type: string
+                          links:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                url:
+                                  type: string
+                                  nullable: true
+                                label:
+                                  type: string
+                                active:
+                                  type: boolean
+                          next_page_url:
+                            type: string
+                            nullable: true
+                          path:
+                            type: string
+                          per_page:
+                            type: integer
+                            example: 15
+                          prev_page_url:
+                            type: string
+                            nullable: true
+                          to:
+                            type: integer
+                            nullable: true
+                          total:
+                            type: integer
+                            example: 50
+              example:
+                success: true
+                message: Company daily attendance retrieved successfully.
+                data:
+                  date: "2026-09-12"
+                  summary:
+                    total_employees: 50
+                    present: 40
+                    late: 5
+                    absent: 5
+                  employees:
+                    current_page: 1
+                    data:
+                      - employee_id: 1
+                        name: John Doe
+                        employee_code: "EMP-2026-00001"
+                        job_title: Software Engineer
+                        department: Engineering
+                        manager_name: Sarah Manager
+                        attendance_id: 105
+                        check_in: "09:00 AM"
+                        check_out: "05:00 PM"
+                        status: Present
+                        worked_hours: "8.0h"
+                        is_exception: false
+                    first_page_url: "http://localhost:8000/api/hr/attendance/daily?page=1"
+                    from: 1
+                    last_page: 4
+                    last_page_url: "http://localhost:8000/api/hr/attendance/daily?page=4"
+                    links:
+                      - url: null
+                        label: "&laquo; Previous"
+                        active: false
+                      - url: "http://localhost:8000/api/hr/attendance/daily?page=1"
+                        label: "1"
+                        active: true
+                    next_page_url: "http://localhost:8000/api/hr/attendance/daily?page=2"
+                    path: "http://localhost:8000/api/hr/attendance/daily"
+                    per_page: 15
+                    prev_page_url: null
+                    to: 15
+                    total: 50
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: Unauthenticated
+                errors: null
+        '403':
+          description: Forbidden - User does not have HR or Owner role
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: User does not have the right roles.
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: User does not have the right roles.
+                errors: null
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Validation error
+                  errors:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: string
+              example:
+                success: false
+                message: Validation error
+                errors:
+                  department_id:
+                    - The selected department id is invalid.
+
+  /hr/attendance/exceptions:
+    get:
+      summary: Retrieve attendance exception records
+      operationId: getHrAttendanceExceptions
+      tags:
+        - Attendance
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: query
+          name: date
+          required: false
+          description: Target date in Y-m-d format
+          schema:
+            type: string
+            format: date
+          example: "2026-09-12"
+        - in: query
+          name: department_id
+          required: false
+          schema:
+            type: integer
+          example: 1
+        - in: query
+          name: per_page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 15
+          example: 15
+      responses:
+        '200':
+          description: Attendance exceptions retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Attendance exceptions retrieved successfully.
+                  data:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            attendance_id:
+                              type: integer
+                              example: 102
+                            date:
+                              type: string
+                              format: date
+                              example: "2026-09-12"
+                            employee:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 5
+                                name:
+                                  type: string
+                                  example: Alex Johnson
+                                employee_code:
+                                  type: string
+                                  example: "EMP-2026-00005"
+                                job_title:
+                                  type: string
+                                  example: Senior Accountant
+                                department:
+                                  type: string
+                                  example: Finance
+                            check_in:
+                              type: string
+                              nullable: true
+                              example: "05:30 PM"
+                            check_out:
+                              type: string
+                              nullable: true
+                              example: null
+                            status:
+                              type: string
+                              example: Late
+                            exception_reason:
+                              type: string
+                              example: Check-in recorded after official shift hours.
+                            location_name:
+                              type: string
+                              nullable: true
+                              example: Main Branch
+                      first_page_url:
+                        type: string
+                      from:
+                        type: integer
+                        nullable: true
+                      last_page:
+                        type: integer
+                      last_page_url:
+                        type: string
+                      links:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            url:
+                              type: string
+                              nullable: true
+                            label:
+                              type: string
+                            active:
+                              type: boolean
+                      next_page_url:
+                        type: string
+                        nullable: true
+                      path:
+                        type: string
+                      per_page:
+                        type: integer
+                        example: 15
+                      prev_page_url:
+                        type: string
+                        nullable: true
+                      to:
+                        type: integer
+                        nullable: true
+                      total:
+                        type: integer
+                        example: 1
+              example:
+                success: true
+                message: Attendance exceptions retrieved successfully.
+                data:
+                  current_page: 1
+                  data:
+                    - attendance_id: 102
+                      date: "2026-09-12"
+                      employee:
+                        id: 5
+                        name: Alex Johnson
+                        employee_code: "EMP-2026-00005"
+                        job_title: Senior Accountant
+                        department: Finance
+                      check_in: "05:30 PM"
+                      check_out: null
+                      status: Late
+                      exception_reason: Check-in recorded after official shift hours.
+                      location_name: Main Branch
+                  first_page_url: "http://localhost:8000/api/hr/attendance/exceptions?page=1"
+                  from: 1
+                  last_page: 1
+                  last_page_url: "http://localhost:8000/api/hr/attendance/exceptions?page=1"
+                  links:
+                    - url: null
+                      label: "&laquo; Previous"
+                      active: false
+                    - url: "http://localhost:8000/api/hr/attendance/exceptions?page=1"
+                      label: "1"
+                      active: true
+                  next_page_url: null
+                  path: "http://localhost:8000/api/hr/attendance/exceptions"
+                  per_page: 15
+                  prev_page_url: null
+                  to: 1
+                  total: 1
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: Unauthenticated
+                errors: null
+        '403':
+          description: Forbidden - User does not have HR or Owner role
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: User does not have the right roles.
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: User does not have the right roles.
+                errors: null
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Validation error
+                  errors:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: string
+              example:
+                success: false
+                message: Validation error
+                errors:
+                  date:
+                    - The date does not match the format Y-m-d.
+
+  /hr/attendance/monthly-summary:
+    get:
+      summary: Retrieve monthly attendance summary for all active employees
+      operationId: getHrMonthlySummary
+      tags:
+        - Attendance
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: query
+          name: month
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+          example: 9
+        - in: query
+          name: year
+          required: true
+          schema:
+            type: integer
+            minimum: 2020
+          example: 2026
+        - in: query
+          name: department_id
+          required: false
+          schema:
+            type: integer
+          example: 1
+        - in: query
+          name: search
+          required: false
+          description: Search employee by name
+          schema:
+            type: string
+            maxLength: 100
+          example: John
+        - in: query
+          name: per_page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 15
+          example: 15
+      responses:
+        '200':
+          description: Monthly attendance summary retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Monthly attendance summary retrieved successfully.
+                  data:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            employee_id:
+                              type: integer
+                              example: 1
+                            employee_code:
+                              type: string
+                              example: "EMP-2026-00001"
+                            name:
+                              type: string
+                              example: John Doe
+                            job_title:
+                              type: string
+                              example: Software Engineer
+                            department:
+                              type: string
+                              example: Engineering
+                            summary:
+                              type: object
+                              properties:
+                                present_days:
+                                  type: integer
+                                  example: 20
+                                late_days:
+                                  type: integer
+                                  example: 2
+                                late_minutes_total:
+                                  type: integer
+                                  example: 45
+                                absent_days:
+                                  type: integer
+                                  example: 1
+                                total_worked_hours:
+                                  type: string
+                                  example: "160.0h"
+                                total_worked_seconds:
+                                  type: integer
+                                  example: 576000
+                      first_page_url:
+                        type: string
+                      from:
+                        type: integer
+                        nullable: true
+                      last_page:
+                        type: integer
+                      last_page_url:
+                        type: string
+                      links:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            url:
+                              type: string
+                              nullable: true
+                            label:
+                              type: string
+                            active:
+                              type: boolean
+                      next_page_url:
+                        type: string
+                        nullable: true
+                      path:
+                        type: string
+                      per_page:
+                        type: integer
+                        example: 15
+                      prev_page_url:
+                        type: string
+                        nullable: true
+                      to:
+                        type: integer
+                        nullable: true
+                      total:
+                        type: integer
+                        example: 1
+              example:
+                success: true
+                message: Monthly attendance summary retrieved successfully.
+                data:
+                  current_page: 1
+                  data:
+                    - employee_id: 1
+                      employee_code: "EMP-2026-00001"
+                      name: John Doe
+                      job_title: Software Engineer
+                      department: Engineering
+                      summary:
+                        present_days: 20
+                        late_days: 2
+                        late_minutes_total: 45
+                        absent_days: 1
+                        total_worked_hours: "160.0h"
+                        total_worked_seconds: 576000
+                  first_page_url: "http://localhost:8000/api/hr/attendance/monthly-summary?page=1"
+                  from: 1
+                  last_page: 1
+                  last_page_url: "http://localhost:8000/api/hr/attendance/monthly-summary?page=1"
+                  links:
+                    - url: null
+                      label: "&laquo; Previous"
+                      active: false
+                    - url: "http://localhost:8000/api/hr/attendance/monthly-summary?page=1"
+                      label: "1"
+                      active: true
+                  next_page_url: null
+                  path: "http://localhost:8000/api/hr/attendance/monthly-summary"
+                  per_page: 15
+                  prev_page_url: null
+                  to: 1
+                  total: 1
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: Unauthenticated
+                errors: null
+        '403':
+          description: Forbidden - User does not have HR or Owner role
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: User does not have the right roles.
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: User does not have the right roles.
+                errors: null
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Validation error
+                  errors:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: string
+              examples:
+                missingMonth:
+                  summary: Missing Month Parameter
+                  value:
+                    success: false
+                    message: Validation error
+                    errors:
+                      month:
+                        - The month field is required.
+                invalidYear:
+                  summary: Invalid Year Parameter
+                  value:
+                    success: false
+                    message: Validation error
+                    errors:
+                      year:
+                        - The year must be at least 2020.
+
+  /hr/attendance/export:
+    get:
+      summary: Export monthly attendance summary to Excel sheet
+      operationId: exportHrMonthlySummary
+      tags:
+        - Attendance
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: query
+          name: month
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+          example: 9
+        - in: query
+          name: year
+          required: true
+          schema:
+            type: integer
+            minimum: 2020
+          example: 2026
+        - in: query
+          name: department_id
+          required: false
+          schema:
+            type: integer
+          example: 1
+        - in: query
+          name: search
+          required: false
+          schema:
+            type: string
+            maxLength: 100
+        - in: query
+          name: per_page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: Monthly attendance summary Excel spreadsheet file binary stream.
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+              example: attachment; filename="attendance_summary_09_2026.xlsx"
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: Unauthenticated
+                errors: null
+        '403':
+          description: Forbidden - User does not have HR or Owner role
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: User does not have the right roles.
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: User does not have the right roles.
+                errors: null
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Validation error
+                  errors:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: string
+              example:
+                success: false
+                message: Validation error
+                errors:
+                  month:
+                    - The month field is required.
 
 components:
   securitySchemes:
