@@ -23,7 +23,6 @@ class AttendanceResource extends JsonResource
             'status' => $this->status,
             'worked_seconds' => $this->worked_seconds,
             'is_exception' => $this->is_exception,
-            'exception_reason' => when($this->is_exception, fn () => $this->exception_reason),
         ];
     }
 }

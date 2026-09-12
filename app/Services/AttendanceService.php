@@ -94,7 +94,7 @@ class AttendanceService
         }
 
         $now = now();
-        $workedSeconds = $now->diffInSeconds($attendance->check_in);
+        $workedSeconds = (int) abs($now->diffInSeconds($attendance->check_in));
 
         $attendance->update([
             'check_out' => $now,

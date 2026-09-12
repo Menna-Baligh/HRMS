@@ -74,5 +74,6 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
     Route::prefix('attendance')->group(function () {
         Route::get('/today', [AttendanceController::class, 'today']);
         Route::post('/check-in', [AttendanceController::class, 'checkIn']);
+        Route::post('/check-out', [AttendanceController::class, 'checkOut']);
     });
 });
