@@ -403,4 +403,49 @@ class AttendanceService
 
         return $employees;
     }
+    public function getHrMonthlySummaryAll(int $month, int $year, ?int $departmentId = null)
+    {
+        $startDate = Carbon::createFromDate($year, $month, 1)->startOfMonth();
+        $endDate = $startDate->copy()->endOfMonth();
+        $daysInMonth = $endDate->isFuture() ? now()->day : $startDate->daysInMonth;
+        $shiftStart = Carbon::parse('09:00:00');
+
+        $query = Employee::with(['user', 'department'])->where('status', 'active');
+
+        if ($departmentId) {
+            $query->where('department_id', $departmentId);
+        }
+
+        $employees = $query->get();
+
+        return $employees->map(function ($employee) use ($startDate, $endDate, $daysInMonth, $shiftStart) {
+            $attendances = Attendance::where('employee_id', $employee->id)
+                ->whereBetween('date', [$startDate->toDateString(), $endDate->toDateString()])
+                ->get();
+
+            $presentDays = $attendances->whereNotNull('check_in')->count();
+            $lateDays = $attendances->where('status', 'Late')->count();
+            $absentDays = max(0, $daysInMonth - $presentDays);
+            $totalWorkedSeconds = $attendances->sum('worked_seconds');
+
+            $totalLateMinutes = 0;
+            foreach ($attendances->where('status', 'Late') as $att) {
+                if ($att->check_in) {
+                    $checkInTime = Carbon::parse($att->check_in->format('H:i:s'));
+                    if ($checkInTime->gt($shiftStart)) {
+                        $totalLateMinutes += (int) abs($shiftStart->diffInMinutes($checkInTime));
+                    }
+                }
+            }
+
+            return [
+                'employee' => $employee,
+                'present_days' => $presentDays,
+                'late_days' => $lateDays,
+                'late_minutes_total' => $totalLateMinutes,
+                'absent_days' => $absentDays,
+                'total_worked_seconds' => $totalWorkedSeconds,
+            ];
+        });
+    }
 }

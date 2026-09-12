@@ -87,5 +87,6 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
         Route::get('/daily', [HrAttendanceController::class, 'daily']);
         Route::get('/exceptions', [HrAttendanceController::class, 'exceptions']);
         Route::get('/monthly-summary', [HrAttendanceController::class, 'monthlySummary']);
+        Route::get('/export', [HrAttendanceController::class, 'export']);
     });
 });
