@@ -153,4 +153,99 @@ class AttendanceService
             ->orderBy('date', 'desc')
             ->paginate($perPage);
     }
+    public function getManagerTeamTodayData(Employee $manager, ?string $date = null, ?string $statusFilter = null, ?string $search = null, int $perPage = 15): array
+    {
+        $targetDate = $date ? Carbon::parse($date) : now();
+        $formattedDate = $targetDate->toDateString();
+
+        $subordinateIds = Employee::where('manager_id', $manager->id)
+            ->where('status', 'active')
+            ->pluck('id');
+
+        $totalTeamCount = $subordinateIds->count();
+
+        $todayAttendances = Attendance::whereIn('employee_id', $subordinateIds)
+            ->where('date', $formattedDate)
+            ->get();
+
+        $presentCount = $todayAttendances->where('status', 'Present')->count();
+        $lateCount = $todayAttendances->where('status', 'Late')->count();
+        $checkedInCount = $todayAttendances->whereNotNull('check_in')->count();
+        $absentCount = max(0, $totalTeamCount - $checkedInCount);
+        $onShiftCount = $todayAttendances->whereNotNull('check_in')->whereNull('check_out')->count();
+
+        $totalSecondsWorked = $todayAttendances->sum('worked_seconds');
+        $completedShiftsCount = $todayAttendances->whereNotNull('worked_seconds')->where('worked_seconds', '>', 0)->count();
+        $avgHours = $completedShiftsCount > 0 ? number_format(($totalSecondsWorked / $completedShiftsCount) / 3600, 1) . 'h' : '0.0h';
+
+        $startOfWeek = $targetDate->copy()->startOfWeek(Carbon::MONDAY);
+        $endOfWeek = $targetDate->copy()->endOfWeek(Carbon::SUNDAY);
+
+        $weeklyAttendances = Attendance::whereIn('employee_id', $subordinateIds)
+            ->whereBetween('date', [$startOfWeek->toDateString(), $endOfWeek->toDateString()])
+            ->get();
+
+        $weeklyChart = [];
+        for ($day = $startOfWeek->copy(); $day->lte($endOfWeek); $day->addDay()) {
+            $dayDate = $day->toDateString();
+            $dayAtts = $weeklyAttendances->where('date', $dayDate);
+
+            $dayPresent = $dayAtts->where('status', 'Present')->count();
+            $dayLate = $dayAtts->where('status', 'Late')->count();
+            $dayCheckedIn = $dayAtts->whereNotNull('check_in')->count();
+            $dayAbsent = max(0, $totalTeamCount - $dayCheckedIn);
+
+            $weeklyChart[] = [
+                'day' => $day->format('D'),
+                'date' => $dayDate,
+                'present' => $dayPresent,
+                'late' => $dayLate,
+                'absent' => $dayAbsent,
+            ];
+        }
+
+        $query = Employee::with(['user', 'todayAttendance' => function ($q) use ($formattedDate) {
+            $q->where('date', $formattedDate);
+        }])
+            ->where('manager_id', $manager->id)
+            ->where('status', 'active');
+
+        if ($search) {
+            $query->whereHas('user', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%");
+            });
+        }
+
+        if ($statusFilter) {
+            if ($statusFilter === 'Absent') {
+                $query->whereDoesntHave('todayAttendance', function ($q) use ($formattedDate) {
+                    $q->where('date', $formattedDate);
+                });
+            } elseif ($statusFilter === 'On Shift') {
+                $query->whereHas('todayAttendance', function ($q) use ($formattedDate) {
+                    $q->where('date', $formattedDate)->whereNotNull('check_in')->whereNull('check_out');
+                });
+            } else {
+                $query->whereHas('todayAttendance', function ($q) use ($formattedDate, $statusFilter) {
+                    $q->where('date', $formattedDate)->where('status', $statusFilter);
+                });
+            }
+        }
+
+        $paginatedTeam = $query->paginate($perPage);
+
+        return [
+            'selected_date' => $formattedDate,
+            'summary' => [
+                'present' => $presentCount,
+                'late' => $lateCount,
+                'absent' => $absentCount,
+                'avg_hours' => $avgHours,
+                'on_shift' => $onShiftCount,
+                'total_team' => $totalTeamCount,
+            ],
+            'weekly_chart' => $weeklyChart,
+            'team' => $paginatedTeam,
+        ];
+    }
 }

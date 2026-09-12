@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\GoogleAuthController;
+use App\Http\Controllers\Api\ManagerAttendanceController;
 use App\Http\Controllers\Api\ManagerController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\CompanyLocations\CompanyLocationController;
@@ -76,5 +77,8 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
         Route::post('/check-in', [AttendanceController::class, 'checkIn']);
         Route::post('/check-out', [AttendanceController::class, 'checkOut']);
         Route::get('/history', [AttendanceController::class, 'history']);
+    });
+    Route::middleware(['role:Manager|Owner|HR'])->prefix('manager/attendance')->group(function () {
+        Route::get('/today', [ManagerAttendanceController::class, 'today']);
     });
 });
