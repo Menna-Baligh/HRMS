@@ -61,4 +61,8 @@ class Employee extends Model
     {
         return $this->hasOne(Attendance::class)->whereDate('date', now()->today());
     }
+    public function companyLocation(): BelongsTo
+    {
+        return $this->belongsTo(CompanyLocation::class);
+    }
 }

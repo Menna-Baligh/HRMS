@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
@@ -22,7 +23,7 @@ Route::prefix('auth')->group(function () {
 });
 
 
-// Company Location 
+// Company Location
 
 // Create company location
 Route::post('company/location',[CompanyLocationController::class, 'store']);
@@ -69,4 +70,8 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
     Route::patch('/departments/{id}/change-status', [DepartmentController::class, 'changeStatus'])->middleware('permission:department.change-status');
 
     Route::get('/managers/employees', [ManagerController::class, 'employees'])->middleware('permission:manager.view-employees');
+
+    Route::prefix('attendance')->group(function () {
+        Route::get('/today', [AttendanceController::class, 'today']);
+    });
 });
