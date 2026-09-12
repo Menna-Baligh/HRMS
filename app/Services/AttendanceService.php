@@ -36,9 +36,23 @@ class AttendanceService
             throw new Exception('OUTSIDE_RADIUS');
         }
 
+        $shiftStart = Carbon::parse('09:00:00');
+        $gracePeriodEnd = Carbon::parse('09:15:00');
+        $shiftEnd = Carbon::parse('17:00:00');
+
         $now = now();
-        $shiftStartTime = Carbon::parse('09:00:00');
-        $status = $now->gt($shiftStartTime) ? 'Late' : 'Present';
+        $isException = false;
+        $exceptionReason = null;
+
+        if ($now->lte($gracePeriodEnd)) {
+            $status = 'Present';
+        } elseif ($now->between($gracePeriodEnd, $shiftEnd)) {
+            $status = 'Late';
+        } else {
+            $status = 'Late';
+            $isException = true;
+            $exceptionReason = 'Check-in recorded after official shift hours.';
+        }
 
         return Attendance::create([
             'employee_id' => $employee->id,
@@ -48,6 +62,8 @@ class AttendanceService
             'check_in_lat' => $lat,
             'check_in_lng' => $lng,
             'status' => $status,
+            'is_exception' => $isException,
+            'exception_reason' => $exceptionReason,
         ]);
     }
 
@@ -90,7 +106,7 @@ class AttendanceService
         return $attendance;
     }
 
-    
+
     public function getTodayData(Employee $employee, ?float $currentLat = null, ?float $currentLng = null): array
     {
         $attendance = Attendance::where('employee_id', $employee->id)
