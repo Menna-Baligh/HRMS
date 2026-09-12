@@ -248,4 +248,27 @@ class AttendanceService
             'team' => $paginatedTeam,
         ];
     }
+    public function getManagerEmployeeAttendanceDetail(Employee $manager, int $employeeId, ?string $date = null): ?array
+    {
+        $formattedDate = $date ?? now()->toDateString();
+
+        $employee = Employee::with(['user', 'companyLocation'])
+            ->where('id', $employeeId)
+            ->where('manager_id', $manager->id)
+            ->first();
+
+        if (! $employee) {
+            return null;
+        }
+
+        $attendance = Attendance::where('employee_id', $employee->id)
+            ->where('date', $formattedDate)
+            ->first();
+
+        return [
+            'employee' => $employee,
+            'attendance' => $attendance,
+            'date' => $formattedDate,
+        ];
+    }
 }

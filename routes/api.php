@@ -80,5 +80,6 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
     });
     Route::middleware(['role:Manager|Owner|HR'])->prefix('manager/attendance')->group(function () {
         Route::get('/today', [ManagerAttendanceController::class, 'today']);
+        Route::get('/{employeeId}', [ManagerAttendanceController::class, 'show']);
     });
 });
