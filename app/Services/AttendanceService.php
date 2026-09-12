@@ -5,6 +5,7 @@ use App\Models\Attendance;
 use App\Models\Employee;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class AttendanceService
 {
@@ -140,5 +141,16 @@ class AttendanceService
             'distance_meters' => $distance,
             'is_inside_radius' => $isInside,
         ];
+    }
+    public function getHistory(Employee $employee, ?int $month = null, ?int $year = null, int $perPage = 15): LengthAwarePaginator
+    {
+        $month = $month ?? now()->month;
+        $year = $year ?? now()->year;
+
+        return Attendance::where('employee_id', $employee->id)
+            ->whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->orderBy('date', 'desc')
+            ->paginate($perPage);
     }
 }

@@ -6,7 +6,9 @@ use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CheckInRequest;
 use App\Http\Requests\CheckOutRequest;
+use App\Http\Requests\GetAttendanceHistoryRequest;
 use App\Http\Requests\GetTodayAttendanceRequest;
+use App\Http\Resources\AttendanceHistoryResource;
 use App\Http\Resources\AttendanceResource;
 use App\Http\Resources\TodayAttendanceResource;
 use App\Services\AttendanceService;
@@ -113,5 +115,28 @@ class AttendanceController extends Controller
                 statusCode: $statusCode
             );
         }
+    }
+    public function history(GetAttendanceHistoryRequest $request): JsonResponse
+    {
+        $employee = auth('api')->user()?->employee;
+
+        if (! $employee) {
+            return ResponseHelper::error(
+                message: 'Employee profile not found.',
+                statusCode: Response::HTTP_NOT_FOUND
+            );
+        }
+
+        $paginatedHistory = $this->attendanceService->getHistory(
+            $employee,
+            $request->filled('month') ? (int) $request->month : null,
+            $request->filled('year') ? (int) $request->year : null,
+            $request->filled('per_page') ? (int) $request->per_page : 15
+        );
+
+        return ResponseHelper::success(
+            data: AttendanceHistoryResource::collection($paginatedHistory)->response()->getData(true),
+            message: 'Attendance history retrieved successfully.'
+        );
     }
 }
