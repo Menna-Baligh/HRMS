@@ -384,7 +384,7 @@ class AttendanceService
                 if ($att->check_in) {
                     $checkInTime = Carbon::parse($att->check_in->format('H:i:s'));
                     if ($checkInTime->gt($shiftStart)) {
-                        $totalLateMinutes += $checkInTime->diffInMinutes($shiftStart);
+                        $totalLateMinutes += (int) abs($shiftStart->diffInMinutes($checkInTime));
                     }
                 }
             }
