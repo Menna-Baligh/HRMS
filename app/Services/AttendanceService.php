@@ -271,4 +271,136 @@ class AttendanceService
             'date' => $formattedDate,
         ];
     }
+    public function getHrDailyAttendance(?string $date = null, ?int $departmentId = null, ?int $managerId = null, ?string $statusFilter = null, ?string $search = null, int $perPage = 15): array
+    {
+        $formattedDate = $date ?? now()->toDateString();
+
+        $query = Employee::with(['user', 'department', 'manager.user', 'todayAttendance' => function ($q) use ($formattedDate) {
+            $q->where('date', $formattedDate);
+        }])->where('status', 'active');
+
+        if ($departmentId) {
+            $query->where('department_id', $departmentId);
+        }
+
+        if ($managerId) {
+            $query->where('manager_id', $managerId);
+        }
+
+        if ($search) {
+            $query->whereHas('user', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%");
+            });
+        }
+
+        if ($statusFilter) {
+            if ($statusFilter === 'Absent') {
+                $query->whereDoesntHave('todayAttendance', function ($q) use ($formattedDate) {
+                    $q->where('date', $formattedDate);
+                });
+            } elseif ($statusFilter === 'On Shift') {
+                $query->whereHas('todayAttendance', function ($q) use ($formattedDate) {
+                    $q->where('date', $formattedDate)->whereNotNull('check_in')->whereNull('check_out');
+                });
+            } else {
+                $query->whereHas('todayAttendance', function ($q) use ($formattedDate, $statusFilter) {
+                    $q->where('date', $formattedDate)->where('status', $statusFilter);
+                });
+            }
+        }
+
+        $employees = $query->paginate($perPage);
+
+        $allActiveCount = Employee::where('status', 'active')->count();
+        $todayAtts = Attendance::where('date', $formattedDate)->get();
+
+        return [
+            'date' => $formattedDate,
+            'summary' => [
+                'total_employees' => $allActiveCount,
+                'present' => $todayAtts->where('status', 'Present')->count(),
+                'late' => $todayAtts->where('status', 'Late')->count(),
+                'absent' => max(0, $allActiveCount - $todayAtts->whereNotNull('check_in')->count()),
+            ],
+            'data' => $employees,
+        ];
+    }
+
+
+    public function getHrAttendanceExceptions(?string $date = null, ?int $departmentId = null, int $perPage = 15)
+    {
+        $query = Attendance::with(['employee.user', 'employee.department', 'companyLocation'])
+            ->where('is_exception', true);
+
+        if ($date) {
+            $query->where('date', $date);
+        }
+
+        if ($departmentId) {
+            $query->whereHas('employee', function ($q) use ($departmentId) {
+                $q->where('department_id', $departmentId);
+            });
+        }
+
+        return $query->orderBy('date', 'desc')->paginate($perPage);
+    }
+
+
+    public function getHrMonthlySummary(int $month, int $year, ?int $departmentId = null, ?string $search = null, int $perPage = 15)
+    {
+        $startDate = Carbon::createFromDate($year, $month, 1)->startOfMonth();
+        $endDate = $startDate->copy()->endOfMonth();
+
+        $daysInMonth = $endDate->isFuture() ? now()->day : $startDate->daysInMonth;
+
+        $query = Employee::with(['user', 'department'])->where('status', 'active');
+
+        if ($departmentId) {
+            $query->where('department_id', $departmentId);
+        }
+
+        if ($search) {
+            $query->whereHas('user', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%");
+            });
+        }
+
+        $employees = $query->paginate($perPage);
+
+        $shiftStart = Carbon::parse('09:00:00');
+
+        $transformed = $employees->getCollection()->map(function ($employee) use ($startDate, $endDate, $daysInMonth, $shiftStart) {
+            $attendances = Attendance::where('employee_id', $employee->id)
+                ->whereBetween('date', [$startDate->toDateString(), $endDate->toDateString()])
+                ->get();
+
+            $presentDays = $attendances->whereNotNull('check_in')->count();
+            $lateDays = $attendances->where('status', 'Late')->count();
+            $absentDays = max(0, $daysInMonth - $presentDays);
+            $totalWorkedSeconds = $attendances->sum('worked_seconds');
+
+            $totalLateMinutes = 0;
+            foreach ($attendances->where('status', 'Late') as $att) {
+                if ($att->check_in) {
+                    $checkInTime = Carbon::parse($att->check_in->format('H:i:s'));
+                    if ($checkInTime->gt($shiftStart)) {
+                        $totalLateMinutes += $checkInTime->diffInMinutes($shiftStart);
+                    }
+                }
+            }
+
+            return [
+                'employee' => $employee,
+                'present_days' => $presentDays,
+                'late_days' => $lateDays,
+                'late_minutes_total' => $totalLateMinutes,
+                'absent_days' => $absentDays,
+                'total_worked_seconds' => $totalWorkedSeconds,
+            ];
+        });
+
+        $employees->setCollection($transformed);
+
+        return $employees;
+    }
 }

@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\GoogleAuthController;
+use App\Http\Controllers\Api\HrAttendanceController;
 use App\Http\Controllers\Api\ManagerAttendanceController;
 use App\Http\Controllers\Api\ManagerController;
 use App\Http\Controllers\Api\PermissionController;
@@ -81,5 +82,10 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
     Route::middleware(['role:Manager|Owner|HR'])->prefix('manager/attendance')->group(function () {
         Route::get('/today', [ManagerAttendanceController::class, 'today']);
         Route::get('/{employeeId}', [ManagerAttendanceController::class, 'show']);
+    });
+    Route::middleware(['role:HR|Owner'])->prefix('hr/attendance')->group(function () {
+        Route::get('/daily', [HrAttendanceController::class, 'daily']);
+        Route::get('/exceptions', [HrAttendanceController::class, 'exceptions']);
+        Route::get('/monthly-summary', [HrAttendanceController::class, 'monthlySummary']);
     });
 });
