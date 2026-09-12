@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exports\HrMonthlySummaryExport;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GetHrDailyAttendanceRequest;
@@ -12,14 +13,12 @@ use App\Http\Resources\HrDailyAttendanceResource;
 use App\Http\Resources\HrMonthlySummaryResource;
 use App\Services\AttendanceService;
 use Illuminate\Http\JsonResponse;
-use App\Exports\HrMonthlySummaryExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class HrAttendanceController extends Controller
 {
     public function __construct(private AttendanceService $attendanceService) {}
-
 
     public function daily(GetHrDailyAttendanceRequest $request): JsonResponse
     {
@@ -42,7 +41,6 @@ class HrAttendanceController extends Controller
         );
     }
 
-
     public function exceptions(GetHrExceptionsAttendanceRequest $request): JsonResponse
     {
         $exceptions = $this->attendanceService->getHrAttendanceExceptions(
@@ -56,7 +54,6 @@ class HrAttendanceController extends Controller
             message: 'Attendance exceptions retrieved successfully.'
         );
     }
-
 
     public function monthlySummary(GetHrMonthlySummaryRequest $request): JsonResponse
     {
@@ -73,6 +70,7 @@ class HrAttendanceController extends Controller
             message: 'Monthly attendance summary retrieved successfully.'
         );
     }
+
     public function export(GetHrMonthlySummaryRequest $request): BinaryFileResponse
     {
         $fileName = sprintf('attendance_summary_%02d_%d.xlsx', $request->month, $request->year);

@@ -14,7 +14,7 @@ class ManagerEmployeeAttendanceDetailResource extends JsonResource
 
         $hoursFormatted = '—';
         if ($attendance?->worked_seconds) {
-            $hoursFormatted = number_format($attendance->worked_seconds / 3600, 1) . 'h';
+            $hoursFormatted = number_format($attendance->worked_seconds / 3600, 1).'h';
         }
 
         return [

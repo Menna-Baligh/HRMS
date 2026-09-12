@@ -14,7 +14,7 @@ class HrMonthlySummaryResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $totalWorkedHours = number_format(($this->resource['total_worked_seconds'] ?? 0) / 3600, 1) . 'h';
+        $totalWorkedHours = number_format(($this->resource['total_worked_seconds'] ?? 0) / 3600, 1).'h';
 
         return [
             'employee_id' => $this->resource['employee']->id,

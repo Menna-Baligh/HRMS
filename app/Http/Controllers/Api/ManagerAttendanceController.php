@@ -45,6 +45,7 @@ class ManagerAttendanceController extends Controller
             message: 'Manager team attendance retrieved successfully.'
         );
     }
+
     public function show(GetManagerEmployeeAttendanceDetailRequest $request, int $employeeId): JsonResponse
     {
         $manager = auth('api')->user()?->employee;

@@ -41,6 +41,7 @@ class AttendanceController extends Controller
             message: 'Today attendance retrieved successfully.'
         );
     }
+
     public function checkIn(CheckInRequest $request): JsonResponse
     {
         $employee = auth('api')->user()?->employee;
@@ -79,6 +80,7 @@ class AttendanceController extends Controller
             );
         }
     }
+
     public function checkOut(CheckOutRequest $request): JsonResponse
     {
         $employee = auth('api')->user()?->employee;
@@ -116,6 +118,7 @@ class AttendanceController extends Controller
             );
         }
     }
+
     public function history(GetAttendanceHistoryRequest $request): JsonResponse
     {
         $employee = auth('api')->user()?->employee;

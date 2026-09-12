@@ -2,14 +2,14 @@
 
 namespace App\Exports;
 
-use Illuminate\Support\Collection;
 use App\Services\AttendanceService;
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 
-class HrMonthlySummaryExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize
+class HrMonthlySummaryExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping
 {
     public function __construct(
         private AttendanceService $attendanceService,
@@ -26,6 +26,7 @@ class HrMonthlySummaryExport implements FromCollection, WithHeadings, WithMappin
             $this->departmentId
         );
     }
+
     public function headings(): array
     {
         return [
@@ -43,7 +44,7 @@ class HrMonthlySummaryExport implements FromCollection, WithHeadings, WithMappin
 
     public function map($row): array
     {
-        $totalWorkedHours = number_format(($row['total_worked_seconds'] ?? 0) / 3600, 1) . 'h';
+        $totalWorkedHours = number_format(($row['total_worked_seconds'] ?? 0) / 3600, 1).'h';
 
         return [
             $row['employee']->employee_id,

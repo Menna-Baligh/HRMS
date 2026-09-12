@@ -13,9 +13,8 @@ class CompanyLocation extends Model
         'longitude',
         'radius',
         'created_by',
-        'is_active'
+        'is_active',
     ];
-
 
     protected $casts = [
         'latitude' => 'decimal:8',
@@ -28,5 +27,4 @@ class CompanyLocation extends Model
     {
         return $this->hasMany(Attendance::class);
     }
-
 }

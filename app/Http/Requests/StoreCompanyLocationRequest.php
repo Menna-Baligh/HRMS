@@ -28,7 +28,7 @@ class StoreCompanyLocationRequest extends FormRequest
             'longitude' => ['required', 'numeric', 'between:-180,180'],
             'radius' => ['required', 'integer', 'min:1'],
             'is_active' => ['sometimes', 'boolean'],
-           
+
         ];
     }
 }

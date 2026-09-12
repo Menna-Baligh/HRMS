@@ -26,6 +26,7 @@ class GetTodayAttendanceRequest extends FormRequest
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
         ];
     }
+
     public function messages(): array
     {
         return [

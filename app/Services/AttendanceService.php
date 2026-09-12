@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\Attendance;
@@ -10,7 +11,6 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 class AttendanceService
 {
     public function __construct(private GeofenceService $geofenceService) {}
-
 
     public function checkIn(Employee $employee, float $lat, float $lng): Attendance
     {
@@ -68,7 +68,6 @@ class AttendanceService
         ]);
     }
 
-
     public function checkOut(Employee $employee, float $lat, float $lng): Attendance
     {
         $today = now()->toDateString();
@@ -107,7 +106,6 @@ class AttendanceService
         return $attendance;
     }
 
-
     public function getTodayData(Employee $employee, ?float $currentLat = null, ?float $currentLng = null): array
     {
         $attendance = Attendance::where('employee_id', $employee->id)
@@ -142,6 +140,7 @@ class AttendanceService
             'is_inside_radius' => $isInside,
         ];
     }
+
     public function getHistory(Employee $employee, ?int $month = null, ?int $year = null, int $perPage = 15): LengthAwarePaginator
     {
         $month = $month ?? now()->month;
@@ -153,6 +152,7 @@ class AttendanceService
             ->orderBy('date', 'desc')
             ->paginate($perPage);
     }
+
     public function getManagerTeamTodayData(Employee $manager, ?string $date = null, ?string $statusFilter = null, ?string $search = null, int $perPage = 15): array
     {
         $targetDate = $date ? Carbon::parse($date) : now();
@@ -176,7 +176,7 @@ class AttendanceService
 
         $totalSecondsWorked = $todayAttendances->sum('worked_seconds');
         $completedShiftsCount = $todayAttendances->whereNotNull('worked_seconds')->where('worked_seconds', '>', 0)->count();
-        $avgHours = $completedShiftsCount > 0 ? number_format(($totalSecondsWorked / $completedShiftsCount) / 3600, 1) . 'h' : '0.0h';
+        $avgHours = $completedShiftsCount > 0 ? number_format(($totalSecondsWorked / $completedShiftsCount) / 3600, 1).'h' : '0.0h';
 
         $startOfWeek = $targetDate->copy()->startOfWeek(Carbon::MONDAY);
         $endOfWeek = $targetDate->copy()->endOfWeek(Carbon::SUNDAY);
@@ -248,6 +248,7 @@ class AttendanceService
             'team' => $paginatedTeam,
         ];
     }
+
     public function getManagerEmployeeAttendanceDetail(Employee $manager, int $employeeId, ?string $date = null): ?array
     {
         $formattedDate = $date ?? now()->toDateString();
@@ -271,6 +272,7 @@ class AttendanceService
             'date' => $formattedDate,
         ];
     }
+
     public function getHrDailyAttendance(?string $date = null, ?int $departmentId = null, ?int $managerId = null, ?string $statusFilter = null, ?string $search = null, int $perPage = 15): array
     {
         $formattedDate = $date ?? now()->toDateString();
@@ -326,7 +328,6 @@ class AttendanceService
         ];
     }
 
-
     public function getHrAttendanceExceptions(?string $date = null, ?int $departmentId = null, int $perPage = 15)
     {
         $query = Attendance::with(['employee.user', 'employee.department', 'companyLocation'])
@@ -344,7 +345,6 @@ class AttendanceService
 
         return $query->orderBy('date', 'desc')->paginate($perPage);
     }
-
 
     public function getHrMonthlySummary(int $month, int $year, ?int $departmentId = null, ?string $search = null, int $perPage = 15)
     {
@@ -403,6 +403,7 @@ class AttendanceService
 
         return $employees;
     }
+
     public function getHrMonthlySummaryAll(int $month, int $year, ?int $departmentId = null)
     {
         $startDate = Carbon::createFromDate($year, $month, 1)->startOfMonth();

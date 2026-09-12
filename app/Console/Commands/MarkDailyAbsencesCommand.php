@@ -8,9 +8,7 @@ use Illuminate\Console\Command;
 
 class MarkDailyAbsencesCommand extends Command
 {
-
     protected $signature = 'attendance:mark-absent {date?}';
-
 
     protected $description = 'Automatically mark active employees without check-in as Absent for the target date';
 
