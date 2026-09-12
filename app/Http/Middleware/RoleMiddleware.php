@@ -14,8 +14,10 @@ class RoleMiddleware
     /**
      * Handle an incoming request.
      *
-     * Accepts one or more comma-separated role names, e.g.:
+     * Accepts one or more comma-separated, pipe-separated, or vararg role names, e.g.:
      *   Route::middleware('role:HR,Owner')
+     *   Route::middleware('role:Owner|HR')
+     *   Route::middleware('role:Manager,HR,Owner')
      */
     public function handle(Request $request, Closure $next, string ...$roles): SymfonyResponse
     {
@@ -26,15 +28,38 @@ class RoleMiddleware
             return response()->json(['message' => 'Unauthenticated.'], Response::HTTP_UNAUTHORIZED);
         }
 
-        $allowedRoles = array_map(
-            static fn (string $r) => UserRole::from($r),
-            $roles,
-        );
-
-        if (! in_array($user->role, $allowedRoles, true)) {
-            return response()->json(['message' => 'Forbidden.'], Response::HTTP_FORBIDDEN);
+        // Flatten any pipe-separated or comma-separated roles
+        $allowedRoleNames = [];
+        foreach ($roles as $roleGroup) {
+            $split = preg_split('/[,|]/', $roleGroup);
+            if ($split !== false) {
+                foreach ($split as $role) {
+                    $trimmed = trim($role);
+                    if ($trimmed !== '') {
+                        $allowedRoleNames[] = $trimmed;
+                    }
+                }
+            }
         }
 
-        return $next($request);
+        // 1. Check using Spatie hasRole / hasAnyRole if available
+        if (method_exists($user, 'hasAnyRole')) {
+            try {
+                if ($user->hasAnyRole($allowedRoleNames)) {
+                    return $next($request);
+                }
+            } catch (\Throwable) {
+                // In case Spatie roles table is empty or unmigrated, continue to check user->role
+            }
+        }
+
+        // 2. Check using User->role property (enum or string)
+        $userRoleValue = $user->role instanceof \BackedEnum ? $user->role->value : (string) $user->role;
+
+        if (in_array($userRoleValue, $allowedRoleNames, true)) {
+            return $next($request);
+        }
+
+        return response()->json(['message' => 'Forbidden.'], Response::HTTP_FORBIDDEN);
     }
 }

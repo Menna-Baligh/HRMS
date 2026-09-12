@@ -7,14 +7,18 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, HasRoles, Notifiable;
+
+    protected $guard_name = 'api';
 
     /**
      * The attributes that are mass assignable.
@@ -27,9 +31,10 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'phone',
         'avatar',
+        'email_verified_at',
+        'role',
         'provider',
         'provider_id',
-        'role',
         'manager_id',
     ];
 
@@ -59,17 +64,24 @@ class User extends Authenticatable implements JWTSubject
 
     // ─── JWTSubject ──────────────────────────────────────────────────────────
 
+    /**
+     * Get the identifier that will be stored in the subject claim of the JWT.
+     */
     public function getJWTIdentifier(): mixed
     {
         return $this->getKey();
     }
 
     /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
      * @return array<string, mixed>
      */
     public function getJWTCustomClaims(): array
     {
-        return ['role' => $this->role->value];
+        $roleValue = $this->role instanceof \BackedEnum ? $this->role->value : (string) $this->role;
+
+        return ['role' => $roleValue];
     }
 
     // ─── Relationships ────────────────────────────────────────────────────────
@@ -98,35 +110,57 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(LeaveBalance::class);
     }
 
+    /** The employee profile associated with this user. */
+    public function employee(): HasOne
+    {
+        return $this->hasOne(Employee::class);
+    }
+
     // ─── Role Helpers ─────────────────────────────────────────────────────────
 
     public function isOwner(): bool
     {
-        return $this->role === UserRole::Owner;
+        return (method_exists($this, 'hasRole') && $this->hasRole('Owner'))
+            || $this->role === UserRole::Owner
+            || $this->role === 'Owner';
     }
 
     public function isHR(): bool
     {
-        return $this->role === UserRole::HR;
+        return (method_exists($this, 'hasRole') && $this->hasRole('HR'))
+            || $this->role === UserRole::HR
+            || $this->role === 'HR';
     }
 
     public function isManager(): bool
     {
-        return $this->role === UserRole::Manager;
+        return (method_exists($this, 'hasRole') && $this->hasRole('Manager'))
+            || $this->role === UserRole::Manager
+            || $this->role === 'Manager';
     }
 
     public function isEmployee(): bool
     {
-        return $this->role === UserRole::Employee;
+        return (method_exists($this, 'hasRole') && $this->hasRole('Employee'))
+            || $this->role === UserRole::Employee
+            || $this->role === 'Employee';
     }
 
     public function isHrOrAbove(): bool
     {
-        return $this->role->isHrOrAbove();
+        if ($this->role instanceof UserRole) {
+            return $this->role->isHrOrAbove();
+        }
+
+        return in_array($this->role, ['Owner', 'HR', UserRole::Owner, UserRole::HR], true);
     }
 
     public function isManagerOrAbove(): bool
     {
-        return $this->role->isManagerOrAbove();
+        if ($this->role instanceof UserRole) {
+            return $this->role->isManagerOrAbove();
+        }
+
+        return in_array($this->role, ['Owner', 'HR', 'Manager', UserRole::Owner, UserRole::HR, UserRole::Manager], true);
     }
 }
