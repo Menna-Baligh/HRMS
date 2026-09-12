@@ -23,6 +23,7 @@ class Employee extends Model
         'manager_id',
         'phone',
         'address',
+        'company_location_id',
     ];
 
     public function user(): BelongsTo
