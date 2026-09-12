@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Models\TaskActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
@@ -62,4 +64,9 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasOne(Employee::class);
     }
+
+    public function taskActivities(): HasMany
+{
+    return $this->hasMany(TaskActivity::class, 'employee_id');
+}
 }

@@ -15,6 +15,10 @@ class ForgotPasswordService
     ) {
     }
 
+
+   
+ 
+
     public function sendOtp(string $email): array {
          $user = User::where('email', $email)->first();
           if (!$user) 
