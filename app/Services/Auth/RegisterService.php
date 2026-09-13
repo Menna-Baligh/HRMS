@@ -3,16 +3,13 @@
 namespace App\Services\Auth;
 
 use App\Models\User;
-use App\Services\Auth\OtpService;
 use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class RegisterService
 {
+    public function __construct(protected OtpService $otpService) {}
 
-    public function __construct( protected OtpService $otpService ) {
-        
-    }
     public function register(array $data): array
     {
         $user = User::create([

@@ -13,6 +13,14 @@ class LoginService
                 'email' => [__('auth.failed')],
             ]);
         }
+        $user = auth('api')->user();
+
+        if ($user->employee && $user->employee->status === 'inactive') {
+            auth('api')->logout();
+            throw ValidationException::withMessages([
+                'email' => 'Your account is inactive. Please activate your account first.',
+            ]);
+        }
 
         return [
             'access_token' => $token,

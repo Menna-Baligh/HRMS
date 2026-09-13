@@ -23,13 +23,14 @@ class UpdateEmployeeHrFieldsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'job_title'       => ['sometimes', 'string', 'max:255'],
+            'job_title' => ['sometimes', 'string', 'max:255'],
             'employment_type' => ['sometimes', 'in:Full-time,Part-time,Contract'],
-            'status'          => ['sometimes', 'in:active,inactive'],
-            'department_id'   => ['nullable', 'exists:departments,id'],
-            'manager_id'      => ['nullable', 'exists:employees,id'],
+            'status' => ['sometimes', 'in:active,inactive'],
+            'department_id' => ['nullable', 'exists:departments,id'],
+            'manager_id' => ['nullable', 'exists:employees,id'],
         ];
     }
+
     public function messages(): array
     {
         return [

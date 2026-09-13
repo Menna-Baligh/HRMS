@@ -16,7 +16,7 @@ paths:
           schema:
             type: string
             default: application/json
-            example: application/json
+          example: application/json
       requestBody:
         required: true
         content:
@@ -30,13 +30,13 @@ paths:
                 email:
                   type: string
                   format: email
-                  example: employee@example.com
+                  example: user@example.com
                 password:
                   type: string
-                  example: password
+                  example: secret123
       responses:
-        "200":
-          description: Login successful, returns token payload and user resource.
+        '200':
+          description: Login successfully
           content:
             application/json:
               schema:
@@ -44,8 +44,10 @@ paths:
                 properties:
                   success:
                     type: boolean
+                    example: true
                   message:
                     type: string
+                    example: Login successfully
                   data:
                     type: object
                     properties:
@@ -53,25 +55,41 @@ paths:
                         type: string
                       token_type:
                         type: string
+                        example: bearer
                       expires_in:
                         type: string
+                        example: 24 hours
                       user:
                         type: object
                         properties:
                           id:
                             type: integer
+                            example: 1
                           name:
                             type: string
+                            example: John Doe
                           email:
                             type: string
+                            format: email
+                            example: user@example.com
                           phone:
                             type: string
                             nullable: true
+                            example: null
                           avatar:
                             type: string
                             nullable: true
+                            example: null
                           role:
                             type: string
+                            example: Employee
+                          permissions:
+                            type: array
+                            items:
+                              type: string
+                            example:
+                              - view_dashboard
+                              - create_posts
               example:
                 success: true
                 message: Login successfully
@@ -81,13 +99,16 @@ paths:
                   expires_in: 24 hours
                   user:
                     id: 1
-                    name: Test Employee
-                    email: employee@example.com
+                    name: John Doe
+                    email: user@example.com
                     phone: null
                     avatar: null
                     role: Employee
-        "422":
-          description: Validation errors (missing fields or invalid credentials).
+                    permissions:
+                      - view_dashboard
+                      - create_posts
+        '422':
+          description: Validation error or authentication failure
           content:
             application/json:
               schema:
@@ -95,8 +116,10 @@ paths:
                 properties:
                   success:
                     type: boolean
+                    example: false
                   message:
                     type: string
+                    example: Validation error
                   errors:
                     type: object
                     additionalProperties:
@@ -104,12 +127,14 @@ paths:
                       items:
                         type: string
               examples:
-                missingPassword:
-                  summary: Missing Password
+                missingFields:
+                  summary: Missing Required Fields
                   value:
                     success: false
                     message: Validation error
                     errors:
+                      email:
+                        - The email field is required.
                       password:
                         - The password field is required.
                 invalidCredentials:
@@ -120,6 +145,33 @@ paths:
                     errors:
                       email:
                         - These credentials do not match our records.
+                inactiveAccount:
+                  summary: Inactive Account
+                  value:
+                    success: false
+                    message: Validation error
+                    errors:
+                      email:
+                        - Your account is inactive. Please activate your account first.
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Something went wrong
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: Something went wrong
+                errors: null
 
   /api/auth/logout:
     post:
@@ -136,7 +188,7 @@ paths:
           schema:
             type: string
             default: application/json
-            example: application/json
+          example: application/json
       responses:
         '200':
           description: Successfully logged out.
@@ -188,9 +240,9 @@ paths:
           schema:
             type: string
             default: application/json
-            example: application/json
+          example: application/json
       responses:
-        "200":
+        '200':
           description: Google redirect URL generated successfully.
           content:
             application/json:
@@ -225,7 +277,7 @@ paths:
           schema:
             type: string
             default: application/json
-            example: application/json
+          example: application/json
         - in: query
           name: code
           required: false
@@ -239,7 +291,7 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        '200':
           description: Logged in with Google successfully.
           content:
             application/json:
@@ -276,7 +328,6 @@ paths:
                             nullable: true
                           role:
                             type: string
-
               example:
                 success: true
                 message: Logged in with Google successfully
@@ -291,8 +342,7 @@ paths:
                     phone: null
                     avatar: null
                     role: Owner
-                    
-        "422":
+        '422':
           description: Validation or process error.
           content:
             application/json:
@@ -315,6 +365,2007 @@ paths:
                 errors:
                   email:
                     - Google authentication failed
+
+  /permissions:
+    get:
+      summary: Retrieve all permissions
+      description: Returns a list of all permission names configured for the 'api' guard. Requires authentication and Owner or HR role.
+      operationId: getPermissions
+      tags:
+        - Permissions
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+      responses:
+        '200':
+          description: Permissions list retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Permissions list retrieved successfully
+                  data:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                      - view_dashboard
+                      - manage_employees
+                      - create_roles
+              example:
+                success: true
+                message: Permissions list retrieved successfully
+                data:
+                  - view_dashboard
+                  - manage_employees
+                  - create_roles
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: Unauthenticated
+                errors: null
+        '403':
+          description: Forbidden - User does not have Owner or HR role
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: User does not have the right roles.
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: User does not have the right roles.
+                errors: null
+        '500':
+          description: Failed to retrieve permissions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Failed to retrieve permissions
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: Failed to retrieve permissions
+                errors: null
+
+  /employees:
+    get:
+      summary: List all employees
+      operationId: getAllEmployees
+      tags:
+        - Employees
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: query
+          name: search
+          required: false
+          schema:
+            type: string
+          description: Search by name, email, employee ID, job title, or phone
+        - in: query
+          name: status
+          required: false
+          schema:
+            type: string
+            enum: [active, inactive]
+        - in: query
+          name: department_id
+          required: false
+          schema:
+            type: integer
+        - in: query
+          name: manager_id
+          required: false
+          schema:
+            type: integer
+        - in: query
+          name: employment_type
+          required: false
+          schema:
+            type: string
+            enum: [Full-time, Part-time, Contract]
+        - in: query
+          name: role
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: per_page
+          required: false
+          schema:
+            type: integer
+            default: 15
+      responses:
+        '200':
+          description: Employees retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Employees retrieved successfully
+                  data:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            name:
+                              type: string
+                              example: John Doe
+                            email:
+                              type: string
+                              example: john@example.com
+                            phone:
+                              type: string
+                              nullable: true
+                              example: "+1234567890"
+                            avatar:
+                              type: string
+                              nullable: true
+                              example: null
+                            role:
+                              type: string
+                              example: Employee
+                            permissions:
+                              type: array
+                              items:
+                                type: string
+                              example: ["employee.view-all"]
+                      first_page_url:
+                        type: string
+                      from:
+                        type: integer
+                        nullable: true
+                      last_page:
+                        type: integer
+                      last_page_url:
+                        type: string
+                      links:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            url:
+                              type: string
+                              nullable: true
+                            label:
+                              type: string
+                            active:
+                              type: boolean
+                      next_page_url:
+                        type: string
+                        nullable: true
+                      path:
+                        type: string
+                      per_page:
+                        type: integer
+                        example: 15
+                      prev_page_url:
+                        type: string
+                        nullable: true
+                      to:
+                        type: integer
+                        nullable: true
+                      total:
+                        type: integer
+                        example: 1
+
+    post:
+      summary: Create a new employee
+      operationId: storeEmployee
+      tags:
+        - Employees
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - password
+                - role
+                - job_title
+                - employment_type
+                - start_date
+              properties:
+                name:
+                  type: string
+                  maxLength: 255
+                  example: Jane Doe
+                email:
+                  type: string
+                  format: email
+                  example: jane.doe@example.com
+                password:
+                  type: string
+                  minLength: 8
+                  example: password123
+                role:
+                  type: string
+                  enum: [HR, Manager, Employee]
+                  example: Employee
+                job_title:
+                  type: string
+                  maxLength: 255
+                  example: Software Engineer
+                permissions:
+                  type: array
+                  items:
+                    type: string
+                  example: ["employee.view-all"]
+                employment_type:
+                  type: string
+                  enum: [Full-time, Part-time, Contract]
+                  example: Full-time
+                start_date:
+                  type: string
+                  format: date
+                  example: "2026-01-15"
+                department_id:
+                  type: integer
+                  nullable: true
+                  example: 1
+                manager_id:
+                  type: integer
+                  nullable: true
+                  example: 2
+                phone:
+                  type: string
+                  maxLength: 20
+                  nullable: true
+                  example: "+1234567890"
+                address:
+                  type: string
+                  nullable: true
+                  example: "123 Main St"
+      responses:
+        '201':
+          description: Employee created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Employee created successfully
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      employee_id:
+                        type: string
+                        example: "EMP-2026-00001"
+                      name:
+                        type: string
+                        example: Jane Doe
+                      email:
+                        type: string
+                        format: email
+                        example: jane.doe@example.com
+                      role:
+                        type: string
+                        example: Employee
+                      avatar:
+                        type: string
+                        nullable: true
+                        example: null
+                      job_title:
+                        type: string
+                        example: Software Engineer
+                      employment_type:
+                        type: string
+                        example: Full-time
+                      status:
+                        type: string
+                        example: inactive
+                      start_date:
+                        type: string
+                        format: date
+                        example: "2026-01-15"
+                      phone:
+                        type: string
+                        nullable: true
+                        example: "+1234567890"
+                      address:
+                        type: string
+                        nullable: true
+                        example: "123 Main St"
+                      department:
+                        type: string
+                        nullable: true
+                        example: Engineering
+                      manager:
+                        type: object
+                        nullable: true
+                        properties:
+                          id:
+                            type: integer
+                            example: 2
+                          employee_id:
+                            type: string
+                            example: "EMP-2026-00002"
+                          name:
+                            type: string
+                            example: John Manager
+                      created_at:
+                        type: string
+                        example: "2026-09-10 21:30:00"
+                      permissions:
+                        type: array
+                        items:
+                          type: string
+                        example: ["employee.view-all"]
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Validation error
+                  errors:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: string
+              examples:
+                emailTaken:
+                  summary: Email Already Taken
+                  value:
+                    success: false
+                    message: Validation error
+                    errors:
+                      email:
+                        - The email address is already in use.
+                invalidRole:
+                  summary: Invalid Role Selected
+                  value:
+                    success: false
+                    message: Validation error
+                    errors:
+                      role:
+                        - "The selected role is invalid. Allowed roles are: HR, Manager, Employee."
+        '500':
+          description: Failed to create employee
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Failed to create employee
+                  errors:
+                    nullable: true
+
+  /employees/profile:
+    patch:
+      summary: Update authenticated user's profile
+      operationId: updateProfile
+      tags:
+        - Employees
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  maxLength: 255
+                  nullable: true
+                  example: Jane Doe
+                phone:
+                  type: string
+                  maxLength: 20
+                  nullable: true
+                  example: "+1234567890"
+                address:
+                  type: string
+                  maxLength: 500
+                  nullable: true
+                  example: "456 Oak St"
+                avatar:
+                  type: string
+                  format: binary
+                  nullable: true
+                  description: Profile image file (jpeg, png, jpg, gif, svg, max 2048KB)
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Profile updated successfully
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      employee_id:
+                        type: string
+                        example: "EMP-2026-00001"
+                      name:
+                        type: string
+                        example: Jane Doe
+                      email:
+                        type: string
+                        example: jane@example.com
+                      role:
+                        type: string
+                        example: Employee
+                      avatar:
+                        type: string
+                        nullable: true
+                        example: "avatars/sample.jpg"
+                      job_title:
+                        type: string
+                        example: Software Engineer
+                      employment_type:
+                        type: string
+                        example: Full-time
+                      status:
+                        type: string
+                        example: active
+                      start_date:
+                        type: string
+                        format: date
+                        example: "2026-01-15"
+                      phone:
+                        type: string
+                        nullable: true
+                        example: "+1234567890"
+                      address:
+                        type: string
+                        nullable: true
+                        example: "456 Oak St"
+                      department:
+                        type: string
+                        nullable: true
+                        example: Engineering
+                      manager:
+                        type: object
+                        nullable: true
+                      created_at:
+                        type: string
+                        example: "2026-09-10 21:30:00"
+                      permissions:
+                        type: array
+                        items:
+                          type: string
+        '404':
+          description: Employee profile not found for this user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Employee profile not found for this user.
+                  errors:
+                    nullable: true
+        '500':
+          description: Failed to update profile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Failed to update profile
+                  errors:
+                    nullable: true
+
+  /employees/{id}:
+    get:
+      summary: Retrieve employee details
+      operationId: getEmployeeById
+      tags:
+        - Employees
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Employee ID
+      responses:
+        '200':
+          description: Employee details retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Employee details retrieved successfully
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      employee_id:
+                        type: string
+                        example: "EMP-2026-00001"
+                      name:
+                        type: string
+                        example: Jane Doe
+                      email:
+                        type: string
+                        example: jane@example.com
+                      role:
+                        type: string
+                        example: Employee
+                      avatar:
+                        type: string
+                        nullable: true
+                      job_title:
+                        type: string
+                        example: Software Engineer
+                      employment_type:
+                        type: string
+                        example: Full-time
+                      status:
+                        type: string
+                        example: active
+                      start_date:
+                        type: string
+                        format: date
+                        example: "2026-01-15"
+                      phone:
+                        type: string
+                        nullable: true
+                        example: "+1234567890"
+                      address:
+                        type: string
+                        nullable: true
+                        example: "123 Main St"
+                      department:
+                        type: string
+                        nullable: true
+                        example: Engineering
+                      manager:
+                        type: object
+                        nullable: true
+                        properties:
+                          id:
+                            type: integer
+                            example: 2
+                          employee_id:
+                            type: string
+                            example: "EMP-2026-00002"
+                          name:
+                            type: string
+                            example: John Manager
+                      created_at:
+                        type: string
+                        example: "2026-09-10 21:30:00"
+                      permissions:
+                        type: array
+                        items:
+                          type: string
+        '403':
+          description: Forbidden - Not authorized to view profile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: You are not authorized to view this employee profile.
+                  errors:
+                    nullable: true
+        '404':
+          description: Employee not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Employee not found.
+                  errors:
+                    nullable: true
+        '500':
+          description: Failed to retrieve employee details
+
+  /employees/{id}/hr-fields:
+    patch:
+      summary: Update HR fields of an employee
+      operationId: updateEmployeeHrFields
+      tags:
+        - Employees
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Employee ID
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                job_title:
+                  type: string
+                  maxLength: 255
+                  example: Senior Software Engineer
+                employment_type:
+                  type: string
+                  enum: [Full-time, Part-time, Contract]
+                  example: Full-time
+                status:
+                  type: string
+                  enum: [active, inactive]
+                  example: active
+                department_id:
+                  type: integer
+                  nullable: true
+                  example: 1
+                manager_id:
+                  type: integer
+                  nullable: true
+                  example: 2
+      responses:
+        '200':
+          description: Employee HR fields updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Employee HR fields updated successfully
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      employee_id:
+                        type: string
+                        example: "EMP-2026-00001"
+                      name:
+                        type: string
+                        example: Jane Doe
+                      email:
+                        type: string
+                        example: jane@example.com
+                      role:
+                        type: string
+                        example: Employee
+                      avatar:
+                        type: string
+                        nullable: true
+                      job_title:
+                        type: string
+                        example: Senior Software Engineer
+                      employment_type:
+                        type: string
+                        example: Full-time
+                      status:
+                        type: string
+                        example: active
+                      start_date:
+                        type: string
+                        format: date
+                        example: "2026-01-15"
+                      phone:
+                        type: string
+                        nullable: true
+                      address:
+                        type: string
+                        nullable: true
+                      department:
+                        type: string
+                        nullable: true
+                        example: Engineering
+                      manager:
+                        type: object
+                        nullable: true
+                      created_at:
+                        type: string
+                        example: "2026-09-10 21:30:00"
+                      permissions:
+                        type: array
+                        items:
+                          type: string
+        '403':
+          description: Forbidden - Not authorized to update HR fields
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: You are not authorized to update HR fields.
+                  errors:
+                    nullable: true
+        '404':
+          description: Employee not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Employee not found.
+                  errors:
+                    nullable: true
+        '500':
+          description: Failed to update HR fields
+
+  /employees/{id}/change-account-status:
+    patch:
+      summary: Toggle employee account active/inactive status
+      operationId: changeAccountStatus
+      tags:
+        - Employees
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Employee ID
+      responses:
+        '200':
+          description: Account status changed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Employee account has been activated successfully.
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      employee_id:
+                        type: string
+                        example: "EMP-2026-00001"
+                      name:
+                        type: string
+                        example: Jane Doe
+                      email:
+                        type: string
+                        example: jane@example.com
+                      role:
+                        type: string
+                        example: Employee
+                      avatar:
+                        type: string
+                        nullable: true
+                      job_title:
+                        type: string
+                        example: Software Engineer
+                      employment_type:
+                        type: string
+                        example: Full-time
+                      status:
+                        type: string
+                        example: active
+                      start_date:
+                        type: string
+                        format: date
+                        example: "2026-01-15"
+                      phone:
+                        type: string
+                        nullable: true
+                      address:
+                        type: string
+                        nullable: true
+                      department:
+                        type: string
+                        nullable: true
+                      manager:
+                        type: object
+                        nullable: true
+                      created_at:
+                        type: string
+                        example: "2026-09-10 21:30:00"
+                      permissions:
+                        type: array
+                        items:
+                          type: string
+              examples:
+                activated:
+                  summary: Account Activated
+                  value:
+                    success: true
+                    message: Employee account has been activated successfully.
+                    data:
+                      id: 1
+                      employee_id: "EMP-2026-00001"
+                      name: Jane Doe
+                      email: jane@example.com
+                      role: Employee
+                      avatar: null
+                      job_title: Software Engineer
+                      employment_type: Full-time
+                      status: active
+                      start_date: "2026-01-15"
+                      phone: null
+                      address: null
+                      department: null
+                      manager: null
+                      created_at: "2026-09-10 21:30:00"
+                      permissions: []
+                deactivated:
+                  summary: Account Deactivated
+                  value:
+                    success: true
+                    message: Employee account has been deactivated successfully.
+                    data:
+                      id: 1
+                      employee_id: "EMP-2026-00001"
+                      name: Jane Doe
+                      email: jane@example.com
+                      role: Employee
+                      avatar: null
+                      job_title: Software Engineer
+                      employment_type: Full-time
+                      status: inactive
+                      start_date: "2026-01-15"
+                      phone: null
+                      address: null
+                      department: null
+                      manager: null
+                      created_at: "2026-09-10 21:30:00"
+                      permissions: []
+        '422':
+          description: Validation error (e.g. changing own account status)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Validation error
+                  errors:
+                    type: object
+                    properties:
+                      employee:
+                        type: array
+                        items:
+                          type: string
+                        example:
+                          - You cannot change the status of your own account.
+              example:
+                success: false
+                message: Validation error
+                errors:
+                  employee:
+                    - You cannot change the status of your own account.
+
+  /departments:
+    get:
+      summary: List departments
+      operationId: listDepartments
+      tags:
+        - Departments
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: query
+          name: search
+          required: false
+          schema:
+            type: string
+          description: Search by department name or description
+        - in: query
+          name: status
+          required: false
+          schema:
+            type: string
+            enum: [active, inactive]
+        - in: query
+          name: per_page
+          required: false
+          schema:
+            type: integer
+            default: 15
+      responses:
+        '200':
+          description: Departments retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Departments retrieved successfully
+                  data:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            name:
+                              type: string
+                              example: Engineering
+                            description:
+                              type: string
+                              nullable: true
+                              example: Software Development Department
+                            status:
+                              type: string
+                              example: active
+                            manager:
+                              type: object
+                              nullable: true
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 2
+                                name:
+                                  type: string
+                                  example: John Doe
+                                email:
+                                  type: string
+                                  example: john@example.com
+                                job_title:
+                                  type: string
+                                  example: Engineering Manager
+                            employees_count:
+                              type: integer
+                              example: 12
+                            created_at:
+                              type: string
+                              example: "2026-01-15 10:00:00"
+                      first_page_url:
+                        type: string
+                      from:
+                        type: integer
+                        nullable: true
+                      last_page:
+                        type: integer
+                      last_page_url:
+                        type: string
+                      links:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            url:
+                              type: string
+                              nullable: true
+                            label:
+                              type: string
+                            active:
+                              type: boolean
+                      next_page_url:
+                        type: string
+                        nullable: true
+                      path:
+                        type: string
+                      per_page:
+                        type: integer
+                        example: 15
+                      prev_page_url:
+                        type: string
+                        nullable: true
+                      to:
+                        type: integer
+                        nullable: true
+                      total:
+                        type: integer
+                        example: 1
+              example:
+                success: true
+                message: Departments retrieved successfully
+                data:
+                  current_page: 1
+                  data:
+                    - id: 1
+                      name: Engineering
+                      description: Software Development Department
+                      status: active
+                      manager:
+                        id: 2
+                        name: John Doe
+                        email: john@example.com
+                        job_title: Engineering Manager
+                      employees_count: 12
+                      created_at: "2026-01-15 10:00:00"
+                  first_page_url: "http://localhost:8000/api/departments?page=1"
+                  from: 1
+                  last_page: 1
+                  last_page_url: "http://localhost:8000/api/departments?page=1"
+                  links:
+                    - url: null
+                      label: "&laquo; Previous"
+                      active: false
+                    - url: "http://localhost:8000/api/departments?page=1"
+                      label: "1"
+                      active: true
+                    - url: null
+                      label: "Next &raquo;"
+                      active: false
+                  next_page_url: null
+                  path: "http://localhost:8000/api/departments"
+                  per_page: 15
+                  prev_page_url: null
+                  to: 1
+                  total: 1
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: Unauthenticated
+                errors: null
+        '403':
+          description: Forbidden - User lacks department.view permission
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: User does not have the right permissions.
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: User does not have the right permissions.
+                errors: null
+
+    post:
+      summary: Create a new department
+      operationId: storeDepartment
+      tags:
+        - Departments
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  maxLength: 255
+                  example: Human Resources
+                description:
+                  type: string
+                  maxLength: 1000
+                  nullable: true
+                  example: Responsible for hiring, training, and employee welfare.
+                manager_id:
+                  type: integer
+                  nullable: true
+                  example: 5
+      responses:
+        '201':
+          description: Department created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Department created successfully
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 2
+                      name:
+                        type: string
+                        example: Human Resources
+                      description:
+                        type: string
+                        nullable: true
+                        example: Responsible for hiring, training, and employee welfare.
+                      status:
+                        type: string
+                        example: active
+                      manager:
+                        type: object
+                        nullable: true
+                        properties:
+                          id:
+                            type: integer
+                            example: 5
+                          name:
+                            type: string
+                            example: Sarah Smith
+                          email:
+                            type: string
+                            example: sarah@example.com
+                          job_title:
+                            type: string
+                            example: HR Manager
+                      employees_count:
+                        type: integer
+                        example: 0
+                      created_at:
+                        type: string
+                        example: "2026-09-10 21:35:00"
+              example:
+                success: true
+                message: Department created successfully
+                data:
+                  id: 2
+                  name: Human Resources
+                  description: Responsible for hiring, training, and employee welfare.
+                  status: active
+                  manager:
+                    id: 5
+                    name: Sarah Smith
+                    email: sarah@example.com
+                    job_title: HR Manager
+                  employees_count: 0
+                  created_at: "2026-09-10 21:35:00"
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: Unauthenticated
+                errors: null
+        '403':
+          description: Forbidden - User lacks department.create permission
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: User does not have the right permissions.
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: User does not have the right permissions.
+                errors: null
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Validation error
+                  errors:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: string
+              examples:
+                duplicateName:
+                  summary: Department Name Already Exists
+                  value:
+                    success: false
+                    message: Validation error
+                    errors:
+                      name:
+                        - The name has already been taken.
+                invalidManager:
+                  summary: Selected Manager Does Not Exist
+                  value:
+                    success: false
+                    message: Validation error
+                    errors:
+                      manager_id:
+                        - The selected manager id is invalid.
+
+  /departments/{id}:
+    patch:
+      summary: Update department details
+      operationId: updateDepartment
+      tags:
+        - Departments
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Department ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  maxLength: 255
+                  example: Engineering & Operations
+                description:
+                  type: string
+                  maxLength: 1000
+                  nullable: true
+                  example: Handles soft dev and infrastructure.
+                manager_id:
+                  type: integer
+                  nullable: true
+                  example: 3
+      responses:
+        '200':
+          description: Department updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Department updated successfully
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      name:
+                        type: string
+                        example: Engineering & Operations
+                      description:
+                        type: string
+                        nullable: true
+                        example: Handles soft dev and infrastructure.
+                      status:
+                        type: string
+                        example: active
+                      manager:
+                        type: object
+                        nullable: true
+                        properties:
+                          id:
+                            type: integer
+                            example: 3
+                          name:
+                            type: string
+                            example: Alex Johnson
+                          email:
+                            type: string
+                            example: alex@example.com
+                          job_title:
+                            type: string
+                            example: VP of Engineering
+                      employees_count:
+                        type: integer
+                        example: 12
+                      created_at:
+                        type: string
+                        example: "2026-01-15 10:00:00"
+              example:
+                success: true
+                message: Department updated successfully
+                data:
+                  id: 1
+                  name: Engineering & Operations
+                  description: Handles soft dev and infrastructure.
+                  status: active
+                  manager:
+                    id: 3
+                    name: Alex Johnson
+                    email: alex@example.com
+                    job_title: VP of Engineering
+                  employees_count: 12
+                  created_at: "2026-01-15 10:00:00"
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: Unauthenticated
+                errors: null
+        '403':
+          description: Forbidden - User lacks department.edit permission
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: User does not have the right permissions.
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: User does not have the right permissions.
+                errors: null
+        '404':
+          description: Department not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Department not found
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: Department not found
+                errors: null
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Validation error
+                  errors:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: string
+              example:
+                success: false
+                message: Validation error
+                errors:
+                  name:
+                    - The name has already been taken.
+
+  /departments/{id}/change-status:
+    patch:
+      summary: Toggle department active/inactive status
+      operationId: changeDepartmentStatus
+      tags:
+        - Departments
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Department ID
+      responses:
+        '200':
+          description: Department status changed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Activated department successfully with keeping employee records.
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      name:
+                        type: string
+                        example: Engineering
+                      description:
+                        type: string
+                        nullable: true
+                        example: Software Development Department
+                      status:
+                        type: string
+                        example: active
+                      manager:
+                        type: object
+                        nullable: true
+                      employees_count:
+                        type: integer
+                        example: 12
+                      created_at:
+                        type: string
+                        example: "2026-01-15 10:00:00"
+              examples:
+                activated:
+                  summary: Department Activated
+                  value:
+                    success: true
+                    message: Activated department successfully with keeping employee records.
+                    data:
+                      id: 1
+                      name: Engineering
+                      description: Software Development Department
+                      status: active
+                      manager: null
+                      employees_count: 12
+                      created_at: "2026-01-15 10:00:00"
+                deactivated:
+                  summary: Department Deactivated
+                  value:
+                    success: true
+                    message: Deactivated department successfully with keeping employee records.
+                    data:
+                      id: 1
+                      name: Engineering
+                      description: Software Development Department
+                      status: inactive
+                      manager: null
+                      employees_count: 12
+                      created_at: "2026-01-15 10:00:00"
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: Unauthenticated
+                errors: null
+        '403':
+          description: Forbidden - User lacks department.change-status permission
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: User does not have the right permissions.
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: User does not have the right permissions.
+                errors: null
+        '404':
+          description: Department not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Department not found
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: Department not found
+                errors: null
+
+  /managers/employees:
+    get:
+      summary: Retrieve employees managed by the authenticated manager
+      operationId: getManagerEmployees
+      tags:
+        - Managers
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: query
+          name: search
+          required: false
+          schema:
+            type: string
+          description: Search by name, email, employee ID, job title, or phone
+        - in: query
+          name: status
+          required: false
+          schema:
+            type: string
+            enum: [active, inactive]
+        - in: query
+          name: department_id
+          required: false
+          schema:
+            type: integer
+        - in: query
+          name: employment_type
+          required: false
+          schema:
+            type: string
+            enum: [Full-time, Part-time, Contract]
+        - in: query
+          name: role
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: per_page
+          required: false
+          schema:
+            type: integer
+            default: 15
+      responses:
+        '200':
+          description: Manager employees retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Manager employees retrieved successfully.
+                  data:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            name:
+                              type: string
+                              example: John Doe
+                            email:
+                              type: string
+                              example: john@example.com
+                            phone:
+                              type: string
+                              nullable: true
+                              example: "+1234567890"
+                            avatar:
+                              type: string
+                              nullable: true
+                              example: null
+                            role:
+                              type: string
+                              example: Employee
+                            permissions:
+                              type: array
+                              items:
+                                type: string
+                              example: ["employee.view"]
+                      first_page_url:
+                        type: string
+                      from:
+                        type: integer
+                        nullable: true
+                      last_page:
+                        type: integer
+                      last_page_url:
+                        type: string
+                      links:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            url:
+                              type: string
+                              nullable: true
+                            label:
+                              type: string
+                            active:
+                              type: boolean
+                      next_page_url:
+                        type: string
+                        nullable: true
+                      path:
+                        type: string
+                      per_page:
+                        type: integer
+                        example: 15
+                      prev_page_url:
+                        type: string
+                        nullable: true
+                      to:
+                        type: integer
+                        nullable: true
+                      total:
+                        type: integer
+                        example: 1
+              example:
+                success: true
+                message: Manager employees retrieved successfully.
+                data:
+                  current_page: 1
+                  data:
+                    - id: 1
+                      name: John Doe
+                      email: john@example.com
+                      phone: "+1234567890"
+                      avatar: null
+                      role: Employee
+                      permissions:
+                        - employee.view
+                  first_page_url: "http://localhost:8000/api/managers/employees?page=1"
+                  from: 1
+                  last_page: 1
+                  last_page_url: "http://localhost:8000/api/managers/employees?page=1"
+                  links:
+                    - url: null
+                      label: "&laquo; Previous"
+                      active: false
+                    - url: "http://localhost:8000/api/managers/employees?page=1"
+                      label: "1"
+                      active: true
+                    - url: null
+                      label: "Next &raquo;"
+                      active: false
+                  next_page_url: null
+                  path: "http://localhost:8000/api/managers/employees"
+                  per_page: 15
+                  prev_page_url: null
+                  to: 1
+                  total: 1
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated
+                  errors:
+                    nullable: true
+              example:
+                success: false
+                message: Unauthenticated
+                errors: null
+        '403':
+          description: Forbidden - User lacks manager.view-employees permission or is not registered as an employee
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: You are not registered as an employee.
+                  errors:
+                    nullable: true
+              examples:
+                notRegisteredAsEmployee:
+                  summary: Not Registered as Employee
+                  value:
+                    success: false
+                    message: You are not registered as an employee.
+                    errors: null
+                permissionDenied:
+                  summary: Permission Denied
+                  value:
+                    success: false
+                    message: User does not have the right permissions.
+                    errors: null
 
 components:
   securitySchemes:

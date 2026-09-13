@@ -13,14 +13,8 @@ class OtpService
 
     public function __construct()
     {
-        $this->otp = new Otp();
+        $this->otp = new Otp;
     }
-
-
-    
-
- 
-
 /** * Generate a new OTP and send it to the given email. */
  public function generate(string $email): string 
  { 

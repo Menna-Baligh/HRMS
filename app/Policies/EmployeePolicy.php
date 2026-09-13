@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\PermissionEnum;
 use App\Models\Employee;
 use App\Models\User;
 
@@ -23,8 +24,9 @@ class EmployeePolicy
 
         return false;
     }
+
     public function updateHrFields(User $authUser): bool
     {
-        return $authUser->hasRole(['Owner', 'HR']);
+        return $authUser->hasPermissionTo(PermissionEnum::EDIT_HR_FIELDS->value);
     }
 }
