@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\AttendanceController;
-use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AuthController as ApiAuthController;
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\GoogleAuthController;
@@ -11,6 +11,14 @@ use App\Http\Controllers\Api\ManagerAttendanceController;
 use App\Http\Controllers\Api\ManagerController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\TaskController;
+use App\Http\Controllers\Api\V1\Calendar\LeaveCalendarController;
+use App\Http\Controllers\Api\V1\HR\HRLeaveQueueController;
+use App\Http\Controllers\Api\V1\LeaveBalance\LeaveBalanceController;
+use App\Http\Controllers\Api\V1\LeaveDecisionHistory\LeaveDecisionHistoryController;
+use App\Http\Controllers\Api\V1\LeaveRequest\LeaveApprovalController;
+use App\Http\Controllers\Api\V1\LeaveRequest\LeaveRequestController;
+use App\Http\Controllers\Api\V1\LeaveType\LeaveTypeController;
+use App\Http\Controllers\Api\V1\Manager\ManagerLeaveQueueController;
 use App\Http\Controllers\CompanyLocations\CompanyLocationController;
 use Illuminate\Support\Facades\Route;
 
@@ -118,16 +126,16 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
 
 // ─── V1 Leave Management API ─────────────────────────────────────────────────
 Route::prefix('v1')->group(function (): void {
-    // Authentication
-    Route::prefix('auth')->group(function (): void {
-        Route::post('login', [V1AuthController::class, 'login'])->name('auth.login');
+    // // Authentication
+    // Route::prefix('auth')->group(function (): void {
+    //     Route::post('login', [V1AuthController::class, 'login'])->name('auth.login');
 
-        Route::middleware('jwt.auth')->group(function (): void {
-            Route::post('logout', [V1AuthController::class, 'logout'])->name('auth.logout');
-            Route::post('refresh', [V1AuthController::class, 'refresh'])->name('auth.refresh');
-            Route::get('me', [V1AuthController::class, 'me'])->name('auth.me');
-        });
-    });
+    //     Route::middleware('jwt.auth')->group(function (): void {
+    //         Route::post('logout', [V1AuthController::class, 'logout'])->name('auth.logout');
+    //         Route::post('refresh', [V1AuthController::class, 'refresh'])->name('auth.refresh');
+    //         Route::get('me', [V1AuthController::class, 'me'])->name('auth.me');
+    //     });
+    // });
 
     // Protected Leave Management Routes
     Route::middleware('jwt.auth')->group(function (): void {
