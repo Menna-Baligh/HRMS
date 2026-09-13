@@ -1,23 +1,24 @@
 <?php
 
+use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\AuthController as ApiAuthController;
+use App\Http\Controllers\Api\DepartmentController;
+use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\GoogleAuthController;
+use App\Http\Controllers\Api\HrAttendanceController;
+use App\Http\Controllers\Api\ManagerAttendanceController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\ManagerController;
 
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\CompanyLocations\CompanyLocationController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-
-Route::post('/register', [AuthController::class, 'register']);
-
-
 Route::prefix('auth')->group(function () {
-    // Route::post('/login', [AuthController::class,'login'])
-    //     ->middleware('throttle:5,1');
-
+    Route::post('/login', [AuthController::class,'login'])
+        ->middleware('throttle:5,1');
+    Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
     Route::post('/forget-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:5,1');
     Route::post('/forgot-password/verify-otp', [AuthController::class, 'verifyForgotPasswordOtp'])->middleware('throttle:5,1');
     Route::post('/forgot-password/reset', [AuthController::class, 'resetPassword'])->middleware('throttle:5,1');
@@ -102,6 +103,23 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
     Route::patch('/departments/{id}/change-status', [DepartmentController::class, 'changeStatus'])->middleware('permission:department.change-status');
 
     Route::get('/managers/employees', [ManagerController::class, 'employees'])->middleware('permission:manager.view-employees');
+
+    Route::prefix('attendance')->group(function () {
+        Route::get('/today', [AttendanceController::class, 'today']);
+        Route::post('/check-in', [AttendanceController::class, 'checkIn']);
+        Route::post('/check-out', [AttendanceController::class, 'checkOut']);
+        Route::get('/history', [AttendanceController::class, 'history']);
+    });
+    Route::middleware(['role:Manager|Owner|HR'])->prefix('manager/attendance')->group(function () {
+        Route::get('/today', [ManagerAttendanceController::class, 'today']);
+        Route::get('/{employeeId}', [ManagerAttendanceController::class, 'show']);
+    });
+    Route::middleware(['role:HR|Owner'])->prefix('hr/attendance')->group(function () {
+        Route::get('/daily', [HrAttendanceController::class, 'daily']);
+        Route::get('/exceptions', [HrAttendanceController::class, 'exceptions']);
+        Route::get('/monthly-summary', [HrAttendanceController::class, 'monthlySummary']);
+        Route::get('/export', [HrAttendanceController::class, 'export']);
+    });
 });
 
 // ─── V1 Leave Management API ─────────────────────────────────────────────────
