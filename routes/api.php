@@ -112,5 +112,29 @@ Route::prefix('v1')->group(function (): void {
 
         // Leave Calendar (Approved leaves view)
         Route::get('calendar/leaves', [LeaveCalendarController::class, 'index'])->name('calendar.leaves');
+
+        // ─── AI Integration Gateway ──────────────────────────────────────────
+        Route::prefix('ai')->group(function (): void {
+            // Career Coach
+            Route::get('career-coach/context', [\App\Http\Controllers\Api\V1\Ai\CareerCoachController::class, 'context'])->name('ai.career-coach.context');
+            Route::post('career-coach/generate', [\App\Http\Controllers\Api\V1\Ai\CareerCoachController::class, 'generate'])->name('ai.career-coach.generate');
+
+            // Policy Assistant
+            Route::get('policy-assistant/context', [\App\Http\Controllers\Api\V1\Ai\PolicyAssistantController::class, 'context'])->name('ai.policy-assistant.context');
+            Route::post('policy-assistant/ask', [\App\Http\Controllers\Api\V1\Ai\PolicyAssistantController::class, 'ask'])->name('ai.policy-assistant.ask');
+
+            // Performance Insight
+            Route::post('performance-insight/generate', [\App\Http\Controllers\Api\V1\Ai\PerformanceInsightController::class, 'generate'])->name('ai.performance-insight.generate');
+
+            // Evaluation Draft (Manager/HR/Owner only)
+            Route::middleware('role:Manager,HR,Owner')
+                ->post('evaluation-draft/generate', [\App\Http\Controllers\Api\V1\Ai\EvaluationDraftController::class, 'generate'])
+                ->name('ai.evaluation-draft.generate');
+
+            // Generations History, Regeneration & Feedback
+            Route::get('generations', [\App\Http\Controllers\Api\V1\Ai\AiGenerationController::class, 'index'])->name('ai.generations.index');
+            Route::post('generations/{id}/regenerate', [\App\Http\Controllers\Api\V1\Ai\AiGenerationController::class, 'regenerate'])->name('ai.generations.regenerate');
+            Route::post('generations/{id}/feedback', [\App\Http\Controllers\Api\V1\Ai\AiGenerationController::class, 'feedback'])->name('ai.generations.feedback');
+        });
     });
 });

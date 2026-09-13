@@ -16,5 +16,5 @@ function tokenFor(User $user): string
     /** @var JWTGuard $guard */
     $guard = auth('api');
 
-    return $guard->login($user);
+    return $guard->login($user) ?? \Tymon\JWTAuth\Facades\JWTAuth::fromUser($user);
 }

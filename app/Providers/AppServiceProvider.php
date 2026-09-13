@@ -23,7 +23,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(
+            \App\Services\AiGateway\Contracts\AiProviderInterface::class,
+            \App\Services\AiGateway\Providers\MockAiProvider::class
+        );
     }
 
     /**

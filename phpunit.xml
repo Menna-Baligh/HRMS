@@ -28,6 +28,7 @@
         <env name="DB_URL" value=""/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
+        <env name="JWT_SECRET" value="fO5TF4hXiDRxW2se4X4A24HiYavuLeb0BwJwfC8vJkJcYWwCY3LqyLoHGn7jo7Ai"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>

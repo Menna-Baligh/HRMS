@@ -6,6 +6,7 @@ use App\Helpers\ResponseHelper;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Tymon\JWTAuth\JWTGuard;
 
 class CheckActiveStatus
 {
@@ -16,10 +17,12 @@ class CheckActiveStatus
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $user = auth('api')->user();
+        /** @var JWTGuard $guard */
+        $guard = auth('api');
+        $user = $guard->user();
 
         if ($user && $user->employee && $user->employee->status === 'inactive') {
-            auth('api')->logout();
+            $guard->logout();
 
             return ResponseHelper::error(
                 message: 'Your account is inactive. Please activate your account first or contact your administrator.',
