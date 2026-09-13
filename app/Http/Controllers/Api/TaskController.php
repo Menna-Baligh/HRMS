@@ -10,8 +10,7 @@ class TaskController extends Controller
 {
     public function __construct(
         private TaskService $taskService
-    ) {
-    }
+    ) {}
 
     public function store(StoreTaskRequest $request)
     {
@@ -23,9 +22,8 @@ class TaskController extends Controller
         ], 201);
     }
 
-
-    
-    public function update(UpdateTaskRequest $request,Task $task): JsonResponse {
+    public function update(UpdateTaskRequest $request, Task $task): JsonResponse
+    {
         $task = $this->taskService->update(
             $task,
             $request->validated()
@@ -37,8 +35,8 @@ class TaskController extends Controller
         ]);
     }
 
-
-    public function assign(AssignTaskRequest $request,Task $task): JsonResponse {
+    public function assign(AssignTaskRequest $request, Task $task): JsonResponse
+    {
         $assignment = $this->taskService->assign(
             $task,
             $request->integer('employee_id')
@@ -50,13 +48,14 @@ class TaskController extends Controller
         ], 201);
     }
 
-       /**
+    /**
      * Update task progress.
      */
-    public function updateProgress(UpdateTaskProgressRequest $request,Task $task): JsonResponse {
+    public function updateProgress(UpdateTaskProgressRequest $request, Task $task): JsonResponse
+    {
         $task = $this->taskService->updateProgress(
-        $task,
-        $request->integer('progress')
+            $task,
+            $request->integer('progress')
         );
 
         return response()->json([
@@ -65,10 +64,11 @@ class TaskController extends Controller
         ]);
     }
 
-      /**
+    /**
      * Update task status.
      */
-    public function updateStatus(UpdateTaskStatusRequest $request,Task $task): JsonResponse {
+    public function updateStatus(UpdateTaskStatusRequest $request, Task $task): JsonResponse
+    {
         $task = $this->taskService->updateStatus(
             $task,
             TaskStatus::from(

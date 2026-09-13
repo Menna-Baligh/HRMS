@@ -72,7 +72,6 @@ class TaskService
         return $task->refresh();
     }
 
-
     public function assign(Task $task, int $employeeId)
     {
         $this->ensureTaskCanBeAssigned($task);
@@ -108,7 +107,7 @@ class TaskService
         return $assignment;
     }
 
-       /**
+    /**
      * Update task progress.
      */
     public function updateProgress(Task $task, int $progress): Task
@@ -139,7 +138,7 @@ class TaskService
         return $task->refresh();
     }
 
-      /**
+    /**
      * Update task status.
      */
     public function updateStatus(Task $task, TaskStatus $newStatus): Task
@@ -167,7 +166,6 @@ class TaskService
 
         return $task->refresh();
     }
-
 
     private function ensureTaskCanBeUpdated(Task $task): void
     {
@@ -199,7 +197,6 @@ class TaskService
         }
     }
 
-
     private function ensureEmployeeAssignedToTask(Task $task): void
     {
         $isAssigned = TaskAssignment::where('task_id', $task->id)
@@ -211,10 +208,8 @@ class TaskService
                 'task' => 'You are not assigned to this task.',
             ]);
         }
-    }    
+    }
 
-
-    
     private function validateStatusTransition(
         Task $task,
         TaskStatus $oldStatus,
@@ -250,9 +245,6 @@ class TaskService
             ]);
         }
     }
-
-
-    
 
     /**
      * Store task activity history.

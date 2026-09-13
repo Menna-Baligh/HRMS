@@ -14,27 +14,28 @@ class RegisterService
     {
         $user = User::create([
 
-           'name' => $data['name'], 
-           'email' => $data['email'],
+            'name' => $data['name'],
+            'email' => $data['email'],
             'phone' => $data['phone'] ?? null,
-            'avatar' => $data['avatar'] ?? null, 
-            'provider' => $data['provider'] ?? null, 
+            'avatar' => $data['avatar'] ?? null,
+            'provider' => $data['provider'] ?? null,
             'provider_id' => $data['provider_id'] ?? null,
-            'password' => Hash::make($data['password']), 
-             'role' => 'Owner',
+            'password' => Hash::make($data['password']),
+            'role' => 'Owner',
         ]);
 
         // Generate OTP and send it to the registered email
-         $this->otpService->generate($user->email);
+        $this->otpService->generate($user->email);
 
-       // Generate JWT access token
+        // Generate JWT access token
         $token = JWTAuth::fromUser($user);
-       return [
-        'access_token' => $token,
-         'token_type' => 'bearer', 
-         'expires_in' => auth('api')->factory()->getTTL() / 60 . ' hours', 
-         'user' => $user,
-       ];
+
+        return [
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => auth('api')->factory()->getTTL() / 60 .' hours',
+            'user' => $user,
+        ];
 
         // $otp = $this->otpService->generate($user->email);
 
@@ -43,11 +44,11 @@ class RegisterService
         //     'otp' => $otp,
         // ];
 
+        $otp = $this->otpService->generate($user->email);
 
-        $otp = $this->otpService->generate($user->email); 
-        return [ 
-            'user' => $user, 
-            'otp' => $otp, 
+        return [
+            'user' => $user,
+            'otp' => $otp,
         ];
 
     }
