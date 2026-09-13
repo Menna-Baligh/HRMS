@@ -126,7 +126,7 @@ class AttendanceService
         $workedSeconds = 0;
         if ($attendance && $attendance->check_in) {
             $endTime = $attendance->check_out ?? now();
-            $workedSeconds = $endTime->diffInSeconds($attendance->check_in);
+            $workedSeconds = (int) abs($endTime->diffInSeconds($attendance->check_in));
         }
 
         return [
