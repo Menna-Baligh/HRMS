@@ -12,6 +12,14 @@ class GoalResource extends JsonResource
         return [
             'id' => $this->id,
             'employee_id' => $this->employee_id,
+            'employee' => $this->whenLoaded('employee', function () {
+                return [
+                    'id' => $this->employee->id,
+                    'name' => $this->employee->user?->name,
+                    'job_title' => $this->employee->job_title,
+                    'department' => $this->employee->department?->name,
+                ];
+            }),
             'title' => $this->title,
             'description' => $this->description,
             'target_value' => $this->target_value,
@@ -20,7 +28,7 @@ class GoalResource extends JsonResource
             'target_date' => $this->target_date?->format('Y-m-d'),
             'status' => $this->status->value ?? $this->status,
             'histories' => GoalProgressHistoryResource::collection($this->whenLoaded('histories')),
-            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
+            'created_at' => $this->created_at?->toIso8601String(),
         ];
     }
 }

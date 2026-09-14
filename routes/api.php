@@ -113,9 +113,12 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
         Route::post('/check-out', [AttendanceController::class, 'checkOut']);
         Route::get('/history', [AttendanceController::class, 'history']);
     });
-    Route::middleware(['role:Manager|Owner|HR'])->prefix('manager/attendance')->group(function () {
-        Route::get('/today', [ManagerAttendanceController::class, 'today']);
-        Route::get('/{employeeId}', [ManagerAttendanceController::class, 'show']);
+    Route::middleware(['role:Manager|Owner|HR'])->prefix('manager')->group(function () {
+        Route::prefix('/attendance')->group(function () {
+            Route::get('/today', [ManagerAttendanceController::class, 'today']);
+            Route::get('/{employeeId}', [ManagerAttendanceController::class, 'show']);
+        });
+        Route::get('/team-goals', [ManagerController::class, 'teamGoals']);
     });
     Route::middleware(['role:HR|Owner'])->prefix('hr/attendance')->group(function () {
         Route::get('/daily', [HrAttendanceController::class, 'daily']);

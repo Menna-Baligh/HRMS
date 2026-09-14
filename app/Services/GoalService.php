@@ -103,4 +103,21 @@ class GoalService
             ->where('id', $goalId)
             ->first();
     }
+    public function getManagerTeamGoals(Employee $manager, ?string $status = null, ?int $employeeId = null, int $perPage = 15)
+    {
+        $teamEmployeeIds = Employee::where('manager_id', $manager->id)->pluck('id');
+
+        $query = Goal::with(['employee.user', 'employee.department'])
+            ->whereIn('employee_id', $teamEmployeeIds);
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        if ($employeeId) {
+            $query->where('employee_id', $employeeId);
+        }
+
+        return $query->latest()->paginate($perPage);
+    }
 }
