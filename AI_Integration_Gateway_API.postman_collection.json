@@ -1,0 +1,577 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-4a7b-8c9d-aigateway-v1",
+		"name": "AI Integration Gateway API (HRMS)",
+		"description": "Comprehensive Postman collection for HRMS AI Integration Gateway module including JWT Auth, Career Coach, Policy Assistant, Performance Insight, Evaluation Draft, and Generations Lineage & Feedback.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8000/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "generation_id",
+			"value": "1",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Authentication",
+			"description": "Login endpoints to authenticate as Employee, Manager, or HR. Automatically sets {{token}} variable.",
+			"item": [
+				{
+					"name": "Login as Employee",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var jsonData = pm.response.json();",
+									"if (jsonData.access_token) {",
+									"    pm.collectionVariables.set(\"token\", jsonData.access_token);",
+									"    console.log(\"Token set successfully for Employee\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"employee@example.com\",\n    \"password\": \"password\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					}
+				},
+				{
+					"name": "Login as Manager",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var jsonData = pm.response.json();",
+									"if (jsonData.access_token) {",
+									"    pm.collectionVariables.set(\"token\", jsonData.access_token);",
+									"    console.log(\"Token set successfully for Manager\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"manager@example.com\",\n    \"password\": \"password\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					}
+				},
+				{
+					"name": "Login as HR",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var jsonData = pm.response.json();",
+									"if (jsonData.access_token) {",
+									"    pm.collectionVariables.set(\"token\", jsonData.access_token);",
+									"    console.log(\"Token set successfully for HR\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"hr@example.com\",\n    \"password\": \"password\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Career Coach",
+			"description": "Endpoints for retrieving authorized career coach context envelopes and generating recommendations.",
+			"item": [
+				{
+					"name": "Get Career Coach Context (Own Data)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/ai/career-coach/context",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"ai",
+								"career-coach",
+								"context"
+							]
+						},
+						"description": "Fetches permission-aware context envelope for the authenticated employee. Strips secrets, passwords, and tokens."
+					}
+				},
+				{
+					"name": "Get Career Coach Context (Direct Report - Manager)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/ai/career-coach/context?employee_id=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"ai",
+								"career-coach",
+								"context"
+							],
+							"query": [
+								{
+									"key": "employee_id",
+									"value": "1",
+									"description": "Target employee ID (must be a direct report if requester is a Manager)"
+								}
+							]
+						},
+						"description": "Allows a Manager to inspect the career context envelope of a direct report."
+					}
+				},
+				{
+					"name": "Generate Career Coach Recommendations",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var jsonData = pm.response.json();",
+									"if (jsonData.data && jsonData.data.id) {",
+									"    pm.collectionVariables.set(\"generation_id\", jsonData.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employee_id\": null\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/ai/career-coach/generate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"ai",
+								"career-coach",
+								"generate"
+							]
+						},
+						"description": "Executes the AI Career Coach pipeline: builds context, calls AI Gateway, validates output contract, and persists generation."
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Policy Assistant",
+			"description": "RAG-style query assistant against company policies and personal facts.",
+			"item": [
+				{
+					"name": "Get Policy Assistant Context",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/ai/policy-assistant/context?query=annual leave policy",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"ai",
+								"policy-assistant",
+								"context"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "annual leave policy",
+									"description": "Search query to filter active policy documents"
+								}
+							]
+						},
+						"description": "Builds context envelope containing active policy documents and authorized personal facts (e.g. employee's own leave balances)."
+					}
+				},
+				{
+					"name": "Ask Policy Assistant",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"query\": \"How many days of annual leave am I entitled to and what is the notice period?\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/ai/policy-assistant/ask",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"ai",
+								"policy-assistant",
+								"ask"
+							]
+						},
+						"description": "Processes a policy query via the AI Gateway, citing specific policy codes, categories, and sections."
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Performance Insight",
+			"description": "Synthesizes attendance, leave, and review metrics into performance insights.",
+			"item": [
+				{
+					"name": "Generate Performance Insight (Own)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employee_id\": null,\n    \"from_date\": \"2026-01-01\",\n    \"to_date\": \"2026-06-30\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/ai/performance-insight/generate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"ai",
+								"performance-insight",
+								"generate"
+							]
+						},
+						"description": "Generates performance summary metrics and highlights for the authenticated employee over the specified period."
+					}
+				},
+				{
+					"name": "Generate Performance Insight (Manager for Direct Report)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employee_id\": 1,\n    \"from_date\": \"2026-01-01\",\n    \"to_date\": \"2026-06-30\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/ai/performance-insight/generate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"ai",
+								"performance-insight",
+								"generate"
+							]
+						},
+						"description": "Allows a Manager or HR to generate performance insights for an authorized subordinate."
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Evaluation Draft",
+			"description": "Generates draft evaluation reviews. Restricted to Manager, HR, and Owner roles.",
+			"item": [
+				{
+					"name": "Generate Evaluation Draft (Manager / HR only)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employee_id\": 1,\n    \"notes\": \"Strong problem-solving skills, meets project deadlines consistently, excellent collaboration with backend teammates.\",\n    \"competencies\": [\n        \"Technical Problem Solving\",\n        \"Communication & Teamwork\",\n        \"Code Quality & Testing\"\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/ai/evaluation-draft/generate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"ai",
+								"evaluation-draft",
+								"generate"
+							]
+						},
+						"description": "Generates a structured review draft with mandatory 'is_draft = true' flag. Rejects regular Employee role with 403 Forbidden."
+					}
+				}
+			]
+		},
+		{
+			"name": "6. Generations, Lineage & Feedback",
+			"description": "Manage AI generation history, version regeneration, and quality feedback.",
+			"item": [
+				{
+					"name": "List AI Generations History",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/ai/generations?feature=career_coach",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"ai",
+								"generations"
+							],
+							"query": [
+								{
+									"key": "feature",
+									"value": "career_coach",
+									"description": "Filter by feature: career_coach, policy_assistant, performance_insight, evaluation_draft"
+								}
+							]
+						},
+						"description": "Lists paginated history of AI generations accessible to the authenticated user."
+					}
+				},
+				{
+					"name": "Regenerate AI Generation (Creates v2 without overwriting v1)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/ai/generations/{{generation_id}}/regenerate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"ai",
+								"generations",
+								"{{generation_id}}",
+								"regenerate"
+							]
+						},
+						"description": "Regenerates an existing AI response, preserving the original (v1) and creating a linked new version (v2)."
+					}
+				},
+				{
+					"name": "Submit AI Feedback",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": \"useful\",\n    \"comments\": \"The career milestone recommendations are practical and tailored to my role.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/ai/generations/{{generation_id}}/feedback",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"ai",
+								"generations",
+								"{{generation_id}}",
+								"feedback"
+							]
+						},
+						"description": "Captures user feedback ('useful' or 'not_useful') on their authorized generation."
+					}
+				}
+			]
+		}
+	]
+}
