@@ -25,6 +25,19 @@ class GoalService
     }
 
 
+    public function updateGoal(Goal $goal, array $data): Goal
+    {
+        $goal->update(array_filter([
+            'title' => $data['title'] ?? $goal->title,
+            'description' => array_key_exists('description', $data) ? $data['description'] : $goal->description,
+            'target_value' => $data['target_value'] ?? $goal->target_value,
+            'target_date' => $data['target_date'] ?? $goal->target_date,
+        ], fn ($value) => ! is_null($value)));
+
+        return $goal->fresh(['histories.updater']);
+    }
+
+    
     public function updateProgress(Goal $goal, float $newValue, int $updatedByUserId, ?string $note = null): Goal
     {
         return DB::transaction(function () use ($goal, $newValue, $updatedByUserId, $note) {
@@ -51,27 +64,25 @@ class GoalService
                 event(new GoalCompleted($goal));
             }
 
-            return $goal->fresh(['histories']);
+            return $goal->fresh(['histories.updater']);
         });
     }
 
-    
-    public function changeStatus(Goal $goal, GoalStatus $newStatus): Goal
+    public function markAsCompleted(Goal $goal): Goal
     {
-        $previousStatus = $goal->status;
+        return DB::transaction(function () use ($goal) {
+            $wasCompletedBefore = $goal->status === GoalStatus::COMPLETED;
 
-        if ($newStatus === GoalStatus::COMPLETED) {
+            $goal->status = GoalStatus::COMPLETED;
             $goal->current_value = $goal->target_value;
-        }
+            $goal->save();
 
-        $goal->status = $newStatus;
-        $goal->save();
+            if (! $wasCompletedBefore) {
+                event(new GoalCompleted($goal));
+            }
 
-        if ($newStatus === GoalStatus::COMPLETED && $previousStatus !== GoalStatus::COMPLETED) {
-            event(new GoalCompleted($goal));
-        }
-
-        return $goal;
+            return $goal->fresh(['histories.updater']);
+        });
     }
     public function getEmployeeGoals(Employee $employee, ?string $status = null, int $perPage = 15)
     {

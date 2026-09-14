@@ -130,6 +130,9 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
             Route::get('/', [GoalController::class, 'index']);
             Route::post('/', [GoalController::class, 'store']);
             Route::get('/{id}', [GoalController::class, 'show']);
+            Route::put('/{id}', [GoalController::class, 'update']);
+            Route::patch('/{id}/progress', [GoalController::class, 'updateProgress']);
+            Route::patch('/{id}/complete', [GoalController::class, 'complete']);
         });
     });
 
