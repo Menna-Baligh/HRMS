@@ -20,4 +20,11 @@ class StoreGoalRequest extends FormRequest
             'target_date' => ['required', 'date', 'after_or_equal:today'], 
         ];
     }
+    public function messages(): array
+    {
+        return [
+            'target_value.min' => 'Target value must be greater than zero.',
+            'target_date.after_or_equal' => 'Target date must be today or a future date.',
+        ];
+    }
 }
