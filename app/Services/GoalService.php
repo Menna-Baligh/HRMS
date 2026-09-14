@@ -120,4 +120,24 @@ class GoalService
 
         return $query->latest()->paginate($perPage);
     }
+    public function getHrGoalsOverview(?string $status = null, ?int $departmentId = null, ?int $employeeId = null, int $perPage = 15)
+    {
+        $query = Goal::with(['employee.user', 'employee.department']);
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        if ($employeeId) {
+            $query->where('employee_id', $employeeId);
+        }
+
+        if ($departmentId) {
+            $query->whereHas('employee', function ($q) use ($departmentId) {
+                $q->where('department_id', $departmentId);
+            });
+        }
+
+        return $query->latest()->paginate($perPage);
+    }
 }

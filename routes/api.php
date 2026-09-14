@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\GoalController;
 use App\Http\Controllers\Api\GoogleAuthController;
 use App\Http\Controllers\Api\HrAttendanceController;
+use App\Http\Controllers\Api\HrGoalController;
 use App\Http\Controllers\Api\ManagerAttendanceController;
 use App\Http\Controllers\Api\ManagerController;
 use App\Http\Controllers\Api\PermissionController;
@@ -120,11 +121,15 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
         });
         Route::get('/team-goals', [ManagerController::class, 'teamGoals']);
     });
-    Route::middleware(['role:HR|Owner'])->prefix('hr/attendance')->group(function () {
-        Route::get('/daily', [HrAttendanceController::class, 'daily']);
-        Route::get('/exceptions', [HrAttendanceController::class, 'exceptions']);
-        Route::get('/monthly-summary', [HrAttendanceController::class, 'monthlySummary']);
-        Route::get('/export', [HrAttendanceController::class, 'export']);
+    Route::middleware(['role:HR|Owner'])->prefix('hr')->group(function () {
+        Route::prefix('/attendance')->group(function () {
+            Route::get('/daily', [HrAttendanceController::class, 'daily']);
+            Route::get('/exceptions', [HrAttendanceController::class, 'exceptions']);
+            Route::get('/monthly-summary', [HrAttendanceController::class, 'monthlySummary']);
+            Route::get('/export', [HrAttendanceController::class, 'export']);
+        });
+
+        Route::get('/goals', [HrGoalController::class, 'index']);
     });
 });
 
