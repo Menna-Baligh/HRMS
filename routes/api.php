@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AuthController as ApiAuthController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
+use App\Http\Controllers\Api\GoalController;
 use App\Http\Controllers\Api\GoogleAuthController;
 use App\Http\Controllers\Api\HrAttendanceController;
 use App\Http\Controllers\Api\ManagerAttendanceController;
@@ -123,6 +124,12 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
         Route::get('/export', [HrAttendanceController::class, 'export']);
     });
 });
+
+    Route::middleware(['auth:api', 'check.active'])->group(function () {
+        Route::prefix('goals')->group(function () {
+            Route::post('/', [GoalController::class, 'store']);
+        });
+    });
 
 // ─── V1 Leave Management API ─────────────────────────────────────────────────
 Route::prefix('v1')->group(function (): void {

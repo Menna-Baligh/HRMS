@@ -19,7 +19,7 @@ class GoalResource extends JsonResource
             'progress_percentage' => $this->progress_percentage,
             'target_date' => $this->target_date?->format('Y-m-d'),
             'status' => $this->status->value ?? $this->status,
-            'created_at' => $this->created_at?->toIso8601String(),
+            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
         ];
     }
 }
