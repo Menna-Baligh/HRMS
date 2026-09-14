@@ -73,4 +73,23 @@ class GoalService
 
         return $goal;
     }
+    public function getEmployeeGoals(Employee $employee, ?string $status = null, int $perPage = 15)
+    {
+        $query = Goal::where('employee_id', $employee->id);
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        return $query->latest()->paginate($perPage);
+    }
+
+
+    public function getEmployeeGoalDetails(Employee $employee, int $goalId): ?Goal
+    {
+        return Goal::with(['histories.updater'])
+            ->where('employee_id', $employee->id)
+            ->where('id', $goalId)
+            ->first();
+    }
 }

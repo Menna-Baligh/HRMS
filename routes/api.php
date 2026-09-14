@@ -127,7 +127,9 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
 
     Route::middleware(['auth:api', 'check.active'])->group(function () {
         Route::prefix('goals')->group(function () {
+            Route::get('/', [GoalController::class, 'index']);
             Route::post('/', [GoalController::class, 'store']);
+            Route::get('/{id}', [GoalController::class, 'show']);
         });
     });
 
