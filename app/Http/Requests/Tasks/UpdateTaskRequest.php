@@ -24,16 +24,16 @@ class UpdateTaskRequest extends FormRequest
      */
     public function rules(): array
     {
-                //to update task
+        // to update task
 
         return [
-            'title' => ['sometimes','string','min:3','max:255',],
+            'title' => ['sometimes', 'string', 'min:3', 'max:255'],
 
-            'description' => ['sometimes','nullable','string',],
+            'description' => ['sometimes', 'nullable', 'string'],
 
-            'priority' => ['sometimes', Rule::enum(TaskPriority::class),],
+            'priority' => ['sometimes', Rule::enum(TaskPriority::class)],
 
-            'deadline' => ['sometimes','date','after:now',],
+            'deadline' => ['sometimes', 'date', 'after:now'],
         ];
     }
 }

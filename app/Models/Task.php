@@ -2,16 +2,13 @@
 
 namespace App\Models;
 
-use App\Models\TaskActivity;
-use App\Models\TaskAssignment;
 use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 class Task extends Model
 {
-    protected $fillable = [ 
+    protected $fillable = [
         'title',
         'description',
         'priority',
@@ -25,6 +22,7 @@ class Task extends Model
         'priority' => TaskPriority::class,
         'status' => TaskStatus::class,
     ];
+
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');

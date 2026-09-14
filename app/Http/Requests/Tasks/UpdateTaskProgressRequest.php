@@ -25,7 +25,7 @@ class UpdateTaskProgressRequest extends FormRequest
 
         // renew the task progress
         return [
-            'progress' => ['required', 'integer','between:0,100',],
+            'progress' => ['required', 'integer', 'between:0,100'],
         ];
     }
 }

@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\TaskActivity;
 use App\Enums\UserRole;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -118,9 +117,9 @@ class User extends Authenticatable implements JWTSubject
     }
 
     public function taskActivities(): HasMany
-{
-    return $this->hasMany(TaskActivity::class, 'employee_id');
-}
+    {
+        return $this->hasMany(TaskActivity::class, 'employee_id');
+    }
     // ─── Role Helpers ─────────────────────────────────────────────────────────
 
     public function isOwner(): bool
