@@ -70,4 +70,8 @@ class Employee extends Model
     {
         return $this->hasMany(Goal::class);
     }
+    public function evaluations(): HasMany
+    {
+        return $this->hasMany(Evaluation::class);
+    }
 }
