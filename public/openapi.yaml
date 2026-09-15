@@ -4592,8 +4592,576 @@ paths:
                 errors:
                   month:
                     - The month field is required.
+# ----------------------------------------------------------------------
+  # Evaluation Endpoints
+  # ----------------------------------------------------------------------
+  /api/evaluation-periods:
+    get:
+      summary: List Evaluation Periods
+      operationId: listEvaluationPeriods
+      tags:
+        - Evaluation
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+            example: application/json
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: Evaluation periods retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Evaluation periods retrieved successfully.
+                  data:
+                    type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/EvaluationPeriod'
+                      links:
+                        type: object
+                      meta:
+                        type: object
 
-  
+    post:
+      summary: Store Evaluation Period
+      operationId: storeEvaluationPeriod
+      tags:
+        - Evaluation
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+            example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - start_date
+                - end_date
+              properties:
+                name:
+                  type: string
+                  example: Q1 2026 Evaluation
+                start_date:
+                  type: string
+                  format: date
+                  example: "2026-01-01"
+                end_date:
+                  type: string
+                  format: date
+                  example: "2026-03-31"
+      responses:
+        '201':
+          description: Evaluation period created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Evaluation period created successfully.
+                  data:
+                    $ref: '#/components/schemas/EvaluationPeriod'
+
+  /api/evaluation-periods/{id}/toggle-status:
+    patch:
+      summary: Toggle Evaluation Period Status
+      operationId: toggleEvaluationPeriodStatus
+      tags:
+        - Evaluation
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+            example: application/json
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Evaluation period status toggled successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Evaluation period status changed to active.
+                  data:
+                    $ref: '#/components/schemas/EvaluationPeriod'
+
+  /api/evaluation-categories:
+    get:
+      summary: List Evaluation Categories
+      operationId: listEvaluationCategories
+      tags:
+        - Evaluation
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+            example: application/json
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: Evaluation categories retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Evaluation categories retrieved successfully.
+                  data:
+                    type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/EvaluationCategory'
+
+    post:
+      summary: Store Evaluation Category
+      operationId: storeEvaluationCategory
+      tags:
+        - Evaluation
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+            example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - max_score
+                - weight
+              properties:
+                name:
+                  type: string
+                  example: Technical Skills
+                max_score:
+                  type: number
+                  example: 10
+                weight:
+                  type: number
+                  example: 1.5
+      responses:
+        '201':
+          description: Evaluation category created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Evaluation category created successfully.
+                  data:
+                    $ref: '#/components/schemas/EvaluationCategory'
+
+  /api/evaluations:
+    get:
+      summary: HR Company Evaluations Overview
+      operationId: hrEvaluationsOverview
+      tags:
+        - Evaluation
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+            example: application/json
+        - in: query
+          name: status
+          required: false
+          schema:
+            type: string
+            example: draft
+        - in: query
+          name: period_id
+          required: false
+          schema:
+            type: integer
+            example: 1
+        - in: query
+          name: department_id
+          required: false
+          schema:
+            type: integer
+            example: 2
+        - in: query
+          name: employee_id
+          required: false
+          schema:
+            type: integer
+            example: 5
+        - in: query
+          name: evaluator_id
+          required: false
+          schema:
+            type: integer
+            example: 3
+      responses:
+        '200':
+          description: Company evaluations overview retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Company evaluations overview retrieved successfully.
+                  data:
+                    type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Evaluation'
+
+    post:
+      summary: Create Evaluation Draft
+      operationId: storeEvaluationDraft
+      tags:
+        - Evaluation
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+            example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - employee_id
+                - period_id
+              properties:
+                employee_id:
+                  type: integer
+                  example: 5
+                period_id:
+                  type: integer
+                  example: 1
+                feedback:
+                  type: string
+                  example: Great overall performance.
+                scores:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - category_id
+                      - score
+                    properties:
+                      category_id:
+                        type: integer
+                        example: 1
+                      score:
+                        type: number
+                        example: 9.5
+                evidence_goal_ids:
+                  type: array
+                  items:
+                    type: integer
+                  example: [1, 2]
+      responses:
+        '201':
+          description: Evaluation draft created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Evaluation draft created successfully.
+                  data:
+                    $ref: '#/components/schemas/Evaluation'
+
+  /api/evaluations/{id}:
+    put:
+      summary: Update Evaluation Draft
+      operationId: updateEvaluationDraft
+      tags:
+        - Evaluation
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+            example: application/json
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          example: 10
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                feedback:
+                  type: string
+                  example: Updated feedback details.
+                scores:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      category_id:
+                        type: integer
+                        example: 1
+                      score:
+                        type: number
+                        example: 8.0
+                evidence_goal_ids:
+                  type: array
+                  items:
+                    type: integer
+                  example: [2]
+      responses:
+        '200':
+          description: Evaluation draft updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Evaluation draft updated successfully.
+                  data:
+                    $ref: '#/components/schemas/Evaluation'
+
+  /api/evaluations/{id}/complete:
+    patch:
+      summary: Complete Evaluation
+      operationId: completeEvaluation
+      tags:
+        - Evaluation
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+            example: application/json
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          example: 10
+      responses:
+        '200':
+          description: Evaluation completed successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Evaluation completed and locked successfully.
+                  data:
+                    $ref: '#/components/schemas/Evaluation'
+
+  /api/manager/evaluations:
+    get:
+      summary: Manager Team Evaluations
+      operationId: managerTeamEvaluations
+      tags:
+        - Evaluation
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+            example: application/json
+        - in: query
+          name: status
+          required: false
+          schema:
+            type: string
+            example: completed
+        - in: query
+          name: period_id
+          required: false
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Team evaluations retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Team evaluations retrieved successfully.
+                  data:
+                    type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Evaluation'
+
+  /api/employee/evaluations:
+    get:
+      summary: Employee Evaluation History
+      operationId: employeeEvaluationsHistory
+      tags:
+        - Evaluation
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+            example: application/json
+      responses:
+        '200':
+          description: Evaluation history retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Completed evaluation history retrieved successfully.
+                  data:
+                    type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Evaluation'
+
 
 components:
   securitySchemes:
@@ -4601,3 +5169,150 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+  schemas:
+    EvaluationPeriod:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Q1 2026 Evaluation
+        start_date:
+          type: string
+          format: date
+          example: "2026-01-01"
+        end_date:
+          type: string
+          format: date
+          example: "2026-03-31"
+        status:
+          type: string
+          example: active
+        created_at:
+          type: string
+          example: "2026-01-01 10:00:00"
+
+    EvaluationCategory:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Technical Skills
+        max_score:
+          type: number
+          example: 10.0
+        weight:
+          type: number
+          example: 1.5
+        created_at:
+          type: string
+          example: "2026-01-01 10:00:00"
+
+    Evaluation:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 10
+        employee_id:
+          type: integer
+          example: 5
+        employee_name:
+          type: string
+          example: John Doe
+        job_title:
+          type: string
+          example: Software Engineer
+        department:
+          type: string
+          example: Engineering
+        evaluator_id:
+          type: integer
+          example: 2
+        evaluator_name:
+          type: string
+          example: Jane Smith
+        period_id:
+          type: integer
+          example: 1
+        period_name:
+          type: string
+          example: Q1 2026 Evaluation
+        overall_score:
+          type: number
+          example: 95.5
+        feedback:
+          type: string
+          example: Excellent performance throughout the quarter.
+        status:
+          type: string
+          example: completed
+        scores:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 1
+              category_id:
+                type: integer
+                example: 1
+              category_name:
+                type: string
+                example: Technical Skills
+              max_score:
+                type: number
+                example: 10
+              weight:
+                type: number
+                example: 1.5
+              score:
+                type: number
+                example: 9.5
+        evidence:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 1
+              goal_id:
+                type: integer
+                example: 2
+              goal_title:
+                type: string
+                example: Deliver Microservice Feature
+              description:
+                type: string
+                nullable: true
+        audit_logs:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 1
+              action:
+                type: string
+                example: completed
+              performed_by:
+                type: string
+                example: Jane Smith
+              details:
+                type: object
+              created_at:
+                type: string
+                example: "2026-03-31 15:30:00"
+        created_at:
+          type: string
+          example: "2026-03-01 09:00:00"
+
+

@@ -156,7 +156,7 @@ return [
         /**
          * Whether to show models in the sidebar, search, and content.
          */
-        'hideModels' => false,
+        'hideModels' => true,
 
         /**
          * File type of the “Download OpenAPI Document” button.
