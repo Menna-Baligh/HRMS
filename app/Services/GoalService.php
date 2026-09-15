@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Enums\GoalStatus;
@@ -10,7 +11,6 @@ use Illuminate\Support\Facades\DB;
 
 class GoalService
 {
-
     public function createGoal(Employee $employee, array $data): Goal
     {
         return Goal::create([
@@ -24,7 +24,6 @@ class GoalService
         ]);
     }
 
-
     public function updateGoal(Goal $goal, array $data): Goal
     {
         $goal->update(array_filter([
@@ -37,7 +36,6 @@ class GoalService
         return $goal->fresh(['histories.updater']);
     }
 
-    
     public function updateProgress(Goal $goal, float $newValue, int $updatedByUserId, ?string $note = null): Goal
     {
         return DB::transaction(function () use ($goal, $newValue, $updatedByUserId, $note) {
@@ -84,6 +82,7 @@ class GoalService
             return $goal->fresh(['histories.updater']);
         });
     }
+
     public function getEmployeeGoals(Employee $employee, ?string $status = null, int $perPage = 15)
     {
         $query = Goal::where('employee_id', $employee->id);
@@ -95,7 +94,6 @@ class GoalService
         return $query->latest()->paginate($perPage);
     }
 
-
     public function getEmployeeGoalDetails(Employee $employee, int $goalId): ?Goal
     {
         return Goal::with(['histories.updater'])
@@ -103,6 +101,7 @@ class GoalService
             ->where('id', $goalId)
             ->first();
     }
+
     public function getManagerTeamGoals(Employee $manager, ?string $status = null, ?int $employeeId = null, int $perPage = 15)
     {
         $teamEmployeeIds = Employee::where('manager_id', $manager->id)->pluck('id');
@@ -120,6 +119,7 @@ class GoalService
 
         return $query->latest()->paginate($perPage);
     }
+
     public function getHrGoalsOverview(?string $status = null, ?int $departmentId = null, ?int $employeeId = null, int $perPage = 15)
     {
         $query = Goal::with(['employee.user', 'employee.department']);

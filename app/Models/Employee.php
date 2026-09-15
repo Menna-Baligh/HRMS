@@ -66,8 +66,14 @@ class Employee extends Model
     {
         return $this->belongsTo(CompanyLocation::class);
     }
+
     public function goals(): HasMany
     {
         return $this->hasMany(Goal::class);
+    }
+
+    public function evaluations(): HasMany
+    {
+        return $this->hasMany(Evaluation::class);
     }
 }

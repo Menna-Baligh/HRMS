@@ -38,6 +38,7 @@ class ManagerController extends Controller
             message: 'Manager employees retrieved successfully.'
         );
     }
+
     public function teamGoals(Request $request): JsonResponse
     {
         try {

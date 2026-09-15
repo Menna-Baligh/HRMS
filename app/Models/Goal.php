@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Models;
 
 use App\Enums\GoalStatus;
