@@ -149,4 +149,45 @@ class EvaluationService
 
         return $query->latest()->paginate($perPage);
     }
+    public function getHrEvaluationsOverview(
+    ?string $status = null,
+    ?int $periodId = null,
+    ?int $departmentId = null,
+    ?int $employeeId = null,
+    ?int $evaluatorId = null,
+    int $perPage = 10
+    ) {
+        $query = Evaluation::with([
+            'employee.user',
+            'employee.department',
+            'evaluator',
+            'period',
+            'scores.category',
+            'evidence.goal',
+        ]);
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        if ($periodId) {
+            $query->where('period_id', $periodId);
+        }
+
+        if ($employeeId) {
+            $query->where('employee_id', $employeeId);
+        }
+
+        if ($evaluatorId) {
+            $query->where('evaluator_id', $evaluatorId);
+        }
+
+        if ($departmentId) {
+            $query->whereHas('employee', function ($q) use ($departmentId) {
+                $q->where('department_id', $departmentId);
+            });
+        }
+
+        return $query->latest()->paginate($perPage);
+    }
 }

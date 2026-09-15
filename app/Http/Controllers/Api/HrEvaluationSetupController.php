@@ -9,13 +9,47 @@ use App\Http\Requests\StoreEvaluationCategoryRequest;
 use App\Http\Requests\StoreEvaluationPeriodRequest;
 use App\Http\Resources\EvaluationCategoryResource;
 use App\Http\Resources\EvaluationPeriodResource;
+use App\Http\Resources\EvaluationResource;
 use App\Models\EvaluationCategory;
 use App\Models\EvaluationPeriod;
+use App\Services\EvaluationService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Throwable;
 
 class HrEvaluationSetupController extends Controller
 {
+    public function __construct(private EvaluationService $evaluationService) {}
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $status = $request->query('status');
+            $periodId = $request->query('period_id') ? (int) $request->query('period_id') : null;
+            $departmentId = $request->query('department_id') ? (int) $request->query('department_id') : null;
+            $employeeId = $request->query('employee_id') ? (int) $request->query('employee_id') : null;
+            $evaluatorId = $request->query('evaluator_id') ? (int) $request->query('evaluator_id') : null;
+
+            $evaluations = $this->evaluationService->getHrEvaluationsOverview(
+                $status,
+                $periodId,
+                $departmentId,
+                $employeeId,
+                $evaluatorId,
+                10
+            );
+
+            return ResponseHelper::success(
+                EvaluationResource::collection($evaluations)->response()->getData(true),
+                'Company evaluations overview retrieved successfully.'
+            );
+        } catch (Throwable $e) {
+            return ResponseHelper::error(
+                config('app.debug') ? $e->getMessage() : null,
+                'Failed to retrieve company evaluations overview.',
+                500
+            );
+        }
+    }
     public function listPeriods(): JsonResponse
     {
         try {

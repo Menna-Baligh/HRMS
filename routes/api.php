@@ -130,7 +130,7 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
             Route::get('/monthly-summary', [HrAttendanceController::class, 'monthlySummary']);
             Route::get('/export', [HrAttendanceController::class, 'export']);
         });
-
+        Route::get('/evaluations', [HrEvaluationSetupController::class, 'index']);
         Route::get('/goals', [HrGoalController::class, 'index']);
     });
     Route::middleware(['role:Manager|HR|Owner'])->group(function () {
@@ -144,7 +144,6 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
         Route::post('/evaluations', [EvaluationController::class, 'store']);
         Route::put('/evaluations/{id}', [EvaluationController::class, 'update']);
         Route::patch('/evaluations/{id}/complete', [EvaluationController::class, 'complete']);
-
         Route::get('/manager/evaluations', [EvaluationController::class, 'managerEvaluations']);
     });
 });
