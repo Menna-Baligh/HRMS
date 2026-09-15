@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AuthController as ApiAuthController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
+use App\Http\Controllers\Api\EvaluationController;
 use App\Http\Controllers\Api\GoalController;
 use App\Http\Controllers\Api\GoogleAuthController;
 use App\Http\Controllers\Api\HrAttendanceController;
@@ -130,6 +131,13 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
         });
 
         Route::get('/goals', [HrGoalController::class, 'index']);
+    });
+    Route::middleware(['role:Manager|HR|Owner'])->group(function () {
+        Route::post('/evaluations', [EvaluationController::class, 'store']);
+        Route::put('/evaluations/{id}', [EvaluationController::class, 'update']);
+        Route::patch('/evaluations/{id}/complete', [EvaluationController::class, 'complete']);
+
+        Route::get('/manager/evaluations', [EvaluationController::class, 'managerEvaluations']);
     });
 });
 

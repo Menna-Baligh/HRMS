@@ -3,10 +3,12 @@ namespace App\Services;
 
 use App\Enums\EvaluationPeriodStatus;
 use App\Enums\EvaluationStatus;
+use App\Models\Employee;
 use App\Models\Evaluation;
 use App\Models\EvaluationEvidence;
 use App\Models\EvaluationPeriod;
 use App\Models\EvaluationScore;
+use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\DB;
 
@@ -16,6 +18,19 @@ class EvaluationService
     public function saveDraft(int $evaluatorUserId, array $data, ?Evaluation $evaluation = null): Evaluation
     {
         return DB::transaction(function () use ($evaluatorUserId, $data, $evaluation) {
+            $evaluator = User::with('employee')->findOrFail($evaluatorUserId);
+            $targetEmployeeId = $evaluation ? $evaluation->employee_id : $data['employee_id'];
+
+            if (! $evaluator->hasAnyRole(['HR', 'Owner'])) {
+                $isDirectReport = Employee::where('id', $targetEmployeeId)
+                    ->where('manager_id', $evaluator->employee?->id)
+                    ->exists();
+
+                if (! $isDirectReport) {
+                    throw new Exception('You can only evaluate employees within your direct team.');
+                }
+            }
+
             if ($evaluation) {
                 if ($evaluation->status === EvaluationStatus::COMPLETED) {
                     throw new Exception('Completed evaluations cannot be modified as draft.');
@@ -116,5 +131,22 @@ class EvaluationService
 
             return $evaluation->fresh(['scores.category', 'evidence.goal', 'employee.user']);
         });
+    }
+    public function getManagerTeamEvaluations(Employee $manager, ?string $status = null, ?int $periodId = null, int $perPage = 15)
+    {
+        $teamEmployeeIds = Employee::where('manager_id', $manager->id)->pluck('id');
+
+        $query = Evaluation::with(['employee.user', 'employee.department', 'evaluator', 'period', 'scores.category', 'evidence.goal'])
+            ->whereIn('employee_id', $teamEmployeeIds);
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        if ($periodId) {
+            $query->where('period_id', $periodId);
+        }
+
+        return $query->latest()->paginate($perPage);
     }
 }
