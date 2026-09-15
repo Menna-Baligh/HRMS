@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\GoogleAuthController;
 use App\Http\Controllers\Api\HrAttendanceController;
 use App\Http\Controllers\Api\HrEvaluationSetupController;
 use App\Http\Controllers\Api\HrGoalController;
+use App\Http\Controllers\Api\HrPerformanceController;
 use App\Http\Controllers\Api\ManagerAttendanceController;
 use App\Http\Controllers\Api\ManagerController;
 use App\Http\Controllers\Api\ManagerPerformanceController;
@@ -135,6 +136,7 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
         });
         Route::get('/evaluations', [HrEvaluationSetupController::class, 'index']);
         Route::get('/goals', [HrGoalController::class, 'index']);
+        Route::get('/company-performance', [HrPerformanceController::class, 'companyDashboard']);
     });
     Route::middleware(['role:Manager|HR|Owner'])->group(function () {
         Route::get('/evaluation-periods', [HrEvaluationSetupController::class, 'listPeriods']);
