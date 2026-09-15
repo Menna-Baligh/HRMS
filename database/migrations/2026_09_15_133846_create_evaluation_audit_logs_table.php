@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('evaluation_id')->constrained('evaluations')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->string('action'); 
+            $table->string('action');
             $table->json('details')->nullable();
             $table->timestamps();
         });

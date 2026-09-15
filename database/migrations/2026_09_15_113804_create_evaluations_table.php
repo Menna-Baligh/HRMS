@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('employee_id')->constrained('employees')->cascadeOnDelete();
             $table->foreignId('evaluator_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('period_id')->constrained('evaluation_periods')->cascadeOnDelete();
-            $table->decimal('overall_score', 5, 2)->nullable(); 
+            $table->decimal('overall_score', 5, 2)->nullable();
             $table->text('feedback')->nullable();
             $table->string('status')->default(EvaluationStatus::DRAFT->value);
             $table->timestamps();

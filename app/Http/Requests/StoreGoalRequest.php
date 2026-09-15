@@ -16,10 +16,11 @@ class StoreGoalRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'target_value' => ['required', 'numeric', 'min:1'], 
-            'target_date' => ['required', 'date', 'after_or_equal:today'], 
+            'target_value' => ['required', 'numeric', 'min:1'],
+            'target_date' => ['required', 'date', 'after_or_equal:today'],
         ];
     }
+
     public function messages(): array
     {
         return [

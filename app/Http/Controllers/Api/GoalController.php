@@ -70,6 +70,7 @@ class GoalController extends Controller
             );
         }
     }
+
     public function store(StoreGoalRequest $request): JsonResponse
     {
         try {
@@ -98,6 +99,7 @@ class GoalController extends Controller
             );
         }
     }
+
     public function update(UpdateGoalRequest $request, int $id): JsonResponse
     {
         try {

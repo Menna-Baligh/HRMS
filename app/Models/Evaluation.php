@@ -50,6 +50,7 @@ class Evaluation extends Model
     {
         return $this->hasMany(EvaluationEvidence::class);
     }
+
     public function auditLogs(): HasMany
     {
         return $this->hasMany(EvaluationAuditLog::class);

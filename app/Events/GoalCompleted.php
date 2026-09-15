@@ -11,7 +11,5 @@ class GoalCompleted
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public function __construct(public Goal $goal)
-    {
-    }
+    public function __construct(public Goal $goal) {}
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Enums\EvaluationPeriodStatus;
@@ -15,7 +16,6 @@ use Illuminate\Support\Facades\DB;
 
 class EvaluationService
 {
-
     public function saveDraft(int $evaluatorUserId, array $data, ?Evaluation $evaluation = null): Evaluation
     {
         return DB::transaction(function () use ($evaluatorUserId, $data, $evaluation) {
@@ -92,7 +92,6 @@ class EvaluationService
         });
     }
 
-
     public function calculateOverallScore(Evaluation $evaluation): float
     {
         $scores = $evaluation->scores()->with('category')->get();
@@ -121,7 +120,6 @@ class EvaluationService
 
         return round($percentage, 2);
     }
-
 
     public function completeEvaluation(Evaluation $evaluation): Evaluation
     {
@@ -153,6 +151,7 @@ class EvaluationService
             return $evaluation->fresh(['scores.category', 'evidence.goal', 'employee.user']);
         });
     }
+
     public function getManagerTeamEvaluations(Employee $manager, ?string $status = null, ?int $periodId = null, int $perPage = 15)
     {
         $teamEmployeeIds = Employee::where('manager_id', $manager->id)->pluck('id');
@@ -170,13 +169,14 @@ class EvaluationService
 
         return $query->latest()->paginate($perPage);
     }
+
     public function getHrEvaluationsOverview(
-    ?string $status = null,
-    ?int $periodId = null,
-    ?int $departmentId = null,
-    ?int $employeeId = null,
-    ?int $evaluatorId = null,
-    int $perPage = 10
+        ?string $status = null,
+        ?int $periodId = null,
+        ?int $departmentId = null,
+        ?int $employeeId = null,
+        ?int $evaluatorId = null,
+        int $perPage = 10
     ) {
         $query = Evaluation::with([
             'employee.user',
@@ -211,6 +211,7 @@ class EvaluationService
 
         return $query->latest()->paginate($perPage);
     }
+
     public function getEmployeeEvaluationsHistory(Employee $employee, int $perPage = 10)
     {
         return Evaluation::with(['period', 'evaluator', 'scores.category', 'evidence.goal', 'auditLogs.user'])

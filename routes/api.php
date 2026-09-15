@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\AttendanceController;
-use App\Http\Controllers\Api\AuthController as ApiAuthController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\AuthController as ApiAuthController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\EmployeeEvaluationController;
@@ -150,16 +150,16 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
     Route::get('/employee/evaluations', [EmployeeEvaluationController::class, 'index']);
 });
 
-    Route::middleware(['auth:api', 'check.active'])->group(function () {
-        Route::prefix('goals')->group(function () {
-            Route::get('/', [GoalController::class, 'index']);
-            Route::post('/', [GoalController::class, 'store']);
-            Route::get('/{id}', [GoalController::class, 'show']);
-            Route::put('/{id}', [GoalController::class, 'update']);
-            Route::patch('/{id}/progress', [GoalController::class, 'updateProgress']);
-            Route::patch('/{id}/complete', [GoalController::class, 'complete']);
-        });
+Route::middleware(['auth:api', 'check.active'])->group(function () {
+    Route::prefix('goals')->group(function () {
+        Route::get('/', [GoalController::class, 'index']);
+        Route::post('/', [GoalController::class, 'store']);
+        Route::get('/{id}', [GoalController::class, 'show']);
+        Route::put('/{id}', [GoalController::class, 'update']);
+        Route::patch('/{id}/progress', [GoalController::class, 'updateProgress']);
+        Route::patch('/{id}/complete', [GoalController::class, 'complete']);
     });
+});
 
 // ─── V1 Leave Management API ─────────────────────────────────────────────────
 Route::prefix('v1')->group(function (): void {
