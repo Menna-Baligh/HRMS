@@ -6,18 +6,25 @@ use App\Models\Evaluation;
 
 class EvaluationAggregatorService
 {
-    
-    public function getMetrics(int $employeeId, ?int $periodId = null): array
+
+    public function getMetrics(int $employeeId, ?int $periodId = null,?string $startDate = null,?string $endDate = null): array
     {
         $query = Evaluation::with('period')
             ->where('employee_id', $employeeId)
-            ->where('status', EvaluationStatus::COMPLETED);
+            ->where(function ($q) {
+                $q->where('status', EvaluationStatus::COMPLETED)
+                ->orWhere('status', 'completed');
+            });
 
         if ($periodId) {
             $query->where('period_id', $periodId);
         }
 
-        $evaluations = $query->latest()->get();
+        if ($startDate && $endDate) {
+            $query->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
+        }
+
+        $evaluations = $query->latest('created_at')->get();
 
         $latestEvaluation = $evaluations->first();
         $previousEvaluation = $evaluations->skip(1)->first();

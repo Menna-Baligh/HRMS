@@ -2,6 +2,7 @@
 namespace App\Services\Aggregators;
 
 use App\Models\TaskAssignment;
+use BackedEnum;
 use Carbon\Carbon;
 
 class TaskAggregatorService
@@ -23,8 +24,6 @@ class TaskAggregatorService
         $overdueTasks = 0;
         $totalProgress = 0;
 
-        $now = Carbon::now();
-
         foreach ($assignments as $assignment) {
             $task = $assignment->task;
             if (! $task) {
@@ -33,16 +32,23 @@ class TaskAggregatorService
 
             $totalProgress += $task->progress ?? 0;
 
-            if ($task->status === 'Completed' || $task->status === 'Closed') {
+            $rawStatus = $task->status;
+            $statusStr = $rawStatus instanceof BackedEnum
+                ? $rawStatus->value
+                : (is_object($rawStatus) && property_exists($rawStatus, 'value') ? $rawStatus->value : (string) ($rawStatus ?? ''));
+
+            $status = strtolower(trim($statusStr));
+
+            if (in_array($status, ['completed', 'closed'])) {
                 $completedTasks++;
-            } elseif ($task->status === 'In Progress') {
+            } elseif (in_array($status, ['in progress', 'in_progress'])) {
                 $inProgressTasks++;
             } else {
                 $pendingTasks++;
             }
 
-            if ($task->status !== 'Completed' && $task->status !== 'Closed') {
-                if (Carbon::parse($task->deadline)->isPast()) {
+            if (! in_array($status, ['completed', 'closed'])) {
+                if ($task->deadline && Carbon::parse($task->deadline)->isPast()) {
                     $overdueTasks++;
                 }
             }

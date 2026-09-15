@@ -10,14 +10,26 @@ class GoalAggregatorService
     {
         $goals = Goal::where('employee_id', $employeeId)
             ->where(function ($q) use ($startDate, $endDate) {
-                $q->whereBetween('start_date', [$startDate, $endDate])
-                    ->orWhereBetween('end_date', [$startDate, $endDate]);
+                $q->whereBetween('target_date', [$startDate, $endDate])
+                    ->orWhereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
             })
             ->get();
 
         $totalGoals = $goals->count();
         $completedGoals = $goals->where('status', 'completed')->count();
-        $averageProgress = $totalGoals > 0 ? round($goals->avg('progress'), 2) : 0.0;
+
+        $totalProgressPercentage = 0;
+
+        foreach ($goals as $goal) {
+            if ($goal->target_value > 0) {
+                $goalProgress = ($goal->current_value / $goal->target_value) * 100;
+                $totalProgressPercentage += min(100, $goalProgress); 
+            }
+        }
+
+        $averageProgress = $totalGoals > 0
+            ? round($totalProgressPercentage / $totalGoals, 2)
+            : 0.0;
 
         $completionRate = $totalGoals > 0
             ? round(($completedGoals / $totalGoals) * 100, 2)

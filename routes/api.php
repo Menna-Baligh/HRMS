@@ -1,11 +1,12 @@
 <?php
 
 use App\Http\Controllers\Api\AttendanceController;
-use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AuthController as ApiAuthController;
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\EmployeeEvaluationController;
+use App\Http\Controllers\Api\EmployeePerformanceController;
 use App\Http\Controllers\Api\EvaluationController;
 use App\Http\Controllers\Api\GoalController;
 use App\Http\Controllers\Api\GoogleAuthController;
@@ -148,6 +149,7 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
         Route::get('/manager/evaluations', [EvaluationController::class, 'managerEvaluations']);
     });
     Route::get('/employee/evaluations', [EmployeeEvaluationController::class, 'index']);
+    Route::get('/employee/performance', [EmployeePerformanceController::class, 'dashboard']);
 });
 
 Route::middleware(['auth:api', 'check.active'])->group(function () {
