@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\HrEvaluationSetupController;
 use App\Http\Controllers\Api\HrGoalController;
 use App\Http\Controllers\Api\ManagerAttendanceController;
 use App\Http\Controllers\Api\ManagerController;
+use App\Http\Controllers\Api\ManagerPerformanceController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\V1\Calendar\LeaveCalendarController;
@@ -147,6 +148,8 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
         Route::put('/evaluations/{id}', [EvaluationController::class, 'update']);
         Route::patch('/evaluations/{id}/complete', [EvaluationController::class, 'complete']);
         Route::get('/manager/evaluations', [EvaluationController::class, 'managerEvaluations']);
+
+        Route::get('/manager/team-performance', [ManagerPerformanceController::class, 'teamDashboard']);
     });
     Route::get('/employee/evaluations', [EmployeeEvaluationController::class, 'index']);
     Route::get('/employee/performance', [EmployeePerformanceController::class, 'dashboard']);

@@ -1,0 +1,51 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Helpers\ResponseHelper;
+use App\Http\Controllers\Controller;
+use App\Services\ManagerPerformanceService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Throwable;
+
+class ManagerPerformanceController extends Controller
+{
+    public function __construct(private ManagerPerformanceService $managerService) {}
+
+
+    public function teamDashboard(Request $request): JsonResponse
+    {
+        try {
+            $manager = $request->user()->employee;
+
+            if (! $manager) {
+                return ResponseHelper::error(null, 'Manager profile not found.', 404);
+            }
+
+            $periodId = $request->query('period_id') ? (int) $request->query('period_id') : null;
+            $startDate = $request->query('start_date');
+            $endDate = $request->query('end_date');
+            $perPage = (int) $request->query('per_page', 10);
+
+            $data = $this->managerService->getTeamDashboardPerformance(
+                $manager,
+                $periodId,
+                $startDate,
+                $endDate,
+                $perPage
+            );
+
+            return ResponseHelper::success(
+                $data,
+                'Team performance dashboard retrieved successfully.'
+            );
+        } catch (Throwable $e) {
+            return ResponseHelper::error(
+                config('app.debug') ? $e->getMessage() : null,
+                'Failed to retrieve team performance dashboard.',
+                500
+            );
+        }
+    }
+}
