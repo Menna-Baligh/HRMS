@@ -5,6 +5,7 @@ use App\Enums\EvaluationPeriodStatus;
 use App\Enums\EvaluationStatus;
 use App\Models\Employee;
 use App\Models\Evaluation;
+use App\Models\EvaluationAuditLog;
 use App\Models\EvaluationEvidence;
 use App\Models\EvaluationPeriod;
 use App\Models\EvaluationScore;
@@ -75,6 +76,17 @@ class EvaluationService
                     ]);
                 }
             }
+            $action = $evaluation->wasRecentlyCreated ? 'created_draft' : 'updated_draft';
+
+            EvaluationAuditLog::create([
+                'evaluation_id' => $evaluation->id,
+                'user_id' => $evaluatorUserId,
+                'action' => $action,
+                'details' => [
+                    'scores_count' => count($data['scores'] ?? []),
+                    'feedback_provided' => ! empty($data['feedback']),
+                ],
+            ]);
 
             return $evaluation->fresh(['scores.category', 'evidence.goal']);
         });
@@ -127,6 +139,15 @@ class EvaluationService
             $evaluation->update([
                 'overall_score' => $overallScore,
                 'status' => EvaluationStatus::COMPLETED,
+            ]);
+            EvaluationAuditLog::create([
+                'evaluation_id' => $evaluation->id,
+                'user_id' => auth()->id() ?? $evaluation->evaluator_id,
+                'action' => 'completed',
+                'details' => [
+                    'final_overall_score' => $overallScore,
+                    'completed_at' => now()->toDateTimeString(),
+                ],
             ]);
 
             return $evaluation->fresh(['scores.category', 'evidence.goal', 'employee.user']);
@@ -189,5 +210,13 @@ class EvaluationService
         }
 
         return $query->latest()->paginate($perPage);
+    }
+    public function getEmployeeEvaluationsHistory(Employee $employee, int $perPage = 10)
+    {
+        return Evaluation::with(['period', 'evaluator', 'scores.category', 'evidence.goal', 'auditLogs.user'])
+            ->where('employee_id', $employee->id)
+            ->where('status', EvaluationStatus::COMPLETED)
+            ->latest()
+            ->paginate($perPage);
     }
 }

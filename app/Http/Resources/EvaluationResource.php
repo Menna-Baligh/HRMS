@@ -29,6 +29,15 @@ class EvaluationResource extends JsonResource
             'status' => $this->status->value ?? $this->status,
             'scores' => EvaluationScoreResource::collection($this->whenLoaded('scores')),
             'evidence' => EvaluationEvidenceResource::collection($this->whenLoaded('evidence')),
+            'audit_logs' => $this->whenLoaded('auditLogs', function () {
+                return $this->auditLogs->map(fn ($log) => [
+                    'id' => $log->id,
+                    'action' => $log->action,
+                    'performed_by' => $log->user?->name,
+                    'details' => $log->details,
+                    'created_at' => $log->created_at?->format('Y-m-d H:i:s'),
+                ]);
+            }),
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
         ];
     }
