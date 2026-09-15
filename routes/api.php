@@ -6,14 +6,17 @@ use App\Http\Controllers\Api\AuthController as ApiAuthController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\EmployeeEvaluationController;
+use App\Http\Controllers\Api\EmployeePerformanceController;
 use App\Http\Controllers\Api\EvaluationController;
 use App\Http\Controllers\Api\GoalController;
 use App\Http\Controllers\Api\GoogleAuthController;
 use App\Http\Controllers\Api\HrAttendanceController;
 use App\Http\Controllers\Api\HrEvaluationSetupController;
 use App\Http\Controllers\Api\HrGoalController;
+use App\Http\Controllers\Api\HrPerformanceController;
 use App\Http\Controllers\Api\ManagerAttendanceController;
 use App\Http\Controllers\Api\ManagerController;
+use App\Http\Controllers\Api\ManagerPerformanceController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\V1\Calendar\LeaveCalendarController;
@@ -133,6 +136,7 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
         });
         Route::get('/evaluations', [HrEvaluationSetupController::class, 'index']);
         Route::get('/goals', [HrGoalController::class, 'index']);
+        Route::get('/company-performance', [HrPerformanceController::class, 'companyDashboard']);
     });
     Route::middleware(['role:Manager|HR|Owner'])->group(function () {
         Route::get('/evaluation-periods', [HrEvaluationSetupController::class, 'listPeriods']);
@@ -146,8 +150,11 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
         Route::put('/evaluations/{id}', [EvaluationController::class, 'update']);
         Route::patch('/evaluations/{id}/complete', [EvaluationController::class, 'complete']);
         Route::get('/manager/evaluations', [EvaluationController::class, 'managerEvaluations']);
+
+        Route::get('/manager/team-performance', [ManagerPerformanceController::class, 'teamDashboard']);
     });
     Route::get('/employee/evaluations', [EmployeeEvaluationController::class, 'index']);
+    Route::get('/employee/performance', [EmployeePerformanceController::class, 'dashboard']);
 });
 
 Route::middleware(['auth:api', 'check.active'])->group(function () {
