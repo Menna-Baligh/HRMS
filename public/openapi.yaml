@@ -4832,7 +4832,7 @@ paths:
                   data:
                     $ref: '#/components/schemas/EvaluationCategory'
 
-  /api/evaluations:
+  /api/hr/evaluations:
     get:
       summary: HR Company Evaluations Overview
       operationId: hrEvaluationsOverview
@@ -5162,6 +5162,228 @@ paths:
                         items:
                           $ref: '#/components/schemas/Evaluation'
 
+  /employee/performance:
+    get:
+      tags:
+        - Performance
+      summary: Get employee performance dashboard
+      description: Retrieves detailed performance metrics, 6-month historical trends, at-a-glance KPIs, and period comparisons for the authenticated employee profile.
+      operationId: getEmployeePerformanceDashboard
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Accept
+          in: header
+          required: true
+          schema:
+            type: string
+            example: application/json
+        - name: period_id
+          in: query
+          required: false
+          description: Optional evaluation period ID to filter metrics.
+          schema:
+            type: integer
+            example: 1
+        - name: start_date
+          in: query
+          required: false
+          description: Custom period start date (YYYY-MM-DD). Used if period_id is not provided.
+          schema:
+            type: string
+            format: date
+            example: "2026-09-01"
+        - name: end_date
+          in: query
+          required: false
+          description: Custom period end date (YYYY-MM-DD). Used if period_id is not provided.
+          schema:
+            type: string
+            format: date
+            example: "2026-09-30"
+      responses:
+        '200':
+          description: Employee performance dashboard retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Employee performance dashboard retrieved successfully.
+                  data:
+                    $ref: '#/components/schemas/EmployeeDashboardData'
+
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          description: Employee profile not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Employee profile not found.
+                errors: null
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /manager/team-performance:
+    get:
+      tags:
+        - Performance
+      summary: Get manager team performance dashboard
+      description: Retrieves aggregated performance summaries, 6-month trend charts, and paginated team member metrics for employees directly managed by the authenticated manager.
+      operationId: getManagerTeamPerformanceDashboard
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Accept
+          in: header
+          required: true
+          schema:
+            type: string
+            example: application/json
+        - name: period_id
+          in: query
+          required: false
+          description: Optional evaluation period ID to filter team metrics.
+          schema:
+            type: integer
+            example: 1
+        - name: start_date
+          in: query
+          required: false
+          description: Custom period start date (YYYY-MM-DD).
+          schema:
+            type: string
+            format: date
+            example: "2026-09-01"
+        - name: end_date
+          in: query
+          required: false
+          description: Custom period end date (YYYY-MM-DD).
+          schema:
+            type: string
+            format: date
+            example: "2026-09-30"
+        - name: per_page
+          in: query
+          required: false
+          description: Number of team members per page.
+          schema:
+            type: integer
+            default: 10
+            example: 10
+      responses:
+        '200':
+          description: Team performance dashboard retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Team performance dashboard retrieved successfully.
+                  data:
+                    $ref: '#/components/schemas/TeamDashboardData'
+
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          description: Manager profile not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Manager profile not found.
+                errors: null
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /hr/company-performance:
+    get:
+      tags:
+        - Performance
+      summary: Get HR company performance dashboard
+      description: Retrieves company-wide performance metrics, department-level aggregations, historical trends, and high/low performer counts across the organization.
+      operationId: getHrCompanyPerformanceDashboard
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Accept
+          in: header
+          required: true
+          schema:
+            type: string
+            example: application/json
+        - name: period_id
+          in: query
+          required: false
+          description: Optional evaluation period ID.
+          schema:
+            type: integer
+            example: 1
+        - name: start_date
+          in: query
+          required: false
+          description: Custom period start date (YYYY-MM-DD).
+          schema:
+            type: string
+            format: date
+            example: "2026-09-01"
+        - name: end_date
+          in: query
+          required: false
+          description: Custom period end date (YYYY-MM-DD).
+          schema:
+            type: string
+            format: date
+            example: "2026-09-30"
+        - name: per_page
+          in: query
+          required: false
+          description: Number of departments per page.
+          schema:
+            type: integer
+            default: 10
+            example: 10
+      responses:
+        '200':
+          description: Company performance dashboard retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Company performance dashboard retrieved successfully.
+                  data:
+                    $ref: '#/components/schemas/CompanyDashboardData'
+
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+
 
 components:
   securitySchemes:
@@ -5169,6 +5391,39 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+  responses:
+    Unauthenticated:
+      description: Unauthenticated access attempt.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            message: Unauthenticated.
+            errors: null
+
+    Forbidden:
+      description: Forbidden - User lacks sufficient permissions.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            message: This action is unauthorized.
+            errors: null
+
+    InternalServerError:
+      description: Internal Server Error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            message: Failed to retrieve performance dashboard.
+            errors: null
   schemas:
     EvaluationPeriod:
       type: object
@@ -5314,5 +5569,472 @@ components:
         created_at:
           type: string
           example: "2026-03-01 09:00:00"
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: An error occurred processing the request.
+        data:
+          type: object
+          nullable: true
+          example: null
+        errors:
+          type: object
+          nullable: true
+          example: null
+
+    AtAGlanceMetrics:
+      type: object
+      properties:
+        tasks_rate:
+          type: number
+          format: float
+          example: 85.5
+          description: Task completion percentage rate.
+        quality_rate:
+          type: number
+          format: float
+          example: 92.0
+          description: Quality score rating based on evaluations.
+        attendance_rate:
+          type: number
+          format: float
+          example: 96.4
+          description: Attendance rate percentage.
+
+    TrendItem:
+      type: object
+      properties:
+        month:
+          type: string
+          example: Sep
+          description: Short month name.
+        overall_score:
+          type: number
+          format: float
+          example: 88.5
+          description: Overall score recorded for that month.
+
+    AttendanceMetrics:
+      type: object
+      properties:
+        total_days:
+          type: integer
+          example: 22
+        present_days:
+          type: integer
+          example: 21
+        late_days:
+          type: integer
+          example: 1
+        absent_days:
+          type: integer
+          example: 0
+        attendance_rate:
+          type: number
+          format: float
+          example: 95.45
+        total_worked_hours:
+          type: number
+          format: float
+          example: 168.5
+
+    TaskMetrics:
+      type: object
+      properties:
+        total_tasks:
+          type: integer
+          example: 15
+        completed_tasks:
+          type: integer
+          example: 12
+        in_progress_tasks:
+          type: integer
+          example: 2
+        pending_tasks:
+          type: integer
+          example: 1
+        overdue_tasks:
+          type: integer
+          example: 0
+        completion_rate:
+          type: number
+          format: float
+          example: 80.0
+        average_progress:
+          type: number
+          format: float
+          example: 88.33
+
+    GoalMetrics:
+      type: object
+      properties:
+        total_goals:
+          type: integer
+          example: 4
+        completed_goals:
+          type: integer
+          example: 3
+        completion_rate:
+          type: number
+          format: float
+          example: 75.0
+        average_progress:
+          type: number
+          format: float
+          example: 82.5
+
+    EvaluationMetrics:
+      type: object
+      properties:
+        total_evaluations:
+          type: integer
+          example: 2
+        latest_overall_score:
+          type: number
+          format: float
+          example: 90.0
+        previous_overall_score:
+          type: number
+          format: float
+          example: 85.0
+        score_change:
+          type: number
+          format: float
+          example: 5.0
+        trend:
+          type: string
+          enum: [improving, declining]
+          example: improving
+
+    PerformanceMetrics:
+      type: object
+      properties:
+        attendance:
+          $ref: '#/components/schemas/AttendanceMetrics'
+        tasks:
+          $ref: '#/components/schemas/TaskMetrics'
+        goals:
+          $ref: '#/components/schemas/GoalMetrics'
+        evaluations:
+          $ref: '#/components/schemas/EvaluationMetrics'
+
+    EmployeeDashboardData:
+      type: object
+      properties:
+        period_name:
+          type: string
+          example: September 2026
+        start_date:
+          type: string
+          format: date
+          example: "2026-09-01"
+        end_date:
+          type: string
+          format: date
+          example: "2026-09-30"
+        overall:
+          type: object
+          properties:
+            score:
+              type: number
+              format: float
+              example: 87.65
+            change_label:
+              type: string
+              example: "+3.5% from last month"
+            trend:
+              type: string
+              enum: [up, down]
+              example: up
+        at_a_glance:
+          $ref: '#/components/schemas/AtAGlanceMetrics'
+        performance_trend:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrendItem'
+        metrics:
+          $ref: '#/components/schemas/PerformanceMetrics'
+
+    TeamSummary:
+      type: object
+      properties:
+        overall_score:
+          type: number
+          format: float
+          example: 84.3
+        total_members:
+          type: integer
+          example: 8
+        high_performers_count:
+          type: integer
+          example: 5
+        needs_attention_count:
+          type: integer
+          example: 1
+
+    TeamMemberPerformance:
+      type: object
+      properties:
+        employee_id:
+          type: integer
+          example: 10
+        user_id:
+          type: integer
+          example: 15
+        name:
+          type: string
+          example: Sarah Connor
+        job_title:
+          type: string
+          example: Software Engineer
+        overall_score:
+          type: number
+          format: float
+          example: 89.2
+        tasks_rate:
+          type: number
+          format: float
+          example: 90.0
+        attendance_rate:
+          type: number
+          format: float
+          example: 95.0
+        quality_rate:
+          type: number
+          format: float
+          example: 88.0
+        status_label:
+          type: string
+          enum: [High Performer, Good, Needs Attention]
+          example: High Performer
+
+    PaginatedTeamMembers:
+      type: object
+      properties:
+        current_page:
+          type: integer
+          example: 1
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamMemberPerformance'
+        first_page_url:
+          type: string
+          example: "https://api.domain.com/api/manager/team-performance?page=1"
+        from:
+          type: integer
+          nullable: true
+          example: 1
+        last_page:
+          type: integer
+          example: 1
+        last_page_url:
+          type: string
+          example: "https://api.domain.com/api/manager/team-performance?page=1"
+        links:
+          type: array
+          items:
+            type: object
+            properties:
+              url:
+                type: string
+                nullable: true
+                example: "https://api.domain.com/api/manager/team-performance?page=1"
+              label:
+                type: string
+                example: "1"
+              active:
+                type: boolean
+                example: true
+        next_page_url:
+          type: string
+          nullable: true
+          example: null
+        path:
+          type: string
+          example: "https://api.domain.com/api/manager/team-performance"
+        per_page:
+          type: integer
+          example: 10
+        prev_page_url:
+          type: string
+          nullable: true
+          example: null
+        to:
+          type: integer
+          nullable: true
+          example: 8
+        total:
+          type: integer
+          example: 8
+
+    TeamDashboardData:
+      type: object
+      properties:
+        period_name:
+          type: string
+          example: September 2026
+        start_date:
+          type: string
+          format: date
+          example: "2026-09-01"
+        end_date:
+          type: string
+          format: date
+          example: "2026-09-30"
+        team_summary:
+          $ref: '#/components/schemas/TeamSummary'
+        at_a_glance:
+          $ref: '#/components/schemas/AtAGlanceMetrics'
+        performance_trend:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrendItem'
+        team_members:
+          $ref: '#/components/schemas/PaginatedTeamMembers'
+
+    CompanySummary:
+      type: object
+      properties:
+        overall_score:
+          type: number
+          format: float
+          example: 82.5
+        total_employees:
+          type: integer
+          example: 120
+        total_departments:
+          type: integer
+          example: 6
+        high_performers_count:
+          type: integer
+          example: 45
+        needs_attention_count:
+          type: integer
+          example: 8
+
+    DepartmentPerformance:
+      type: object
+      properties:
+        department_id:
+          type: integer
+          example: 3
+        name:
+          type: string
+          example: Engineering
+        total_employees:
+          type: integer
+          example: 25
+        overall_score:
+          type: number
+          format: float
+          example: 86.4
+        tasks_rate:
+          type: number
+          format: float
+          example: 88.0
+        attendance_rate:
+          type: number
+          format: float
+          example: 94.2
+        quality_rate:
+          type: number
+          format: float
+          example: 85.0
+        status_label:
+          type: string
+          enum: [High Performing Dept, Good, Needs Attention, No Data]
+          example: High Performing Dept
+
+    PaginatedDepartments:
+      type: object
+      properties:
+        current_page:
+          type: integer
+          example: 1
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DepartmentPerformance'
+        first_page_url:
+          type: string
+          example: "https://api.domain.com/api/hr/company-performance?page=1"
+        from:
+          type: integer
+          nullable: true
+          example: 1
+        last_page:
+          type: integer
+          example: 1
+        last_page_url:
+          type: string
+          example: "https://api.domain.com/api/hr/company-performance?page=1"
+        links:
+          type: array
+          items:
+            type: object
+            properties:
+              url:
+                type: string
+                nullable: true
+                example: "https://api.domain.com/api/hr/company-performance?page=1"
+              label:
+                type: string
+                example: "1"
+              active:
+                type: boolean
+                example: true
+        next_page_url:
+          type: string
+          nullable: true
+          example: null
+        path:
+          type: string
+          example: "https://api.domain.com/api/hr/company-performance"
+        per_page:
+          type: integer
+          example: 10
+        prev_page_url:
+          type: string
+          nullable: true
+          example: null
+        to:
+          type: integer
+          nullable: true
+          example: 6
+        total:
+          type: integer
+          example: 6
+
+    CompanyDashboardData:
+      type: object
+      properties:
+        period_name:
+          type: string
+          example: September 2026
+        start_date:
+          type: string
+          format: date
+          example: "2026-09-01"
+        end_date:
+          type: string
+          format: date
+          example: "2026-09-30"
+        company_summary:
+          $ref: '#/components/schemas/CompanySummary'
+        at_a_glance:
+          $ref: '#/components/schemas/AtAGlanceMetrics'
+        performance_trend:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrendItem'
+        departments_performance:
+          $ref: '#/components/schemas/PaginatedDepartments'
 
 
