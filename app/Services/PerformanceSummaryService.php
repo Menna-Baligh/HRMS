@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\DTOs\PerformanceMetricData;
@@ -18,7 +19,6 @@ class PerformanceSummaryService
         private GoalAggregatorService $goalAggregator,
         private EvaluationAggregatorService $evaluationAggregator
     ) {}
-
 
     public function resolveDateRange(?int $periodId = null, ?string $startDate = null, ?string $endDate = null): array
     {
@@ -50,7 +50,6 @@ class PerformanceSummaryService
             'period_name' => $start->format('F Y'),
         ];
     }
-
 
     public function getEmployeeSummary(Employee $employee, array $dateRange, ?int $periodId = null): array
     {
@@ -84,7 +83,6 @@ class PerformanceSummaryService
             'metrics' => $metricData->toArray(),
         ];
     }
-
 
     public function getPeriodComparison(Employee $employee, array $currentRange): array
     {
@@ -120,10 +118,11 @@ class PerformanceSummaryService
             'comparison' => [
                 'overall_change' => $overallChange,
                 'trend' => $overallChange >= 0 ? 'up' : 'down',
-                'change_label' => ($overallChange >= 0 ? "+{$overallChange}%" : "{$overallChange}%") . ' from last month',
+                'change_label' => ($overallChange >= 0 ? "+{$overallChange}%" : "{$overallChange}%").' from last month',
             ],
         ];
     }
+
     public function getDashboardPerformance(Employee $employee, ?int $periodId = null, ?string $startDate = null, ?string $endDate = null): array
     {
         $dateRange = $this->resolveDateRange($periodId, $startDate, $endDate);
@@ -148,7 +147,6 @@ class PerformanceSummaryService
             'metrics' => $summary['metrics'],
         ];
     }
-
 
     private function getSixMonthTrend(Employee $employee, string $currentStartDate): array
     {

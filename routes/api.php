@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\AttendanceController;
-use App\Http\Controllers\Api\AuthController as ApiAuthController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\AuthController as ApiAuthController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\EmployeeEvaluationController;

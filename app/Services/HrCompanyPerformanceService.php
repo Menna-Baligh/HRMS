@@ -1,9 +1,9 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\Department;
 use App\Models\Employee;
-use App\Services\PerformanceSummaryService;
 use Carbon\Carbon;
 
 class HrCompanyPerformanceService
@@ -11,7 +11,6 @@ class HrCompanyPerformanceService
     public function __construct(
         private PerformanceSummaryService $performanceSummaryService
     ) {}
-
 
     public function getCompanyDashboardPerformance(
         ?int $periodId = null,

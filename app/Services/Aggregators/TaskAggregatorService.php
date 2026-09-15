@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services\Aggregators;
 
 use App\Models\TaskAssignment;
@@ -7,13 +8,12 @@ use Carbon\Carbon;
 
 class TaskAggregatorService
 {
-
     public function getMetrics(int $userId, string $startDate, string $endDate): array
     {
         $assignments = TaskAssignment::with('task')
             ->where('employee_id', $userId)
             ->whereHas('task', function ($q) use ($startDate, $endDate) {
-                $q->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
+                $q->whereBetween('created_at', [$startDate.' 00:00:00', $endDate.' 23:59:59']);
             })
             ->get();
 

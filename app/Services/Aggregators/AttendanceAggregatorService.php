@@ -1,12 +1,11 @@
 <?php
+
 namespace App\Services\Aggregators;
 
 use App\Models\Attendance;
-use Carbon\Carbon;
 
 class AttendanceAggregatorService
 {
-
     public function getMetrics(int $employeeId, string $startDate, string $endDate): array
     {
         $attendances = Attendance::where('employee_id', $employeeId)

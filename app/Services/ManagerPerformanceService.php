@@ -1,8 +1,8 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\Employee;
-use App\Services\PerformanceSummaryService;
 use Carbon\Carbon;
 
 class ManagerPerformanceService
@@ -10,7 +10,6 @@ class ManagerPerformanceService
     public function __construct(
         private PerformanceSummaryService $performanceSummaryService
     ) {}
-
 
     public function getTeamDashboardPerformance(
         Employee $managerEmployee,
@@ -76,7 +75,7 @@ class ManagerPerformanceService
         $paginatedMembers = Employee::with('user')
             ->where(function ($q) use ($managerEmployee) {
                 $q->where('manager_id', $managerEmployee->id)
-                ->orWhere('manager_id', $managerEmployee->user_id);
+                    ->orWhere('manager_id', $managerEmployee->user_id);
             })
             ->paginate($perPage)
             ->through(function ($member) use ($dateRange, $periodId) {

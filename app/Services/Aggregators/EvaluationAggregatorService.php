@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services\Aggregators;
 
 use App\Enums\EvaluationStatus;
@@ -6,14 +7,13 @@ use App\Models\Evaluation;
 
 class EvaluationAggregatorService
 {
-
-    public function getMetrics(int $employeeId, ?int $periodId = null,?string $startDate = null,?string $endDate = null): array
+    public function getMetrics(int $employeeId, ?int $periodId = null, ?string $startDate = null, ?string $endDate = null): array
     {
         $query = Evaluation::with('period')
             ->where('employee_id', $employeeId)
             ->where(function ($q) {
                 $q->where('status', EvaluationStatus::COMPLETED)
-                ->orWhere('status', 'completed');
+                    ->orWhere('status', 'completed');
             });
 
         if ($periodId) {
@@ -21,7 +21,7 @@ class EvaluationAggregatorService
         }
 
         if ($startDate && $endDate) {
-            $query->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
+            $query->whereBetween('created_at', [$startDate.' 00:00:00', $endDate.' 23:59:59']);
         }
 
         $evaluations = $query->latest('created_at')->get();

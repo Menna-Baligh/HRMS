@@ -1,17 +1,17 @@
 <?php
+
 namespace App\Services\Aggregators;
 
 use App\Models\Goal;
 
 class GoalAggregatorService
 {
-
     public function getMetrics(int $employeeId, string $startDate, string $endDate): array
     {
         $goals = Goal::where('employee_id', $employeeId)
             ->where(function ($q) use ($startDate, $endDate) {
                 $q->whereBetween('target_date', [$startDate, $endDate])
-                    ->orWhereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
+                    ->orWhereBetween('created_at', [$startDate.' 00:00:00', $endDate.' 23:59:59']);
             })
             ->get();
 
@@ -23,7 +23,7 @@ class GoalAggregatorService
         foreach ($goals as $goal) {
             if ($goal->target_value > 0) {
                 $goalProgress = ($goal->current_value / $goal->target_value) * 100;
-                $totalProgressPercentage += min(100, $goalProgress); 
+                $totalProgressPercentage += min(100, $goalProgress);
             }
         }
 

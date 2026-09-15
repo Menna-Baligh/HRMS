@@ -13,7 +13,6 @@ class HrPerformanceController extends Controller
 {
     public function __construct(private HrCompanyPerformanceService $hrService) {}
 
-
     public function companyDashboard(Request $request): JsonResponse
     {
         try {

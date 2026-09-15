@@ -13,7 +13,6 @@ class ManagerPerformanceController extends Controller
 {
     public function __construct(private ManagerPerformanceService $managerService) {}
 
-
     public function teamDashboard(Request $request): JsonResponse
     {
         try {
