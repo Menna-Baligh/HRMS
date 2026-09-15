@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\EvaluationController;
 use App\Http\Controllers\Api\GoalController;
 use App\Http\Controllers\Api\GoogleAuthController;
 use App\Http\Controllers\Api\HrAttendanceController;
+use App\Http\Controllers\Api\HrEvaluationSetupController;
 use App\Http\Controllers\Api\HrGoalController;
 use App\Http\Controllers\Api\ManagerAttendanceController;
 use App\Http\Controllers\Api\ManagerController;
@@ -133,6 +134,13 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
         Route::get('/goals', [HrGoalController::class, 'index']);
     });
     Route::middleware(['role:Manager|HR|Owner'])->group(function () {
+        Route::get('/evaluation-periods', [HrEvaluationSetupController::class, 'listPeriods']);
+        Route::post('/evaluation-periods', [HrEvaluationSetupController::class, 'storePeriod']);
+        Route::patch('/evaluation-periods/{id}/toggle-status', [HrEvaluationSetupController::class, 'togglePeriodStatus']);
+
+        Route::get('/evaluation-categories', [HrEvaluationSetupController::class, 'listCategories']);
+        Route::post('/evaluation-categories', [HrEvaluationSetupController::class, 'storeCategory']);
+
         Route::post('/evaluations', [EvaluationController::class, 'store']);
         Route::put('/evaluations/{id}', [EvaluationController::class, 'update']);
         Route::patch('/evaluations/{id}/complete', [EvaluationController::class, 'complete']);
