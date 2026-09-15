@@ -2371,7 +2371,7 @@ paths:
       summary: Retrieve today's attendance status and location check for the authenticated employee
       operationId: getTodayAttendance
       tags:
-        - Flutter
+        - Attendance
       security:
         - bearerAuth: []
       parameters:
@@ -2526,7 +2526,7 @@ paths:
       summary: Perform check-in for the authenticated employee
       operationId: checkIn
       tags:
-        - Flutter
+        - Attendance
       security:
         - bearerAuth: []
       parameters:
@@ -2708,7 +2708,7 @@ paths:
       summary: Perform check-out for the authenticated employee
       operationId: checkOut
       tags:
-        - Flutter
+        - Attendance
       security:
         - bearerAuth: []
       parameters:
@@ -2889,7 +2889,7 @@ paths:
       summary: Retrieve paginated attendance history for the authenticated employee
       operationId: getAttendanceHistory
       tags:
-        - Flutter
+        - Attendance
       security:
         - bearerAuth: []
       parameters:
@@ -4592,6 +4592,8 @@ paths:
                 errors:
                   month:
                     - The month field is required.
+
+  
 
 components:
   securitySchemes:
