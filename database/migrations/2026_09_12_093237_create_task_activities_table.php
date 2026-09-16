@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('task_id')->constrained('tasks')->cascadeOnDelete();
             // User who performed the activity
-             $table->foreignId('employee_id')->constrained('users')->cascadeOnDelete();
+             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             // Activity type
             $table->enum('action', ['created','updated','assigned','unassigned','status_changed','progress_updated',]);
             // Previous value before the change

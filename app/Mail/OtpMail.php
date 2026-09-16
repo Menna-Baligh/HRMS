@@ -25,9 +25,9 @@ class OtpMail extends Mailable
     /**
      * Get the message envelope.
      */
-   public function envelope(): Envelope
-    { 
-        return new Envelope( subject: 'Your HRMS Verification Code', ); 
+    public function envelope(): Envelope
+    {
+        return new Envelope(subject: 'Your HRMS Verification Code');
     }
 
     /**
@@ -39,6 +39,7 @@ class OtpMail extends Mailable
              markdown: 'emails.otp',
               with: [ 'otp' => $this->otp, ], 
             );
+       
     }
 
     /**

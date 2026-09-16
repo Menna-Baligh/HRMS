@@ -1,23 +1,39 @@
 <?php
 
+use App\Http\Controllers\Api\AttendanceController;
+use App\Http\Controllers\Api\AuthController as ApiAuthController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\DepartmentController;
+use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\GoogleAuthController;
-use App\Http\Controllers\Api\TaskController;
+use App\Http\Controllers\Api\HrAttendanceController;
+use App\Http\Controllers\Api\ManagerAttendanceController;
 use App\Http\Controllers\Api\ManagerController;
-
 use App\Http\Controllers\Api\PermissionController;
+use App\Http\Controllers\Api\SubmissionController;
+use App\Http\Controllers\Api\TaskController;
+use App\Http\Controllers\Api\V1\Calendar\LeaveCalendarController;
+use App\Http\Controllers\Api\V1\HR\HRLeaveQueueController;
+use App\Http\Controllers\Api\V1\LeaveBalance\LeaveBalanceController;
+use App\Http\Controllers\Api\V1\LeaveDecisionHistory\LeaveDecisionHistoryController;
+use App\Http\Controllers\Api\V1\LeaveRequest\LeaveApprovalController;
+use App\Http\Controllers\Api\V1\LeaveRequest\LeaveRequestController;
+use App\Http\Controllers\Api\V1\LeaveType\LeaveTypeController;
+use App\Http\Controllers\Api\V1\Manager\ManagerLeaveQueueController;
 use App\Http\Controllers\CompanyLocations\CompanyLocationController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 
-Route::post('/register', [AuthController::class, 'register']);
+// Route::post('/register', [AuthController::class, 'register']);
 
 
-Route::prefix('auth')->group(function () {
     // Route::post('/login', [AuthController::class,'login'])
     //     ->middleware('throttle:5,1');
 
+Route::prefix('auth')->group(function () {
+    Route::post('/login', [AuthController::class, 'login'])
+        ->middleware('throttle:5,1');
+    Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
     Route::post('/forget-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:5,1');
     Route::post('/forgot-password/verify-otp', [AuthController::class, 'verifyForgotPasswordOtp'])->middleware('throttle:5,1');
     Route::post('/forgot-password/reset', [AuthController::class, 'resetPassword'])->middleware('throttle:5,1');
@@ -25,38 +41,56 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::prefix('tasks')->middleware('auth:api')->group(function () {
-        // create task
-        Route::post('/', [TaskController::class, 'store']);
-        // update task
-        Route::put('/{task}', [TaskController::class, 'update']);
-        // assign task to employee
-        Route::post('/{task}/assign', [TaskController::class, 'assign']);
-        // progress
-        Route::patch('/{task}/progress',[TaskController::class, 'updateProgress']);
-        //change status
-        Route::patch('/{task}/status',[TaskController::class, 'updateStatus']);
+    // Create task
+    Route::post('/', [TaskController::class, 'store']);
+    // Update task
+    Route::put('/{task}', [TaskController::class, 'update']);
+    // Assign task to employee
+    Route::post('/{task}/assign', [TaskController::class, 'assign']);
+    // Update task progress
+    Route::patch('/{task}/progress', [TaskController::class, 'updateProgress']);
+    // Update task status
+    Route::patch('/{task}/status', [TaskController::class, 'updateStatus']);
+    // submission a task
+    Route::post('/{task}/submissions',[SubmissionController::class, 'store']);
+    // attach file
+    Route::post('/submissions/{submission}/attachments',[SubmissionController::class, 'attachFile']);
+
+    //Review Queue
+    Route::get('/submissions/review',[SubmissionController::class, 'reviewQueue']);
+     //Submission Details
+    Route::get('/submissions/{submission}',[SubmissionController::class, 'show']);
+    //approve
+    Route::patch('/submissions/{submission}/approve',[SubmissionController::class, 'approve']);
+    //reject
+    Route::patch('/submissions/{submission}/reject',[SubmissionController::class, 'reject']);
+    //request changes
+    Route::patch('/submissions/{submission}/request-changes',[SubmissionController::class, 'requestChanges']);
+    // resubmit
+    Route::post('/submissions/{submission}/resubmit',[SubmissionController::class, 'resubmit']);
+
+});
+
+// Company Location
+Route::middleware('auth:api')->prefix('locations')->group(function()
+{
+    // Create company location
+Route::post('company/location', [CompanyLocationController::class, 'store']);
+
+// Update company location
+Route::put('company/location/{id}', [CompanyLocationController::class, 'update']);
+
+// Deactivate company location
+Route::patch('company/location/{id}/deactivate', [CompanyLocationController::class, 'deactivate']);
+
+// Activate company location
+Route::patch('company/location/{id}/activate', [CompanyLocationController::class, 'activate']);
+// Get active company location
+Route::get('company/location/active', [CompanyLocationController::class, 'activeLocation']);
+
 });
 
 
-// Company Location 
-
-// Create company location
-Route::post('company/location',[CompanyLocationController::class, 'store']);
-
-// Update company location
-Route::put('company/location/{id}',[CompanyLocationController::class, 'update']);
-
-// Deactivate company location
-Route::patch('company/location/{id}/deactivate',[CompanyLocationController::class, 'deactivate']);
-
-// Activate company location
-Route::patch('company/location/{id}/activate',[CompanyLocationController::class, 'activate']);
-// Get active company location
-Route::get('company/location/active',[CompanyLocationController::class, 'activeLocation']);
-
-// use App\Http\Controllers\Api\AuthController;
-// use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\EmployeeController;
 
 // ─── Team Auth & Account Routes ──────────────────────────────────────────────
 Route::prefix('auth')->group(function () {
@@ -77,12 +111,6 @@ Route::prefix('auth')->group(function () {
     });
 });
 
-// ─── Company Locations ───────────────────────────────────────────────────────
-Route::post('company/location', [CompanyLocationController::class, 'store']);
-Route::put('company/location/{id}', [CompanyLocationController::class, 'update']);
-Route::patch('company/location/{id}/deactivate', [CompanyLocationController::class, 'deactivate']);
-Route::patch('company/location/{id}/activate', [CompanyLocationController::class, 'activate']);
-Route::get('company/location/active', [CompanyLocationController::class, 'activeLocation']);
 
 // ─── Protected Management Routes (Employees, Departments, Managers) ──────────
 Route::middleware(['auth:api', 'check.active'])->group(function () {
@@ -102,20 +130,37 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
     Route::patch('/departments/{id}/change-status', [DepartmentController::class, 'changeStatus'])->middleware('permission:department.change-status');
 
     Route::get('/managers/employees', [ManagerController::class, 'employees'])->middleware('permission:manager.view-employees');
+
+    Route::prefix('attendance')->group(function () {
+        Route::get('/today', [AttendanceController::class, 'today']);
+        Route::post('/check-in', [AttendanceController::class, 'checkIn']);
+        Route::post('/check-out', [AttendanceController::class, 'checkOut']);
+        Route::get('/history', [AttendanceController::class, 'history']);
+    });
+    Route::middleware(['role:Manager|Owner|HR'])->prefix('manager/attendance')->group(function () {
+        Route::get('/today', [ManagerAttendanceController::class, 'today']);
+        Route::get('/{employeeId}', [ManagerAttendanceController::class, 'show']);
+    });
+    Route::middleware(['role:HR|Owner'])->prefix('hr/attendance')->group(function () {
+        Route::get('/daily', [HrAttendanceController::class, 'daily']);
+        Route::get('/exceptions', [HrAttendanceController::class, 'exceptions']);
+        Route::get('/monthly-summary', [HrAttendanceController::class, 'monthlySummary']);
+        Route::get('/export', [HrAttendanceController::class, 'export']);
+    });
 });
 
 // ─── V1 Leave Management API ─────────────────────────────────────────────────
 Route::prefix('v1')->group(function (): void {
-    // Authentication
-    Route::prefix('auth')->group(function (): void {
-        Route::post('login', [V1AuthController::class, 'login'])->name('auth.login');
+    // // Authentication
+    // Route::prefix('auth')->group(function (): void {
+    //     Route::post('login', [V1AuthController::class, 'login'])->name('auth.login');
 
-        Route::middleware('jwt.auth')->group(function (): void {
-            Route::post('logout', [V1AuthController::class, 'logout'])->name('auth.logout');
-            Route::post('refresh', [V1AuthController::class, 'refresh'])->name('auth.refresh');
-            Route::get('me', [V1AuthController::class, 'me'])->name('auth.me');
-        });
-    });
+    //     Route::middleware('jwt.auth')->group(function (): void {
+    //         Route::post('logout', [V1AuthController::class, 'logout'])->name('auth.logout');
+    //         Route::post('refresh', [V1AuthController::class, 'refresh'])->name('auth.refresh');
+    //         Route::get('me', [V1AuthController::class, 'me'])->name('auth.me');
+    //     });
+    // });
 
     // Protected Leave Management Routes
     Route::middleware('jwt.auth')->group(function (): void {

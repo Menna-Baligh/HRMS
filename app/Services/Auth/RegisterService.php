@@ -13,9 +13,10 @@ class RegisterService
     public function register(array $data): array
     {
         $user = User::create([
+        
 
-           'name' => $data['name'], 
-           'email' => $data['email'],
+            'name' => $data['name'],
+            'email' => $data['email'],
             'phone' => $data['phone'] ?? null,
             'avatar' => $data['avatar'] ?? null, 
             'provider' => $data['provider'] ?? null, 
@@ -35,6 +36,8 @@ class RegisterService
          'expires_in' => auth('api')->factory()->getTTL() / 60 . ' hours', 
          'user' => $user,
        ];
+    
+
 
         // $otp = $this->otpService->generate($user->email);
 

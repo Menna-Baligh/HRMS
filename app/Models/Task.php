@@ -2,38 +2,43 @@
 
 namespace App\Models;
 
-use App\Models\TaskActivity;
-use App\Models\TaskAssignment;
 use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Task extends Model
 {
-    protected $fillable = [ 
+    protected $fillable = [
         'title',
         'description',
         'priority',
         'status',
-        'deadline',
+        'progress',
         'created_by',
+        'deadline',
     ];
 
     protected $casts = [
-        'deadline' => 'datetime',
         'priority' => TaskPriority::class,
         'status' => TaskStatus::class,
+        'deadline' => 'datetime',
+        'progress' => 'integer',
     ];
-    public function creator()
+
+    /**
+     * User who created the task.
+     */
+    public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
     }
 
     /**
-     * Employees assigned to this task.
+     * Employees assigned to the task.
      */
-    public function assignments()
+    public function assignments(): HasMany
     {
         return $this->hasMany(TaskAssignment::class);
     }
@@ -41,8 +46,12 @@ class Task extends Model
     /**
      * Task activity history.
      */
-    public function activities()
+    public function activities(): HasMany
     {
         return $this->hasMany(TaskActivity::class);
     }
+    public function submissions(): HasMany
+{
+    return $this->hasMany(Submission::class);
+}
 }

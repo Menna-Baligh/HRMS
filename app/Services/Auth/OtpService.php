@@ -2,8 +2,8 @@
 
 namespace App\Services\Auth;
 
-use Ichtrojan\Otp\Otp;
 use App\Mail\OtpMail;
+use Ichtrojan\Otp\Otp;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Mail;
 
@@ -36,4 +36,10 @@ class OtpService
          } 
          return true;
          }
+
+    /** * Generate a new OTP and send it to the given email. */
+
+
+    /** * Verify the given OTP for the email. */
+  
 }

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Enums\UserRole;
 use App\Events\LeaveRequestApproved;
 use App\Events\LeaveRequestRejected;
 use App\Events\LeaveRequestSubmitted;
@@ -32,7 +33,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::before(function ($user, $ability) {
-            return (method_exists($user, 'hasRole') && $user->hasRole('Owner')) || (isset($user->role) && ($user->role === \App\Enums\UserRole::Owner || $user->role === 'Owner')) ? true : null;
+            return (method_exists($user, 'hasRole') && $user->hasRole('Owner')) || (isset($user->role) && ($user->role === UserRole::Owner || $user->role === 'Owner')) ? true : null;
         });
 
         Gate::policy(LeaveType::class, LeaveTypePolicy::class);

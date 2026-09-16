@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Requests\Tasks;
 
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -22,13 +21,14 @@ class AssignTaskRequest extends FormRequest
      */
     public function rules(): array
     {
-
-
-    /**
-     *give a task to an employee
-     */
+        /**
+         * Give a task to an employee.
+         */
         return [
-            'employee_id' => ['required','integer','exists:users,id',
+            'employee_id' => [
+                'required',
+                'integer',
+                'exists:employees,id',
             ],
         ];
     }
