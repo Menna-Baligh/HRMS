@@ -78,4 +78,13 @@ public function submissions(): HasMany
 {
     return $this->hasMany(Submission::class);
 }
+    public function goals(): HasMany
+    {
+        return $this->hasMany(Goal::class);
+    }
+
+    public function evaluations(): HasMany
+    {
+        return $this->hasMany(Evaluation::class);
+    }
 }

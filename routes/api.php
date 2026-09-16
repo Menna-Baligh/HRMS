@@ -11,6 +11,23 @@ use App\Http\Controllers\Api\ManagerAttendanceController;
 use App\Http\Controllers\Api\ManagerController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\SubmissionController;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\AuthController as ApiAuthController;
+use App\Http\Controllers\Api\DepartmentController;
+use App\Http\Controllers\Api\EmployeeController;
+use App\Http\Controllers\Api\EmployeeEvaluationController;
+use App\Http\Controllers\Api\EmployeePerformanceController;
+use App\Http\Controllers\Api\EvaluationController;
+use App\Http\Controllers\Api\GoalController;
+use App\Http\Controllers\Api\GoogleAuthController;
+use App\Http\Controllers\Api\HrAttendanceController;
+use App\Http\Controllers\Api\HrEvaluationSetupController;
+use App\Http\Controllers\Api\HrGoalController;
+use App\Http\Controllers\Api\HrPerformanceController;
+use App\Http\Controllers\Api\ManagerAttendanceController;
+use App\Http\Controllers\Api\ManagerController;
+use App\Http\Controllers\Api\ManagerPerformanceController;
+use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\V1\Calendar\LeaveCalendarController;
 use App\Http\Controllers\Api\V1\HR\HRLeaveQueueController;
@@ -88,10 +105,6 @@ Route::patch('company/location/{id}/activate', [CompanyLocationController::class
 // Get active company location
 Route::get('company/location/active', [CompanyLocationController::class, 'activeLocation']);
 
-});
-
-
-
 // ─── Team Auth & Account Routes ──────────────────────────────────────────────
 Route::prefix('auth')->group(function () {
     Route::post('/register', [ApiAuthController::class, 'register'])->middleware('throttle:5,1');
@@ -137,15 +150,51 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
         Route::post('/check-out', [AttendanceController::class, 'checkOut']);
         Route::get('/history', [AttendanceController::class, 'history']);
     });
-    Route::middleware(['role:Manager|Owner|HR'])->prefix('manager/attendance')->group(function () {
-        Route::get('/today', [ManagerAttendanceController::class, 'today']);
-        Route::get('/{employeeId}', [ManagerAttendanceController::class, 'show']);
+    Route::middleware(['role:Manager|Owner|HR'])->prefix('manager')->group(function () {
+        Route::prefix('/attendance')->group(function () {
+            Route::get('/today', [ManagerAttendanceController::class, 'today']);
+            Route::get('/{employeeId}', [ManagerAttendanceController::class, 'show']);
+        });
+        Route::get('/team-goals', [ManagerController::class, 'teamGoals']);
     });
-    Route::middleware(['role:HR|Owner'])->prefix('hr/attendance')->group(function () {
-        Route::get('/daily', [HrAttendanceController::class, 'daily']);
-        Route::get('/exceptions', [HrAttendanceController::class, 'exceptions']);
-        Route::get('/monthly-summary', [HrAttendanceController::class, 'monthlySummary']);
-        Route::get('/export', [HrAttendanceController::class, 'export']);
+    Route::middleware(['role:HR|Owner'])->prefix('hr')->group(function () {
+        Route::prefix('/attendance')->group(function () {
+            Route::get('/daily', [HrAttendanceController::class, 'daily']);
+            Route::get('/exceptions', [HrAttendanceController::class, 'exceptions']);
+            Route::get('/monthly-summary', [HrAttendanceController::class, 'monthlySummary']);
+            Route::get('/export', [HrAttendanceController::class, 'export']);
+        });
+        Route::get('/evaluations', [HrEvaluationSetupController::class, 'index']);
+        Route::get('/goals', [HrGoalController::class, 'index']);
+        Route::get('/company-performance', [HrPerformanceController::class, 'companyDashboard']);
+    });
+    Route::middleware(['role:Manager|HR|Owner'])->group(function () {
+        Route::get('/evaluation-periods', [HrEvaluationSetupController::class, 'listPeriods']);
+        Route::post('/evaluation-periods', [HrEvaluationSetupController::class, 'storePeriod']);
+        Route::patch('/evaluation-periods/{id}/toggle-status', [HrEvaluationSetupController::class, 'togglePeriodStatus']);
+
+        Route::get('/evaluation-categories', [HrEvaluationSetupController::class, 'listCategories']);
+        Route::post('/evaluation-categories', [HrEvaluationSetupController::class, 'storeCategory']);
+
+        Route::post('/evaluations', [EvaluationController::class, 'store']);
+        Route::put('/evaluations/{id}', [EvaluationController::class, 'update']);
+        Route::patch('/evaluations/{id}/complete', [EvaluationController::class, 'complete']);
+        Route::get('/manager/evaluations', [EvaluationController::class, 'managerEvaluations']);
+
+        Route::get('/manager/team-performance', [ManagerPerformanceController::class, 'teamDashboard']);
+    });
+    Route::get('/employee/evaluations', [EmployeeEvaluationController::class, 'index']);
+    Route::get('/employee/performance', [EmployeePerformanceController::class, 'dashboard']);
+});
+
+Route::middleware(['auth:api', 'check.active'])->group(function () {
+    Route::prefix('goals')->group(function () {
+        Route::get('/', [GoalController::class, 'index']);
+        Route::post('/', [GoalController::class, 'store']);
+        Route::get('/{id}', [GoalController::class, 'show']);
+        Route::put('/{id}', [GoalController::class, 'update']);
+        Route::patch('/{id}/progress', [GoalController::class, 'updateProgress']);
+        Route::patch('/{id}/complete', [GoalController::class, 'complete']);
     });
 });
 

@@ -11,14 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tasks', function (Blueprint $table) {
+        Schema::create('evaluation_evidence', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
+            $table->foreignId('evaluation_id')->constrained('evaluations')->cascadeOnDelete();
+            $table->foreignId('goal_id')->nullable()->constrained('goals')->nullOnDelete();
             $table->text('description')->nullable();
-            $table->enum('priority', ['Low', 'Medium', 'High', 'Urgent'])->default('Medium');
-            $table->enum('status', ['Pending', 'In Progress', 'Completed', 'Closed'])->default('Pending');
-            $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
-            $table->dateTime('deadline');
             $table->timestamps();
         });
     }
@@ -28,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tasks');
+        Schema::dropIfExists('evaluation_evidence');
     }
 };
