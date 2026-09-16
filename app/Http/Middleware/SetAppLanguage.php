@@ -9,15 +9,17 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SetAppLanguage
 {
-
+    
     public function handle(Request $request, Closure $next): Response
     {
-        $locale = $request->header('Accept-Language', config('app.locale', 'en'));
+        $locale = $request->query('lang') 
+            ?? $request->query('locale') 
+            ?? $request->header('Accept-Language', config('app.locale', 'en'));
 
         if (in_array($locale, ['ar', 'en'])) {
             App::setLocale($locale);
         } else {
-            App::setLocale('en'); 
+            App::setLocale(config('app.locale', 'en')); 
         }
 
         return $next($request);

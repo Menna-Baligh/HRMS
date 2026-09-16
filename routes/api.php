@@ -29,6 +29,8 @@ use App\Http\Controllers\Api\V1\LeaveRequest\LeaveRequestController;
 use App\Http\Controllers\Api\V1\LeaveType\LeaveTypeController;
 use App\Http\Controllers\Api\V1\Manager\ManagerLeaveQueueController;
 use App\Http\Controllers\CompanyLocations\CompanyLocationController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -223,4 +225,8 @@ Route::prefix('v1')->group(function (): void {
         // Leave Calendar (Approved leaves view)
         Route::get('calendar/leaves', [LeaveCalendarController::class, 'index'])->name('calendar.leaves');
     });
+});
+
+Route::middleware('auth:api')->post('/broadcasting/auth', function (Request $request) {
+    return Broadcast::auth($request);
 });
