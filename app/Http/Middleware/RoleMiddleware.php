@@ -29,11 +29,14 @@ class RoleMiddleware
 
         // Flatten any pipe-separated or comma-separated roles
         $allowedRoleNames = [];
+
         foreach ($roles as $roleGroup) {
             $split = preg_split('/[,|]/', $roleGroup);
+
             if ($split !== false) {
                 foreach ($split as $role) {
                     $trimmed = trim($role);
+
                     if ($trimmed !== '') {
                         $allowedRoleNames[] = $trimmed;
                     }
@@ -48,17 +51,23 @@ class RoleMiddleware
                     return $next($request);
                 }
             } catch (\Throwable) {
-                // In case Spatie roles table is empty or unmigrated, continue to check user->role
+                // In case Spatie roles table is empty or unmigrated,
+                // continue to check user->role
             }
         }
 
         // 2. Check using User->role property (enum or string)
-        $userRoleValue = $user->role instanceof \BackedEnum ? $user->role->value : (string) $user->role;
+        $userRoleValue = $user->role instanceof \BackedEnum
+            ? $user->role->value
+            : (string) $user->role;
 
         if (in_array($userRoleValue, $allowedRoleNames, true)) {
             return $next($request);
         }
 
-        return response()->json(['message' => 'Forbidden.'], Response::HTTP_FORBIDDEN);
+        return response()->json(
+            ['message' => 'Forbidden.'],
+            Response::HTTP_FORBIDDEN
+        );
     }
 }

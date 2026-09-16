@@ -4,6 +4,7 @@ namespace App\Services\Auth;
 
 use App\Mail\OtpMail;
 use Ichtrojan\Otp\Otp;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
@@ -30,13 +31,18 @@ class OtpService
     }
 
     /** * Verify the given OTP for the email. */
-    public function verify(string $email, string $token): bool
-    {
-        $response = $this->otp->validate($email, $token);
-        if (! $response->status) {
-            throw ValidationException::withMessages(['otp' => $response->message ?? 'Invalid or expired OTP.']);
-        }
+     public function verify(string $email, string $token): bool
+      { 
+        $response = $this->otp->validate( $email, $token ); 
+        if (! $response->status)
+         { throw ValidationException::withMessages([ 'otp' => $response->message ?? 'Invalid or expired OTP.', ]);
+         } 
+         return true;
+         }
 
-        return true;
-    }
+    /** * Generate a new OTP and send it to the given email. */
+
+
+    /** * Verify the given OTP for the email. */
+  
 }

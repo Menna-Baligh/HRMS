@@ -4,11 +4,12 @@ namespace App\Services\Tasks;
 
 use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
+use App\Models\Employee;
 use App\Models\Task;
 use App\Models\TaskActivity;
 use App\Models\TaskAssignment;
-use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class TaskService
@@ -18,93 +19,117 @@ class TaskService
      */
     public function create(array $data): Task
     {
+        return DB::transaction(function () use ($data) {
 
-        dd(Auth::id());
-        $task = Task::create([
-            'title' => $data['title'],
-            'description' => $data['description'] ?? null,
-            'priority' => TaskPriority::from($data['priority']),
-            'status' => TaskStatus::PENDING,
-            'deadline' => $data['deadline'],
-            'progress' => 0,
-            'created_by' => Auth::id(),
-        ]);
+            $task = Task::create([
+                'title' => $data['title'],
+                'description' => $data['description'] ?? null,
+                'priority' => TaskPriority::from($data['priority']),
+                'status' => TaskStatus::PENDING,
+                'deadline' => $data['deadline'],
+                'progress' => 0,
+                'created_by' => Auth::id(),
+            ]);
 
-        $this->logActivity(
-            task: $task,
-            employeeId: Auth::id(),
-            action: 'created',
-            description: 'Task created.'
-        );
+            // The activity actor is a User, not an Employee.
+            $this->logActivity(
+                task: $task,
+                userId: Auth::id(),
+                action: 'created',
+                description: 'Task created.'
+            );
 
-        return $task;
+            return $task;
+        });
     }
 
+    /**
+     * Update task details.
+     */
     public function update(Task $task, array $data): Task
     {
-        $this->ensureTaskCanBeUpdated($task);
+        return DB::transaction(function () use ($task, $data) {
 
-        $oldValues = $task->only([
-            'title',
-            'description',
-            'priority',
-            'deadline',
-        ]);
+            $this->ensureTaskCanBeUpdated($task);
 
-        $task->update($data);
+            $oldValues = $task->only([
+                'title',
+                'description',
+                'priority',
+                'deadline',
+            ]);
 
-        $newValues = $task->only([
-            'title',
-            'description',
-            'priority',
-            'deadline',
-        ]);
+            $task->update([
+                'title' => $data['title'] ?? $task->title,
+                'description' => $data['description'] ?? $task->description,
+                'priority' => isset($data['priority'])
+                    ? TaskPriority::from($data['priority'])
+                    : $task->priority,
+                'deadline' => $data['deadline'] ?? $task->deadline,
+            ]);
 
-        $this->logActivity(
-            task: $task,
-            employeeId: Auth::id(),
-            action: 'updated',
-            oldValue: json_encode($oldValues),
-            newValue: json_encode($newValues),
-            description: 'Task details updated.'
-        );
+            $newValues = $task->only([
+                'title',
+                'description',
+                'priority',
+                'deadline',
+            ]);
 
-        return $task->refresh();
+            $this->logActivity(
+                task: $task,
+                userId: Auth::id(),
+                action: 'updated',
+                oldValue: json_encode($oldValues),
+                newValue: json_encode($newValues),
+                description: 'Task details updated.'
+            );
+
+            return $task->refresh();
+        });
     }
 
-    public function assign(Task $task, int $employeeId)
+    /**
+     * Assign task to an employee.
+     */
+    public function assign(Task $task, int $employeeId): TaskAssignment
     {
-        $this->ensureTaskCanBeAssigned($task);
+        return DB::transaction(function () use ($task, $employeeId) {
 
-        $employee = User::findOrFail($employeeId);
+            $this->ensureTaskCanBeAssigned($task);
 
-        $this->ensureEmployeeCanBeAssigned($employee);
+            // employee_id refers to employees.id, not users.id.
+            $employee = Employee::findOrFail($employeeId);
 
-        if (
-            TaskAssignment::where('task_id', $task->id)
-                ->where('employee_id', $employeeId)
-                ->exists()
-        ) {
-            throw ValidationException::withMessages([
-                'employee_id' => 'This employee is already assigned to this task.',
+            $this->ensureEmployeeCanBeAssigned($employee);
+
+            $alreadyAssigned = TaskAssignment::where('task_id', $task->id)
+                ->where('employee_id', $employee->id)
+                ->exists();
+
+            if ($alreadyAssigned) {
+                throw ValidationException::withMessages([
+                    'employee_id' => 'This employee is already assigned to this task.',
+                ]);
+            }
+
+            // assigned_by refers to users.id.
+            $assignment = TaskAssignment::create([
+                'task_id' => $task->id,
+                'employee_id' => $employee->id,
+                'assigned_by' => Auth::id(),
+                'assigned_at' => now(),
             ]);
-        }
 
-        $assignment = TaskAssignment::create([
-            'task_id' => $task->id,
-            'employee_id' => $employeeId,
-            'assigned_by' => Auth::id(),
-            'assigned_at' => now(),
-        ]);
+            // The activity actor is the authenticated User.
+            $this->logActivity(
+                task: $task,
+                userId: Auth::id(),
+                action: 'assigned',
+                description: "Task assigned to employee #{$employee->id}."
+            );
 
-        $this->logActivity(
-            task: $task,
-            employeeId: Auth::id(),
-            action: 'assigned',
-            description: "Task assigned to employee #{$employeeId}."
-        );
-
-        return $assignment;
+            return $assignment;
+        });
     }
 
     /**
@@ -112,61 +137,96 @@ class TaskService
      */
     public function updateProgress(Task $task, int $progress): Task
     {
-        $this->ensureEmployeeAssignedToTask($task);
+        return DB::transaction(function () use ($task, $progress) {
 
-        if ($task->status === TaskStatus::CLOSED) {
-            throw ValidationException::withMessages([
-                'task' => 'Closed tasks cannot be updated.',
+            $employee = $this->getAuthenticatedEmployee();
+
+            $this->ensureEmployeeAssignedToTask($task, $employee);
+
+            if ($task->status === TaskStatus::CLOSED) {
+                throw ValidationException::withMessages([
+                    'task' => 'Closed tasks cannot be updated.',
+                ]);
+            }
+
+            $oldProgress = $task->progress;
+
+            $task->update([
+                'progress' => $progress,
             ]);
-        }
 
-        $oldProgress = $task->progress;
+            $this->logActivity(
+                task: $task,
+                userId: Auth::id(),
+                action: 'progress_updated',
+                oldValue: (string) $oldProgress,
+                newValue: (string) $progress,
+                description: 'Task progress updated.'
+            );
 
-        $task->update([
-            'progress' => $progress,
-        ]);
-
-        $this->logActivity(
-            task: $task,
-            employeeId: Auth::id(),
-            action: 'progress_updated',
-            oldValue: (string) $oldProgress,
-            newValue: (string) $progress,
-            description: 'Task progress updated.'
-        );
-
-        return $task->refresh();
+            return $task->refresh();
+        });
     }
 
     /**
      * Update task status.
      */
-    public function updateStatus(Task $task, TaskStatus $newStatus): Task
-    {
-        $oldStatus = $task->status;
+    public function updateStatus(
+        Task $task,
+        TaskStatus $newStatus
+    ): Task {
+        return DB::transaction(function () use ($task, $newStatus) {
 
-        $this->validateStatusTransition(
-            $task,
-            $oldStatus,
-            $newStatus
-        );
+            $employee = $this->getAuthenticatedEmployee();
 
-        $task->update([
-            'status' => $newStatus,
-        ]);
+            $this->ensureEmployeeAssignedToTask($task, $employee);
 
-        $this->logActivity(
-            task: $task,
-            employeeId: Auth::id(),
-            action: 'status_changed',
-            oldValue: $oldStatus->value,
-            newValue: $newStatus->value,
-            description: 'Task status changed.'
-        );
+            $oldStatus = $task->status;
 
-        return $task->refresh();
+            $this->validateStatusTransition(
+                $task,
+                $oldStatus,
+                $newStatus
+            );
+
+            $task->update([
+                'status' => $newStatus,
+            ]);
+
+            $this->logActivity(
+                task: $task,
+                userId: Auth::id(),
+                action: 'status_changed',
+                oldValue: $oldStatus->value,
+                newValue: $newStatus->value,
+                description: 'Task status changed.'
+            );
+
+            return $task->refresh();
+        });
     }
 
+    /**
+     * Get the Employee record linked to the authenticated User.
+     *
+     * This is required only for employee-specific actions.
+     */
+    private function getAuthenticatedEmployee(): Employee
+    {
+        $employee = Employee::where('user_id', Auth::id())->first();
+
+        if (! $employee) {
+            throw ValidationException::withMessages([
+                'employee' => 'The authenticated user is not linked to an employee.',
+            ]);
+        }
+
+        return $employee;
+    }
+
+    /**
+     * Make sure the task can be updated.
+     */
     private function ensureTaskCanBeUpdated(Task $task): void
     {
         if ($task->status === TaskStatus::CLOSED) {
@@ -188,19 +248,27 @@ class TaskService
         }
     }
 
-    private function ensureEmployeeCanBeAssigned(User $employee): void
+    /**
+     * Make sure the selected employee is active.
+     */
+    private function ensureEmployeeCanBeAssigned(Employee $employee): void
     {
-        if ($employee->role !== 'Employee') {
+        if ($employee->status !== 'active') {
             throw ValidationException::withMessages([
-                'employee_id' => 'The selected user is not an employee.',
+                'employee_id' => 'The selected employee is inactive.',
             ]);
         }
     }
 
-    private function ensureEmployeeAssignedToTask(Task $task): void
-    {
+    /**
+     * Make sure the authenticated employee is assigned to the task.
+     */
+    private function ensureEmployeeAssignedToTask(
+        Task $task,
+        Employee $employee
+    ): void {
         $isAssigned = TaskAssignment::where('task_id', $task->id)
-            ->where('employee_id', Auth::id())
+            ->where('employee_id', $employee->id)
             ->exists();
 
         if (! $isAssigned) {
@@ -210,6 +278,9 @@ class TaskService
         }
     }
 
+    /**
+     * Validate task status transition.
+     */
     private function validateStatusTransition(
         Task $task,
         TaskStatus $oldStatus,
@@ -248,10 +319,13 @@ class TaskService
 
     /**
      * Store task activity history.
+     *
+     * user_id refers to users.id because the actor
+     * can be HR, Manager, Admin, or Employee.
      */
     private function logActivity(
         Task $task,
-        int $employeeId,
+        int $userId,
         string $action,
         ?string $oldValue = null,
         ?string $newValue = null,
@@ -259,7 +333,7 @@ class TaskService
     ): TaskActivity {
         return TaskActivity::create([
             'task_id' => $task->id,
-            'employee_id' => $employeeId,
+            'user_id' => $userId,
             'action' => $action,
             'old_value' => $oldValue,
             'new_value' => $newValue,

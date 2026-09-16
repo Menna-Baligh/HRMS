@@ -32,9 +32,10 @@ class OtpMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.otp',
-            with: ['otp' => $this->otp],
-        );
+             markdown: 'emails.otp',
+              with: [ 'otp' => $this->otp, ], 
+            );
+       
     }
 
     /**
