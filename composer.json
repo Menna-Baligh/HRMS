@@ -13,6 +13,7 @@
         "ichtrojan/laravel-otp": "^2.0",
         "knuckleswtf/scribe": "^5.11",
         "laravel/framework": "^13.17",
+        "laravel/reverb": "^1.0",
         "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.31",
         "laravel/telescope": "^5.23",
