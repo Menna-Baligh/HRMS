@@ -17,13 +17,13 @@ class NotificationSentEvent implements ShouldBroadcast
 
     public Notification $notification;
 
-    
+
     public function __construct(Notification $notification)
     {
         $this->notification = $notification;
     }
 
-    
+
     public function broadcastOn(): array
     {
         return [
@@ -31,13 +31,17 @@ class NotificationSentEvent implements ShouldBroadcast
         ];
     }
 
-    
+
     public function broadcastAs(): string
     {
         return 'notification.sent';
     }
     public function broadcastWith(): array
     {
+        $userLocale = $this->notification->user?->locale ?? config('app.locale', 'en');
+
+        app()->setLocale($userLocale);
+
         return [
             'notification' => (new NotificationResource($this->notification))->resolve(),
         ];

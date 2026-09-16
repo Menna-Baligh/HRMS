@@ -26,6 +26,7 @@ class UserResource extends JsonResource
             'phone' => $this->phone,
             'avatar' => $this->avatar,
             'role' => $roleValue,
+            'locale' => $this->locale,
             'permissions' => method_exists($this, 'getAllPermissions') ? $this->getAllPermissions()->pluck('name') : [],
         ];
     }

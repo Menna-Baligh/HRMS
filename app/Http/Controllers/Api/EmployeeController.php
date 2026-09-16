@@ -109,19 +109,14 @@ class EmployeeController extends Controller
     public function updateProfile(UpdateProfileRequest $request): JsonResponse
     {
         try {
-            $updatedEmployee = $this->employeeService->updateProfile(
-                auth()->user(),
+            $user = $this->employeeService->updateProfile(
+                auth('api')->user(),
                 $request->validated()
             );
 
             return ResponseHelper::success(
-                data: new EmployeeResource($updatedEmployee->user),
+                data: new UserResource($user),
                 message: 'Profile updated successfully'
-            );
-        } catch (ModelNotFoundException $e) {
-            return ResponseHelper::error(
-                message: $e->getMessage(),
-                statusCode: Response::HTTP_NOT_FOUND
             );
         } catch (Throwable $e) {
             report($e);
@@ -132,7 +127,6 @@ class EmployeeController extends Controller
             );
         }
     }
-
     public function changeAccountStatus(int $id,NotificationService $notificationService): JsonResponse
     {
         $user = $this->employeeService->changeAccountStatus($id);
