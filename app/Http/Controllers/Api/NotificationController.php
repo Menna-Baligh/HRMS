@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateFcmTokenRequest;
 use App\Http\Resources\NotificationResource;
 use App\Models\Notification;
 use Illuminate\Http\JsonResponse;
@@ -11,7 +12,7 @@ use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
-    
+
     public function index(Request $request): JsonResponse
     {
         $notifications = $request->user()
@@ -24,7 +25,7 @@ class NotificationController extends Controller
         );
     }
 
-    
+
     public function unreadCount(Request $request): JsonResponse
     {
         $count = $request->user()
@@ -38,7 +39,7 @@ class NotificationController extends Controller
         );
     }
 
-    
+
     public function markAsRead(Request $request, string $id): JsonResponse
     {
         $notification = Notification::find($id);
@@ -59,7 +60,7 @@ class NotificationController extends Controller
         );
     }
 
-    
+
     public function markAllAsRead(Request $request): JsonResponse
     {
         $request->user()
@@ -71,5 +72,13 @@ class NotificationController extends Controller
             null,
             'All notifications marked as read successfully.'
         );
+    }
+    public function updateFcmToken(UpdateFcmTokenRequest $request): JsonResponse
+    {
+        $request->user()->update([
+            'fcm_token' => $request->fcm_token,
+        ]);
+
+        return ResponseHelper::success(message: 'FCM Token updated successfully');
     }
 }

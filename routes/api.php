@@ -174,6 +174,7 @@ Route::middleware(['auth:api', 'check.active','set.app.language'])->group(functi
         Route::get('/unread-count', [NotificationController::class, 'unreadCount']);
         Route::patch('/{id}/read', [NotificationController::class, 'markAsRead']);
         Route::patch('/read-all', [NotificationController::class, 'markAllAsRead']);
+        Route::post('/fcm-token', [NotificationController::class, 'updateFcmToken']);
     });
 });
 
