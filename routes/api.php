@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\AttendanceController;
-use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AuthController as ApiAuthController;
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\EmployeeEvaluationController;
@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\HrPerformanceController;
 use App\Http\Controllers\Api\ManagerAttendanceController;
 use App\Http\Controllers\Api\ManagerController;
 use App\Http\Controllers\Api\ManagerPerformanceController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\V1\Calendar\LeaveCalendarController;
@@ -96,7 +97,7 @@ Route::patch('company/location/{id}/activate', [CompanyLocationController::class
 Route::get('company/location/active', [CompanyLocationController::class, 'activeLocation']);
 
 // ─── Protected Management Routes (Employees, Departments, Managers) ──────────
-Route::middleware(['auth:api', 'check.active'])->group(function () {
+Route::middleware(['auth:api', 'check.active','set.app.language'])->group(function () {
     Route::middleware(['role:Owner|HR'])->group(function () {
         Route::get('/permissions', [PermissionController::class, 'index']);
     });
@@ -127,7 +128,7 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
         });
         Route::get('/team-goals', [ManagerController::class, 'teamGoals']);
     });
-    Route::middleware(['role:HR|Owner'])->prefix('hr')->group(function () {
+    Route::middleware(['role:HR|Owner',])->prefix('hr')->group(function () {
         Route::prefix('/attendance')->group(function () {
             Route::get('/daily', [HrAttendanceController::class, 'daily']);
             Route::get('/exceptions', [HrAttendanceController::class, 'exceptions']);
@@ -157,7 +158,7 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
     Route::get('/employee/performance', [EmployeePerformanceController::class, 'dashboard']);
 });
 
-Route::middleware(['auth:api', 'check.active'])->group(function () {
+Route::middleware(['auth:api', 'check.active','set.app.language'])->group(function () {
     Route::prefix('goals')->group(function () {
         Route::get('/', [GoalController::class, 'index']);
         Route::post('/', [GoalController::class, 'store']);
@@ -165,6 +166,12 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
         Route::put('/{id}', [GoalController::class, 'update']);
         Route::patch('/{id}/progress', [GoalController::class, 'updateProgress']);
         Route::patch('/{id}/complete', [GoalController::class, 'complete']);
+    });
+    Route::prefix('notifications')->group(function (){
+        Route::get('/', [NotificationController::class, 'index']);
+        Route::get('/unread-count', [NotificationController::class, 'unreadCount']);
+        Route::patch('/{id}/read', [NotificationController::class, 'markAsRead']);
+        Route::patch('/read-all', [NotificationController::class, 'markAllAsRead']);
     });
 });
 
