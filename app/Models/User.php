@@ -117,9 +117,10 @@ class User extends Authenticatable implements JWTSubject
     }
 
     public function taskActivities(): HasMany
-    {
-        return $this->hasMany(TaskActivity::class, 'employee_id');
-    }
+{
+    return $this->hasMany(TaskActivity::class, 'employee_id');
+}
+   
     // ─── Role Helpers ─────────────────────────────────────────────────────────
 
     public function isOwner(): bool
@@ -167,4 +168,21 @@ class User extends Authenticatable implements JWTSubject
 
         return in_array($this->role, ['Owner', 'HR', 'Manager', UserRole::Owner, UserRole::HR, UserRole::Manager], true);
     }
+
+    /**
+ * Tasks created by this user.
+ */
+public function createdTasks(): HasMany
+{
+    return $this->hasMany(Task::class, 'created_by');
+}
+
+/**
+ * Task assignments created by this user.
+ */
+public function taskAssignmentsCreated(): HasMany
+{
+    return $this->hasMany(TaskAssignment::class, 'assigned_by');
+}
+
 }

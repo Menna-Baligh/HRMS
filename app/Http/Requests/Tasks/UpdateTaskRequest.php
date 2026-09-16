@@ -35,5 +35,6 @@ class UpdateTaskRequest extends FormRequest
 
             'deadline' => ['sometimes', 'date', 'after:now'],
         ];
-    }
+    
+}
 }

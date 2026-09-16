@@ -1,6 +1,16 @@
 <?php
 
 use App\Http\Controllers\Api\AttendanceController;
+use App\Http\Controllers\Api\AuthController as ApiAuthController;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\DepartmentController;
+use App\Http\Controllers\Api\EmployeeController;
+use App\Http\Controllers\Api\GoogleAuthController;
+use App\Http\Controllers\Api\HrAttendanceController;
+use App\Http\Controllers\Api\ManagerAttendanceController;
+use App\Http\Controllers\Api\ManagerController;
+use App\Http\Controllers\Api\PermissionController;
+use App\Http\Controllers\Api\SubmissionController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AuthController as ApiAuthController;
 use App\Http\Controllers\Api\DepartmentController;
@@ -30,6 +40,13 @@ use App\Http\Controllers\Api\V1\Manager\ManagerLeaveQueueController;
 use App\Http\Controllers\CompanyLocations\CompanyLocationController;
 use Illuminate\Support\Facades\Route;
 
+
+// Route::post('/register', [AuthController::class, 'register']);
+
+
+    // Route::post('/login', [AuthController::class,'login'])
+    //     ->middleware('throttle:5,1');
+
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])
         ->middleware('throttle:5,1');
@@ -41,21 +58,40 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::prefix('tasks')->middleware('auth:api')->group(function () {
-    // create task
+    // Create task
     Route::post('/', [TaskController::class, 'store']);
-    // update task
+    // Update task
     Route::put('/{task}', [TaskController::class, 'update']);
-    // assign task to employee
+    // Assign task to employee
     Route::post('/{task}/assign', [TaskController::class, 'assign']);
-    // progress
+    // Update task progress
     Route::patch('/{task}/progress', [TaskController::class, 'updateProgress']);
-    // change status
+    // Update task status
     Route::patch('/{task}/status', [TaskController::class, 'updateStatus']);
+    // submission a task
+    Route::post('/{task}/submissions',[SubmissionController::class, 'store']);
+    // attach file
+    Route::post('/submissions/{submission}/attachments',[SubmissionController::class, 'attachFile']);
+
+    //Review Queue
+    Route::get('/submissions/review',[SubmissionController::class, 'reviewQueue']);
+     //Submission Details
+    Route::get('/submissions/{submission}',[SubmissionController::class, 'show']);
+    //approve
+    Route::patch('/submissions/{submission}/approve',[SubmissionController::class, 'approve']);
+    //reject
+    Route::patch('/submissions/{submission}/reject',[SubmissionController::class, 'reject']);
+    //request changes
+    Route::patch('/submissions/{submission}/request-changes',[SubmissionController::class, 'requestChanges']);
+    // resubmit
+    Route::post('/submissions/{submission}/resubmit',[SubmissionController::class, 'resubmit']);
+
 });
 
 // Company Location
-
-// Create company location
+Route::middleware('auth:api')->prefix('locations')->group(function()
+{
+    // Create company location
 Route::post('company/location', [CompanyLocationController::class, 'store']);
 
 // Update company location
@@ -88,12 +124,6 @@ Route::prefix('auth')->group(function () {
     });
 });
 
-// ─── Company Locations ───────────────────────────────────────────────────────
-Route::post('company/location', [CompanyLocationController::class, 'store']);
-Route::put('company/location/{id}', [CompanyLocationController::class, 'update']);
-Route::patch('company/location/{id}/deactivate', [CompanyLocationController::class, 'deactivate']);
-Route::patch('company/location/{id}/activate', [CompanyLocationController::class, 'activate']);
-Route::get('company/location/active', [CompanyLocationController::class, 'activeLocation']);
 
 // ─── Protected Management Routes (Employees, Departments, Managers) ──────────
 Route::middleware(['auth:api', 'check.active'])->group(function () {
