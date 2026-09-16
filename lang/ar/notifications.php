@@ -33,4 +33,14 @@ return [
     'account_activated_body' => 'تم تفعيل حسابك بنجاح. أهلاً بك معنا في الفريق!',
     'account_deactivated_title' => 'تم تعطيل الحساب',
     'account_deactivated_body' => 'تم تعطيل حسابك في النظام. يرجى مراجعة الـ HR لمزيد من التفاصيل.',
+
+    'checkin_success_title' => 'تم تسجيل الحضور',
+    'checkin_success_body' => 'تم تسجيل حضورك بنجاح في تمام الساعة :time.',
+    'checkout_success_title' => 'تم تسجيل الانصراف',
+    'checkout_success_body' => 'تم تسجيل انصرافك بنجاح في تمام الساعة :time.',
+    'late_checkin_title' => 'تنبيه تأخير عن العمل',
+    'late_checkin_body' => 'لقد قمت بتسجيل الحضور متأخراً بمقدار :minutes دقيقة.',
+    'forgot_checkin_title' => 'تذكير بتسجيل الحضور',
+    'forgot_checkin_body' => 'لم تقم بتسجيل حضورك اليوم حتى الآن، يرجى تسجيل الحضور.',
+        
 ];

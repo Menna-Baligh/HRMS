@@ -33,4 +33,13 @@ return [
     'account_activated_body' => 'Your account has been activated successfully. Welcome aboard!',
     'account_deactivated_title' => 'Account Deactivated',
     'account_deactivated_body' => 'Your account has been deactivated. Please contact HR for details.',
+
+    'checkin_success_title' => 'Check-in Successful',
+    'checkin_success_body' => 'Your check-in has been recorded successfully at :time.',
+    'checkout_success_title' => 'Check-out Successful',
+    'checkout_success_body' => 'Your check-out has been recorded successfully at :time.',
+    'late_checkin_title' => 'Late Check-in Warning',
+    'late_checkin_body' => 'You checked in late today by :minutes minutes.',
+    'forgot_checkin_title' => 'Attendance Reminder',
+    'forgot_checkin_body' => 'You haven\'t checked in yet today. Please don\'t forget to check in.',
 ];

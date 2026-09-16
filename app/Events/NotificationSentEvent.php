@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Http\Resources\NotificationResource;
 use App\Models\Notification;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -34,5 +35,11 @@ class NotificationSentEvent implements ShouldBroadcast
     public function broadcastAs(): string
     {
         return 'notification.sent';
+    }
+    public function broadcastWith(): array
+    {
+        return [
+            'notification' => (new NotificationResource($this->notification))->resolve(),
+        ];
     }
 }

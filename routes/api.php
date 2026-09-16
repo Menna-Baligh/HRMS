@@ -227,6 +227,6 @@ Route::prefix('v1')->group(function (): void {
     });
 });
 
-Route::middleware('auth:api')->post('/broadcasting/auth', function (Request $request) {
+Route::middleware(['auth:api','set.app.language'])->post('/broadcasting/auth', function (Request $request) {
     return Broadcast::auth($request);
 });
