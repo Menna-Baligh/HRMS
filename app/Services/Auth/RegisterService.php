@@ -33,24 +33,10 @@ class RegisterService
         $token = JWTAuth::fromUser($user);
 
         return [
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth('api')->factory()->getTTL() / 60 .' hours',
-            'user' => $user->load('roles', 'permissions'),
-        ];
-
-        // $otp = $this->otpService->generate($user->email);
-
-        // return [
-        //     'user' => $user,
-        //     'otp' => $otp,
-        // ];
-
-        $otp = $this->otpService->generate($user->email);
-
-        return [
-            'user' => $user,
-            'otp' => $otp,
+        'access_token' => $token,
+        'token_type'   => 'bearer',
+        'expires_in'   => (auth('api')->factory()->getTTL() / 60) . ' hours',
+        'user'         => $user->load('roles', 'permissions'),
         ];
 
     }
