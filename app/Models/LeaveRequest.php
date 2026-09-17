@@ -3,11 +3,13 @@
 namespace App\Models;
 
 use App\Enums\LeaveStatus;
+use App\Models\File;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class LeaveRequest extends Model
@@ -89,5 +91,9 @@ class LeaveRequest extends Model
     {
         $query->where('start_date', '<=', $end)
             ->where('end_date', '>=', $start);
+    }
+    public function files(): MorphMany
+    {
+        return $this->morphMany(File::class, 'fileable');
     }
 }
