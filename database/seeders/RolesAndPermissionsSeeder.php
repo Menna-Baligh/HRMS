@@ -14,27 +14,32 @@ class RolesAndPermissionsSeeder extends Seeder
     {
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        foreach (PermissionEnum::cases() as $permission) {
-            Permission::firstOrCreate([
-                'name' => $permission->value,
-                'guard_name' => 'api',
+        $guard = 'api';
+
+        $roleNames = ['Owner', 'HR', 'Manager', 'Employee'];
+        $roles = [];
+
+        foreach ($roleNames as $name) {
+            $roles[$name] = Role::firstOrCreate([
+                'name'       => $name,
+                'guard_name' => $guard,
             ]);
         }
 
-        // Create roles
-        $roles = [
-            'Owner',
-            'HR',
-            'Manager',
-            'Employee',
-        ];
-
-        foreach ($roles as $role) {
-            Role::firstOrCreate([
-                'name' => $role,
-                'guard_name' => 'api',
+        foreach (PermissionEnum::cases() as $permissionEnum) {
+            $permission = Permission::firstOrCreate([
+                'name'       => $permissionEnum->value,
+                'guard_name' => $guard,
             ]);
+
+            foreach ($permissionEnum->defaultRoles() as $roleName) {
+                if (isset($roles[$roleName])) {
+                    $roles[$roleName]->givePermissionTo($permission);
+                }
+            }
         }
+
+        $roles['Owner']->givePermissionTo(Permission::all());
 
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
     }
