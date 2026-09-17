@@ -37,7 +37,7 @@ class FileService
 
         return File::create([
             'user_id'       => $user->id,
-            'original_name' => $file->getClientOriginalName(), 
+            'original_name' => $file->getClientOriginalName(),
             'path'          => $path,
             'mime_type'     => $file->getClientMimeType(),
             'size'          => $file->getSize(),
@@ -46,13 +46,15 @@ class FileService
         ]);
     }
 
-    public function downloadFile(File $file): BinaryFileResponse|StreamedResponse
+    public function downloadFile(File $file): BinaryFileResponse
     {
         if (!Storage::disk('local')->exists($file->path)) {
             abort(404, 'File not found on storage.');
         }
 
-        return response()->download(storage_path('app/' . $file->path), $file->original_name);
+        $fullPath = Storage::disk('local')->path($file->path);
+
+        return response()->download($fullPath, $file->original_name);
     }
 
     public function deleteFile(File $file): bool
@@ -62,5 +64,19 @@ class FileService
         }
 
         return $file->delete();
+    }
+
+    public function updateAvatar(UploadedFile $file, User $user): File
+    {
+        $oldAvatar = File::where('user_id', $user->id)
+            ->where('fileable_type', get_class($user))
+            ->where('fileable_id', $user->id)
+            ->first();
+
+        if ($oldAvatar) {
+            $this->deleteFile($oldAvatar);
+        }
+
+        return $this->uploadFile($file, $user, $user);
     }
 }
