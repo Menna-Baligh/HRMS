@@ -5,16 +5,6 @@ use App\Http\Controllers\Api\AuthController as ApiAuthController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
-use App\Http\Controllers\Api\GoogleAuthController;
-use App\Http\Controllers\Api\HrAttendanceController;
-use App\Http\Controllers\Api\ManagerAttendanceController;
-use App\Http\Controllers\Api\ManagerController;
-use App\Http\Controllers\Api\PermissionController;
-use App\Http\Controllers\Api\SubmissionController;
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\AuthController as ApiAuthController;
-use App\Http\Controllers\Api\DepartmentController;
-use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\EmployeeEvaluationController;
 use App\Http\Controllers\Api\EmployeePerformanceController;
 use App\Http\Controllers\Api\EvaluationController;
@@ -27,7 +17,9 @@ use App\Http\Controllers\Api\HrPerformanceController;
 use App\Http\Controllers\Api\ManagerAttendanceController;
 use App\Http\Controllers\Api\ManagerController;
 use App\Http\Controllers\Api\ManagerPerformanceController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PermissionController;
+use App\Http\Controllers\Api\SubmissionController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\V1\Calendar\LeaveCalendarController;
 use App\Http\Controllers\Api\V1\HR\HRLeaveQueueController;
@@ -38,6 +30,8 @@ use App\Http\Controllers\Api\V1\LeaveRequest\LeaveRequestController;
 use App\Http\Controllers\Api\V1\LeaveType\LeaveTypeController;
 use App\Http\Controllers\Api\V1\Manager\ManagerLeaveQueueController;
 use App\Http\Controllers\CompanyLocations\CompanyLocationController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 
 
@@ -126,7 +120,7 @@ Route::prefix('auth')->group(function () {
 
 
 // ─── Protected Management Routes (Employees, Departments, Managers) ──────────
-Route::middleware(['auth:api', 'check.active'])->group(function () {
+Route::middleware(['auth:api', 'check.active','set.app.language'])->group(function () {
     Route::middleware(['role:Owner|HR'])->group(function () {
         Route::get('/permissions', [PermissionController::class, 'index']);
     });
@@ -157,7 +151,7 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
         });
         Route::get('/team-goals', [ManagerController::class, 'teamGoals']);
     });
-    Route::middleware(['role:HR|Owner'])->prefix('hr')->group(function () {
+    Route::middleware(['role:HR|Owner',])->prefix('hr')->group(function () {
         Route::prefix('/attendance')->group(function () {
             Route::get('/daily', [HrAttendanceController::class, 'daily']);
             Route::get('/exceptions', [HrAttendanceController::class, 'exceptions']);
@@ -187,7 +181,7 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
     Route::get('/employee/performance', [EmployeePerformanceController::class, 'dashboard']);
 });
 
-Route::middleware(['auth:api', 'check.active'])->group(function () {
+Route::middleware(['auth:api', 'check.active','set.app.language'])->group(function () {
     Route::prefix('goals')->group(function () {
         Route::get('/', [GoalController::class, 'index']);
         Route::post('/', [GoalController::class, 'store']);
@@ -195,6 +189,13 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
         Route::put('/{id}', [GoalController::class, 'update']);
         Route::patch('/{id}/progress', [GoalController::class, 'updateProgress']);
         Route::patch('/{id}/complete', [GoalController::class, 'complete']);
+    });
+    Route::prefix('notifications')->group(function (){
+        Route::get('/', [NotificationController::class, 'index']);
+        Route::get('/unread-count', [NotificationController::class, 'unreadCount']);
+        Route::patch('/{id}/read', [NotificationController::class, 'markAsRead']);
+        Route::patch('/read-all', [NotificationController::class, 'markAllAsRead']);
+        Route::post('/fcm-token', [NotificationController::class, 'updateFcmToken']);
     });
 });
 
@@ -246,4 +247,8 @@ Route::prefix('v1')->group(function (): void {
         // Leave Calendar (Approved leaves view)
         Route::get('calendar/leaves', [LeaveCalendarController::class, 'index'])->name('calendar.leaves');
     });
+});
+
+Route::middleware(['auth:api','set.app.language'])->post('/broadcasting/auth', function (Request $request) {
+    return Broadcast::auth($request);
 });

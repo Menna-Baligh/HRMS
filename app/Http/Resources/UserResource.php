@@ -19,14 +19,14 @@ class UserResource extends JsonResource
         $roleValue = $this->role instanceof \BackedEnum ? $this->role->value : $this->role;
 
         return [
-            'id' => (method_exists($this, 'hasRole') && $this->hasRole('Owner'))
-                ? $this->id
-                : ($this->employee?->id ?? $this->id),
+            'id' => $this->id,
+            'employee_id' => $this->when($this->employee?->id !== null, $this->employee?->id),
             'name' => $this->name,
             'email' => $this->email,
             'phone' => $this->phone,
             'avatar' => $this->avatar,
             'role' => $roleValue,
+            'locale' => $this->locale,
             'permissions' => method_exists($this, 'getAllPermissions') ? $this->getAllPermissions()->pluck('name') : [],
         ];
     }

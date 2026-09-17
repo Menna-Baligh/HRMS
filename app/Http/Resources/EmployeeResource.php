@@ -35,6 +35,7 @@ class EmployeeResource extends JsonResource
             ] : null,
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
             'permissions' => $this->getAllPermissions()->pluck('name'),
+            'locale' => $this->locale,
         ];
     }
 }

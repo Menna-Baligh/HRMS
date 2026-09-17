@@ -9,3 +9,9 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('attendance:mark-absent')->dailyAt('23:59');
+
+Schedule::command('attendance:check-reminders reminder')
+    ->dailyAt('08:50');
+
+Schedule::command('attendance:check-reminders late')
+    ->dailyAt('09:15');

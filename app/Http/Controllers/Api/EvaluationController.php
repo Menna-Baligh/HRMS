@@ -10,6 +10,7 @@ use App\Http\Requests\UpdateEvaluationRequest;
 use App\Http\Resources\EvaluationResource;
 use App\Models\Evaluation;
 use App\Services\EvaluationService;
+use App\Services\NotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Throwable;
@@ -71,16 +72,34 @@ class EvaluationController extends Controller
         }
     }
 
-    public function complete(Request $request, int $id): JsonResponse
+    public function complete(Request $request, int $id, NotificationService $notificationService): JsonResponse
     {
         try {
-            $evaluation = Evaluation::with(['scores.category'])->find($id);
+            $evaluation = Evaluation::with(['scores.category', 'employee.user', 'period'])->find($id);
 
             if (! $evaluation) {
                 return ResponseHelper::error(null, 'Evaluation not found.', 404);
             }
 
             $completedEvaluation = $this->evaluationService->completeEvaluation($evaluation);
+
+            if ($evaluation->employee && $evaluation->employee->user) {
+                $notificationService->send(
+                    user: $evaluation->employee->user,
+                    type: 'evaluation_closed',
+                    titleKey: 'notifications.evaluation_closed_title',
+                    bodyKey: 'notifications.evaluation_closed_body',
+                    parameters: [
+                        'period_name' => $evaluation->period?->name ?? 'the evaluation period',
+                    ],
+                    metadata: [
+                        'screen' => 'evaluation_summary',
+                        'evaluation_id' => $completedEvaluation->id,
+                        'period_id' => $completedEvaluation->evaluation_period_id,
+                        'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                    ]
+                );
+            }
 
             return ResponseHelper::success(
                 new EvaluationResource($completedEvaluation),

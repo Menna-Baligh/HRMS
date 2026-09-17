@@ -77,24 +77,23 @@ class EmployeeService
         return $employee->load(['user', 'department', 'manager.user']);
     }
 
-    public function updateProfile(User $user, array $data): Employee
+    public function updateProfile(User $user, array $data): User
     {
         return DB::transaction(function () use ($user, $data) {
-            $userData = array_intersect_key($data, array_flip(['name', 'avatar']));
+            $userData = array_intersect_key($data, array_flip(['name', 'avatar', 'locale']));
             if (! empty($userData)) {
                 $user->update($userData);
                 $user->refresh();
             }
+
             $employeeData = array_intersect_key($data, array_flip(['phone', 'address']));
             $employee = $user->employee;
-            if (! $employee) {
-                throw new ModelNotFoundException('Employee profile not found for this user.');
-            }
-            if (! empty($employeeData)) {
+
+            if ($employee && ! empty($employeeData)) {
                 $employee->update($employeeData);
             }
 
-            return $employee->load(['user', 'department', 'manager.user']);
+            return $user->load(['employee.department', 'employee.manager.user']);
         });
     }
 

@@ -36,6 +36,8 @@ class User extends Authenticatable implements JWTSubject
         'provider',
         'provider_id',
         'manager_id',
+        'locale',
+        'fcm_token',
     ];
 
     /**
@@ -167,6 +169,10 @@ class User extends Authenticatable implements JWTSubject
         }
 
         return in_array($this->role, ['Owner', 'HR', 'Manager', UserRole::Owner, UserRole::HR, UserRole::Manager], true);
+    }
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class)->latest();
     }
 
     /**
