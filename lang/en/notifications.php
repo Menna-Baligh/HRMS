@@ -43,7 +43,7 @@ return [
     'forgot_checkin_title' => 'Attendance Reminder',
     'forgot_checkin_body' => 'You haven\'t checked in yet today. Please don\'t forget to check in.',
     'before_shift_title' => 'Shift Reminder',
-    'before_shift_body'  => 'Your shift starts in 10 minutes. Don\'t forget to check in when you arrive.',
-    'late_shift_title'   => 'Late Check-in Warning',
-    'late_shift_body'    => 'It has been 15 minutes since your shift started and you haven\'t checked in yet.',
+    'before_shift_body' => 'Your shift starts in 10 minutes. Don\'t forget to check in when you arrive.',
+    'late_shift_title' => 'Late Check-in Warning',
+    'late_shift_body' => 'It has been 15 minutes since your shift started and you haven\'t checked in yet.',
 ];

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Requests\Tasks;
 
 use Illuminate\Contracts\Validation\ValidationRule;

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Enums\TaskStatus;
-use App\Http\Controllers\Controller;
 use App\Helpers\ResponseHelper;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Tasks\AssignTaskRequest;
 use App\Http\Requests\Tasks\StoreTaskRequest;
 use App\Http\Requests\Tasks\UpdateTaskProgressRequest;
@@ -17,9 +17,7 @@ class TaskController extends Controller
 {
     public function __construct(
         private TaskService $taskService
-    ) {
-    }
- 
+    ) {}
 
     public function store(StoreTaskRequest $request)
     {
@@ -32,8 +30,6 @@ class TaskController extends Controller
         ], 201);
     }
 
-
-    
     public function update(UpdateTaskRequest $request, Task $task)
     {
         $task = $this->taskService->update(
@@ -46,7 +42,6 @@ class TaskController extends Controller
             'data' => $task,
         ]);
     }
-
 
     public function assign(AssignTaskRequest $request, Task $task)
     {
@@ -61,8 +56,6 @@ class TaskController extends Controller
             statusCode: 201
         );
     }
-
-  
 
     /**
      * Update task progress.

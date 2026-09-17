@@ -101,7 +101,7 @@ class AttendanceController extends Controller
         }
     }
 
-    public function checkOut(CheckOutRequest $request,NotificationService $notificationService): JsonResponse
+    public function checkOut(CheckOutRequest $request, NotificationService $notificationService): JsonResponse
     {
         $user = auth('api')->user();
         $employee = $user?->employee;

@@ -27,7 +27,6 @@ class Notification extends Model
         'metadata' => 'array',
     ];
 
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

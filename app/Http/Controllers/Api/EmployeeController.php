@@ -127,7 +127,8 @@ class EmployeeController extends Controller
             );
         }
     }
-    public function changeAccountStatus(int $id,NotificationService $notificationService): JsonResponse
+
+    public function changeAccountStatus(int $id, NotificationService $notificationService): JsonResponse
     {
         $user = $this->employeeService->changeAccountStatus($id);
 

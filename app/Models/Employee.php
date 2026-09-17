@@ -68,16 +68,18 @@ class Employee extends Model
     }
 
     /**
- * Tasks assigned to this employee.
- */
-public function taskAssignments(): HasMany
-{
-    return $this->hasMany(TaskAssignment::class);
-}
-public function submissions(): HasMany
-{
-    return $this->hasMany(Submission::class);
-}
+     * Tasks assigned to this employee.
+     */
+    public function taskAssignments(): HasMany
+    {
+        return $this->hasMany(TaskAssignment::class);
+    }
+
+    public function submissions(): HasMany
+    {
+        return $this->hasMany(Submission::class);
+    }
+
     public function goals(): HasMany
     {
         return $this->hasMany(Goal::class);

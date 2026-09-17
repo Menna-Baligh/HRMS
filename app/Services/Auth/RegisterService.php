@@ -13,7 +13,6 @@ class RegisterService
     public function register(array $data): array
     {
         $user = User::create([
-        
 
             'name' => $data['name'],
             'email' => $data['email'],
@@ -30,14 +29,13 @@ class RegisterService
 
         // Generate JWT access token
         $token = JWTAuth::fromUser($user);
-       return [
-        'access_token' => $token,
-         'token_type' => 'bearer', 
-         'expires_in' => auth('api')->factory()->getTTL() / 60 . ' hours', 
-         'user' => $user,
-       ];
-    
 
+        return [
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => auth('api')->factory()->getTTL() / 60 .' hours',
+            'user' => $user,
+        ];
 
         // $otp = $this->otpService->generate($user->email);
 

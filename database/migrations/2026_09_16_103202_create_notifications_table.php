@@ -15,14 +15,14 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('type');
-            
-            $table->string('title_key'); 
-            $table->string('body_key'); 
-            
-            $table->json('parameters')->nullable(); 
+
+            $table->string('title_key');
+            $table->string('body_key');
+
+            $table->json('parameters')->nullable();
 
             $table->boolean('is_read')->default(false);
-            $table->json('metadata')->nullable(); 
+            $table->json('metadata')->nullable();
             $table->timestamps();
         });
     }
