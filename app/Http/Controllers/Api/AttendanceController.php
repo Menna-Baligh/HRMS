@@ -11,6 +11,7 @@ use App\Http\Requests\GetTodayAttendanceRequest;
 use App\Http\Resources\AttendanceHistoryResource;
 use App\Http\Resources\AttendanceResource;
 use App\Http\Resources\TodayAttendanceResource;
+use App\Jobs\SendNotificationJob;
 use App\Services\AttendanceService;
 use App\Services\NotificationService;
 use Carbon\Carbon;
@@ -65,19 +66,19 @@ class AttendanceController extends Controller
 
             $checkInTime = Carbon::parse($attendance->check_in)->format('g:i A');
 
-            $notificationService->send(
-                user: $user,
-                type: 'checkin_success',
-                titleKey: 'notifications.checkin_success_title',
-                bodyKey: 'notifications.checkin_success_body',
-                parameters: [
-                    'time' => $checkInTime,
-                ],
-                metadata: [
-                    'screen' => 'attendance_history',
-                    'attendance_id' => $attendance->id,
-                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
-                ]
+            SendNotificationJob::dispatch(
+            user: $user,
+            type: 'checkin_success',
+            titleKey: 'notifications.checkin_success_title',
+            bodyKey: 'notifications.checkin_success_body',
+            parameters: [
+                'time' => $checkInTime,
+            ],
+            metadata: [
+                'screen' => 'attendance_history',
+                'attendance_id' => $attendance->id,
+                'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+            ]
             );
 
             return ResponseHelper::success(
@@ -122,19 +123,19 @@ class AttendanceController extends Controller
 
             $checkOutTime = Carbon::parse($attendance->check_out)->format('g:i A');
 
-            $notificationService->send(
-                user: $user,
-                type: 'checkout_success',
-                titleKey: 'notifications.checkout_success_title',
-                bodyKey: 'notifications.checkout_success_body',
-                parameters: [
-                    'time' => $checkOutTime,
-                ],
-                metadata: [
-                    'screen' => 'attendance_history',
-                    'attendance_id' => $attendance->id,
-                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
-                ]
+            SendNotificationJob::dispatch(
+            user: $user,
+            type: 'checkout_success',
+            titleKey: 'notifications.checkout_success_title',
+            bodyKey: 'notifications.checkout_success_body',
+            parameters: [
+                'time' => $checkOutTime,
+            ],
+            metadata: [
+                'screen' => 'attendance_history',
+                'attendance_id' => $attendance->id,
+                'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+            ]
             );
 
             return ResponseHelper::success(
