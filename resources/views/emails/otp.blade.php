@@ -1,18 +1,20 @@
 <x-mail::message>
-# Verification Code
+    # Verification Code
 
-Hello,
+    Hello,
 
-Your verification code is:
+    Use the verification code below to complete your verification:
 
-<x-mail::panel>
-# {{ $otp }}
-</x-mail::panel>
+    <x-mail::panel>
+        # {{ $otp }}
+    </x-mail::panel>
 
-This code will expire shortly. Please do not share this code with anyone.
+    This code will expire shortly.
 
-If you did not request this code, you can safely ignore this email.
+    **Please do not share this code with anyone.**
 
-Thanks,<br>
-{{ config('app.name') }}
+    If you did not request this code, you can safely ignore this email.
+
+    Thanks,<br>
+    {{ config('app.name') }}
 </x-mail::message>
