@@ -69,6 +69,18 @@ class NotificationController extends Controller
             'All notifications marked as read successfully.'
         );
     }
+    
+    public function clearAll(Request $request): JsonResponse
+    {
+        $request->user()
+            ->notifications()
+            ->delete();
+
+        return ResponseHelper::success(
+            null,
+            'All notifications cleared successfully.'
+        );
+    }
 
     public function updateFcmToken(UpdateFcmTokenRequest $request): JsonResponse
     {
