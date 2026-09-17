@@ -9,7 +9,9 @@ use App\Http\Requests\UpdateEmployeeHrFieldsRequest;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Resources\EmployeeResource;
 use App\Http\Resources\UserResource;
+use App\Jobs\SendNotificationJob;
 use App\Services\EmployeeService;
+use App\Services\NotificationService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
@@ -108,19 +110,14 @@ class EmployeeController extends Controller
     public function updateProfile(UpdateProfileRequest $request): JsonResponse
     {
         try {
-            $updatedEmployee = $this->employeeService->updateProfile(
-                auth()->user(),
+            $user = $this->employeeService->updateProfile(
+                auth('api')->user(),
                 $request->validated()
             );
 
             return ResponseHelper::success(
-                data: new EmployeeResource($updatedEmployee->user),
+                data: new UserResource($user),
                 message: 'Profile updated successfully'
-            );
-        } catch (ModelNotFoundException $e) {
-            return ResponseHelper::error(
-                message: $e->getMessage(),
-                statusCode: Response::HTTP_NOT_FOUND
             );
         } catch (Throwable $e) {
             report($e);
@@ -132,13 +129,28 @@ class EmployeeController extends Controller
         }
     }
 
-    public function changeAccountStatus(int $id): JsonResponse
+    public function changeAccountStatus(int $id, NotificationService $notificationService): JsonResponse
     {
         $user = $this->employeeService->changeAccountStatus($id);
 
-        $message = $user->employee->status === 'active'
+        $isActive = $user->employee->status === 'active';
+
+        $message = $isActive
             ? 'Employee account has been activated successfully.'
             : 'Employee account has been deactivated successfully.';
+
+        SendNotificationJob::dispatch(
+        user: $user,
+        type: $isActive ? 'account_activated' : 'account_deactivated',
+        titleKey: $isActive ? 'notifications.account_activated_title' : 'notifications.account_deactivated_title',
+        bodyKey: $isActive ? 'notifications.account_activated_body' : 'notifications.account_deactivated_body',
+        parameters: [],
+        metadata: [
+            'screen' => 'profile_overview',
+            'status' => $user->employee->status,
+            'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+        ]
+    );
 
         return ResponseHelper::success(
             data: new EmployeeResource($user),

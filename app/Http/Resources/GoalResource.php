@@ -28,7 +28,7 @@ class GoalResource extends JsonResource
             'target_date' => $this->target_date?->format('Y-m-d'),
             'status' => $this->status->value ?? $this->status,
             'histories' => GoalProgressHistoryResource::collection($this->whenLoaded('histories')),
-            'created_at' => $this->created_at?->toIso8601String(),
+            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
         ];
     }
 }

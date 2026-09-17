@@ -11,7 +11,10 @@ use App\Http\Requests\GetTodayAttendanceRequest;
 use App\Http\Resources\AttendanceHistoryResource;
 use App\Http\Resources\AttendanceResource;
 use App\Http\Resources\TodayAttendanceResource;
+use App\Jobs\SendNotificationJob;
 use App\Services\AttendanceService;
+use App\Services\NotificationService;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -42,9 +45,10 @@ class AttendanceController extends Controller
         );
     }
 
-    public function checkIn(CheckInRequest $request): JsonResponse
+    public function checkIn(CheckInRequest $request, NotificationService $notificationService): JsonResponse
     {
-        $employee = auth('api')->user()?->employee;
+        $user = auth('api')->user();
+        $employee = $user?->employee;
 
         if (! $employee) {
             return ResponseHelper::error(
@@ -58,6 +62,23 @@ class AttendanceController extends Controller
                 $employee,
                 (float) $request->latitude,
                 (float) $request->longitude
+            );
+
+            $checkInTime = Carbon::parse($attendance->check_in)->format('g:i A');
+
+            SendNotificationJob::dispatch(
+            user: $user,
+            type: 'checkin_success',
+            titleKey: 'notifications.checkin_success_title',
+            bodyKey: 'notifications.checkin_success_body',
+            parameters: [
+                'time' => $checkInTime,
+            ],
+            metadata: [
+                'screen' => 'attendance_history',
+                'attendance_id' => $attendance->id,
+                'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+            ]
             );
 
             return ResponseHelper::success(
@@ -81,9 +102,10 @@ class AttendanceController extends Controller
         }
     }
 
-    public function checkOut(CheckOutRequest $request): JsonResponse
+    public function checkOut(CheckOutRequest $request, NotificationService $notificationService): JsonResponse
     {
-        $employee = auth('api')->user()?->employee;
+        $user = auth('api')->user();
+        $employee = $user?->employee;
 
         if (! $employee) {
             return ResponseHelper::error(
@@ -97,6 +119,23 @@ class AttendanceController extends Controller
                 $employee,
                 (float) $request->latitude,
                 (float) $request->longitude
+            );
+
+            $checkOutTime = Carbon::parse($attendance->check_out)->format('g:i A');
+
+            SendNotificationJob::dispatch(
+            user: $user,
+            type: 'checkout_success',
+            titleKey: 'notifications.checkout_success_title',
+            bodyKey: 'notifications.checkout_success_body',
+            parameters: [
+                'time' => $checkOutTime,
+            ],
+            metadata: [
+                'screen' => 'attendance_history',
+                'attendance_id' => $attendance->id,
+                'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+            ]
             );
 
             return ResponseHelper::success(

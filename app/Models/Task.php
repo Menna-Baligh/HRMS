@@ -50,8 +50,9 @@ class Task extends Model
     {
         return $this->hasMany(TaskActivity::class);
     }
+
     public function submissions(): HasMany
-{
-    return $this->hasMany(Submission::class);
-}
+    {
+        return $this->hasMany(Submission::class);
+    }
 }

@@ -17,16 +17,16 @@ class UserResource extends JsonResource
     public function toArray(Request $request): array
     {
         $roleValue = $this->role instanceof \BackedEnum ? $this->role->value : $this->role;
-
+        $avatarFile = $this->files()->latest()->first();
         return [
-            'id' => (method_exists($this, 'hasRole') && $this->hasRole('Owner'))
-                ? $this->id
-                : ($this->employee?->id ?? $this->id),
+            'id' => $this->id,
+            'employee_id' => $this->when($this->employee?->id !== null, $this->employee?->id),
             'name' => $this->name,
             'email' => $this->email,
             'phone' => $this->phone,
-            'avatar' => $this->avatar,
+            'avatar_url' => $avatarFile ? route('files.download', $avatarFile->id) : null,
             'role' => $roleValue,
+            'locale' => $this->locale,
             'permissions' => method_exists($this, 'getAllPermissions') ? $this->getAllPermissions()->pluck('name') : [],
         ];
     }

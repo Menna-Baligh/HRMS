@@ -8,7 +8,7 @@ use App\Models\Department;
 use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -16,6 +16,7 @@ use Illuminate\Validation\ValidationException;
 
 class EmployeeService
 {
+    public function __construct(protected FileService $fileService) {}
     public function createEmployee(array $data): User
     {
         return DB::transaction(function () use ($data) {
@@ -77,24 +78,27 @@ class EmployeeService
         return $employee->load(['user', 'department', 'manager.user']);
     }
 
-    public function updateProfile(User $user, array $data): Employee
+    public function updateProfile(User $user, array $data): User
     {
         return DB::transaction(function () use ($user, $data) {
-            $userData = array_intersect_key($data, array_flip(['name', 'avatar']));
+            if (isset($data['avatar']) && $data['avatar'] instanceof UploadedFile) {
+                $this->fileService->updateAvatar($data['avatar'], $user);
+                unset($data['avatar']);
+            }
+
+            $userData = array_intersect_key($data, array_flip(['name','phone', 'locale']));
             if (! empty($userData)) {
                 $user->update($userData);
-                $user->refresh();
             }
-            $employeeData = array_intersect_key($data, array_flip(['phone', 'address']));
+
+            $employeeData = array_intersect_key($data, array_flip(['address']));
             $employee = $user->employee;
-            if (! $employee) {
-                throw new ModelNotFoundException('Employee profile not found for this user.');
-            }
-            if (! empty($employeeData)) {
+
+            if ($employee && ! empty($employeeData)) {
                 $employee->update($employeeData);
             }
 
-            return $employee->load(['user', 'department', 'manager.user']);
+            return $user->fresh()->load(['employee.department', 'employee.manager.user', 'files']);
         });
     }
 

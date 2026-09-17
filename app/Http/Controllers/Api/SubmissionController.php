@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Submissions\AttachSubmissionFileRequest;
 use App\Http\Requests\Submissions\RejectSubmissionRequest;
@@ -31,132 +32,123 @@ class SubmissionController extends Controller
             $request->validated()
         );
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Submission created successfully.',
-            'data' => $submission,
-        ], 201);
+        return ResponseHelper::success(
+            $submission,
+            __('Submission created successfully.'),
+            201
+        );
     }
 
     /**
- * Attach a file to a submission.
- */
-public function attachFile(
-    AttachSubmissionFileRequest $request,
-    Submission $submission
-): JsonResponse {
-    $attachment = $this->submissionService->attachFile(
-        $submission,
-        $request->file('file')
-    );
+     * Attach a file to a submission.
+     */
+    public function attachFile(
+        AttachSubmissionFileRequest $request,
+        Submission $submission
+    ): JsonResponse {
+        $file = $this->submissionService->attachFile(
+            $submission,
+            $request->file('file')
+        );
 
-    return response()->json([
-        'success' => true,
-        'message' => 'File attached successfully.',
-        'data' => $attachment,
-    ], 201);
-}
+        return ResponseHelper::success(
+            $file,
+            __('File attached successfully.'),
+            201
+        );
+    }
 
-/**
- * Display submission details.
- */
-public function show(Submission $submission): JsonResponse
-{
-    $submission = $this->submissionService->show($submission);
+    /**
+     * Display submission details.
+     */
+    public function show(Submission $submission): JsonResponse
+    {
+        $submission = $this->submissionService->show($submission);
 
-    return response()->json([
-        'success' => true,
-        'data' => $submission,
-    ]);
-}
+        return ResponseHelper::success(
+            $submission
+        );
+    }
 
-/**
- * Display submissions waiting for review.
- */
-public function reviewQueue(): JsonResponse
-{
-    $submissions = $this->submissionService->reviewQueue();
+    /**
+     * Display submissions waiting for review.
+     */
+    public function reviewQueue(): JsonResponse
+    {
+        $submissions = $this->submissionService->reviewQueue();
 
-    return response()->json([
-        'success' => true,
-        'data' => $submissions,
-    ]);
-}
+        return ResponseHelper::success(
+            $submissions
+        );
+    }
 
-/**
- * Approve submission.
- */
-public function approve(
-    Submission $submission
-): JsonResponse {
-    $submission = $this->submissionService->approve(
-        $submission
-    );
+    /**
+     * Approve submission.
+     */
+    public function approve(
+        Submission $submission
+    ): JsonResponse {
+        $submission = $this->submissionService->approve(
+            $submission
+        );
 
-    return response()->json([
-        'success' => true,
-        'message' => 'Submission approved successfully.',
-        'data' => $submission,
-    ]);
-}
+        return ResponseHelper::success(
+            $submission,
+            __('Submission approved successfully.')
+        );
+    }
 
+    /**
+     * Reject submission.
+     */
+    public function reject(
+        RejectSubmissionRequest $request,
+        Submission $submission
+    ): JsonResponse {
+        $submission = $this->submissionService->reject(
+            $submission,
+            $request->validated('feedback')
+        );
 
-/**
- * Reject submission.
- */
-public function reject(
-    RejectSubmissionRequest $request,
-    Submission $submission
-): JsonResponse {
-    $submission = $this->submissionService->reject(
-        $submission,
-        $request->validated('feedback')
-    );
+        return ResponseHelper::success(
+            $submission,
+            __('Submission rejected successfully.')
+        );
+    }
 
-    return response()->json([
-        'success' => true,
-        'message' => 'Submission rejected successfully.',
-        'data' => $submission,
-    ]);
-}
+    /**
+     * Request changes from employee.
+     */
+    public function requestChanges(
+        RequestChangesRequest $request,
+        Submission $submission
+    ): JsonResponse {
+        $submission = $this->submissionService->requestChanges(
+            $submission,
+            $request->validated('feedback')
+        );
 
+        return ResponseHelper::success(
+            $submission,
+            __('Changes requested successfully.')
+        );
+    }
 
-/**
- * Request changes from employee.
- */
-public function requestChanges(
-    RequestChangesRequest $request,
-    Submission $submission
-): JsonResponse {
-    $submission = $this->submissionService->requestChanges(
-        $submission,
-        $request->validated('feedback')
-    );
+    /**
+     * Resubmit a submission after requested changes.
+     */
+    public function resubmit(
+        ResubmitSubmissionRequest $request,
+        Submission $submission
+    ): JsonResponse {
+        $submission = $this->submissionService->resubmit(
+            $submission,
+            $request->validated('note')
+        );
 
-    return response()->json([
-        'success' => true,
-        'message' => 'Changes requested successfully.',
-        'data' => $submission,
-    ]);
-}
-
-
-/**
- * Resubmit a submission after requested changes.
- */
-public function resubmit(
-    ResubmitSubmissionRequest $request,
-    Submission $submission
-): JsonResponse {
-    $submission = $this->submissionService->resubmit(
-        $submission,
-        $request->validated('note')
-    );
-
-    return response()->json([
-        'success' => true,
-        'message' => 'Submission resubmitted successfully.',
-        'data' => $submission,
-    ]);
-}
+        return ResponseHelper::success(
+            $submission,
+            __('Submission resubmitted successfully.')
+        );
+    }
 }

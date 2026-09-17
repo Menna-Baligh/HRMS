@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -38,6 +39,8 @@ class User extends Authenticatable implements JWTSubject
         'provider',
         'provider_id',
         'manager_id',
+        'locale',
+        'fcm_token',
     ];
 
     /**
@@ -119,10 +122,10 @@ class User extends Authenticatable implements JWTSubject
     }
 
     public function taskActivities(): HasMany
-{
-    return $this->hasMany(TaskActivity::class, 'employee_id');
-}
-   
+    {
+        return $this->hasMany(TaskActivity::class, 'employee_id');
+    }
+
     // ─── Role Helpers ─────────────────────────────────────────────────────────
 
     public function isOwner(): bool
@@ -171,44 +174,28 @@ class User extends Authenticatable implements JWTSubject
         return in_array($this->role, ['Owner', 'HR', 'Manager', UserRole::Owner, UserRole::HR, UserRole::Manager], true);
     }
 
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class)->latest();
+    }
+
     /**
- * Tasks created by this user.
- */
-public function createdTasks(): HasMany
-{
-    return $this->hasMany(Task::class, 'created_by');
-}
+     * Tasks created by this user.
+     */
+    public function createdTasks(): HasMany
+    {
+        return $this->hasMany(Task::class, 'created_by');
+    }
 
-/**
- * Task assignments created by this user.
- */
-public function taskAssignmentsCreated(): HasMany
-{
-    return $this->hasMany(TaskAssignment::class, 'assigned_by');
-}
-
-/**
- * Leave requests reviewed by this user as a manager.
- */
-public function managedLeaveRequests(): HasMany
-{
-    return $this->hasMany(LeaveRequest::class, 'manager_id');
-}
-
-/**
- * Leave requests reviewed by this user as HR.
- */
-public function hrLeaveRequests(): HasMany
-{
-    return $this->hasMany(LeaveRequest::class, 'hr_id');
-}
-
-/**
- * Leave decisions made by this user.
- */
-public function leaveDecisionHistories(): HasMany
-{
-    return $this->hasMany(LeaveDecisionHistory::class, 'reviewer_id');
-}
-
+    /**
+     * Task assignments created by this user.
+     */
+    public function taskAssignmentsCreated(): HasMany
+    {
+        return $this->hasMany(TaskAssignment::class, 'assigned_by');
+    }
+    public function files(): MorphMany
+    {
+        return $this->morphMany(File::class, 'fileable');
+    }
 }
