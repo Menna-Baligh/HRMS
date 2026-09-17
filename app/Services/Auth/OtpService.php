@@ -6,7 +6,6 @@ use App\Mail\OtpMail;
 use Ichtrojan\Otp\Otp;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Validation\ValidationException;
 
 class OtpService
 {

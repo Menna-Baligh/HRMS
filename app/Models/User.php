@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Enums\UserRole;
+use App\Models\LeaveDecisionHistory;
+use App\Models\LeaveRequest;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -183,6 +185,30 @@ public function createdTasks(): HasMany
 public function taskAssignmentsCreated(): HasMany
 {
     return $this->hasMany(TaskAssignment::class, 'assigned_by');
+}
+
+/**
+ * Leave requests reviewed by this user as a manager.
+ */
+public function managedLeaveRequests(): HasMany
+{
+    return $this->hasMany(LeaveRequest::class, 'manager_id');
+}
+
+/**
+ * Leave requests reviewed by this user as HR.
+ */
+public function hrLeaveRequests(): HasMany
+{
+    return $this->hasMany(LeaveRequest::class, 'hr_id');
+}
+
+/**
+ * Leave decisions made by this user.
+ */
+public function leaveDecisionHistories(): HasMany
+{
+    return $this->hasMany(LeaveDecisionHistory::class, 'reviewer_id');
 }
 
 }
