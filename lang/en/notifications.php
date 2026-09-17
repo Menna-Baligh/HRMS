@@ -51,4 +51,11 @@ return [
     'submission_rejected_body'  => 'Your submission for task ":title" was rejected. Feedback: :feedback',
     'submission_changes_title'  => 'Changes Requested',
     'submission_changes_body'   => 'Changes were requested for task ":title". Feedback: :feedback',
+
+    'goal_created_title'          => 'New Goal Created',
+    'goal_created_body'           => ':employee created a new goal: :title',
+    'goal_progress_updated_title' => 'Goal Progress Updated',
+    'goal_progress_updated_body'  => ':employee updated progress for goal ":title" to :value',
+    'goal_completed_title'        => 'Goal Completed 🎉',
+    'goal_completed_body'         => ':employee completed the goal: :title',
 ];

@@ -52,4 +52,11 @@ return [
     'submission_changes_title'  => 'مطلوب تعديلات',
     'submission_changes_body'   => 'تم طلب تعديلات على تسليمتك للمهمة ":title". الملاحظات: :feedback',
 
+    'goal_created_title'          => 'تم إنشاء هدف جديد',
+    'goal_created_body'           => 'قام الموظف :employee بإنشاء هدف جديد: :title',
+    'goal_progress_updated_title' => 'تم تحديث تقدم الهدف',
+    'goal_progress_updated_body'  => 'قام الموظف :employee بتحديث تقدم الهدف ":title" إلى :value',
+    'goal_completed_title'        => 'تم إنجاز الهدف 🎉',
+    'goal_completed_body'         => 'قام الموظف :employee بإنجاز الهدف بالكامل: :title',
+
 ];
