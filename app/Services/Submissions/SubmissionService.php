@@ -5,6 +5,7 @@ namespace App\Services\Submissions;
 
 use App\Enums\SubmissionStatus;
 use App\Enums\TaskStatus;
+use App\Jobs\SendNotificationJob;
 use App\Models\Employee;
 use App\Models\File;
 use App\Models\Submission;
@@ -26,7 +27,7 @@ class SubmissionService
      */
     public function create(Task $task, array $data): Submission
     {
-        return DB::transaction(function () use ($task, $data) {
+        $submission = DB::transaction(function () use ($task, $data) {
 
             $employee = $this->getAuthenticatedEmployee();
 
@@ -59,6 +60,17 @@ class SubmissionService
                 'submitted_at' => now(),
             ]);
         });
+        if ($task->creator) {
+            SendNotificationJob::dispatch(
+                user: $task->creator,
+                type: 'submission_created',
+                titleKey: 'notifications.submission_created_title',
+                bodyKey: 'notifications.submission_created_body',
+                parameters: ['title' => $task->title],
+                metadata: ['submission_id' => $submission->id, 'task_id' => $task->id]
+            );
+        }
+        return $submission;
     }
 
 
@@ -168,7 +180,7 @@ class SubmissionService
      */
     public function approve(Submission $submission): Submission
     {
-        return DB::transaction(function () use ($submission) {
+        $submission = DB::transaction(function () use ($submission) {
 
             $this->ensureSubmissionCanBeReviewed($submission);
 
@@ -184,6 +196,17 @@ class SubmissionService
 
             return $submission->refresh();
         });
+        if ($submission->employee?->user) {
+            SendNotificationJob::dispatch(
+                user: $submission->employee->user,
+                type: 'submission_approved',
+                titleKey: 'notifications.submission_approved_title',
+                bodyKey: 'notifications.submission_approved_body',
+                parameters: ['title' => $submission->task?->title],
+                metadata: ['submission_id' => $submission->id]
+            );
+        }
+        return $submission;
     }
 
     /**
@@ -193,7 +216,7 @@ class SubmissionService
         Submission $submission,
         string $feedback
     ): Submission {
-        return DB::transaction(function () use ($submission, $feedback) {
+        $submission = DB::transaction(function () use ($submission, $feedback) {
 
             $this->ensureSubmissionCanBeReviewed($submission);
 
@@ -209,6 +232,17 @@ class SubmissionService
 
             return $submission->refresh();
         });
+        if ($submission->employee?->user) {
+            SendNotificationJob::dispatch(
+                user: $submission->employee->user,
+                type: 'submission_rejected',
+                titleKey: 'notifications.submission_rejected_title',
+                bodyKey: 'notifications.submission_rejected_body',
+                parameters: ['title' => $submission->task?->title],
+                metadata: ['submission_id' => $submission->id, 'feedback' => $feedback]
+            );
+        }
+        return $submission;
     }
 
     /**
@@ -218,7 +252,7 @@ class SubmissionService
         Submission $submission,
         string $feedback
     ): Submission {
-        return DB::transaction(function () use ($submission, $feedback) {
+        $submission = DB::transaction(function () use ($submission, $feedback) {
 
             $this->ensureSubmissionCanBeReviewed($submission);
 
@@ -234,6 +268,18 @@ class SubmissionService
 
             return $submission->refresh();
         });
+        if ($submission->employee?->user) {
+            SendNotificationJob::dispatch(
+                user: $submission->employee->user,
+                type: 'submission_changes_requested',
+                titleKey: 'notifications.submission_changes_title',
+                bodyKey: 'notifications.submission_changes_body',
+                parameters: ['title' => $submission->task?->title],
+                metadata: ['submission_id' => $submission->id, 'feedback' => $feedback]
+            );
+        }
+
+        return $submission;
     }
 
     /**
