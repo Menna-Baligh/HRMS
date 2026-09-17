@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreEvaluationRequest;
 use App\Http\Requests\UpdateEvaluationRequest;
 use App\Http\Resources\EvaluationResource;
+use App\Jobs\SendNotificationJob;
 use App\Models\Evaluation;
 use App\Services\EvaluationService;
 use App\Services\NotificationService;
@@ -84,20 +85,20 @@ class EvaluationController extends Controller
             $completedEvaluation = $this->evaluationService->completeEvaluation($evaluation);
 
             if ($evaluation->employee && $evaluation->employee->user) {
-                $notificationService->send(
-                    user: $evaluation->employee->user,
-                    type: 'evaluation_closed',
-                    titleKey: 'notifications.evaluation_closed_title',
-                    bodyKey: 'notifications.evaluation_closed_body',
-                    parameters: [
-                        'period_name' => $evaluation->period?->name ?? 'the evaluation period',
-                    ],
-                    metadata: [
-                        'screen' => 'evaluation_summary',
-                        'evaluation_id' => $completedEvaluation->id,
-                        'period_id' => $completedEvaluation->evaluation_period_id,
-                        'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
-                    ]
+                SendNotificationJob::dispatch(
+                user: $evaluation->employee->user,
+                type: 'evaluation_closed',
+                titleKey: 'notifications.evaluation_closed_title',
+                bodyKey: 'notifications.evaluation_closed_body',
+                parameters: [
+                    'period_name' => $evaluation->period?->name ?? 'the evaluation period',
+                ],
+                metadata: [
+                    'screen' => 'evaluation_summary',
+                    'evaluation_id' => $completedEvaluation->id,
+                    'period_id' => $completedEvaluation->evaluation_period_id,
+                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                ]
                 );
             }
 

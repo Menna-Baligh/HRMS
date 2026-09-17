@@ -16,32 +16,30 @@ class NotificationSentEvent implements ShouldBroadcastNow
 
     public Notification $notification;
 
-
     public function __construct(Notification $notification)
     {
         $this->notification = $notification;
     }
 
-
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('notifications.' . $this->notification->user_id),
+            new PrivateChannel('notifications.'.$this->notification->user_id),
         ];
     }
-
 
     public function broadcastAs(): string
     {
         return 'notification.sent';
     }
+
     public function broadcastWith(): array
     {
         $userLocale = $this->notification->user?->locale ?? config('app.locale', 'en');
         app()->setLocale($userLocale);
 
-            return [
-                'notification' => (new NotificationResource($this->notification))->resolve(),
-            ];
+        return [
+            'notification' => (new NotificationResource($this->notification))->resolve(),
+        ];
     }
 }

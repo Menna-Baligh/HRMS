@@ -19,7 +19,7 @@ class StoreLeaveRequestRequest extends FormRequest
             'start_date' => ['required', 'date', 'date_format:Y-m-d', 'after_or_equal:today'],
             'end_date' => ['required', 'date', 'date_format:Y-m-d', 'after_or_equal:start_date'],
             'reason' => ['required', 'string', 'max:1000'],
-            'attachment' => ['nullable', 'file', 'max:5120', 'mimes:pdf,jpg,jpeg,png'],
+            'attachment' => ['nullable', 'file', 'max:10240', 'mimes:pdf,jpg,jpeg,png'],
         ];
     }
 }

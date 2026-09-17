@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -119,10 +120,10 @@ class User extends Authenticatable implements JWTSubject
     }
 
     public function taskActivities(): HasMany
-{
-    return $this->hasMany(TaskActivity::class, 'employee_id');
-}
-   
+    {
+        return $this->hasMany(TaskActivity::class, 'employee_id');
+    }
+
     // ─── Role Helpers ─────────────────────────────────────────────────────────
 
     public function isOwner(): bool
@@ -170,25 +171,29 @@ class User extends Authenticatable implements JWTSubject
 
         return in_array($this->role, ['Owner', 'HR', 'Manager', UserRole::Owner, UserRole::HR, UserRole::Manager], true);
     }
+
     public function notifications()
     {
         return $this->hasMany(Notification::class)->latest();
     }
 
     /**
- * Tasks created by this user.
- */
-public function createdTasks(): HasMany
-{
-    return $this->hasMany(Task::class, 'created_by');
-}
+     * Tasks created by this user.
+     */
+    public function createdTasks(): HasMany
+    {
+        return $this->hasMany(Task::class, 'created_by');
+    }
 
-/**
- * Task assignments created by this user.
- */
-public function taskAssignmentsCreated(): HasMany
-{
-    return $this->hasMany(TaskAssignment::class, 'assigned_by');
-}
-
+    /**
+     * Task assignments created by this user.
+     */
+    public function taskAssignmentsCreated(): HasMany
+    {
+        return $this->hasMany(TaskAssignment::class, 'assigned_by');
+    }
+    public function files(): MorphMany
+    {
+        return $this->morphMany(File::class, 'fileable');
+    }
 }

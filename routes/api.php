@@ -30,16 +30,15 @@ use App\Http\Controllers\Api\V1\LeaveRequest\LeaveRequestController;
 use App\Http\Controllers\Api\V1\LeaveType\LeaveTypeController;
 use App\Http\Controllers\Api\V1\Manager\ManagerLeaveQueueController;
 use App\Http\Controllers\CompanyLocations\CompanyLocationController;
+use App\Http\Controllers\Api\FileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 
-
 // Route::post('/register', [AuthController::class, 'register']);
 
-
-    // Route::post('/login', [AuthController::class,'login'])
-    //     ->middleware('throttle:5,1');
+// Route::post('/login', [AuthController::class,'login'])
+//     ->middleware('throttle:5,1');
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])
@@ -63,41 +62,42 @@ Route::prefix('tasks')->middleware('auth:api')->group(function () {
     // Update task status
     Route::patch('/{task}/status', [TaskController::class, 'updateStatus']);
     // submission a task
-    Route::post('/{task}/submissions',[SubmissionController::class, 'store']);
+    Route::post('/{task}/submissions', [SubmissionController::class, 'store']);
     // attach file
-    Route::post('/submissions/{submission}/attachments',[SubmissionController::class, 'attachFile']);
+    Route::post('/submissions/{submission}/attachments', [SubmissionController::class, 'attachFile']);
 
-    //Review Queue
-    Route::get('/submissions/review',[SubmissionController::class, 'reviewQueue']);
-     //Submission Details
-    Route::get('/submissions/{submission}',[SubmissionController::class, 'show']);
-    //approve
-    Route::patch('/submissions/{submission}/approve',[SubmissionController::class, 'approve']);
-    //reject
-    Route::patch('/submissions/{submission}/reject',[SubmissionController::class, 'reject']);
-    //request changes
-    Route::patch('/submissions/{submission}/request-changes',[SubmissionController::class, 'requestChanges']);
+    // Review Queue
+    Route::get('/submissions/review', [SubmissionController::class, 'reviewQueue']);
+    // Submission Details
+    Route::get('/submissions/{submission}', [SubmissionController::class, 'show']);
+    // approve
+    Route::patch('/submissions/{submission}/approve', [SubmissionController::class, 'approve']);
+    // reject
+    Route::patch('/submissions/{submission}/reject', [SubmissionController::class, 'reject']);
+    // request changes
+    Route::patch('/submissions/{submission}/request-changes', [SubmissionController::class, 'requestChanges']);
     // resubmit
-    Route::post('/submissions/{submission}/resubmit',[SubmissionController::class, 'resubmit']);
+    Route::post('/submissions/{submission}/resubmit', [SubmissionController::class, 'resubmit']);
 
 });
 
 // Company Location
-Route::middleware('auth:api')->prefix('locations')->group(function()
-{
+Route::middleware('auth:api')->prefix('locations')->group(function () {
     // Create company location
-Route::post('company/location', [CompanyLocationController::class, 'store']);
+    Route::post('company/location', [CompanyLocationController::class, 'store']);
 
-// Update company location
-Route::put('company/location/{id}', [CompanyLocationController::class, 'update']);
+    // Update company location
+    Route::put('company/location/{id}', [CompanyLocationController::class, 'update']);
 
-// Deactivate company location
-Route::patch('company/location/{id}/deactivate', [CompanyLocationController::class, 'deactivate']);
+    // Deactivate company location
+    Route::patch('company/location/{id}/deactivate', [CompanyLocationController::class, 'deactivate']);
 
-// Activate company location
-Route::patch('company/location/{id}/activate', [CompanyLocationController::class, 'activate']);
-// Get active company location
-Route::get('company/location/active', [CompanyLocationController::class, 'activeLocation']);
+    // Activate company location
+    Route::patch('company/location/{id}/activate', [CompanyLocationController::class, 'activate']);
+    // Get active company location
+    Route::get('company/location/active', [CompanyLocationController::class, 'activeLocation']);
+
+});
 
 // ─── Team Auth & Account Routes ──────────────────────────────────────────────
 Route::prefix('auth')->group(function () {
@@ -118,9 +118,8 @@ Route::prefix('auth')->group(function () {
     });
 });
 
-
 // ─── Protected Management Routes (Employees, Departments, Managers) ──────────
-Route::middleware(['auth:api', 'check.active','set.app.language'])->group(function () {
+Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(function () {
     Route::middleware(['role:Owner|HR'])->group(function () {
         Route::get('/permissions', [PermissionController::class, 'index']);
     });
@@ -151,7 +150,7 @@ Route::middleware(['auth:api', 'check.active','set.app.language'])->group(functi
         });
         Route::get('/team-goals', [ManagerController::class, 'teamGoals']);
     });
-    Route::middleware(['role:HR|Owner',])->prefix('hr')->group(function () {
+    Route::middleware(['role:HR|Owner'])->prefix('hr')->group(function () {
         Route::prefix('/attendance')->group(function () {
             Route::get('/daily', [HrAttendanceController::class, 'daily']);
             Route::get('/exceptions', [HrAttendanceController::class, 'exceptions']);
@@ -181,7 +180,7 @@ Route::middleware(['auth:api', 'check.active','set.app.language'])->group(functi
     Route::get('/employee/performance', [EmployeePerformanceController::class, 'dashboard']);
 });
 
-Route::middleware(['auth:api', 'check.active','set.app.language'])->group(function () {
+Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(function () {
     Route::prefix('goals')->group(function () {
         Route::get('/', [GoalController::class, 'index']);
         Route::post('/', [GoalController::class, 'store']);
@@ -190,12 +189,17 @@ Route::middleware(['auth:api', 'check.active','set.app.language'])->group(functi
         Route::patch('/{id}/progress', [GoalController::class, 'updateProgress']);
         Route::patch('/{id}/complete', [GoalController::class, 'complete']);
     });
-    Route::prefix('notifications')->group(function (){
+    Route::prefix('notifications')->group(function () {
         Route::get('/', [NotificationController::class, 'index']);
         Route::get('/unread-count', [NotificationController::class, 'unreadCount']);
         Route::patch('/{id}/read', [NotificationController::class, 'markAsRead']);
         Route::patch('/read-all', [NotificationController::class, 'markAllAsRead']);
+        Route::delete('/clear-all', [NotificationController::class, 'clearAll']);
         Route::post('/fcm-token', [NotificationController::class, 'updateFcmToken']);
+    });
+    Route::prefix('files')->group(function () {
+        Route::get('/{file}/download', [FileController::class, 'download'])->name('files.download');
+        Route::delete('/{file}', [FileController::class, 'destroy'])->name('files.destroy');
     });
 });
 
@@ -249,6 +253,6 @@ Route::prefix('v1')->group(function (): void {
     });
 });
 
-Route::middleware(['auth:api','set.app.language'])->post('/broadcasting/auth', function (Request $request) {
+Route::middleware(['auth:api', 'set.app.language'])->post('/broadcasting/auth', function (Request $request) {
     return Broadcast::auth($request);
 });

@@ -6,6 +6,7 @@ use App\Enums\SubmissionStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Submission extends Model
 {
@@ -40,5 +41,9 @@ class Submission extends Model
     public function reviews(): HasMany
     {
         return $this->hasMany(SubmissionReview::class);
+    }
+    public function files(): MorphMany
+    {
+        return $this->morphMany(File::class, 'fileable');
     }
 }

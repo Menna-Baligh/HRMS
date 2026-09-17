@@ -1,12 +1,6 @@
 <?php
 
 return [
-    'task_assigned_title' => 'مهمة جديدة مسندة إليك',
-    'task_assigned_body' => 'تم إسناد مهمة جديدة إليك: :task_name',
-    'task_updated_title' => 'تحديث في المهمة',
-    'task_updated_body' => 'تم تحديث حالة المهمة :task_name إلى :status',
-    'task_overdue_title' => 'تنبيه: مهمة متأخرة',
-    'task_overdue_body' => 'لقد تجاوزت الموعد النهائي للمهمة: :task_name',
 
     'attendance_reminder_title' => 'تذكير بالحضور',
     'attendance_reminder_body' => 'يرجى تذكر تسجيل الحضور (Check-in) لوردية العمل اليوم.',
@@ -43,8 +37,26 @@ return [
     'forgot_checkin_title' => 'تذكير بتسجيل الحضور',
     'forgot_checkin_body' => 'لم تقم بتسجيل حضورك اليوم حتى الآن، يرجى تسجيل الحضور.',
     'before_shift_title' => 'تذكير بموعد الشفت',
-    'before_shift_body'  => 'الشفت الخاص بك يبدأ خلال 10 دقائق، لا تنسَ تسجيل الحضور فور وصولك.',
-    'late_shift_title'   => 'تنبيه تأخير عن تسجيل الحضور',
-    'late_shift_body'    => 'لقد مر 15 دقيقة على بداية الشفت الخاص بك ولم تقم بتسجيل الحضور حتى الآن.',
-        
+    'before_shift_body' => 'الشفت الخاص بك يبدأ خلال 10 دقائق، لا تنسَ تسجيل الحضور فور وصولك.',
+    'late_shift_title' => 'تنبيه تأخير عن تسجيل الحضور',
+    'late_shift_body' => 'لقد مر 15 دقيقة على بداية الشفت الخاص بك ولم تقم بتسجيل الحضور حتى الآن.',
+
+    'task_assigned_title'       => 'تاسك جديد مُسند إليك',
+    'task_assigned_body'        => 'تم إسناد مهمة جديدة لك: :title',
+    'submission_created_title'  => 'تسليم مهمة جديد',
+    'submission_created_body'   => 'قام الموظف :employee بتسليم عمل للمهمة: :title',
+    'submission_approved_title' => 'تم قبول التسليم',
+    'submission_approved_body'  => 'تمت الموافقة على تسليمتك للمهمة ":title".',
+    'submission_rejected_title' => 'تم رفض التسليم',
+    'submission_rejected_body'  => 'تم رفض تسليمتك للمهمة ":title". الملاحظات: :feedback',
+    'submission_changes_title'  => 'مطلوب تعديلات',
+    'submission_changes_body'   => 'تم طلب تعديلات على تسليمتك للمهمة ":title". الملاحظات: :feedback',
+
+    'goal_created_title'          => 'تم إنشاء هدف جديد',
+    'goal_created_body'           => 'قام الموظف :employee بإنشاء هدف جديد: :title',
+    'goal_progress_updated_title' => 'تم تحديث تقدم الهدف',
+    'goal_progress_updated_body'  => 'قام الموظف :employee بتحديث تقدم الهدف ":title" إلى :value',
+    'goal_completed_title'        => 'تم إنجاز الهدف 🎉',
+    'goal_completed_body'         => 'قام الموظف :employee بإنجاز الهدف بالكامل: :title',
+
 ];

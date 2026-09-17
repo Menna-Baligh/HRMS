@@ -4,6 +4,7 @@ namespace App\Services\Tasks;
 
 use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
+use App\Jobs\SendNotificationJob;
 use App\Models\Employee;
 use App\Models\Task;
 use App\Models\TaskActivity;
@@ -38,6 +39,7 @@ class TaskService
                 action: 'created',
                 description: 'Task created.'
             );
+
 
             return $task;
         });
@@ -93,7 +95,7 @@ class TaskService
      */
     public function assign(Task $task, int $employeeId): TaskAssignment
     {
-        return DB::transaction(function () use ($task, $employeeId) {
+        $assignment = DB::transaction(function () use ($task, $employeeId) {
 
             $this->ensureTaskCanBeAssigned($task);
 
@@ -129,7 +131,22 @@ class TaskService
             );
 
             return $assignment;
+
+
         });
+        $employee = Employee::find($employeeId);
+            if ($employee?->user) {
+                SendNotificationJob::dispatch(
+                    user: $employee->user,
+                    type: 'task_assigned',
+                    titleKey: 'notifications.task_assigned_title',
+                    bodyKey: 'notifications.task_assigned_body',
+                    parameters: ['title' => $task->title],
+                    metadata: ['task_id' => $task->id]
+                );
+            }
+
+        return $assignment;
     }
 
     /**

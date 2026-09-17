@@ -1,12 +1,6 @@
 <?php
 
 return [
-    'task_assigned_title' => 'New Task Assigned',
-    'task_assigned_body' => 'You have been assigned to a new task: :task_name',
-    'task_updated_title' => 'Task Updated',
-    'task_updated_body' => 'The task :task_name status has been updated to :status',
-    'task_overdue_title' => 'Overdue Task Alert',
-    'task_overdue_body' => 'The task :task_name is now overdue.',
 
     'attendance_reminder_title' => 'Attendance Reminder',
     'attendance_reminder_body' => 'Please remember to check-in for your shift today.',
@@ -43,7 +37,25 @@ return [
     'forgot_checkin_title' => 'Attendance Reminder',
     'forgot_checkin_body' => 'You haven\'t checked in yet today. Please don\'t forget to check in.',
     'before_shift_title' => 'Shift Reminder',
-    'before_shift_body'  => 'Your shift starts in 10 minutes. Don\'t forget to check in when you arrive.',
-    'late_shift_title'   => 'Late Check-in Warning',
-    'late_shift_body'    => 'It has been 15 minutes since your shift started and you haven\'t checked in yet.',
+    'before_shift_body' => 'Your shift starts in 10 minutes. Don\'t forget to check in when you arrive.',
+    'late_shift_title' => 'Late Check-in Warning',
+    'late_shift_body' => 'It has been 15 minutes since your shift started and you haven\'t checked in yet.',
+
+    'task_assigned_title'       => 'New Task Assigned',
+    'task_assigned_body'        => 'You have been assigned a new task: :title',
+    'submission_created_title'  => 'New Task Submission',
+    'submission_created_body'   => ':employee submitted a response for task: :title',
+    'submission_approved_title' => 'Submission Approved',
+    'submission_approved_body'  => 'Your submission for task ":title" has been approved.',
+    'submission_rejected_title' => 'Submission Rejected',
+    'submission_rejected_body'  => 'Your submission for task ":title" was rejected. Feedback: :feedback',
+    'submission_changes_title'  => 'Changes Requested',
+    'submission_changes_body'   => 'Changes were requested for task ":title". Feedback: :feedback',
+
+    'goal_created_title'          => 'New Goal Created',
+    'goal_created_body'           => ':employee created a new goal: :title',
+    'goal_progress_updated_title' => 'Goal Progress Updated',
+    'goal_progress_updated_body'  => ':employee updated progress for goal ":title" to :value',
+    'goal_completed_title'        => 'Goal Completed 🎉',
+    'goal_completed_body'         => ':employee completed the goal: :title',
 ];

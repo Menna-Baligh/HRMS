@@ -11,18 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('notifications', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+        Schema::create('files', function (Blueprint $table) {
+            $table->id();
+
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->string('type');
 
-            $table->string('title_key');
-            $table->string('body_key');
+            $table->string('original_name');
+            $table->string('path');
+            $table->string('mime_type');
+            $table->unsignedBigInteger('size');
 
-            $table->json('parameters')->nullable();
+            $table->nullableMorphs('fileable');
 
-            $table->boolean('is_read')->default(false);
-            $table->json('metadata')->nullable();
             $table->timestamps();
         });
     }
@@ -32,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('notifications');
+        Schema::dropIfExists('files');
     }
 };

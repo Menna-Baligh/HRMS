@@ -11,6 +11,7 @@ use Illuminate\Console\Command;
 class CheckAttendanceRemindersCommand extends Command
 {
     protected $signature = 'attendance:check-reminders {type : reminder or late}';
+
     protected $description = 'Send automated attendance reminders or late warnings to employees.';
 
     public function handle(NotificationService $notificationService): int
@@ -48,7 +49,7 @@ class CheckAttendanceRemindersCommand extends Command
             }
         }
 
-        $this->info("Attendance {$type} notifications sent successfully to " . $pendingUsers->count() . " users.");
+        $this->info("Attendance {$type} notifications sent successfully to ".$pendingUsers->count().' users.');
 
         return Command::SUCCESS;
     }

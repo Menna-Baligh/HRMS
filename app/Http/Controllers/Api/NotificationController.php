@@ -12,7 +12,6 @@ use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
-
     public function index(Request $request): JsonResponse
     {
         $notifications = $request->user()
@@ -24,7 +23,6 @@ class NotificationController extends Controller
             'Notifications retrieved successfully.'
         );
     }
-
 
     public function unreadCount(Request $request): JsonResponse
     {
@@ -38,7 +36,6 @@ class NotificationController extends Controller
             'Unread notifications count retrieved successfully.'
         );
     }
-
 
     public function markAsRead(Request $request, string $id): JsonResponse
     {
@@ -60,7 +57,6 @@ class NotificationController extends Controller
         );
     }
 
-
     public function markAllAsRead(Request $request): JsonResponse
     {
         $request->user()
@@ -73,6 +69,19 @@ class NotificationController extends Controller
             'All notifications marked as read successfully.'
         );
     }
+    
+    public function clearAll(Request $request): JsonResponse
+    {
+        $request->user()
+            ->notifications()
+            ->delete();
+
+        return ResponseHelper::success(
+            null,
+            'All notifications cleared successfully.'
+        );
+    }
+
     public function updateFcmToken(UpdateFcmTokenRequest $request): JsonResponse
     {
         $request->user()->update([
