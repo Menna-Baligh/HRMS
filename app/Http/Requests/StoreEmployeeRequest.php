@@ -24,10 +24,10 @@ class StoreEmployeeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'            => ['required', 'string', 'max:255'],
-            'email'           => ['required', 'email', 'unique:users,email'],
-            'password'        => ['required', 'string', 'min:8'],
-            'role'            => [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8'],
+            'role' => [
                 'required',
                 'string',
                 'in:HR,Manager,Employee',
@@ -35,15 +35,15 @@ class StoreEmployeeRequest extends FormRequest
                     if ($value === 'HR' && ! $this->user()?->hasRole('Owner')) {
                         $fail('Only the Owner can create HR accounts.');
                     }
-                }
+                },
             ],
-            'job_title'       => ['required', 'string', 'max:255'],
-            'permissions'     => ['sometimes', 'array'],
-            'permissions.*'   => ['string', 'exists:permissions,name'],
+            'job_title' => ['required', 'string', 'max:255'],
+            'permissions' => ['sometimes', 'array'],
+            'permissions.*' => ['string', 'exists:permissions,name'],
             'employment_type' => ['required', 'in:Full-time,Part-time,Contract'],
-            'start_date'      => ['required', 'date'],
-            'department_id'   => ['nullable', 'exists:departments,id'],
-            'manager_id'      => [
+            'start_date' => ['required', 'date'],
+            'department_id' => ['nullable', 'exists:departments,id'],
+            'manager_id' => [
                 'nullable',
                 'exists:employees,id',
                 function ($attribute, $value, $fail) {
@@ -53,8 +53,8 @@ class StoreEmployeeRequest extends FormRequest
                     }
                 },
             ],
-            'phone'               => ['nullable', 'string', 'max:20', 'unique:users,phone'],
-            'address'             => ['nullable', 'string'],
+            'phone' => ['nullable', 'string', 'max:20', 'unique:users,phone'],
+            'address' => ['nullable', 'string'],
             'company_location_id' => ['nullable', 'exists:company_locations,id'],
         ];
     }

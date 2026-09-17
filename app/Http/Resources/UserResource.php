@@ -18,6 +18,7 @@ class UserResource extends JsonResource
     {
         $roleValue = $this->role instanceof \BackedEnum ? $this->role->value : $this->role;
         $avatarFile = $this->files()->latest()->first();
+
         return [
             'id' => $this->id,
             'employee_id' => $this->when($this->employee?->id !== null, $this->employee?->id),

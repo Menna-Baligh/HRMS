@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Services\Submissions;
 
 use App\Enums\SubmissionStatus;
@@ -19,7 +18,6 @@ use Illuminate\Validation\ValidationException;
 
 class SubmissionService
 {
-
     public function __construct(protected FileService $fileService) {}
 
     /**
@@ -70,9 +68,9 @@ class SubmissionService
                 metadata: ['submission_id' => $submission->id, 'task_id' => $task->id]
             );
         }
+
         return $submission;
     }
-
 
     public function attachFile(
         Submission $submission,
@@ -134,7 +132,6 @@ class SubmissionService
             'submission' => 'You are not authorized to view this submission.',
         ]);
     }
-
 
     public function reviewQueue()
     {
@@ -206,6 +203,7 @@ class SubmissionService
                 metadata: ['submission_id' => $submission->id]
             );
         }
+
         return $submission;
     }
 
@@ -242,6 +240,7 @@ class SubmissionService
                 metadata: ['submission_id' => $submission->id, 'feedback' => $feedback]
             );
         }
+
         return $submission;
     }
 

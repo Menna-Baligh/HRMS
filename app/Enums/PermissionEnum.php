@@ -112,7 +112,6 @@ enum PermissionEnum: string
     case FILE_DOWNLOAD = 'file.download';
     case FILE_DELETE = 'file.delete';
 
-
     public function defaultRoles(): array
     {
         return match ($this) {

@@ -140,17 +140,17 @@ class EmployeeController extends Controller
             : 'Employee account has been deactivated successfully.';
 
         SendNotificationJob::dispatch(
-        user: $user,
-        type: $isActive ? 'account_activated' : 'account_deactivated',
-        titleKey: $isActive ? 'notifications.account_activated_title' : 'notifications.account_deactivated_title',
-        bodyKey: $isActive ? 'notifications.account_activated_body' : 'notifications.account_deactivated_body',
-        parameters: [],
-        metadata: [
-            'screen' => 'profile_overview',
-            'status' => $user->employee->status,
-            'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
-        ]
-    );
+            user: $user,
+            type: $isActive ? 'account_activated' : 'account_deactivated',
+            titleKey: $isActive ? 'notifications.account_activated_title' : 'notifications.account_deactivated_title',
+            bodyKey: $isActive ? 'notifications.account_activated_body' : 'notifications.account_deactivated_body',
+            parameters: [],
+            metadata: [
+                'screen' => 'profile_overview',
+                'status' => $user->employee->status,
+                'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+            ]
+        );
 
         return ResponseHelper::success(
             data: new EmployeeResource($user),
