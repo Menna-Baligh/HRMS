@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Submissions\AttachSubmissionFileRequest;
 use App\Http\Requests\Submissions\RejectSubmissionRequest;
@@ -31,11 +32,11 @@ class SubmissionController extends Controller
             $request->validated()
         );
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Submission created successfully.',
-            'data' => $submission,
-        ], 201);
+        return ResponseHelper::success(
+            $submission,
+            __('Submission created successfully.'),
+            201
+        );
     }
 
     /**
@@ -45,16 +46,16 @@ class SubmissionController extends Controller
         AttachSubmissionFileRequest $request,
         Submission $submission
     ): JsonResponse {
-        $attachment = $this->submissionService->attachFile(
+        $file = $this->submissionService->attachFile(
             $submission,
             $request->file('file')
         );
 
-        return response()->json([
-            'success' => true,
-            'message' => 'File attached successfully.',
-            'data' => $attachment,
-        ], 201);
+        return ResponseHelper::success(
+            $file,
+            __('File attached successfully.'),
+            201
+        );
     }
 
     /**
@@ -64,10 +65,9 @@ class SubmissionController extends Controller
     {
         $submission = $this->submissionService->show($submission);
 
-        return response()->json([
-            'success' => true,
-            'data' => $submission,
-        ]);
+        return ResponseHelper::success(
+            $submission
+        );
     }
 
     /**
@@ -77,10 +77,9 @@ class SubmissionController extends Controller
     {
         $submissions = $this->submissionService->reviewQueue();
 
-        return response()->json([
-            'success' => true,
-            'data' => $submissions,
-        ]);
+        return ResponseHelper::success(
+            $submissions
+        );
     }
 
     /**
@@ -93,11 +92,10 @@ class SubmissionController extends Controller
             $submission
         );
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Submission approved successfully.',
-            'data' => $submission,
-        ]);
+        return ResponseHelper::success(
+            $submission,
+            __('Submission approved successfully.')
+        );
     }
 
     /**
@@ -112,11 +110,10 @@ class SubmissionController extends Controller
             $request->validated('feedback')
         );
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Submission rejected successfully.',
-            'data' => $submission,
-        ]);
+        return ResponseHelper::success(
+            $submission,
+            __('Submission rejected successfully.')
+        );
     }
 
     /**
@@ -131,11 +128,10 @@ class SubmissionController extends Controller
             $request->validated('feedback')
         );
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Changes requested successfully.',
-            'data' => $submission,
-        ]);
+        return ResponseHelper::success(
+            $submission,
+            __('Changes requested successfully.')
+        );
     }
 
     /**
@@ -150,10 +146,9 @@ class SubmissionController extends Controller
             $request->validated('note')
         );
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Submission resubmitted successfully.',
-            'data' => $submission,
-        ]);
+        return ResponseHelper::success(
+            $submission,
+            __('Submission resubmitted successfully.')
+        );
     }
 }

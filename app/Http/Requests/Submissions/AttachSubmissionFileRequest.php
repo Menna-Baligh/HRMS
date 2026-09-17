@@ -18,7 +18,7 @@ class AttachSubmissionFileRequest extends FormRequest
                 'required',
                 'file',
                 'max:10240', // 10 MB
-                'mimes:pdf,doc,docx,xls,xlsx,png,jpg,jpeg',
+                'mimes:pdf,png,jpg,jpeg,doc,docx,zip',
             ],
         ];
     }

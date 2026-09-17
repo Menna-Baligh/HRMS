@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\AttendanceController;
-use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AuthController as ApiAuthController;
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\EmployeeEvaluationController;
@@ -30,6 +30,7 @@ use App\Http\Controllers\Api\V1\LeaveRequest\LeaveRequestController;
 use App\Http\Controllers\Api\V1\LeaveType\LeaveTypeController;
 use App\Http\Controllers\Api\V1\Manager\ManagerLeaveQueueController;
 use App\Http\Controllers\CompanyLocations\CompanyLocationController;
+use App\Http\Controllers\FileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
@@ -194,6 +195,10 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
         Route::patch('/{id}/read', [NotificationController::class, 'markAsRead']);
         Route::patch('/read-all', [NotificationController::class, 'markAllAsRead']);
         Route::post('/fcm-token', [NotificationController::class, 'updateFcmToken']);
+    });
+    Route::prefix('files')->group(function () {
+        Route::get('/{file}/download', [FileController::class, 'download'])->name('files.download');
+        Route::delete('/{file}', [FileController::class, 'destroy'])->name('files.destroy');
     });
 });
 

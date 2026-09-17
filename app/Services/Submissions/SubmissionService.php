@@ -1,14 +1,16 @@
 <?php
 
+
 namespace App\Services\Submissions;
 
 use App\Enums\SubmissionStatus;
 use App\Enums\TaskStatus;
 use App\Models\Employee;
+use App\Models\File;
 use App\Models\Submission;
-use App\Models\SubmissionAttachment;
 use App\Models\SubmissionReview;
 use App\Models\Task;
+use App\Services\FileService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -16,6 +18,9 @@ use Illuminate\Validation\ValidationException;
 
 class SubmissionService
 {
+
+    public function __construct(protected FileService $fileService) {}
+
     /**
      * Create a task submission.
      */
@@ -56,13 +61,11 @@ class SubmissionService
         });
     }
 
-    /**
-     * Attach a file to a submission.
-     */
+
     public function attachFile(
         Submission $submission,
         UploadedFile $file
-    ): SubmissionAttachment {
+    ): File {
         return DB::transaction(function () use ($submission, $file) {
 
             $employee = $this->getAuthenticatedEmployee();
@@ -79,19 +82,11 @@ class SubmissionService
                 ]);
             }
 
-            $path = $file->store(
-                'submissions/'.$submission->id,
-                'private'
+            return $this->fileService->uploadFile(
+                file: $file,
+                user: Auth::user(),
+                fileable: $submission
             );
-
-            return SubmissionAttachment::create([
-                'submission_id' => $submission->id,
-                'uploaded_by' => Auth::id(),
-                'file_name' => $file->getClientOriginalName(),
-                'file_path' => $path,
-                'mime_type' => $file->getMimeType(),
-                'file_size' => $file->getSize(),
-            ]);
         });
     }
 
@@ -108,7 +103,7 @@ class SubmissionService
             return $submission->load([
                 'task',
                 'employee',
-                'attachments',
+                'files',
                 'reviews.reviewer',
             ]);
         }
@@ -118,7 +113,7 @@ class SubmissionService
             return $submission->load([
                 'task',
                 'employee',
-                'attachments',
+                'files',
                 'reviews.reviewer',
             ]);
         }
@@ -128,13 +123,7 @@ class SubmissionService
         ]);
     }
 
-    /**
-     * Get submissions waiting for review.
-     */
-    /**
-     * Get submissions waiting for review
-     * within the authenticated user's scope.
-     */
+
     public function reviewQueue()
     {
         $user = Auth::user();
@@ -142,7 +131,7 @@ class SubmissionService
         $query = Submission::with([
             'task',
             'employee',
-            'attachments',
+            'files',
         ])
             ->where(
                 'status',
