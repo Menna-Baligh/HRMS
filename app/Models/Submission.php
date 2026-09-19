@@ -42,6 +42,7 @@ class Submission extends Model
     {
         return $this->hasMany(SubmissionReview::class);
     }
+
     public function files(): MorphMany
     {
         return $this->morphMany(File::class, 'fileable');

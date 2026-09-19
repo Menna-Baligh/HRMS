@@ -86,19 +86,19 @@ class EvaluationController extends Controller
 
             if ($evaluation->employee && $evaluation->employee->user) {
                 SendNotificationJob::dispatch(
-                user: $evaluation->employee->user,
-                type: 'evaluation_closed',
-                titleKey: 'notifications.evaluation_closed_title',
-                bodyKey: 'notifications.evaluation_closed_body',
-                parameters: [
-                    'period_name' => $evaluation->period?->name ?? 'the evaluation period',
-                ],
-                metadata: [
-                    'screen' => 'evaluation_summary',
-                    'evaluation_id' => $completedEvaluation->id,
-                    'period_id' => $completedEvaluation->evaluation_period_id,
-                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
-                ]
+                    user: $evaluation->employee->user,
+                    type: 'evaluation_closed',
+                    titleKey: 'notifications.evaluation_closed_title',
+                    bodyKey: 'notifications.evaluation_closed_body',
+                    parameters: [
+                        'period_name' => $evaluation->period?->name ?? 'the evaluation period',
+                    ],
+                    metadata: [
+                        'screen' => 'evaluation_summary',
+                        'evaluation_id' => $completedEvaluation->id,
+                        'period_id' => $completedEvaluation->evaluation_period_id,
+                        'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                    ]
                 );
             }
 

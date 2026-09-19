@@ -192,6 +192,7 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(TaskAssignment::class, 'assigned_by');
     }
+
     public function files(): MorphMany
     {
         return $this->morphMany(File::class, 'fileable');

@@ -18,6 +18,7 @@ class UserResource extends JsonResource
     {
         $roleValue = $this->role instanceof \BackedEnum ? $this->role->value : $this->role;
         $avatarFile = $this->files()->latest()->first();
+
         return [
             'id' => $this->id,
             'employee_id' => $this->when($this->employee?->id !== null, $this->employee?->id),
@@ -27,7 +28,8 @@ class UserResource extends JsonResource
             'avatar_url' => $avatarFile ? route('files.download', $avatarFile->id) : null,
             'role' => $roleValue,
             'locale' => $this->locale,
-            'permissions' => method_exists($this, 'getAllPermissions') ? $this->getAllPermissions()->pluck('name') : [],
+            'permissions' => $this->getAllPermissions()->pluck('name'),
+            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
         ];
     }
 }

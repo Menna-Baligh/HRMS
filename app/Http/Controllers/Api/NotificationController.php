@@ -69,7 +69,7 @@ class NotificationController extends Controller
             'All notifications marked as read successfully.'
         );
     }
-    
+
     public function clearAll(Request $request): JsonResponse
     {
         $request->user()
