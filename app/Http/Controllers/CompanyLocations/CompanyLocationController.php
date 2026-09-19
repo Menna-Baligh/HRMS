@@ -35,6 +35,7 @@ class CompanyLocationController extends Controller
      */
     public function update( UpdateCompanyLocationRequest $request, int $id ) 
     { 
+        // dd($request->validated());
         $location = $this->companyLocationService->update( $id, $request->validated() );
          return ResponseHelper::success(
              data: $location,

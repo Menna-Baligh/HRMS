@@ -19,5 +19,7 @@ return [
     'longitude_invalid' => 'Longitude must be between -180 and 180.',
 
     'radius_invalid' => 'Radius must be greater than zero.',
+    'no_fields_to_update' => 'Please provide at least one field to update.',
+
 
 ];

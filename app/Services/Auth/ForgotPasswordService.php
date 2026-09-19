@@ -65,15 +65,20 @@ class ForgotPasswordService
         $key = 'password_reset:'.$resetToken;
         $email = Cache::get($key);
 
-        if (! $email) {
-            throw new RuntimeException('Invalid or expired reset token.');
-        }
+        if (! $email)
+         {
+             throw ValidationException::withMessages([ 
+                'reset_token' => [__('auth.invalid_or_expired_reset_token')],
+             ]);
+             }
 
         $user = User::where('email', $email)->first();
-
-        if (! $user) {
-            throw new RuntimeException('user not found.');
-        }
+        if (! $user)
+         {
+             throw ValidationException::withMessages([ 
+                'email' => [__('auth.user_not_found')],
+             ]);
+             }
         $user->update([
             'password' => $password,
         ]);

@@ -7,8 +7,12 @@ return [
     'otp_verified' => 'تم التحقق من رمز التحقق بنجاح.',
     'password_reset' => 'تم إعادة تعيين كلمة المرور بنجاح.',
     'email_not_found' => 'البريد الإلكتروني غير موجود.',
-    'invalid_otp' => 'رمز التحقق غير صحيح.',
+    'validation_error' => 'البيانات المدخلة غير صحيحة.',
+    'unable_to_generate_otp' => 'تعذر إنشاء رمز التحقق.',
     'invalid_or_expired_otp' => 'رمز التحقق غير صحيح أو منتهي الصلاحية.',
+    'invalid_or_expired_reset_token' => 'رمز إعادة تعيين كلمة المرور غير صحيح أو منتهي الصلاحية.',
+    'user_not_found' => 'المستخدم غير موجود.',
+    'invalid_otp' => 'رمز التحقق غير صحيح.',
     'otp_resent' => 'تم إعادة إرسال رمز التحقق بنجاح.',
 
     'validation' => [
