@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\LeaveRequestStatus;
 use App\Enums\LeaveStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -11,24 +12,45 @@ return new class extends Migration
     {
         Schema::create('leave_requests', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('leave_type_id')->constrained()->cascadeOnDelete();
-            $table->enum('status', array_column(LeaveStatus::cases(), 'value'))
-                ->default(LeaveStatus::Pending->value);
+
+            $table->foreignId('employee_id')
+                ->constrained('employees')
+                ->cascadeOnDelete();
+
+            $table->foreignId('leave_type_id')
+                ->constrained('leave_types')
+                ->restrictOnDelete();
+
             $table->date('start_date');
             $table->date('end_date');
-            $table->decimal('requested_days', 5, 2);
-            $table->text('reason');
-            $table->string('attachment_path')->nullable();
-            $table->foreignId('manager_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->foreignId('hr_id')->nullable()->constrained('users')->nullOnDelete();
+
+            $table->decimal('days', 8, 2);
+
+            $table->text('reason')->nullable();
+
+            $table->string('status')
+                ->default(LeaveStatus::Pending->value);
+
             $table->text('rejection_reason')->nullable();
-            $table->softDeletes();
+
+            $table->foreignId('reviewed_by')
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
+
+            $table->timestamp('reviewed_at')->nullable();
+
             $table->timestamps();
 
-            // Performance indexes
-            $table->index(['user_id', 'status']);
-            $table->index(['user_id', 'start_date', 'end_date']);
+            $table->index([
+                'employee_id',
+                'status',
+            ]);
+
+            $table->index([
+                'start_date',
+                'end_date',
+            ]);
         });
     }
 

@@ -2,48 +2,41 @@
 
 namespace App\Models;
 
+use App\Enums\LeaveRequestStatus;
 use App\Enums\LeaveStatus;
+use App\Models\LeaveDecision;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class LeaveRequest extends Model
 {
-    use HasFactory, SoftDeletes;
-
     protected $fillable = [
-        'user_id',
+        'employee_id',
         'leave_type_id',
-        'status',
         'start_date',
         'end_date',
-        'requested_days',
+        'days',
         'reason',
-        'attachment_path',
-        'manager_id',
-        'hr_id',
+        'status',
         'rejection_reason',
+        'reviewed_by',
+        'reviewed_at',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'status' => LeaveStatus::class,
-            'start_date' => 'date',
-            'end_date' => 'date',
-            'requested_days' => 'decimal:2',
-        ];
-    }
+    protected $casts = [
+        'start_date' => 'date',
+        'end_date' => 'date',
+        'days' => 'decimal:2',
+        'reviewed_at' => 'datetime',
+        'status' => LeaveStatus::class,
+    ];
 
-    // ─── Relationships ────────────────────────────────────────────────────────
-
-    public function user(): BelongsTo
+    public function employee(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Employee::class);
     }
 
     public function leaveType(): BelongsTo
@@ -51,49 +44,13 @@ class LeaveRequest extends Model
         return $this->belongsTo(LeaveType::class);
     }
 
-    public function manager(): BelongsTo
+    public function reviewer(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'manager_id');
+        return $this->belongsTo(User::class, 'reviewed_by');
     }
 
-    public function hr(): BelongsTo
+    public function decisions(): HasMany
     {
-        return $this->belongsTo(User::class, 'hr_id');
-    }
-
-    public function decisionHistories(): HasMany
-    {
-        return $this->hasMany(LeaveDecisionHistory::class)->orderBy('decided_at');
-    }
-
-    // ─── Scopes ───────────────────────────────────────────────────────────────
-
-    /**
-     * Requests that block date ranges (non-terminal statuses).
-     *
-     * @param  Builder<LeaveRequest>  $query
-     */
-    public function scopeActive($query): void
-    {
-        $query->whereIn('status', array_column(
-            array_filter(LeaveStatus::cases(), fn (LeaveStatus $s) => $s->isActive()),
-            'value',
-        ));
-    }
-
-    /**
-     * Overlap detection: requests that overlap with [$start, $end].
-     *
-     * @param  Builder<LeaveRequest>  $query
-     */
-    public function scopeOverlapping($query, string $start, string $end): void
-    {
-        $query->where('start_date', '<=', $end)
-            ->where('end_date', '>=', $start);
-    }
-
-    public function files(): MorphMany
-    {
-        return $this->morphMany(File::class, 'fileable');
+        return $this->hasMany(LeaveDecision::class);
     }
 }
