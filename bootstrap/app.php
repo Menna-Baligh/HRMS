@@ -14,6 +14,7 @@ use Illuminate\Validation\ValidationException;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tymon\JWTAuth\Http\Middleware\Authenticate;
 use Tymon\JWTAuth\Http\Middleware\RefreshToken;
@@ -39,35 +40,57 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
-            fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
+        fn (Request $request) => $request->is('api/*') || $request->expectsJson()
         );
-        $exceptions->render(function (AuthenticationException $e, $request) {
-            return ResponseHelper::error(
-                message: __('Unauthenticated'),
-                statusCode: Response::HTTP_UNAUTHORIZED
-            );
-        });
-        $exceptions->render(function (UnauthorizedException $e, $request) {
+
+        // 1. Unauthenticated (401)
+        $exceptions->render(function (AuthenticationException $e, Request $request) {
             if ($request->is('api/*') || $request->wantsJson()) {
                 return ResponseHelper::error(
-                    message: 'You do not have the required role to perform this action.',
+                    message: __('auth.unauthenticated'),
+                    statusCode: Response::HTTP_UNAUTHORIZED
+                );
+            }
+        });
+
+        
+        $exceptions->render(function (\Illuminate\Auth\Access\AuthorizationException $e, Request $request) {
+        if ($request->is('api/*') || $request->wantsJson()) {
+            return ResponseHelper::error(
+                message: __('auth.account_inactive'),
+                statusCode: Response::HTTP_FORBIDDEN
+            );
+        }
+    });
+
+        // 3. General Access Denied / Policies (403)
+        $exceptions->render(function (AccessDeniedHttpException $e, Request $request) {
+            if ($request->is('api/*') || $request->wantsJson()) {
+                return ResponseHelper::error(
+                    message: $e->getMessage() && $e->getMessage() !== 'This action is unauthorized.' 
+                        ? $e->getMessage() 
+                        : __('auth.unauthorized_action'),
                     statusCode: Response::HTTP_FORBIDDEN
                 );
             }
         });
-        $exceptions->render(function (ValidationException $e, $request) {
+
+        // 4. Validation Exceptions (422)
+        $exceptions->render(function (ValidationException $e, Request $request) {
             if ($request->is('api/*') || $request->wantsJson()) {
                 return ResponseHelper::error(
-                    message: $e->validator->errors()->first(),
+                    message: __('auth.validation_error'),
                     errors: $e->errors(),
                     statusCode: Response::HTTP_UNPROCESSABLE_ENTITY
                 );
             }
         });
+
+        // 5. Resource Not Found (404)
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {
-            if ($request->is('api/*')) {
+            if ($request->is('api/*') || $request->wantsJson()) {
                 return ResponseHelper::error(
-                    message: 'The requested resource was not found.',
+                    message: __('auth.resource_not_found'),
                     statusCode: Response::HTTP_NOT_FOUND
                 );
             }
