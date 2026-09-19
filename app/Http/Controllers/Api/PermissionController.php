@@ -22,13 +22,13 @@ class PermissionController extends Controller
 
             return ResponseHelper::success(
                 data: $permissions,
-                message: 'Permissions list retrieved successfully'
+                message: __('permissions.retrieved_successfully')
             );
         } catch (Throwable $e) {
             report($e);
 
             return ResponseHelper::error(
-                message: 'Failed to retrieve permissions',
+                message: __('permissions.failed_to_retrieve'),
                 statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
