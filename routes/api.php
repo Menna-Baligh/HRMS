@@ -83,7 +83,7 @@ Route::prefix('leaves')->middleware('auth:api')->group(function () {
     // new leave type
     Route::post('/leave-types', [LeaveTypeController::class,'store',]);
     //get all leave types
-    Route::get('/leave-types', [LeaveTypeController::class,'index',]); 
+    Route::get('/leave-types', [LeaveTypeController::class,'index',]);
     //update leave type
     Route::put('/leave-types/{leaveType}', [LeaveTypeController::class,'update',]);
     //activate leave
@@ -191,32 +191,32 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
     Route::post(
         '/employees',
         [EmployeeController::class, 'store']
-    )->middleware('permission:create employee');
+    )->middleware(['permission:create employee','set.app.language']);
 
     Route::patch(
         '/employees/profile',
         [EmployeeController::class, 'updateProfile']
-    );
+    )->middleware(['set.app.language']);
 
     Route::get(
         '/employees/{id}',
         [EmployeeController::class, 'show']
-    );
+    )->middleware(['set.app.language']);
 
     Route::patch(
         '/employees/{id}/hr-fields',
         [EmployeeController::class, 'updateHrFields']
-    )->middleware('permission:edit hr fields');
+    )->middleware(['set.app.language','permission:edit hr fields']);
 
     Route::patch(
         '/employees/{id}/change-account-status',
         [EmployeeController::class, 'changeAccountStatus']
-    )->middleware('permission:employee.change-account-status');
+    )->middleware(['set.app.language','permission:employee.change-account-status']);
 
     Route::get(
         '/employees',
         [EmployeeController::class, 'index']
-    )->middleware('permission:employee.view-all');
+    )->middleware(['set.app.language','permission:employee.view-all']);
 
     /*
     |--------------------------------------------------------------------------

@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
@@ -32,15 +33,15 @@ class EmployeeController extends Controller
             $user = $this->employeeService->createEmployee($request->validated());
 
             return ResponseHelper::success(
-                data: new EmployeeResource($user),
-                message: 'Employee created successfully',
+                data: new UserResource($user),
+                message: __('employees.created_successfully'),
                 statusCode: Response::HTTP_CREATED
             );
         } catch (Throwable $e) {
             report($e);
 
             return ResponseHelper::error(
-                message: 'Failed to create employee',
+                message: __('employees.failed_to_create'),
                 statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
@@ -49,28 +50,29 @@ class EmployeeController extends Controller
     public function show(int $id): JsonResponse
     {
         try {
-            $employee = $this->employeeService->getEmployeeById($id);
-            Gate::authorize('view', $employee);
+        $user = $this->employeeService->getEmployeeById($id);
 
-            return ResponseHelper::success(
-                data: new EmployeeResource($employee->user),
-                message: 'Employee details retrieved successfully'
-            );
+        Gate::authorize('view', $user);
+
+        return ResponseHelper::success(
+            data: new UserResource($user),
+            message: __('employees.retrieved_details_successfully')
+        );
         } catch (AuthorizationException $e) {
             return ResponseHelper::error(
-                message: 'You are not authorized to view this employee profile.',
+                message: __('employees.unauthorized_view_profile'),
                 statusCode: Response::HTTP_FORBIDDEN
             );
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::error(
-                message: 'Employee not found.',
+                message: __('employees.not_found'),
                 statusCode: Response::HTTP_NOT_FOUND
             );
         } catch (Throwable $e) {
             report($e);
 
             return ResponseHelper::error(
-                message: 'Failed to retrieve employee details',
+                message: __('employees.failed_to_retrieve_details'),
                 statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
@@ -79,29 +81,31 @@ class EmployeeController extends Controller
     public function updateHrFields(UpdateEmployeeHrFieldsRequest $request, int $id): JsonResponse
     {
         try {
-            $employee = $this->employeeService->getEmployeeById($id);
-            Gate::authorize('updateHrFields', $employee);
-            $updatedEmployee = $this->employeeService->updateHrFields($employee, $request->validated());
+        $user = $this->employeeService->getEmployeeById($id);
 
-            return ResponseHelper::success(
-                data: new EmployeeResource($updatedEmployee->user),
-                message: 'Employee HR fields updated successfully'
-            );
+        Gate::authorize('updateHrFields', $user);
+
+        $updatedUser = $this->employeeService->updateHrFields($user, $request->validated());
+
+        return ResponseHelper::success(
+            data: new UserResource($updatedUser),
+            message: __('employees.hr_fields_updated')
+        );
         } catch (AuthorizationException $e) {
             return ResponseHelper::error(
-                message: 'You are not authorized to update HR fields.',
+                message: __('employees.unauthorized_update_hr_fields'),
                 statusCode: Response::HTTP_FORBIDDEN
             );
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::error(
-                message: 'Employee not found.',
+                message: __('employees.not_found'),
                 statusCode: Response::HTTP_NOT_FOUND
             );
         } catch (Throwable $e) {
             report($e);
 
             return ResponseHelper::error(
-                message: 'Failed to update HR fields',
+                message: __('employees.failed_to_update_hr_fields'),
                 statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
@@ -110,20 +114,20 @@ class EmployeeController extends Controller
     public function updateProfile(UpdateProfileRequest $request): JsonResponse
     {
         try {
-            $user = $this->employeeService->updateProfile(
-                auth('api')->user(),
-                $request->validated()
-            );
+        $user = $this->employeeService->updateProfile(
+            auth('api')->user(),
+            $request->validated()
+        );
 
-            return ResponseHelper::success(
-                data: new UserResource($user),
-                message: 'Profile updated successfully'
-            );
+        return ResponseHelper::success(
+            data: new UserResource($user),
+            message: __('employees.profile_updated_successfully')
+        );
         } catch (Throwable $e) {
             report($e);
 
             return ResponseHelper::error(
-                message: 'Failed to update profile',
+                message: __('employees.failed_to_update_profile'),
                 statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
@@ -131,13 +135,14 @@ class EmployeeController extends Controller
 
     public function changeAccountStatus(int $id, NotificationService $notificationService): JsonResponse
     {
+        try {
         $user = $this->employeeService->changeAccountStatus($id);
 
-        $isActive = $user->employee->status === 'active';
+        $isActive = $user->status === 'active';
 
         $message = $isActive
-            ? 'Employee account has been activated successfully.'
-            : 'Employee account has been deactivated successfully.';
+            ? __('employees.account_activated')
+            : __('employees.account_deactivated');
 
         SendNotificationJob::dispatch(
             user: $user,
@@ -146,35 +151,61 @@ class EmployeeController extends Controller
             bodyKey: $isActive ? 'notifications.account_activated_body' : 'notifications.account_deactivated_body',
             parameters: [],
             metadata: [
-                'screen' => 'profile_overview',
-                'status' => $user->employee->status,
+                'screen'       => 'profile_overview',
+                'status'       => $user->status,
                 'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
             ]
         );
 
         return ResponseHelper::success(
-            data: new EmployeeResource($user),
+            data: new UserResource($user),
             message: $message
         );
+    } catch (ValidationException $e) {
+        throw $e; 
+    } catch (ModelNotFoundException $e) {
+        return ResponseHelper::error(
+            message: __('employees.not_found'),
+            statusCode: Response::HTTP_NOT_FOUND
+        );
+    } catch (Throwable $e) {
+        report($e);
+
+        return ResponseHelper::error(
+            message: __('employees.failed_to_change_status'),
+            statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
+        );
+    }
     }
 
     public function index(Request $request): JsonResponse
     {
-        $filters = $request->only([
-            'search',
-            'status',
-            'department_id',
-            'manager_id',
-            'employment_type',
-            'role',
-        ]);
-        $perPage = (int) $request->get('per_page', 15);
-        $employees = $this->employeeService->getAllEmployees($filters, $perPage);
-        $paginatedData = UserResource::collection($employees)->response()->getData(true);
+        try {
+            $filters = $request->only([
+                'search',
+                'status',
+                'department_id',
+                'manager_id',
+                'employment_type',
+                'role',
+            ]);
 
-        return ResponseHelper::success(
-            data: $paginatedData,
-            message: 'Employees retrieved successfully'
-        );
+            $perPage = (int) $request->get('per_page', 15);
+            $employees = $this->employeeService->getAllEmployees($filters, $perPage);
+
+            $paginatedData = UserResource::collection($employees)->response()->getData(true);
+
+            return ResponseHelper::success(
+                data: $paginatedData,
+                message: __('employees.retrieved_successfully')
+            );
+        } catch (Throwable $e) {
+            report($e);
+
+            return ResponseHelper::error(
+                message: __('employees.failed_to_retrieve'),
+                statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
     }
 }

@@ -72,6 +72,7 @@ class User extends Authenticatable implements JWTSubject
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'role' => UserRole::class,
+            'start_date'        => 'date',
         ];
     }
 
@@ -207,4 +208,22 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->morphMany(File::class, 'fileable');
     }
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class, 'department_id');
+    }
+
+
+    public function companyLocation(): BelongsTo
+    {
+        return $this->belongsTo(CompanyLocation::class, 'company_location_id');
+    }
+
+
+    public function directReports(): HasMany
+    {
+        return $this->hasMany(User::class, 'manager_id');
+    }
+
+
 }

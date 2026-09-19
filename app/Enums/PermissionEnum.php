@@ -191,4 +191,8 @@ enum PermissionEnum: string
             default => ['Owner', 'HR'],
         };
     }
+    public function label(): string
+    {
+        return __('permissions.' . $this->value);
+    }
 }

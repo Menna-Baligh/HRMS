@@ -9,10 +9,12 @@ return [
     */
 
     'required' => 'حقل :attribute مطلوب.',
+    'unique'   => 'قيمة :attribute مُستخدمة من قبل.',
+    'exists'   => 'عذراً، :attribute المحدد غير موجود.',
+    'in'       => 'قيمة :attribute المختارة غير صالحة.',
     'email'    => 'يجب أن يكون :attribute عنوان بريد إلكتروني صحيح.',
-    'string'   => 'يجب أن يكون :attribute نصاً.',
     'min'      => [
-        'string' => 'يجب أن يحتوي :attribute على :min حروف على الأقل.',
+        'string' => 'يجب أن يحتوي :attribute على :min أحرف على الأقل.',
     ],
 
     /*
@@ -22,11 +24,15 @@ return [
     */
 
     'attributes' => [
-        'email'    => 'البريد الإلكتروني',
-        'password' => 'كلمة المرور',
-        'name'     => 'الاسم',
-        'phone'    => 'رقم الهاتف',
-        'role'     => 'الدور',
+    'email'           => 'البريد الإلكتروني',
+    'role'            => 'الدور',
+    'employment_type' => 'نوع التوظيف',
+    'manager'         => 'المدير المباشر',
+    'manager_id'      => 'المدير المباشر',
+    'name'            => 'الاسم',
+    'password'        => 'كلمة المرور',
+    'phone'           => 'رقم الهاتف',
+    'job_title'       => 'المسمى الوظيفي',
+    'department_id'   => 'القسم',
     ],
-
 ];

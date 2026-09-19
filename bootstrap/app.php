@@ -9,6 +9,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Spatie\Permission\Exceptions\UnauthorizedException;
@@ -28,6 +29,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->append(SetAppLanguage::class);
         $middleware->append(ForceJsonResponse::class);
         $middleware->alias([
             'role' => RoleMiddleware::class,
@@ -55,8 +57,28 @@ return Application::configure(basePath: dirname(__DIR__))
                 );
             }
         });
+        $exceptions->render(function (ThrottleRequestsException $e, $request) {
+        if ($request->is('api/*') || $request->wantsJson()) {
+            $headers = $e->getHeaders();
+            $retryAfter = $headers['Retry-After'] ?? 60;
 
-        
+            return ResponseHelper::error(
+                message: __('auth.throttle', ['seconds' => $retryAfter]),
+                statusCode: Response::HTTP_TOO_MANY_REQUESTS
+            );
+        }
+    });
+
+    $exceptions->render(function (UnauthorizedException $e, $request) {
+        if ($request->is('api/*') || $request->wantsJson()) {
+            return ResponseHelper::error(
+                message: __('employees.unauthorized_update_hr_fields'),
+                statusCode: Response::HTTP_FORBIDDEN
+            );
+        }
+    });
+
+
         $exceptions->render(function (\Illuminate\Auth\Access\AuthorizationException $e, Request $request) {
         if ($request->is('api/*') || $request->wantsJson()) {
             return ResponseHelper::error(
@@ -70,8 +92,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (AccessDeniedHttpException $e, Request $request) {
             if ($request->is('api/*') || $request->wantsJson()) {
                 return ResponseHelper::error(
-                    message: $e->getMessage() && $e->getMessage() !== 'This action is unauthorized.' 
-                        ? $e->getMessage() 
+                    message: $e->getMessage() && $e->getMessage() !== 'This action is unauthorized.'
+                        ? $e->getMessage()
                         : __('auth.unauthorized_action'),
                     statusCode: Response::HTTP_FORBIDDEN
                 );

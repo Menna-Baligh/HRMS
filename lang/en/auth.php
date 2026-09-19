@@ -24,5 +24,6 @@ return [
     'unauthenticated'     => 'Unauthenticated. Please log in first.',
     'unauthorized_action' => 'This action is unauthorized.',
     'resource_not_found'  => 'The requested resource was not found.',
+    'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
 
 ];
