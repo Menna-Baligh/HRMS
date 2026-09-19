@@ -5,6 +5,7 @@ namespace App\Services\Auth;
 use App\Mail\OtpMail;
 use Ichtrojan\Otp\Otp;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\ValidationException;
 
 class OtpService
 {
@@ -20,7 +21,9 @@ class OtpService
     {
         $response = $this->otp->generate($email, 'numeric', 6, 10);
         if (! $response->status) {
-            throw ValidationException::withMessages(['email' => $response->message ?? 'Unable to generate OTP.']);
+            throw ValidationException::withMessages([
+               'email' => [__('auth.unable_to_generate_otp')],
+            ]);
         } $otp = $response->token;
         // Send OTP email
         Mail::to($email)->queue(new OtpMail($otp));
@@ -33,7 +36,9 @@ class OtpService
     {
         $response = $this->otp->validate($email, $token);
         if (! $response->status) {
-            throw ValidationException::withMessages(['otp' => $response->message ?? 'Invalid or expired OTP.']);
+            throw ValidationException::withMessages([
+               'otp' => [__('auth.invalid_or_expired_otp')],
+            ]);
         }
 
         return true;

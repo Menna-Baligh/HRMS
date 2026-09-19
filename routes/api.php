@@ -2,11 +2,13 @@
 
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CalendarController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\EmployeeEvaluationController;
 use App\Http\Controllers\Api\EmployeePerformanceController;
 use App\Http\Controllers\Api\EvaluationController;
+use App\Http\Controllers\Api\FileController;
 use App\Http\Controllers\Api\GoalController;
 use App\Http\Controllers\Api\GoogleAuthController;
 use App\Http\Controllers\Api\HrAttendanceController;
@@ -29,7 +31,6 @@ use App\Http\Controllers\Api\V1\LeaveDecisionHistory\LeaveDecisionHistoryControl
 use App\Http\Controllers\Api\V1\LeaveRequest\LeaveApprovalController;
 use App\Http\Controllers\Api\V1\Manager\ManagerLeaveQueueController;
 use App\Http\Controllers\CompanyLocations\CompanyLocationController;
-use App\Http\Controllers\Api\FileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
@@ -40,7 +41,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('auth')->group(function () {
+Route::middleware('set.app.language')->prefix('auth')->group(function () {
 
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 
@@ -77,6 +78,17 @@ Route::prefix('auth')->group(function () {
 
         Route::post('/logout', [AuthController::class, 'logout']);
     });
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| calender Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth:api', 'check.active'])->group(function () {
+    Route::get('/calendar', [CalendarController::class, 'index']);
 });
 
 /*
@@ -151,7 +163,7 @@ Route::prefix('tasks')->middleware('auth:api')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('auth:api')
+Route::middleware('auth:api','set.app.language')
     ->prefix('locations')
     ->group(function () {
         // Create company location

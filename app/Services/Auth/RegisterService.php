@@ -36,20 +36,5 @@ class RegisterService
             'expires_in' => auth('api')->factory()->getTTL() / 60 .' hours',
             'user' => $user,
         ];
-
-        // $otp = $this->otpService->generate($user->email);
-
-        // return [
-        //     'user' => $user,
-        //     'otp' => $otp,
-        // ];
-
-        $otp = $this->otpService->generate($user->email);
-
-        return [
-            'user' => $user,
-            'otp' => $otp,
-        ];
-
     }
 }

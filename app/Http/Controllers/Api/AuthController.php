@@ -38,7 +38,7 @@ class AuthController extends Controller
     
         return ResponseHelper::success(
             data: $data,
-            message: 'User registered successfully.',
+            message: __('auth.registered'),
             statusCode: 201
         );
     }
@@ -51,8 +51,8 @@ class AuthController extends Controller
     
         return ResponseHelper::success(
             data: $data,
-            message: 'OTP sent successfully.'
-        );
+            message: __('auth.otp_sent')
+                );
     }
 
     public function verifyForgotPasswordOtp(VerifyForgotPasswordOtpRequest $request)
@@ -62,11 +62,10 @@ class AuthController extends Controller
             $request->validated('otp')
         );
 
-        return response()->json([
-            'success' => 'true',
-            'message' => 'OTP verified successfully',
-            'data' => $data,
-        ]);
+        return ResponseHelper::success(
+            data: $data,
+            message: __('auth.otp_verified')
+                );
 
     }
 
@@ -78,7 +77,7 @@ class AuthController extends Controller
         );
     
         return ResponseHelper::success(
-            message: 'Password reset successfully.'
+            message: __('auth.password_reset')
         );
     }
 
@@ -90,7 +89,7 @@ class AuthController extends Controller
     
         return ResponseHelper::success(
             data: $data,
-            message: 'OTP resent successfully.'
+            message: __('auth.otp_resent')
         );
     }
 

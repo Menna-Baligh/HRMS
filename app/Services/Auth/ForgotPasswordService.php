@@ -5,6 +5,7 @@ namespace App\Services\Auth;
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use RuntimeException;
 
 class ForgotPasswordService
@@ -14,33 +15,36 @@ class ForgotPasswordService
     ) {}
 
     public function sendOtp(string $email): array
-    {
+     { 
         $user = User::where('email', $email)->first();
-        if (! $user) {
-            throw new RuntimeException('Email not found.');
+         if (! $user) 
+         { throw ValidationException::withMessages([
+            'email' => [__('auth.email_not_found')],
+        ]);
+         } $this->otpService->generate($user->email); 
+         return [ 'email' => $user->email, ]; 
+        
         }
-        $this->otpService->generate($user->email);
-
-        return [
-            'email' => $user->email,
-        ];
-    }
 
     public function verifyOtp($email, $otp)
     {
 
         $user = User::where('email', $email)->first();
 
-        if (! $user) {
-            throw new RuntimeException('Email not found.');
+        if (! $user) 
+        { throw ValidationException::withMessages([ 
+            'email' => [__('auth.email_not_found')],
+         ]); 
         }
         $isValid = $this->otpService->verify(
             $user->email,
             $otp
         );
 
-        if (! $isValid) {
-            throw new RuntimeException('Invalid or expired OTP.');
+        if (! $isValid)
+         { throw ValidationException::withMessages([ 
+            'otp' => [__('auth.invalid_or_expired_otp')],
+         ]); 
         }
 
         $resetToken = Str::random(64);
