@@ -13,8 +13,16 @@ return [
     |
     */
 
-    'failed' => 'These credentials do not match our records.',
-    'password' => 'The provided password is incorrect.',
-    'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
+    'login_success'           => 'Logged in successfully.',
+    'logout_success'          => 'Logged out successfully.',
+    'validation_error'        => 'Validation error.',
+    'something_went_wrong'    => 'Something went wrong.',
+    'google_url_generated'    => 'Google redirect URL generated successfully.',
+    'google_login_success'    => 'Logged in with Google successfully.',
+    'google_login_failed'     => 'Google authentication failed.',
+    'account_inactive' => 'Your account is inactive. Please activate your account first.',
+    'unauthenticated'     => 'Unauthenticated. Please log in first.',
+    'unauthorized_action' => 'This action is unauthorized.',
+    'resource_not_found'  => 'The requested resource was not found.',
 
 ];

@@ -36,14 +36,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Authentication Routes
-|--------------------------------------------------------------------------
-*/
-
-Route::prefix('auth')->group(function () {
-
+Route::middleware('set.app.language')->prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 
     Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
@@ -56,11 +49,9 @@ Route::prefix('auth')->group(function () {
 
     Route::post('/forgot-password/resend-otp', [AuthController::class, 'resendOtp'])->middleware('throttle:5,1');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Google Authentication
-    |--------------------------------------------------------------------------
-    */
+    Route::middleware('auth:api')->group(function () {
+        Route::post('/logout', [AuthController::class, 'logout']);
+    });
 
     Route::prefix('google')->group(function () {
 

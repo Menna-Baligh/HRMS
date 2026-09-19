@@ -28,7 +28,7 @@ class LoginRequest extends FormRequest
         throw new HttpResponseException(
             ResponseHelper::error(
                 errors: $validator->errors(),
-                message: __('Validation error'),
+                message: __('auth.validation_error'),
                 statusCode: Response::HTTP_UNPROCESSABLE_ENTITY
             )
         );

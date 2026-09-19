@@ -15,6 +15,7 @@ use App\Services\Auth\ForgotPasswordService;
 use App\Services\Auth\LoginService;
 use App\Services\Auth\LogoutService;
 use App\Services\Auth\RegisterService;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
@@ -100,17 +101,22 @@ class AuthController extends Controller
             $result = $this->loginService->login($request->validated());
             $result['user'] = new UserResource($result['user']);
 
-            return ResponseHelper::success(data: $result, message: 'Login successfully');
+            return ResponseHelper::success(data: $result, message: __('auth.login_success'));
         } catch (ValidationException $e) {
             return ResponseHelper::error(
                 errors: $e->errors(),
-                message: 'Validation error',
+                message: __('auth.validation_error'),
                 statusCode: Response::HTTP_UNPROCESSABLE_ENTITY,
             );
+        } catch (AuthorizationException $e) {
+        return ResponseHelper::error(
+            message: $e->getMessage() ?: __('auth.account_inactive'),
+            statusCode: Response::HTTP_FORBIDDEN,
+        );
         } catch (Throwable $e) {
             report($e);
 
-            return ResponseHelper::error(message: 'Something went wrong', statusCode: Response::HTTP_INTERNAL_SERVER_ERROR);
+            return ResponseHelper::error(message: __('auth.something_went_wrong'), statusCode: Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -119,12 +125,12 @@ class AuthController extends Controller
         try {
             $this->logoutService->logout();
 
-            return ResponseHelper::success(message: 'Logged out successfully');
+            return ResponseHelper::success(message: __('auth.logout_success'));
         } catch (Throwable $e) {
             report($e);
 
             return ResponseHelper::error(
-                message: 'Something went wrong',
+                message: __('auth.something_went_wrong'),
                 statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }

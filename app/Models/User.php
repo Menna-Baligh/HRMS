@@ -38,9 +38,17 @@ class User extends Authenticatable implements JWTSubject
         'role',
         'provider',
         'provider_id',
-        'manager_id',
+        'employee_id',
         'locale',
         'fcm_token',
+        'job_title',
+        'employment_type',
+        'start_date',
+        'status',
+        'department_id',
+        'company_location_id',
+        'manager_id',
+        'address',
     ];
 
     /**
