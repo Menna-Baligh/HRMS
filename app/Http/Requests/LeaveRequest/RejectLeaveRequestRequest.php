@@ -11,12 +11,15 @@ class RejectLeaveRequestRequest extends FormRequest
         return true;
     }
 
-    /** @return array<string, mixed> */
     public function rules(): array
     {
         return [
-            'rejection_reason' => ['required', 'string', 'max:1000'],
-            'note' => ['nullable', 'string', 'max:500'],
+            'rejection_reason' => [
+                'required',
+                'string',
+                'min:3',
+                'max:2000',
+            ],
         ];
     }
 }

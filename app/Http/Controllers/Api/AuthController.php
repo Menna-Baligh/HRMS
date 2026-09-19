@@ -36,13 +36,12 @@ class AuthController extends Controller
         $data = $this->registerService->register(
             $request->validated()
         );
-        $data['user'] = new UserResource($data['user']);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'User registered successfully.',
-            'data' => $data,
-        ], 201);
+    
+        return ResponseHelper::success(
+            data: $data,
+            message: 'User registered successfully.',
+            statusCode: 201
+        );
     }
 
     public function forgotPassword(ForgetPasswordRequest $request)
@@ -50,13 +49,11 @@ class AuthController extends Controller
         $data = $this->forgotPasswordService->sendOtp(
             $request->validated('email')
         );
-
-        return response()->json([
-            'success' => 'true',
-            'message' => 'OTP sent successfully.',
-            'data' => $data,
-        ]);
-
+    
+        return ResponseHelper::success(
+            data: $data,
+            message: 'OTP sent successfully.'
+        );
     }
 
     public function verifyForgotPasswordOtp(VerifyForgotPasswordOtpRequest $request)
@@ -80,11 +77,10 @@ class AuthController extends Controller
             $request->validated('reset_token'),
             $request->validated('password')
         );
-
-        return response()->json([
-            'success' => 'true',
-            'message' => 'password reset successfully.',
-        ]);
+    
+        return ResponseHelper::success(
+            message: 'Password reset successfully.'
+        );
     }
 
     public function resendOtp(ResendOtpRequest $request)
@@ -92,13 +88,11 @@ class AuthController extends Controller
         $data = $this->forgotPasswordService->resendOtp(
             $request->validated('email')
         );
-
-        return response()->json([
-            'success' => 'true',
-            'message' => 'OTP resnd successfully',
-            'data' => $data,
-        ]);
-
+    
+        return ResponseHelper::success(
+            data: $data,
+            message: 'OTP resent successfully.'
+        );
     }
 
     public function login(LoginRequest $request): JsonResponse

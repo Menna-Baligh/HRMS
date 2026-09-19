@@ -10,15 +10,24 @@ return new class extends Migration
     {
         Schema::create('leave_balances', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('leave_type_id')->constrained()->cascadeOnDelete();
+
+            // Employee who owns this leave balance
+            $table->foreignId('employee_id')->constrained('employees')->cascadeOnDelete();
+            // Leave type associated with this balance
+            $table->foreignId('leave_type_id')->constrained('leave_types')->cascadeOnDelete();
+            // Balance year
             $table->smallInteger('year');
+            // Total allocated leave days
             $table->decimal('allocated_days', 8, 2)->default(0);
+            // Total used leave days
             $table->decimal('used_days', 8, 2)->default(0);
             $table->timestamps();
-
-            // A user can have only one balance record per leave type per year
-            $table->unique(['user_id', 'leave_type_id', 'year']);
+            // One balance per employee, leave type and year
+            $table->unique([
+                'employee_id',
+                'leave_type_id',
+                'year',
+            ]);
         });
     }
 

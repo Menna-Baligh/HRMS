@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\LeaveBalance;
+use App\Models\LeaveRequest;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -89,4 +91,20 @@ class Employee extends Model
     {
         return $this->hasMany(Evaluation::class);
     }
+
+    /**
+ * Get all leave balances for the employee.
+ */
+public function leaveBalances(): HasMany
+{
+    return $this->hasMany(LeaveBalance::class);
+}
+
+/**
+ * Get all leave requests submitted by the employee.
+ */
+public function leaveRequests(): HasMany
+{
+    return $this->hasMany(LeaveRequest::class);
+}
 }

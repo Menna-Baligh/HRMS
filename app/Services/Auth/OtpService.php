@@ -5,7 +5,6 @@ namespace App\Services\Auth;
 use App\Mail\OtpMail;
 use Ichtrojan\Otp\Otp;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Validation\ValidationException;
 
 class OtpService
 {
