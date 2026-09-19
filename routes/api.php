@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\PermissionEnum;
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CalendarController;
@@ -494,6 +495,9 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
             [GoalController::class, 'complete']
         );
     });
+
+    Route::get('/employee/performance', [EmployeePerformanceController::class, 'dashboard'])->middleware('permission:'.PermissionEnum::EMPLOYEE_PERFORMANCE_DASHBOARD->value);
+
     Route::prefix('notifications')->group(function () {
         Route::get('/', [NotificationController::class, 'index']);
         Route::get('/unread-count', [NotificationController::class, 'unreadCount']);
@@ -502,9 +506,10 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
         Route::delete('/clear-all', [NotificationController::class, 'clearAll']);
         Route::post('/fcm-token', [NotificationController::class, 'updateFcmToken']);
     });
+
     Route::prefix('files')->group(function () {
-        Route::get('/{file}/download', [FileController::class, 'download'])->name('files.download');
-        Route::delete('/{file}', [FileController::class, 'destroy'])->name('files.destroy');
+        Route::get('/{file}/download', [FileController::class, 'download'])->name('files.download')->middleware('permission:'.PermissionEnum::FILE_DOWNLOAD->value);
+        Route::delete('/{file}', [FileController::class, 'destroy'])->name('files.destroy')->middleware('permission:'.PermissionEnum::FILE_DELETE->value);
     });
 });
 

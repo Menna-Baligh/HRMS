@@ -24,6 +24,8 @@ class RegisterService
             'role' => 'Owner',
         ]);
 
+        $user->assignRole('Owner');
+
         // Generate OTP and send it to the registered email
         $this->otpService->generate($user->email);
 
@@ -33,8 +35,9 @@ class RegisterService
         return [
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth('api')->factory()->getTTL() / 60 .' hours',
-            'user' => $user,
+            'expires_in' => (auth('api')->factory()->getTTL() / 60).' hours',
+            'user' => $user->load('roles', 'permissions'),
         ];
+
     }
 }

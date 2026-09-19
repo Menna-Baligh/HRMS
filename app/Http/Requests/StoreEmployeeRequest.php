@@ -27,7 +27,16 @@ class StoreEmployeeRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8'],
-            'role' => ['required', 'string', 'in:HR,Manager,Employee'],
+            'role' => [
+                'required',
+                'string',
+                'in:HR,Manager,Employee',
+                function ($attribute, $value, $fail) {
+                    if ($value === 'HR' && ! $this->user()?->hasRole('Owner')) {
+                        $fail('Only the Owner can create HR accounts.');
+                    }
+                },
+            ],
             'job_title' => ['required', 'string', 'max:255'],
             'permissions' => ['sometimes', 'array'],
             'permissions.*' => ['string', 'exists:permissions,name'],
@@ -44,7 +53,7 @@ class StoreEmployeeRequest extends FormRequest
                     }
                 },
             ],
-            'phone' => ['nullable', 'string', 'max:20'],
+            'phone' => ['nullable', 'string', 'max:20', 'unique:users,phone'],
             'address' => ['nullable', 'string'],
             'company_location_id' => ['nullable', 'exists:company_locations,id'],
         ];

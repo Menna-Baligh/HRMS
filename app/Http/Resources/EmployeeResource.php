@@ -25,7 +25,7 @@ class EmployeeResource extends JsonResource
             'employment_type' => $this->employee?->employment_type,
             'status' => $this->employee?->status,
             'start_date' => $this->employee?->start_date ? date('Y-m-d', strtotime($this->employee->start_date)) : null,
-            'phone' => $this->employee?->phone,
+            'phone' => $this->phone ?? null,
             'address' => $this->employee?->address,
             'department' => $this->employee?->department?->name,
             'manager' => $this->employee?->manager ? [
@@ -35,7 +35,7 @@ class EmployeeResource extends JsonResource
             ] : null,
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
             'permissions' => $this->getAllPermissions()->pluck('name'),
-            'locale' => $this->locale,
+            'locale' => $this->locale ?? 'en',
         ];
     }
 }
