@@ -1,15 +1,22 @@
 <x-mail::message>
-# Welcome {{ $user->name }}!
+    <x-slot:header>
+        <x-mail::header :url="config('app.url')">
+            {{ config('app.name') }}
+        </x-mail::header>
+    </x-slot:header>
 
-An account has been created for you on our HR System.
-Please click the button below to set your password and activate your account.
+    # Welcome {{ $user->name }}!
 
-<x-mail::button :url="$activationUrl">
-Set Password & Activate
-</x-mail::button>
+    An account has been created for you on our HR System.
 
-If you did not request this, no further action is required.
+    Please click the button below to set your password and activate your account.
 
-Thanks,<br>
-{{ config('app.name') }}
+    <x-mail::button :url="$activationUrl">
+        Set Password & Activate
+    </x-mail::button>
+
+    If you did not request this, no further action is required.
+
+    Thanks,<br>
+    {{ config('app.name') }}
 </x-mail::message>

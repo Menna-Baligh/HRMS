@@ -17,12 +17,14 @@ use Illuminate\Validation\ValidationException;
 class EmployeeService
 {
     public function __construct(protected FileService $fileService) {}
+
     public function createEmployee(array $data): User
     {
         return DB::transaction(function () use ($data) {
             $user = User::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
+                'phone' => $data['phone'] ?? null,
                 'password' => Hash::make($data['password']),
                 'role' => $data['role'],
             ]);
@@ -47,7 +49,6 @@ class EmployeeService
                 'start_date' => $data['start_date'],
                 'department_id' => $data['department_id'] ?? null,
                 'manager_id' => $managerId,
-                'phone' => $data['phone'] ?? null,
                 'address' => $data['address'] ?? null,
                 'status' => 'inactive',
                 'company_location_id' => $locationId,
@@ -86,7 +87,7 @@ class EmployeeService
                 unset($data['avatar']);
             }
 
-            $userData = array_intersect_key($data, array_flip(['name','phone', 'locale']));
+            $userData = array_intersect_key($data, array_flip(['name', 'phone', 'locale']));
             if (! empty($userData)) {
                 $user->update($userData);
             }

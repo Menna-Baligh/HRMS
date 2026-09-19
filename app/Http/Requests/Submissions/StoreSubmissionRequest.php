@@ -19,7 +19,7 @@ class StoreSubmissionRequest extends FormRequest
                 'string',
                 'max:5000',
             ],
-            'files'   => ['nullable', 'array'],
+            'files' => ['nullable', 'array'],
             'files.*' => ['file', 'mimes:pdf,png,jpg,jpeg,zip,docx', 'max:10240'],
         ];
     }

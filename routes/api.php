@@ -1,12 +1,15 @@
 <?php
 
+use App\Enums\PermissionEnum;
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\AuthController as ApiAuthController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\EmployeeEvaluationController;
 use App\Http\Controllers\Api\EmployeePerformanceController;
 use App\Http\Controllers\Api\EvaluationController;
+use App\Http\Controllers\Api\FileController;
 use App\Http\Controllers\Api\GoalController;
 use App\Http\Controllers\Api\GoogleAuthController;
 use App\Http\Controllers\Api\HrAttendanceController;
@@ -29,7 +32,6 @@ use App\Http\Controllers\Api\V1\LeaveDecisionHistory\LeaveDecisionHistoryControl
 use App\Http\Controllers\Api\V1\LeaveRequest\LeaveApprovalController;
 use App\Http\Controllers\Api\V1\Manager\ManagerLeaveQueueController;
 use App\Http\Controllers\CompanyLocations\CompanyLocationController;
-use App\Http\Controllers\Api\FileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
@@ -482,6 +484,9 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
             [GoalController::class, 'complete']
         );
     });
+
+    Route::get('/employee/performance', [EmployeePerformanceController::class, 'dashboard'])->middleware('permission:'.PermissionEnum::EMPLOYEE_PERFORMANCE_DASHBOARD->value);
+
     Route::prefix('notifications')->group(function () {
         Route::get('/', [NotificationController::class, 'index']);
         Route::get('/unread-count', [NotificationController::class, 'unreadCount']);
@@ -490,9 +495,10 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
         Route::delete('/clear-all', [NotificationController::class, 'clearAll']);
         Route::post('/fcm-token', [NotificationController::class, 'updateFcmToken']);
     });
+
     Route::prefix('files')->group(function () {
-        Route::get('/{file}/download', [FileController::class, 'download'])->name('files.download');
-        Route::delete('/{file}', [FileController::class, 'destroy'])->name('files.destroy');
+        Route::get('/{file}/download', [FileController::class, 'download'])->name('files.download')->middleware('permission:'.PermissionEnum::FILE_DOWNLOAD->value);
+        Route::delete('/{file}', [FileController::class, 'destroy'])->name('files.destroy')->middleware('permission:'.PermissionEnum::FILE_DELETE->value);
     });
 });
 

@@ -40,7 +40,6 @@ class TaskService
                 description: 'Task created.'
             );
 
-
             return $task;
         });
     }
@@ -132,19 +131,18 @@ class TaskService
 
             return $assignment;
 
-
         });
         $employee = Employee::find($employeeId);
-            if ($employee?->user) {
-                SendNotificationJob::dispatch(
-                    user: $employee->user,
-                    type: 'task_assigned',
-                    titleKey: 'notifications.task_assigned_title',
-                    bodyKey: 'notifications.task_assigned_body',
-                    parameters: ['title' => $task->title],
-                    metadata: ['task_id' => $task->id]
-                );
-            }
+        if ($employee?->user) {
+            SendNotificationJob::dispatch(
+                user: $employee->user,
+                type: 'task_assigned',
+                titleKey: 'notifications.task_assigned_title',
+                bodyKey: 'notifications.task_assigned_body',
+                parameters: ['title' => $task->title],
+                metadata: ['task_id' => $task->id]
+            );
+        }
 
         return $assignment;
     }
