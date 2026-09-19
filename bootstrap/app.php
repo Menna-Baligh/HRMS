@@ -37,6 +37,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'jwt.refresh' => RefreshToken::class,
             'set.app.language' => SetAppLanguage::class,
         ]);
+        $middleware->api(append: [
+            SetAppLanguage::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
