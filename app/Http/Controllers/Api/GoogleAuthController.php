@@ -24,13 +24,13 @@ class GoogleAuthController extends Controller
 
             return ResponseHelper::success(
                 data: ['url' => $url],
-                message: 'Google redirect URL generated successfully'
+                message: __('auth.google_url_generated')
             );
         } catch (Throwable $e) {
             report($e);
 
             return ResponseHelper::error(
-                message: 'Could not generate Google login URL',
+                message: __('auth.google_login_failed'),
                 statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
@@ -44,19 +44,19 @@ class GoogleAuthController extends Controller
 
             return ResponseHelper::success(
                 data: $result,
-                message: 'Logged in with Google successfully'
+                message: __('auth.google_login_success')
             );
         } catch (ValidationException $e) {
             return ResponseHelper::error(
                 errors: $e->errors(),
-                message: 'Google authentication failed',
+                message: __('auth.google_login_failed'),
                 statusCode: Response::HTTP_UNPROCESSABLE_ENTITY
             );
         } catch (Throwable $e) {
             report($e);
 
             return ResponseHelper::error(
-                message: 'Google authentication failed',
+                message: __('auth.google_login_failed'),
                 statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }

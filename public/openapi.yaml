@@ -30,7 +30,7 @@ paths:
                 email:
                   type: string
                   format: email
-                  example: user@example.com
+                  example: noni@gmail.com
                 password:
                   type: string
                   example: secret123
@@ -47,7 +47,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Login successfully
+                    example: Logged in successfully.
                   data:
                     type: object
                     properties:
@@ -64,49 +64,91 @@ paths:
                         properties:
                           id:
                             type: integer
-                            example: 1
+                            example: 49
+                          employee_id:
+                            type: integer
+                            nullable: true
+                            example: 37
                           name:
                             type: string
-                            example: John Doe
+                            example: noni
                           email:
                             type: string
                             format: email
-                            example: user@example.com
+                            example: noni@gmail.com
                           phone:
                             type: string
                             nullable: true
                             example: null
-                          avatar:
+                          avatar_url:
                             type: string
                             nullable: true
                             example: null
                           role:
                             type: string
                             example: Employee
+                          locale:
+                            type: string
+                            example: en
                           permissions:
                             type: array
                             items:
                               type: string
                             example:
-                              - view_dashboard
-                              - create_posts
+                              - edit self profile
+                              - department.view
+                              - employee.view-profile
+                              - attendance.checkin-checkout
+                          created_at:
+                            type: string
+                            example: "2026-09-17 17:23:59"
               example:
                 success: true
-                message: Login successfully
+                message: Logged in successfully.
                 data:
-                  access_token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3ODg4NjA0NzksImV4cCI6MTc4ODk0Njg3OSwibmJmIjoxNzg4ODYwNDc5LCJqdGkiOiI4ZERjNW1YUURoWHZSUUN2Iiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.gk2rVSgLGfCCfbx3PniTWxIqBzgahTEr7fGmyAzE_wc
+                  access_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
                   token_type: bearer
                   expires_in: 24 hours
                   user:
-                    id: 1
-                    name: John Doe
-                    email: user@example.com
+                    id: 49
+                    employee_id: 37
+                    name: noni
+                    email: noni@gmail.com
                     phone: null
-                    avatar: null
+                    avatar_url: null
                     role: Employee
+                    locale: en
                     permissions:
-                      - view_dashboard
-                      - create_posts
+                      - edit self profile
+                      - department.view
+                      - employee.view-profile
+                      - employee.update-profile
+                      - task.update-progress
+                      - task.update-status
+                      - submission.create
+                      - submission.attach-file
+                      - submission.view
+                      - submission.resubmit
+                      - location.view-active
+                      - attendance.checkin-checkout
+                      - attendance.view-history
+                      - goal.view-own
+                      - goal.create
+                      - goal.update
+                      - goal.update-progress
+                      - goal.complete
+                      - evaluation.view-employee
+                      - employee.performance.dashboard
+                      - leave-type.view
+                      - leave-balance.view
+                      - leave-request.create
+                      - leave-request.view-own
+                      - leave-request.cancel
+                      - leave.view-history
+                      - leave.calendar-view
+                      - file.download
+                      - file.delete
+                    created_at: "2026-09-17 17:23:59"
         '422':
           description: Validation error or authentication failure
           content:
@@ -122,10 +164,7 @@ paths:
                     example: Validation error
                   errors:
                     type: object
-                    additionalProperties:
-                      type: array
-                      items:
-                        type: string
+                    nullable: true
               examples:
                 missingFields:
                   summary: Missing Required Fields
@@ -145,14 +184,6 @@ paths:
                     errors:
                       email:
                         - These credentials do not match our records.
-                inactiveAccount:
-                  summary: Inactive Account
-                  value:
-                    success: false
-                    message: Validation error
-                    errors:
-                      email:
-                        - Your account is inactive. Please activate your account first.
         '500':
           description: Internal server error
           content:
@@ -168,11 +199,7 @@ paths:
                     example: Something went wrong
                   errors:
                     nullable: true
-              example:
-                success: false
-                message: Something went wrong
-                errors: null
-
+                    example: null
   /api/auth/logout:
     post:
       summary: Logout
@@ -300,8 +327,10 @@ paths:
                 properties:
                   success:
                     type: boolean
+                    example: true
                   message:
                     type: string
+                    example: Logged in with Google successfully
                   data:
                     type: object
                     properties:
@@ -309,39 +338,125 @@ paths:
                         type: string
                       token_type:
                         type: string
+                        example: bearer
                       expires_in:
                         type: string
+                        example: 24 hours
                       user:
                         type: object
                         properties:
                           id:
                             type: integer
+                            example: 49
+                          employee_id:
+                            type: integer
+                            nullable: true
+                            example: 37
                           name:
                             type: string
+                            example: noni
                           email:
                             type: string
+                            format: email
+                            example: noni@gmail.com
                           phone:
                             type: string
                             nullable: true
-                          avatar:
+                            example: null
+                          avatar_url:
                             type: string
                             nullable: true
+                            example: null
                           role:
                             type: string
+                            example: Employee
+                          locale:
+                            type: string
+                            example: en
+                          permissions:
+                            type: array
+                            items:
+                              type: string
+                            example:
+                              - edit self profile
+                              - department.view
+                              - employee.view-profile
+                              - employee.update-profile
+                              - task.update-progress
+                              - task.update-status
+                              - submission.create
+                              - submission.attach-file
+                              - submission.view
+                              - submission.resubmit
+                              - location.view-active
+                              - attendance.checkin-checkout
+                              - attendance.view-history
+                              - goal.view-own
+                              - goal.create
+                              - goal.update
+                              - goal.update-progress
+                              - goal.complete
+                              - evaluation.view-employee
+                              - employee.performance.dashboard
+                              - leave-type.view
+                              - leave-balance.view
+                              - leave-request.create
+                              - leave-request.view-own
+                              - leave-request.cancel
+                              - leave.view-history
+                              - leave.calendar-view
+                              - file.download
+                              - file.delete
+                          created_at:
+                            type: string
+                            example: "2026-09-17 17:23:59"
               example:
                 success: true
                 message: Logged in with Google successfully
                 data:
-                  access_token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
+                  access_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3ODk4MDU4NTQsImV4cCI6MTc4OTg5MjI1NCwibmJmIjoxNzg5ODA1ODU0LCJqdGkiOiJXdFI0VGNhRWlhV1NibWxuIiwic3ViIjoiNDkiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3Iiwicm9sZSI6IkVtcGxveWVlIn0.2BRyaQT1IDhq5urGMLg1fZGWuECfdKDZUMcLAD0XehA"
                   token_type: bearer
-                  expires_in: 1 hours
+                  expires_in: 24 hours
                   user:
-                    id: 1
-                    name: Company Owner
-                    email: owner@example.com
+                    id: 49
+                    employee_id: 37
+                    name: noni
+                    email: noni@gmail.com
                     phone: null
-                    avatar: null
-                    role: Owner
+                    avatar_url: null
+                    role: Employee
+                    locale: en
+                    permissions:
+                      - edit self profile
+                      - department.view
+                      - employee.view-profile
+                      - employee.update-profile
+                      - task.update-progress
+                      - task.update-status
+                      - submission.create
+                      - submission.attach-file
+                      - submission.view
+                      - submission.resubmit
+                      - location.view-active
+                      - attendance.checkin-checkout
+                      - attendance.view-history
+                      - goal.view-own
+                      - goal.create
+                      - goal.update
+                      - goal.update-progress
+                      - goal.complete
+                      - evaluation.view-employee
+                      - employee.performance.dashboard
+                      - leave-type.view
+                      - leave-balance.view
+                      - leave-request.create
+                      - leave-request.view-own
+                      - leave-request.cancel
+                      - leave.view-history
+                      - leave.calendar-view
+                      - file.download
+                      - file.delete
+                    created_at: "2026-09-17 17:23:59"
         '422':
           description: Validation or process error.
           content:
@@ -351,10 +466,13 @@ paths:
                 properties:
                   success:
                     type: boolean
+                    example: false
                   message:
                     type: string
+                    example: Google authentication failed
                   errors:
                     type: object
+                    nullable: true
                     additionalProperties:
                       type: array
                       items:
@@ -365,7 +483,6 @@ paths:
                 errors:
                   email:
                     - Google authentication failed
-
   /api/permissions:
     get:
       summary: Retrieve all permissions
@@ -6240,7 +6357,365 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /api/register:
+    post:
+      summary: Register a new user (Owner role)
+      operationId: registerUser
+      tags:
+        - Authentication
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - password
+                - password_confirmation
+              properties:
+                name:
+                  type: string
+                  example: "John Doe"
+                email:
+                  type: string
+                  format: email
+                  example: "john@example.com"
+                phone:
+                  type: string
+                  nullable: true
+                  example: "+201234567890"
+                password:
+                  type: string
+                  format: password
+                  example: "Password123!"
+                password_confirmation:
+                  type: string
+                  format: password
+                  example: "Password123!"
+      responses:
+        '201':
+          description: User registered successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "User registered successfully."
+                  data:
+                    type: object
+                    properties:
+                      access_token:
+                        type: string
+                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                      token_type:
+                        type: string
+                        example: "bearer"
+                      expires_in:
+                        type: string
+                        example: "1 hours"
+                      user:
+                        $ref: '#/components/schemas/User'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Too Many Requests (Throttle limit exceeded)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
+  /api/forget-password:
+    post:
+      summary: Forget password request to send OTP via email
+      operationId: forgotPassword
+      tags:
+        - Authentication
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "john@example.com"
+      responses:
+        '200':
+          description: OTP sent successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "OTP sent successfully."
+                  data:
+                    type: object
+                    properties:
+                      email:
+                        type: string
+                        example: "john@example.com"
+          example:
+            success: true
+            message: "OTP sent successfully."
+            data:
+              email: "john@example.com"
+        '422':
+          description: Validation error or Email not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/forgot-password/verify-otp:
+    post:
+      summary: Verify OTP code
+      operationId: verifyForgotPasswordOtp
+      tags:
+        - Authentication
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - otp
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "john@example.com"
+                otp:
+                  type: string
+                  example: "123456"
+      responses:
+        '200':
+          description: OTP verified successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "OTP verified successfully"
+                  data:
+                    type: object
+                    properties:
+                      email:
+                        type: string
+                        example: "john@example.com"
+                      reset_token:
+                        type: string
+                        example: "64-character-random-token-string"
+          example:
+            success: true
+            message: "OTP verified successfully"
+            data:
+              email: "john@example.com"
+              reset_token: "9f8e7d6c5b4a3..."
+        '422':
+          description: Invalid or expired OTP / Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/forgot-password/reset:
+    post:
+      summary: Reset user password 
+      operationId: resetPassword
+      tags:
+        - Authentication
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - reset_token
+                - password
+                - password_confirmation
+              properties:
+                reset_token:
+                  type: string
+                  example: "64-character-random-token-string"
+                password:
+                  type: string
+                  format: password
+                  example: "NewPassword123!"
+                password_confirmation:
+                  type: string
+                  format: password
+                  example: "NewPassword123!"
+      responses:
+        '200':
+          description: Password reset successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "password reset successfully."
+                  data:
+                    type: object
+                    nullable: true
+                    example: null
+          example:
+            success: true
+            message: "password reset successfully."
+            data: null
+        '422':
+          description: Invalid or expired reset token / Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/forgot-password/resend-otp:
+    post:
+      summary: Resend OTP code 
+      operationId: resendOtp
+      tags:
+        - Authentication
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "john@example.com"
+      responses:
+        '200':
+          description: OTP resent successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "OTP resnd successfully"
+                  data:
+                    type: object
+                    properties:
+                      email:
+                        type: string
+                        example: "john@example.com"
+          example:
+            success: true
+            message: "OTP resnd successfully"
+            data:
+              email: "john@example.com"
+        '422':
+          description: Email not found or validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
 components:
   securitySchemes:

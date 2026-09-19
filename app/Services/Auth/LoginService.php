@@ -2,10 +2,12 @@
 
 namespace App\Services\Auth;
 
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Validation\ValidationException;
 
 class LoginService
 {
+
     public function login(array $credentials): array
     {
         if (! $token = auth('api')->attempt($credentials)) {
@@ -17,9 +19,10 @@ class LoginService
 
         if ($user->employee && $user->employee->status === 'inactive') {
             auth('api')->logout();
-            throw ValidationException::withMessages([
-                'email' => 'Your account is inactive. Please activate your account first.',
-            ]);
+            // throw ValidationException::withMessages([
+            //     'email' => 'Your account is inactive. Please activate your account first.',
+            // ]);
+            throw new AuthorizationException(__('auth.account_inactive'));
         }
 
         return [
