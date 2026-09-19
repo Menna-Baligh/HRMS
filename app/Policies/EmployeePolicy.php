@@ -2,31 +2,31 @@
 
 namespace App\Policies;
 
-use App\Enums\PermissionEnum;
-use App\Models\Employee;
 use App\Models\User;
 
-class EmployeePolicy
+class UserPolicy
 {
-    public function view(User $authUser, Employee $targetEmployee): bool
+
+    public function before(User $user, string $ability): ?bool
     {
-        if ($authUser->hasRole(['Owner', 'HR'])) {
+        $roleValue = $user->role instanceof \BackedEnum ? $user->role->value : $user->role;
+
+        if (in_array($roleValue, ['HR', 'Owner']) || $user->hasAnyRole(['Owner', 'HR'])) {
             return true;
         }
 
-        if ($authUser->employee?->id === $targetEmployee->id) {
-            return true;
-        }
-
-        if ($authUser->hasRole('Manager') && $targetEmployee->manager_id === $authUser->employee?->id) {
-            return true;
-        }
-
-        return false;
+        return null; 
     }
 
-    public function updateHrFields(User $authUser): bool
+    public function view(User $currentUser, User $targetUser): bool
     {
-        return $authUser->hasPermissionTo(PermissionEnum::EDIT_HR_FIELDS->value);
+        return $currentUser->id === $targetUser->id 
+            || $targetUser->manager_id === $currentUser->id;
+    }
+    public function updateHrFields(User $currentUser, User $targetUser): bool
+    {
+        $roleValue = $currentUser->role instanceof \BackedEnum ? $currentUser->role->value : $currentUser->role;
+
+        return in_array($roleValue, ['Owner', 'HR']) || $currentUser->hasAnyRole(['Owner', 'HR']);
     }
 }

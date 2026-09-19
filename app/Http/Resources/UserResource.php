@@ -26,9 +26,11 @@ class UserResource extends JsonResource
             'email'               => $this->email,
             'phone'               => $this->phone,
             'job_title'           => $this->job_title,
-            'employment_type'     => $this->employment_type,
+            'employment_type' => $this->employment_type
+            ? __('employment_types.' . strtolower(str_replace(' ', '-', $this->employment_type)))
+            : null,
             'start_date'          => $this->start_date?->format('Y-m-d'),
-            'status'              => $this->status,
+            'status' => $this->status ? __('statuses.' . $this->status) : null,
             'address'             => $this->address,
             'avatar_url'          => $avatarFile ? route('files.download', $avatarFile->id) : null,
             'role'                => $roleValue,
