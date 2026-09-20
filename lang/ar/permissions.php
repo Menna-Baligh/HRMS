@@ -73,20 +73,20 @@ return [
     'employee.performance.dashboard' => 'عرض لوحة الأداء الشخصي',
 
     // Leave Management
-    'leave-type.manage'       => 'إدارة أنواع الإجازات',
-    'leave-type.view'         => 'عرض أنواع الإجازات',
-    'leave-balance.view'      => 'عرض رصيد الإجازات',
-    'leave-request.create'    => 'تقديم طلب إجازة',
-    'leave-request.view-own'  => 'عرض طلبات الإجازة الشخصية',
-    'leave-request.cancel'    => 'إلغاء طلب الإجازة',
-    'leave.approve-manager'   => 'موافقة المدير على الإجازة',
-    'leave.approve-hr'        => 'موافقة الموارد البشرية على الإجازة',
+    'leave_type.manage'       => 'إدارة أنواع الإجازات',
+    'leave_type.view'         => 'عرض أنواع الإجازات',
+    'leave_balance.view'      => 'عرض رصيد الإجازات',
+    'leave_request.create'    => 'تقديم طلب إجازة',
+    'leave_request.view_own'  => 'عرض طلبات الإجازة الشخصية',
+    'leave_request.cancel'    => 'إلغاء طلب الإجازة',
+    'leave.approve_manager'   => 'موافقة المدير على الإجازة',
+    'leave.approve_hr'        => 'موافقة الموارد البشرية على الإجازة',
     'leave.reject'            => 'رفض طلب الإجازة',
-    'leave.view-history'      => 'عرض سجل الإجازات',
-    'leave.queue-manager'     => 'قائمة انتظار إجازات الفريق',
-    'leave.queue-hr'          => 'قائمة انتظار إجازات الموارد البشرية',
-    'leave.calendar-view'     => 'عرض تقويم الإجازات',
-
+    'leave.view_history'      => 'عرض سجل الإجازات',
+    'leave.queue_manager'     => 'قائمة انتظار إجازات الفريق',
+    'leave.queue_hr'          => 'قائمة انتظار إجازات الموارد البشرية',
+    'leave.calendar_view'     => 'عرض تقويم الإجازات',
+    
     // System & Files
     'permission.view-all' => 'عرض جميع الصلاحيات',
     'file.download'       => 'تحميل الملفات',
