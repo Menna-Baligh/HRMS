@@ -246,8 +246,18 @@ class User extends Authenticatable implements JWTSubject
                 $q->where('name', 'Owner');
             })
             ->when($currentUserId, function ($q) use ($currentUserId) {
-                $q->where('id', '!=', $currentUserId); 
+                $q->where('id', '!=', $currentUserId);
             });
+    }
+
+    public function evaluations()
+    {
+        return $this->hasMany(Evaluation::class, 'user_id');
+    }
+
+    public function evaluationsGiven()
+    {
+        return $this->hasMany(Evaluation::class, 'evaluator_id');
     }
 
 
