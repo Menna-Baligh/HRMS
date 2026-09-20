@@ -113,7 +113,6 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
         Route::get('/attendance/exceptions', [HrAttendanceController::class, 'exceptions'])->middleware('permission:'.PermissionEnum::HR_ATTENDANCE_VIEW_EXCEPTIONS->value);
         Route::get('/attendance/monthly-summary', [HrAttendanceController::class, 'monthlySummary'])->middleware('permission:'.PermissionEnum::HR_ATTENDANCE_VIEW_SUMMARY->value);
         Route::get('/attendance/export', [HrAttendanceController::class, 'export'])->middleware('permission:'.PermissionEnum::HR_ATTENDANCE_EXPORT->value);
-        Route::get('/evaluations', [HrEvaluationSetupController::class, 'index'])->middleware('permission:'.PermissionEnum::EVALUATION_MANAGE_SETUP->value);
         Route::get('/goals', [HrGoalController::class, 'index'])->middleware('permission:'.PermissionEnum::HR_GOALS_OVERVIEW->value);
         Route::get('/company-performance', [HrPerformanceController::class, 'companyDashboard'])->middleware('permission:'.PermissionEnum::HR_PERFORMANCE_COMPANY->value);
     });
@@ -144,6 +143,7 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
         Route::patch('/{id}/complete', [EvaluationController::class, 'complete'])->middleware('permission:'.PermissionEnum::EVALUATION_COMPLETE->value);
         Route::get('/manager', [EvaluationController::class, 'managerEvaluations'])->middleware('permission:'.PermissionEnum::EVALUATION_VIEW_MANAGER->value);
         Route::get('/employee', [EmployeeEvaluationController::class, 'index'])->middleware('permission:'.PermissionEnum::EVALUATION_VIEW_EMPLOYEE->value);
+        Route::get('/hr', [HrEvaluationSetupController::class, 'index'])->middleware('permission:'.PermissionEnum::EVALUATION_MANAGE_SETUP->value);
     });
 
     Route::get('/employee/performance', [EmployeePerformanceController::class, 'dashboard'])->middleware('permission:'.PermissionEnum::EMPLOYEE_PERFORMANCE_DASHBOARD->value);
