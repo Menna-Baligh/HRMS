@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Enums\EvaluationPeriodStatus;
 use App\Enums\EvaluationStatus;
-use App\Models\Employee;
 use App\Models\Evaluation;
 use App\Models\EvaluationAuditLog;
 use App\Models\EvaluationEvidence;
@@ -19,35 +18,35 @@ class EvaluationService
     public function saveDraft(int $evaluatorUserId, array $data, ?Evaluation $evaluation = null): Evaluation
     {
         return DB::transaction(function () use ($evaluatorUserId, $data, $evaluation) {
-            $evaluator = User::with('employee')->findOrFail($evaluatorUserId);
-            $targetEmployeeId = $evaluation ? $evaluation->employee_id : $data['employee_id'];
+            $evaluator = User::findOrFail($evaluatorUserId);
+            $targetUserId = $evaluation ? $evaluation->user_id : $data['user_id'];
 
             if (! $evaluator->hasAnyRole(['HR', 'Owner'])) {
-                $isDirectReport = Employee::where('id', $targetEmployeeId)
-                    ->where('manager_id', $evaluator->employee?->id)
+                $isDirectReport = User::where('id', $targetUserId)
+                    ->where('manager_id', $evaluator->id)
                     ->exists();
 
                 if (! $isDirectReport) {
-                    throw new Exception('You can only evaluate employees within your direct team.');
+                    throw new Exception(__('evaluation.errors.direct_reports_only'));
                 }
             }
 
             if ($evaluation) {
                 if ($evaluation->status === EvaluationStatus::COMPLETED) {
-                    throw new Exception('Completed evaluations cannot be modified as draft.');
+                    throw new Exception(__('evaluation.errors.completed_immutable'));
                 }
             } else {
                 $period = EvaluationPeriod::findOrFail($data['period_id']);
                 if ($period->status === EvaluationPeriodStatus::CLOSED) {
-                    throw new Exception('Cannot create evaluation for a closed period.');
+                    throw new Exception(__('evaluation.errors.closed_period'));
                 }
 
                 $evaluation = Evaluation::create([
-                    'employee_id' => $data['employee_id'],
+                    'user_id'      => $data['user_id'],
                     'evaluator_id' => $evaluatorUserId,
-                    'period_id' => $data['period_id'],
-                    'feedback' => $data['feedback'] ?? null,
-                    'status' => EvaluationStatus::DRAFT,
+                    'period_id'    => $data['period_id'],
+                    'feedback'     => $data['feedback'] ?? null,
+                    'status'       => EvaluationStatus::DRAFT,
                 ]);
             }
 
@@ -60,7 +59,7 @@ class EvaluationService
                     EvaluationScore::updateOrCreate(
                         [
                             'evaluation_id' => $evaluation->id,
-                            'category_id' => $scoreData['category_id'],
+                            'category_id'   => $scoreData['category_id'],
                         ],
                         ['score' => $scoreData['score']]
                     );
@@ -72,7 +71,7 @@ class EvaluationService
                 foreach ($data['evidence_goal_ids'] as $goalId) {
                     EvaluationEvidence::create([
                         'evaluation_id' => $evaluation->id,
-                        'goal_id' => $goalId,
+                        'goal_id'       => $goalId,
                     ]);
                 }
             }
@@ -80,10 +79,10 @@ class EvaluationService
 
             EvaluationAuditLog::create([
                 'evaluation_id' => $evaluation->id,
-                'user_id' => $evaluatorUserId,
-                'action' => $action,
-                'details' => [
-                    'scores_count' => count($data['scores'] ?? []),
+                'user_id'       => $evaluatorUserId,
+                'action'        => $action,
+                'details'       => [
+                    'scores_count'      => count($data['scores'] ?? []),
                     'feedback_provided' => ! empty($data['feedback']),
                 ],
             ]);
@@ -124,11 +123,11 @@ class EvaluationService
     public function completeEvaluation(Evaluation $evaluation): Evaluation
     {
         if ($evaluation->status === EvaluationStatus::COMPLETED) {
-            throw new Exception('Evaluation is already completed.');
+            throw new Exception(__('evaluation.errors.already_completed'));
         }
 
         if ($evaluation->scores()->count() === 0) {
-            throw new Exception('Cannot complete evaluation without category scores.');
+            throw new Exception(__('evaluation.errors.no_scores'));
         }
 
         return DB::transaction(function () use ($evaluation) {
@@ -136,28 +135,29 @@ class EvaluationService
 
             $evaluation->update([
                 'overall_score' => $overallScore,
-                'status' => EvaluationStatus::COMPLETED,
+                'status'        => EvaluationStatus::COMPLETED,
             ]);
+
             EvaluationAuditLog::create([
                 'evaluation_id' => $evaluation->id,
-                'user_id' => auth()->id() ?? $evaluation->evaluator_id,
-                'action' => 'completed',
-                'details' => [
+                'user_id'       => auth('api')->id() ?? $evaluation->evaluator_id,
+                'action'        => 'completed',
+                'details'       => [
                     'final_overall_score' => $overallScore,
-                    'completed_at' => now()->toDateTimeString(),
+                    'completed_at'        => now()->toDateTimeString(),
                 ],
             ]);
 
-            return $evaluation->fresh(['scores.category', 'evidence.goal', 'employee.user']);
+            return $evaluation->fresh(['scores.category', 'evidence.goal', 'user']);
         });
     }
 
-    public function getManagerTeamEvaluations(Employee $manager, ?string $status = null, ?int $periodId = null, int $perPage = 15)
+    public function getManagerTeamEvaluations(User $manager, ?string $status = null, ?int $periodId = null, int $perPage = 15)
     {
-        $teamEmployeeIds = Employee::where('manager_id', $manager->id)->pluck('id');
+        $teamUserIds = User::where('manager_id', $manager->id)->pluck('id');
 
-        $query = Evaluation::with(['employee.user', 'employee.department', 'evaluator', 'period', 'scores.category', 'evidence.goal'])
-            ->whereIn('employee_id', $teamEmployeeIds);
+        $query = Evaluation::with(['user.department', 'evaluator', 'period', 'scores.category', 'evidence.goal'])
+            ->whereIn('user_id', $teamUserIds);
 
         if ($status) {
             $query->where('status', $status);
@@ -174,18 +174,18 @@ class EvaluationService
         ?string $status = null,
         ?int $periodId = null,
         ?int $departmentId = null,
-        ?int $employeeId = null,
+        ?int $userId = null,
         ?int $evaluatorId = null,
         int $perPage = 10
     ) {
         $query = Evaluation::with([
-            'employee.user',
-            'employee.department',
+            'user.department',
             'evaluator',
             'period',
             'scores.category',
             'evidence.goal',
-        ]);
+        ])
+        ->whereHas('user', fn ($q) => $q->excludeOwnerAndSelf());
 
         if ($status) {
             $query->where('status', $status);
@@ -195,8 +195,8 @@ class EvaluationService
             $query->where('period_id', $periodId);
         }
 
-        if ($employeeId) {
-            $query->where('employee_id', $employeeId);
+        if ($userId) {
+            $query->where('user_id', $userId);
         }
 
         if ($evaluatorId) {
@@ -204,7 +204,7 @@ class EvaluationService
         }
 
         if ($departmentId) {
-            $query->whereHas('employee', function ($q) use ($departmentId) {
+            $query->whereHas('user', function ($q) use ($departmentId) {
                 $q->where('department_id', $departmentId);
             });
         }
@@ -212,10 +212,10 @@ class EvaluationService
         return $query->latest()->paginate($perPage);
     }
 
-    public function getEmployeeEvaluationsHistory(Employee $employee, int $perPage = 10)
+    public function getEmployeeEvaluationsHistory(User $user, int $perPage = 10)
     {
         return Evaluation::with(['period', 'evaluator', 'scores.category', 'evidence.goal', 'auditLogs.user'])
-            ->where('employee_id', $employee->id)
+            ->where('user_id', $user->id)
             ->where('status', EvaluationStatus::COMPLETED)
             ->latest()
             ->paginate($perPage);
