@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('attendances', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('employee_id')
-                ->constrained('employees')
+            $table->foreignId('user_id')
+                ->constrained('users')
                 ->cascadeOnDelete();
 
             $table->foreignId('company_location_id')
@@ -43,7 +43,7 @@ return new class extends Migration
 
             $table->timestamps();
 
-            $table->unique(['employee_id', 'date']);
+            $table->unique(['user_id', 'date']);
 
             $table->index('date');
             $table->index('status');

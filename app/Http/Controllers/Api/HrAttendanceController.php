@@ -15,6 +15,8 @@ use App\Services\AttendanceService;
 use Illuminate\Http\JsonResponse;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 class HrAttendanceController extends Controller
 {
@@ -22,53 +24,80 @@ class HrAttendanceController extends Controller
 
     public function daily(GetHrDailyAttendanceRequest $request): JsonResponse
     {
-        $result = $this->attendanceService->getHrDailyAttendance(
-            $request->date,
-            $request->department_id ? (int) $request->department_id : null,
-            $request->manager_id ? (int) $request->manager_id : null,
-            $request->status,
-            $request->search,
-            $request->filled('per_page') ? (int) $request->per_page : 15
-        );
+        try {
+            $result = $this->attendanceService->getHrDailyAttendance(
+                $request->date,
+                $request->department_id ? (int) $request->department_id : null,
+                $request->manager_id ? (int) $request->manager_id : null,
+                $request->status,
+                $request->search,
+                $request->filled('per_page') ? (int) $request->per_page : 15
+            );
 
-        return ResponseHelper::success(
-            data: [
-                'date' => $result['date'],
-                'summary' => $result['summary'],
-                'employees' => HrDailyAttendanceResource::collection($result['data'])->response()->getData(true),
-            ],
-            message: 'Company daily attendance retrieved successfully.'
-        );
+            return ResponseHelper::success(
+                data: [
+                    'date'      => $result['date'],
+                    'summary'   => $result['summary'],
+                    'employees' => HrDailyAttendanceResource::collection($result['data'])->response()->getData(true),
+                ],
+                message: __('hr.daily_attendance_retrieved')
+            );
+        } catch (Throwable $e) {
+            report($e);
+
+            return ResponseHelper::error(
+                message: __('hr.failed_to_retrieve'),
+                statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
     }
 
     public function exceptions(GetHrExceptionsAttendanceRequest $request): JsonResponse
     {
-        $exceptions = $this->attendanceService->getHrAttendanceExceptions(
-            $request->date,
-            $request->department_id ? (int) $request->department_id : null,
-            $request->filled('per_page') ? (int) $request->per_page : 15
-        );
+        try {
+            $exceptions = $this->attendanceService->getHrAttendanceExceptions(
+                $request->date,
+                $request->department_id ? (int) $request->department_id : null,
+                $request->filled('per_page') ? (int) $request->per_page : 15
+            );
 
-        return ResponseHelper::success(
-            data: HrAttendanceExceptionResource::collection($exceptions)->response()->getData(true),
-            message: 'Attendance exceptions retrieved successfully.'
-        );
+            return ResponseHelper::success(
+                data: HrAttendanceExceptionResource::collection($exceptions)->response()->getData(true),
+                message: __('hr.exceptions_retrieved')
+            );
+        } catch (Throwable $e) {
+            report($e);
+
+            return ResponseHelper::error(
+                message: __('hr.failed_to_retrieve'),
+                statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
     }
 
     public function monthlySummary(GetHrMonthlySummaryRequest $request): JsonResponse
     {
-        $summary = $this->attendanceService->getHrMonthlySummary(
-            (int) $request->month,
-            (int) $request->year,
-            $request->department_id ? (int) $request->department_id : null,
-            $request->search,
-            $request->filled('per_page') ? (int) $request->per_page : 15
-        );
+        try {
+            $summary = $this->attendanceService->getHrMonthlySummary(
+                (int) $request->month,
+                (int) $request->year,
+                $request->department_id ? (int) $request->department_id : null,
+                $request->search,
+                $request->filled('per_page') ? (int) $request->per_page : 15
+            );
 
-        return ResponseHelper::success(
-            data: HrMonthlySummaryResource::collection($summary)->response()->getData(true),
-            message: 'Monthly attendance summary retrieved successfully.'
-        );
+            return ResponseHelper::success(
+                data: HrMonthlySummaryResource::collection($summary)->response()->getData(true),
+                message: __('hr.monthly_summary_retrieved')
+            );
+        } catch (Throwable $e) {
+            report($e);
+
+            return ResponseHelper::error(
+                message: __('hr.failed_to_retrieve'),
+                statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
     }
 
     public function export(GetHrMonthlySummaryRequest $request): BinaryFileResponse

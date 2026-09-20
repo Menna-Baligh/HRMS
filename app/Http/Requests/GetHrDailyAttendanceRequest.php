@@ -16,7 +16,7 @@ class GetHrDailyAttendanceRequest extends FormRequest
         return [
             'date' => ['nullable', 'date_format:Y-m-d'],
             'department_id' => ['nullable', 'integer', 'exists:departments,id'],
-            'manager_id' => ['nullable', 'integer', 'exists:employees,id'],
+            'manager_id' => ['nullable', 'integer', 'exists:users,id'],
             'status' => ['nullable', 'in:Present,Late,Absent,On Shift'],
             'search' => ['nullable', 'string', 'max:100'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],

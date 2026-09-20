@@ -24,42 +24,41 @@ class AttendanceController extends Controller
 
     public function today(GetTodayAttendanceRequest $request): JsonResponse
     {
-        $employee = auth('api')->user()?->employee;
+        $user = auth('api')->user();
 
-        if (! $employee) {
+        if (! $user) {
             return ResponseHelper::error(
-                message: 'Employee profile not found.',
+                message: __('attendance.user_not_found'),
                 statusCode: Response::HTTP_NOT_FOUND
             );
         }
 
         $todayData = $this->attendanceService->getTodayData(
-            $employee,
+            $user,
             $request->filled('latitude') ? (float) $request->latitude : null,
             $request->filled('longitude') ? (float) $request->longitude : null
         );
 
         return ResponseHelper::success(
             data: new TodayAttendanceResource($todayData),
-            message: 'Today attendance retrieved successfully.'
+            message: __('attendance.today_retrieved')
         );
     }
 
     public function checkIn(CheckInRequest $request, NotificationService $notificationService): JsonResponse
     {
         $user = auth('api')->user();
-        $employee = $user?->employee;
 
-        if (! $employee) {
+        if (! $user) {
             return ResponseHelper::error(
-                message: 'Employee profile not found.',
+                message: __('attendance.user_not_found'),
                 statusCode: Response::HTTP_NOT_FOUND
             );
         }
 
         try {
             $attendance = $this->attendanceService->checkIn(
-                $employee,
+                $user,
                 (float) $request->latitude,
                 (float) $request->longitude
             );
@@ -75,22 +74,22 @@ class AttendanceController extends Controller
                     'time' => $checkInTime,
                 ],
                 metadata: [
-                    'screen' => 'attendance_history',
+                    'screen'        => 'attendance_history',
                     'attendance_id' => $attendance->id,
-                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                    'click_action'  => 'FLUTTER_NOTIFICATION_CLICK',
                 ]
             );
 
             return ResponseHelper::success(
                 data: new AttendanceResource($attendance),
-                message: 'Checked in successfully.',
+                message: __('attendance.checkin_success'),
                 statusCode: Response::HTTP_CREATED
             );
         } catch (\Exception $e) {
             $errorResponses = [
-                'DUPLICATE_CHECKIN' => [Response::HTTP_UNPROCESSABLE_ENTITY, 'You have already checked in today.'],
-                'OUTSIDE_RADIUS' => [Response::HTTP_UNPROCESSABLE_ENTITY, 'You are outside the allowed company location radius.'],
-                'LOCATION_NOT_CONFIGURED' => [Response::HTTP_UNPROCESSABLE_ENTITY, 'Company location is not assigned or active for your profile.'],
+                'DUPLICATE_CHECKIN'       => [Response::HTTP_UNPROCESSABLE_ENTITY, __('attendance.errors.duplicate_checkin')],
+                'OUTSIDE_RADIUS'          => [Response::HTTP_UNPROCESSABLE_ENTITY, __('attendance.errors.outside_radius')],
+                'LOCATION_NOT_CONFIGURED' => [Response::HTTP_UNPROCESSABLE_ENTITY, __('attendance.errors.location_not_configured')],
             ];
 
             [$statusCode, $message] = $errorResponses[$e->getMessage()] ?? [Response::HTTP_BAD_REQUEST, $e->getMessage()];
@@ -105,18 +104,17 @@ class AttendanceController extends Controller
     public function checkOut(CheckOutRequest $request, NotificationService $notificationService): JsonResponse
     {
         $user = auth('api')->user();
-        $employee = $user?->employee;
 
-        if (! $employee) {
+        if (! $user) {
             return ResponseHelper::error(
-                message: 'Employee profile not found.',
+                message: __('attendance.user_not_found'),
                 statusCode: Response::HTTP_NOT_FOUND
             );
         }
 
         try {
             $attendance = $this->attendanceService->checkOut(
-                $employee,
+                $user,
                 (float) $request->latitude,
                 (float) $request->longitude
             );
@@ -132,21 +130,21 @@ class AttendanceController extends Controller
                     'time' => $checkOutTime,
                 ],
                 metadata: [
-                    'screen' => 'attendance_history',
+                    'screen'        => 'attendance_history',
                     'attendance_id' => $attendance->id,
-                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                    'click_action'  => 'FLUTTER_NOTIFICATION_CLICK',
                 ]
             );
 
             return ResponseHelper::success(
                 data: new AttendanceResource($attendance),
-                message: 'Checked out successfully.'
+                message: __('attendance.checkout_success')
             );
         } catch (\Exception $e) {
             $errorResponses = [
-                'NO_OPEN_CHECKIN' => [Response::HTTP_UNPROCESSABLE_ENTITY, 'No active check-in record found for today.'],
-                'ALREADY_CHECKED_OUT' => [Response::HTTP_UNPROCESSABLE_ENTITY, 'You have already checked out today.'],
-                'OUTSIDE_RADIUS' => [Response::HTTP_UNPROCESSABLE_ENTITY, 'You are outside the allowed company location radius.'],
+                'NO_OPEN_CHECKIN'     => [Response::HTTP_UNPROCESSABLE_ENTITY, __('attendance.errors.no_open_checkin')],
+                'ALREADY_CHECKED_OUT' => [Response::HTTP_UNPROCESSABLE_ENTITY, __('attendance.errors.already_checked_out')],
+                'OUTSIDE_RADIUS'      => [Response::HTTP_UNPROCESSABLE_ENTITY, __('attendance.errors.outside_radius')],
             ];
 
             [$statusCode, $message] = $errorResponses[$e->getMessage()] ?? [Response::HTTP_BAD_REQUEST, $e->getMessage()];
@@ -160,17 +158,17 @@ class AttendanceController extends Controller
 
     public function history(GetAttendanceHistoryRequest $request): JsonResponse
     {
-        $employee = auth('api')->user()?->employee;
+        $user = auth('api')->user();
 
-        if (! $employee) {
+        if (! $user) {
             return ResponseHelper::error(
-                message: 'Employee profile not found.',
+                message: __('attendance.user_not_found'),
                 statusCode: Response::HTTP_NOT_FOUND
             );
         }
 
         $paginatedHistory = $this->attendanceService->getHistory(
-            $employee,
+            $user,
             $request->filled('month') ? (int) $request->month : null,
             $request->filled('year') ? (int) $request->year : null,
             $request->filled('per_page') ? (int) $request->per_page : 15
@@ -178,7 +176,7 @@ class AttendanceController extends Controller
 
         return ResponseHelper::success(
             data: AttendanceHistoryResource::collection($paginatedHistory)->response()->getData(true),
-            message: 'Attendance history retrieved successfully.'
+            message: __('attendance.history_retrieved')
         );
     }
 }

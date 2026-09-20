@@ -22,7 +22,7 @@ return [
     'google_login_failed'     => 'Google authentication failed.',
     'account_inactive' => 'Your account is inactive. Please activate your account first.',
     'unauthenticated'     => 'Unauthenticated. Please log in first.',
-    'unauthorized_action' => 'This action is unauthorized.',
+    'unauthorized_action' => 'You do not have the required permissions to perform this action.',
     'resource_not_found'  => 'The requested resource was not found.',
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
 

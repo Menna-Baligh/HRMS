@@ -184,6 +184,9 @@ return [
         'attribute-name' => [
             'rule-name' => 'custom-message',
         ],
+        'manager_id' => [
+            'invalid_role' => 'The selected user must have a Manager role or higher.',
+        ],
     ],
 
     /*
