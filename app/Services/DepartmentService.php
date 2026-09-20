@@ -9,7 +9,7 @@ class DepartmentService
 {
     public function getAllDepartments(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        return Department::with(['manager.user'])
+        return Department::with(['manager'])
             ->withCount('employees')
             ->when(! empty($filters['search']), function ($query) use ($filters) {
                 $search = $filters['search'];
@@ -28,13 +28,13 @@ class DepartmentService
     public function createDepartment(array $data): Department
     {
         $department = Department::create([
-            'name' => $data['name'],
+            'name'        => $data['name'],
             'description' => $data['description'] ?? null,
-            'manager_id' => $data['manager_id'] ?? null,
-            'status' => 'active',
+            'manager_id'  => $data['manager_id'] ?? null,
+            'status'      => 'active',
         ]);
 
-        return $department->load('manager.user');
+        return $department->load('manager');
     }
 
     public function updateDepartment(int $id, array $data): Department
@@ -42,7 +42,7 @@ class DepartmentService
         $department = Department::findOrFail($id);
         $department->update($data);
 
-        return $department->load('manager.user');
+        return $department->load('manager');
     }
 
     public function changeDepartmentStatus(int $id): Department
@@ -51,6 +51,6 @@ class DepartmentService
         $newStatus = $department->status === 'active' ? 'inactive' : 'active';
         $department->update(['status' => $newStatus]);
 
-        return $department->load('manager.user');
+        return $department->load('manager');
     }
 }

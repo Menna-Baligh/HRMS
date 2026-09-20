@@ -8,9 +8,11 @@ use App\Http\Requests\StoreDepartmentRequest;
 use App\Http\Requests\UpdateDepartmentRequest;
 use App\Http\Resources\DepartmentResource;
 use App\Services\DepartmentService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 class DepartmentController extends Controller
 {
@@ -18,49 +20,95 @@ class DepartmentController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $filters = $request->only(['search', 'status']);
-        $perPage = (int) $request->get('per_page', 15);
-        $departments = $this->departmentService->getAllDepartments($filters, $perPage);
-        $paginatedData = DepartmentResource::collection($departments)->response()->getData(true);
+        try {
+            $filters = $request->only(['search', 'status']);
+            $perPage = (int) $request->get('per_page', 15);
+            $departments = $this->departmentService->getAllDepartments($filters, $perPage);
+            $paginatedData = DepartmentResource::collection($departments)->response()->getData(true);
 
-        return ResponseHelper::success(
-            data: $paginatedData,
-            message: 'Departments retrieved successfully'
-        );
+            return ResponseHelper::success(
+                data: $paginatedData,
+                message: __('departments.retrieved_successfully')
+            );
+        } catch (Throwable $e) {
+            report($e);
+
+            return ResponseHelper::error(
+                message: __('departments.failed_to_process'),
+                statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
     }
 
     public function store(StoreDepartmentRequest $request): JsonResponse
     {
-        $department = $this->departmentService->createDepartment($request->validated());
+        try {
+            $department = $this->departmentService->createDepartment($request->validated());
 
-        return ResponseHelper::success(
-            data: new DepartmentResource($department),
-            message: 'Department created successfully',
-            statusCode: Response::HTTP_CREATED
-        );
+            return ResponseHelper::success(
+                data: new DepartmentResource($department),
+                message: __('departments.created_successfully'),
+                statusCode: Response::HTTP_CREATED
+            );
+        } catch (Throwable $e) {
+            report($e);
+
+            return ResponseHelper::error(
+                message: __('departments.failed_to_process'),
+                statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
     }
 
     public function update(UpdateDepartmentRequest $request, int $id): JsonResponse
     {
-        $department = $this->departmentService->updateDepartment($id, $request->validated());
+        try {
+            $department = $this->departmentService->updateDepartment($id, $request->validated());
 
-        return ResponseHelper::success(
-            data: new DepartmentResource($department),
-            message: 'Department updated successfully'
-        );
+            return ResponseHelper::success(
+                data: new DepartmentResource($department),
+                message: __('departments.updated_successfully')
+            );
+        } catch (ModelNotFoundException $e) {
+            return ResponseHelper::error(
+                message: __('departments.not_found'),
+                statusCode: Response::HTTP_NOT_FOUND
+            );
+        } catch (Throwable $e) {
+            report($e);
+
+            return ResponseHelper::error(
+                message: __('departments.failed_to_process'),
+                statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
     }
 
     public function changeStatus(int $id): JsonResponse
     {
-        $department = $this->departmentService->changeDepartmentStatus($id);
+        try {
+            $department = $this->departmentService->changeDepartmentStatus($id);
 
-        $message = $department->status === 'active'
-            ? 'Activated department successfully with keeping employee records.'
-            : 'Deactivated department successfully with keeping employee records.';
+            $message = $department->status === 'active'
+                ? __('departments.activated_successfully')
+                : __('departments.deactivated_successfully');
 
-        return ResponseHelper::success(
-            data: new DepartmentResource($department),
-            message: $message
-        );
+            return ResponseHelper::success(
+                data: new DepartmentResource($department),
+                message: $message
+            );
+        } catch (ModelNotFoundException $e) {
+            return ResponseHelper::error(
+                message: __('departments.not_found'),
+                statusCode: Response::HTTP_NOT_FOUND
+            );
+        } catch (Throwable $e) {
+            report($e);
+
+            return ResponseHelper::error(
+                message: __('departments.failed_to_process'),
+                statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
     }
 }

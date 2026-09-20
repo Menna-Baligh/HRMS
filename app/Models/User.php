@@ -101,13 +101,13 @@ class User extends Authenticatable implements JWTSubject
     // ─── Relationships ────────────────────────────────────────────────────────
 
     /** The manager this user reports to. */
-    public function manager(): BelongsTo
+    public function manager()
     {
         return $this->belongsTo(User::class, 'manager_id');
     }
 
     /** All employees directly managed by this user. */
-    public function subordinates(): HasMany
+    public function subordinates()
     {
         return $this->hasMany(User::class, 'manager_id');
     }
@@ -211,6 +211,11 @@ class User extends Authenticatable implements JWTSubject
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class, 'department_id');
+    }
+
+    public function managedDepartments()
+    {
+        return $this->hasMany(Department::class, 'manager_id');
     }
 
 
