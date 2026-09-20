@@ -19,6 +19,14 @@ return [
     'failed_progress'       => 'Failed to update goal progress.',
     'failed_complete'       => 'Failed to mark goal as completed.',
 
+    'errors' => [
+        'value_exceeds_target' => 'The current value cannot exceed the goal target value of (:target).',
+    ],
+    'attributes' => [
+        'current_value' => 'Current Value',
+        'note'          => 'Note',
+    ],
+
     'statuses' => [
         'active'    => 'Active',
         'completed' => 'Completed',

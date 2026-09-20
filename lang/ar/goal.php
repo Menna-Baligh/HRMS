@@ -19,6 +19,14 @@ return [
     'failed_progress'       => 'فشل في تحديث تقدم الهدف.',
     'failed_complete'       => 'فشل في تعليم الهدف كمكتمل.',
 
+    'errors' => [
+        'value_exceeds_target' => 'القيمة الحالية لا يمكن أن تتجاوز القيمة المستهدفة للهدف (:target).',
+    ],
+    'attributes' => [
+        'current_value' => 'القيمة الحالية',
+        'note'          => 'الملاحظة',
+    ],
+
     'statuses' => [
         'active'    => 'نشط',
         'completed' => 'مكتمل',
