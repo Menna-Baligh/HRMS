@@ -16,10 +16,10 @@ class EmployeePerformanceController extends Controller
     public function dashboard(Request $request): JsonResponse
     {
         try {
-            $employee = $request->user()->employee;
+            $user = $request->user();
 
-            if (! $employee) {
-                return ResponseHelper::error(null, 'Employee profile not found.', 404);
+            if (! $user) {
+                return ResponseHelper::error(null, __('performance.user_not_found'), 404);
             }
 
             $periodId = $request->query('period_id') ? (int) $request->query('period_id') : null;
@@ -27,7 +27,7 @@ class EmployeePerformanceController extends Controller
             $endDate = $request->query('end_date');
 
             $dashboardData = $this->summaryService->getDashboardPerformance(
-                $employee,
+                $user,
                 $periodId,
                 $startDate,
                 $endDate
@@ -35,12 +35,14 @@ class EmployeePerformanceController extends Controller
 
             return ResponseHelper::success(
                 $dashboardData,
-                'Employee performance dashboard retrieved successfully.'
+                __('performance.employee_dashboard_success')
             );
         } catch (Throwable $e) {
+            report($e);
+
             return ResponseHelper::error(
                 config('app.debug') ? $e->getMessage() : null,
-                'Failed to retrieve performance dashboard.',
+                __('performance.failed_employee_dashboard'),
                 500
             );
         }

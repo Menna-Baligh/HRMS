@@ -16,10 +16,10 @@ class ManagerPerformanceController extends Controller
     public function teamDashboard(Request $request): JsonResponse
     {
         try {
-            $manager = $request->user()->employee;
+            $manager = $request->user(); 
 
             if (! $manager) {
-                return ResponseHelper::error(null, 'Manager profile not found.', 404);
+                return ResponseHelper::error(null, __('performance.manager_not_found'), 404);
             }
 
             $periodId = $request->query('period_id') ? (int) $request->query('period_id') : null;
@@ -37,12 +37,14 @@ class ManagerPerformanceController extends Controller
 
             return ResponseHelper::success(
                 $data,
-                'Team performance dashboard retrieved successfully.'
+                __('performance.team_dashboard_success')
             );
         } catch (Throwable $e) {
+            report($e);
+
             return ResponseHelper::error(
                 config('app.debug') ? $e->getMessage() : null,
-                'Failed to retrieve team performance dashboard.',
+                __('performance.failed_team_dashboard'),
                 500
             );
         }
