@@ -29,13 +29,15 @@ class EvaluationController extends Controller
 
             return ResponseHelper::success(
                 new EvaluationResource($evaluation),
-                'Evaluation draft created successfully.',
+                __('evaluation.draft_created'),
                 201
             );
         } catch (Throwable $e) {
+            report($e);
+
             return ResponseHelper::error(
                 config('app.debug') ? $e->getMessage() : null,
-                $e->getMessage() ?: 'Failed to save evaluation draft.',
+                $e->getMessage() ?: __('evaluation.failed_save_draft'),
                 400
             );
         }
@@ -47,11 +49,11 @@ class EvaluationController extends Controller
             $evaluation = Evaluation::with(['scores', 'evidence'])->find($id);
 
             if (! $evaluation) {
-                return ResponseHelper::error(null, 'Evaluation not found.', 404);
+                return ResponseHelper::error(null, __('evaluation.not_found'), 404);
             }
 
             if ($evaluation->status === EvaluationStatus::COMPLETED) {
-                return ResponseHelper::error(null, 'Completed evaluations cannot be modified.', 422);
+                return ResponseHelper::error(null, __('evaluation.completed_immutable'), 422);
             }
 
             $updatedEvaluation = $this->evaluationService->saveDraft(
@@ -62,12 +64,14 @@ class EvaluationController extends Controller
 
             return ResponseHelper::success(
                 new EvaluationResource($updatedEvaluation),
-                'Evaluation draft updated successfully.'
+                __('evaluation.draft_updated')
             );
         } catch (Throwable $e) {
+            report($e);
+
             return ResponseHelper::error(
                 config('app.debug') ? $e->getMessage() : null,
-                $e->getMessage() ?: 'Failed to update evaluation.',
+                $e->getMessage() ?: __('evaluation.failed_update'),
                 400
             );
         }
@@ -76,17 +80,17 @@ class EvaluationController extends Controller
     public function complete(Request $request, int $id, NotificationService $notificationService): JsonResponse
     {
         try {
-            $evaluation = Evaluation::with(['scores.category', 'employee.user', 'period'])->find($id);
+            $evaluation = Evaluation::with(['scores.category', 'user', 'period'])->find($id);
 
             if (! $evaluation) {
-                return ResponseHelper::error(null, 'Evaluation not found.', 404);
+                return ResponseHelper::error(null, __('evaluation.not_found'), 404);
             }
 
             $completedEvaluation = $this->evaluationService->completeEvaluation($evaluation);
 
-            if ($evaluation->employee && $evaluation->employee->user) {
+            if ($evaluation->user) {
                 SendNotificationJob::dispatch(
-                    user: $evaluation->employee->user,
+                    user: $evaluation->user,
                     type: 'evaluation_closed',
                     titleKey: 'notifications.evaluation_closed_title',
                     bodyKey: 'notifications.evaluation_closed_body',
@@ -94,22 +98,24 @@ class EvaluationController extends Controller
                         'period_name' => $evaluation->period?->name ?? 'the evaluation period',
                     ],
                     metadata: [
-                        'screen' => 'evaluation_summary',
+                        'screen'        => 'evaluation_summary',
                         'evaluation_id' => $completedEvaluation->id,
-                        'period_id' => $completedEvaluation->evaluation_period_id,
-                        'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                        'period_id'     => $completedEvaluation->period_id,
+                        'click_action'  => 'FLUTTER_NOTIFICATION_CLICK',
                     ]
                 );
             }
 
             return ResponseHelper::success(
                 new EvaluationResource($completedEvaluation),
-                'Evaluation completed and locked successfully.'
+                __('evaluation.completed_success')
             );
         } catch (Throwable $e) {
+            report($e);
+
             return ResponseHelper::error(
                 config('app.debug') ? $e->getMessage() : null,
-                $e->getMessage() ?: 'Failed to complete evaluation.',
+                $e->getMessage() ?: __('evaluation.failed_complete'),
                 400
             );
         }
@@ -118,10 +124,10 @@ class EvaluationController extends Controller
     public function managerEvaluations(Request $request): JsonResponse
     {
         try {
-            $manager = $request->user()->employee;
+            $manager = $request->user(); 
 
             if (! $manager) {
-                return ResponseHelper::error(null, 'Employee profile not found.', 404);
+                return ResponseHelper::error(null, __('evaluation.user_not_found'), 404);
             }
 
             $status = $request->query('status');
@@ -131,12 +137,14 @@ class EvaluationController extends Controller
 
             return ResponseHelper::success(
                 EvaluationResource::collection($evaluations)->response()->getData(true),
-                'Team evaluations retrieved successfully.'
+                __('evaluation.team_evaluations')
             );
         } catch (Throwable $e) {
+            report($e);
+
             return ResponseHelper::error(
                 config('app.debug') ? $e->getMessage() : null,
-                'Failed to retrieve team evaluations.',
+                __('evaluation.failed_team'),
                 500
             );
         }

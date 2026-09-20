@@ -34,6 +34,14 @@ return [
     'phone'           => 'رقم الهاتف',
     'job_title'       => 'المسمى الوظيفي',
     'department_id'   => 'القسم',
+    'user_id'              => 'الموظف',
+    'period_id'            => 'فترة التقييم',
+    'feedback'             => 'الملاحظات',
+    'scores'               => 'الدرجات',
+    'scores.*.category_id' => 'فئة التقييم',
+    'scores.*.score'       => 'الدرجة',
+    'evidence_goal_ids'    => 'الأهداف المرتبطة',
+    'evidence_goal_ids.*'  => 'الهدف المرتبط',
     ],
 
     'custom' => [
