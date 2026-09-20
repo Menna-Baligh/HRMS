@@ -17,11 +17,8 @@ class LoginService
         }
         $user = auth('api')->user();
 
-        if ($user->employee && $user->employee->status === 'inactive') {
+        if ($user->status === 'inactive') {
             auth('api')->logout();
-            // throw ValidationException::withMessages([
-            //     'email' => 'Your account is inactive. Please activate your account first.',
-            // ]);
             throw new AuthorizationException(__('auth.account_inactive'));
         }
 
