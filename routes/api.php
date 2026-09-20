@@ -42,15 +42,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('set.app.language')->prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
-
     Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
-
     Route::post('/forget-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:5,1');
-
     Route::post('/forgot-password/verify-otp', [AuthController::class, 'verifyForgotPasswordOtp'])->middleware('throttle:5,1');
-
     Route::post('/forgot-password/reset', [AuthController::class, 'resetPassword'])->middleware('throttle:5,1');
-
     Route::post('/forgot-password/resend-otp', [AuthController::class, 'resendOtp'])->middleware('throttle:5,1');
 
     Route::middleware('auth:api')->group(function () {
@@ -58,21 +53,8 @@ Route::middleware('set.app.language')->prefix('auth')->group(function () {
     });
 
     Route::prefix('google')->group(function () {
-
         Route::get('/redirect', [GoogleAuthController::class, 'redirect']);
-
         Route::get('/callback', [GoogleAuthController::class, 'callback']);
-    });
-
-    /*
-    |--------------------------------------------------------------------------
-    | Logout
-    |--------------------------------------------------------------------------
-    */
-
-    Route::middleware('auth:api')->group(function () {
-
-        Route::post('/logout', [AuthController::class, 'logout']);
     });
 });
 
@@ -137,6 +119,7 @@ Route::prefix('leaves')->middleware('auth:api','set.app.language')->group(functi
 |--------------------------------------------------------------------------
 */
 
+Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(function () {
 
 Route::prefix('tasks')->middleware('auth:api','set.app.language')->group(function () {
         // Task list
@@ -195,323 +178,98 @@ Route::middleware('auth:api','set.app.language')
         );
     });
 
-/*
-|--------------------------------------------------------------------------
-| Protected Management Routes
-|--------------------------------------------------------------------------
-*/
-
-Route::middleware(['auth:api', 'check.active'])->group(function () {
-
-    /*
-    |--------------------------------------------------------------------------
-    | Permissions
-    |--------------------------------------------------------------------------
-    */
-
-    Route::middleware(['role:Owner|HR'])->group(function () {
-
-        Route::get(
-            '/permissions',
-            [PermissionController::class, 'index']
-        );
+    Route::prefix('locations/company/location')->group(function () {
+        Route::get('/active', [CompanyLocationController::class, 'activeLocation'])->middleware('permission:'.PermissionEnum::LOCATION_VIEW_ACTIVE->value);
+        Route::post('/', [CompanyLocationController::class, 'store'])->middleware('permission:'.PermissionEnum::LOCATION_CREATE->value);
+        Route::put('/{id}', [CompanyLocationController::class, 'update'])->middleware('permission:'.PermissionEnum::LOCATION_UPDATE->value);
+        Route::patch('/{id}/deactivate', [CompanyLocationController::class, 'deactivate'])->middleware('permission:'.PermissionEnum::LOCATION_DEACTIVATE->value);
+        Route::patch('/{id}/activate', [CompanyLocationController::class, 'activate'])->middleware('permission:'.PermissionEnum::LOCATION_ACTIVATE->value);
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | Employees
-    |--------------------------------------------------------------------------
-    */
+    Route::prefix('tasks')->group(function () {
+        Route::post('/', [TaskController::class, 'store'])->middleware('permission:'.PermissionEnum::TASK_CREATE->value);
+        Route::put('/{task}', [TaskController::class, 'update'])->middleware('permission:'.PermissionEnum::TASK_UPDATE->value);
+        Route::post('/{task}/assign', [TaskController::class, 'assign'])->middleware('permission:'.PermissionEnum::TASK_ASSIGN->value);
+        Route::patch('/{task}/progress', [TaskController::class, 'updateProgress'])->middleware('permission:'.PermissionEnum::TASK_UPDATE_PROGRESS->value);
+        Route::patch('/{task}/status', [TaskController::class, 'updateStatus'])->middleware('permission:'.PermissionEnum::TASK_UPDATE_STATUS->value);
 
-    Route::post(
-        '/employees',
-        [EmployeeController::class, 'store']
-    )->middleware('permission:create employee');
-
-    Route::patch(
-        '/employees/profile',
-        [EmployeeController::class, 'updateProfile']
-    );
-
-    Route::get(
-        '/employees/{id}',
-        [EmployeeController::class, 'show']
-    );
-
-    Route::patch(
-        '/employees/{id}/hr-fields',
-        [EmployeeController::class, 'updateHrFields']
-    )->middleware('permission:edit hr fields');
-
-    Route::patch(
-        '/employees/{id}/change-account-status',
-        [EmployeeController::class, 'changeAccountStatus']
-    )->middleware('permission:employee.change-account-status');
-
-    Route::get(
-        '/employees',
-        [EmployeeController::class, 'index']
-    )->middleware('permission:employee.view-all');
-
-    /*
-    |--------------------------------------------------------------------------
-    | Departments
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get(
-        '/departments',
-        [DepartmentController::class, 'index']
-    )->middleware('permission:department.view');
-
-    Route::post(
-        '/departments',
-        [DepartmentController::class, 'store']
-    )->middleware('permission:department.create');
-
-    Route::patch(
-        '/departments/{id}',
-        [DepartmentController::class, 'update']
-    )->middleware('permission:department.edit');
-
-    Route::patch(
-        '/departments/{id}/change-status',
-        [DepartmentController::class, 'changeStatus']
-    )->middleware('permission:department.change-status');
-
-    /*
-    |--------------------------------------------------------------------------
-    | Manager
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get(
-        '/managers/employees',
-        [ManagerController::class, 'employees']
-    )->middleware('permission:manager.view-employees');
-
-    /*
-    |--------------------------------------------------------------------------
-    | Employee Attendance
-    |--------------------------------------------------------------------------
-    */
+        Route::post('/{task}/submissions', [SubmissionController::class, 'store'])->middleware('permission:'.PermissionEnum::SUBMISSION_CREATE->value);
+        Route::post('/submissions/{submission}/attachments', [SubmissionController::class, 'attachFile'])->middleware('permission:'.PermissionEnum::SUBMISSION_ATTACH_FILE->value);
+        Route::get('/submissions/review', [SubmissionController::class, 'reviewQueue'])->middleware('permission:'.PermissionEnum::SUBMISSION_REVIEW_QUEUE->value);
+        Route::get('/submissions/{submission}', [SubmissionController::class, 'show'])->middleware('permission:'.PermissionEnum::SUBMISSION_VIEW->value);
+        Route::patch('/submissions/{submission}/approve', [SubmissionController::class, 'approve'])->middleware('permission:'.PermissionEnum::SUBMISSION_APPROVE->value);
+        Route::patch('/submissions/{submission}/reject', [SubmissionController::class, 'reject'])->middleware('permission:'.PermissionEnum::SUBMISSION_REJECT->value);
+        Route::patch('/submissions/{submission}/request-changes', [SubmissionController::class, 'requestChanges'])->middleware('permission:'.PermissionEnum::SUBMISSION_REQUEST_CHANGES->value);
+        Route::post('/submissions/{submission}/resubmit', [SubmissionController::class, 'resubmit'])->middleware('permission:'.PermissionEnum::SUBMISSION_RESUBMIT->value);
+    });
 
     Route::prefix('attendance')->group(function () {
-
-        Route::get(
-            '/today',
-            [AttendanceController::class, 'today']
-        );
-
-        Route::post(
-            '/check-in',
-            [AttendanceController::class, 'checkIn']
-        );
-
-        Route::post(
-            '/check-out',
-            [AttendanceController::class, 'checkOut']
-        );
-
-        Route::get(
-            '/history',
-            [AttendanceController::class, 'history']
-        );
+        Route::get('/today', [AttendanceController::class, 'today'])->middleware('permission:'.PermissionEnum::ATTENDANCE_CHECKIN_CHECKOUT->value);
+        Route::post('/check-in', [AttendanceController::class, 'checkIn'])->middleware('permission:'.PermissionEnum::ATTENDANCE_CHECKIN_CHECKOUT->value);
+        Route::post('/check-out', [AttendanceController::class, 'checkOut'])->middleware('permission:'.PermissionEnum::ATTENDANCE_CHECKIN_CHECKOUT->value);
+        Route::get('/history', [AttendanceController::class, 'history'])->middleware('permission:'.PermissionEnum::ATTENDANCE_VIEW_HISTORY->value);
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | Manager Routes
-    |--------------------------------------------------------------------------
-    */
-
-    Route::middleware(['role:Manager|Owner|HR'])
-        ->prefix('manager')
-        ->group(function () {
-
-            Route::prefix('/attendance')->group(function () {
-
-                Route::get(
-                    '/today',
-                    [ManagerAttendanceController::class, 'today']
-                );
-
-                Route::get(
-                    '/{employeeId}',
-                    [ManagerAttendanceController::class, 'show']
-                );
-            });
-
-            Route::get(
-                '/team-goals',
-                [ManagerController::class, 'teamGoals']
-            );
-        });
-
-    /*
-    |--------------------------------------------------------------------------
-    | HR Routes
-    |--------------------------------------------------------------------------
-    */
-
-    Route::middleware(['role:HR|Owner'])
-        ->prefix('hr')
-        ->group(function () {
-
-            Route::prefix('/attendance')->group(function () {
-
-                Route::get(
-                    '/daily',
-                    [HrAttendanceController::class, 'daily']
-                );
-
-                Route::get(
-                    '/exceptions',
-                    [HrAttendanceController::class, 'exceptions']
-                );
-
-                Route::get(
-                    '/monthly-summary',
-                    [HrAttendanceController::class, 'monthlySummary']
-                );
-
-                Route::get(
-                    '/export',
-                    [HrAttendanceController::class, 'export']
-                );
-            });
-
-            Route::get(
-                '/evaluations',
-                [HrEvaluationSetupController::class, 'index']
-            );
-
-            Route::get(
-                '/goals',
-                [HrGoalController::class, 'index']
-            );
-
-            Route::get(
-                '/company-performance',
-                [HrPerformanceController::class, 'companyDashboard']
-            );
-        });
-
-    /*
-    |--------------------------------------------------------------------------
-    | Evaluation Management
-    |--------------------------------------------------------------------------
-    */
-
-    Route::middleware(['role:Manager|HR|Owner'])->group(function () {
-
-        // Evaluation periods
-        Route::get(
-            '/evaluation-periods',
-            [HrEvaluationSetupController::class, 'listPeriods']
-        );
-
-        Route::post(
-            '/evaluation-periods',
-            [HrEvaluationSetupController::class, 'storePeriod']
-        );
-
-        Route::patch(
-            '/evaluation-periods/{id}/toggle-status',
-            [HrEvaluationSetupController::class, 'togglePeriodStatus']
-        );
-
-        // Evaluation categories
-        Route::get(
-            '/evaluation-categories',
-            [HrEvaluationSetupController::class, 'listCategories']
-        );
-
-        Route::post(
-            '/evaluation-categories',
-            [HrEvaluationSetupController::class, 'storeCategory']
-        );
-
-        // Evaluations
-        Route::post(
-            '/evaluations',
-            [EvaluationController::class, 'store']
-        );
-
-        Route::put(
-            '/evaluations/{id}',
-            [EvaluationController::class, 'update']
-        );
-
-        Route::patch(
-            '/evaluations/{id}/complete',
-            [EvaluationController::class, 'complete']
-        );
-
-        Route::get(
-            '/manager/evaluations',
-            [EvaluationController::class, 'managerEvaluations']
-        );
-
-        // Manager performance
-        Route::get(
-            '/manager/team-performance',
-            [ManagerPerformanceController::class, 'teamDashboard']
-        );
+    Route::prefix('manager')->group(function () {
+        Route::get('/employees', [ManagerController::class, 'employees'])->middleware('permission:'.PermissionEnum::MANAGER_VIEW_EMPLOYEES->value);
+        Route::get('/attendance/today', [ManagerAttendanceController::class, 'today'])->middleware('permission:'.PermissionEnum::MANAGER_VIEW_ATTENDANCE->value);
+        Route::get('/attendance/{employeeId}', [ManagerAttendanceController::class, 'show'])->middleware('permission:'.PermissionEnum::MANAGER_VIEW_ATTENDANCE->value);
+        Route::get('/team-goals', [ManagerController::class, 'teamGoals'])->middleware('permission:'.PermissionEnum::MANAGER_VIEW_TEAM_GOALS->value);
+        Route::get('/team-performance', [ManagerPerformanceController::class, 'teamDashboard'])->middleware('permission:'.PermissionEnum::MANAGER_PERFORMANCE_TEAM->value);
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | Employee Evaluation & Performance
-    |--------------------------------------------------------------------------
-    */
+    Route::prefix('hr')->group(function () {
+        Route::get('/attendance/daily', [HrAttendanceController::class, 'daily'])->middleware('permission:'.PermissionEnum::HR_ATTENDANCE_VIEW_DAILY->value);
+        Route::get('/attendance/exceptions', [HrAttendanceController::class, 'exceptions'])->middleware('permission:'.PermissionEnum::HR_ATTENDANCE_VIEW_EXCEPTIONS->value);
+        Route::get('/attendance/monthly-summary', [HrAttendanceController::class, 'monthlySummary'])->middleware('permission:'.PermissionEnum::HR_ATTENDANCE_VIEW_SUMMARY->value);
+        Route::get('/attendance/export', [HrAttendanceController::class, 'export'])->middleware('permission:'.PermissionEnum::HR_ATTENDANCE_EXPORT->value);
+        Route::get('/evaluations', [HrEvaluationSetupController::class, 'index'])->middleware('permission:'.PermissionEnum::EVALUATION_MANAGE_SETUP->value);
+        Route::get('/goals', [HrGoalController::class, 'index'])->middleware('permission:'.PermissionEnum::HR_GOALS_OVERVIEW->value);
+        Route::get('/company-performance', [HrPerformanceController::class, 'companyDashboard'])->middleware('permission:'.PermissionEnum::HR_PERFORMANCE_COMPANY->value);
+    });
 
-    Route::get(
-        '/employee/evaluations',
-        [EmployeeEvaluationController::class, 'index']
-    );
-
-    Route::get(
-        '/employee/performance',
-        [EmployeePerformanceController::class, 'dashboard']
-    );
-});
-
-Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(function () {
     Route::prefix('goals')->group(function () {
+        Route::get('/', [GoalController::class, 'index'])->middleware('permission:'.PermissionEnum::GOAL_VIEW_OWN->value);
+        Route::post('/', [GoalController::class, 'store'])->middleware('permission:'.PermissionEnum::GOAL_CREATE->value);
+        Route::get('/{id}', [GoalController::class, 'show'])->middleware('permission:'.PermissionEnum::GOAL_VIEW_OWN->value);
+        Route::put('/{id}', [GoalController::class, 'update'])->middleware('permission:'.PermissionEnum::GOAL_UPDATE->value);
+        Route::patch('/{id}/progress', [GoalController::class, 'updateProgress'])->middleware('permission:'.PermissionEnum::GOAL_UPDATE_PROGRESS->value);
+        Route::patch('/{id}/complete', [GoalController::class, 'complete'])->middleware('permission:'.PermissionEnum::GOAL_COMPLETE->value);
+    });
 
-        Route::get(
-            '/',
-            [GoalController::class, 'index']
-        );
+    Route::prefix('evaluation-periods')->group(function () {
+        Route::get('/', [HrEvaluationSetupController::class, 'listPeriods'])->middleware('permission:'.PermissionEnum::EVALUATION_MANAGE_SETUP->value);
+        Route::post('/', [HrEvaluationSetupController::class, 'storePeriod'])->middleware('permission:'.PermissionEnum::EVALUATION_MANAGE_SETUP->value);
+        Route::patch('/{id}/toggle-status', [HrEvaluationSetupController::class, 'togglePeriodStatus'])->middleware('permission:'.PermissionEnum::EVALUATION_MANAGE_SETUP->value);
+    });
 
-        Route::post(
-            '/',
-            [GoalController::class, 'store']
-        );
+    Route::prefix('evaluation-categories')->group(function () {
+        Route::get('/', [HrEvaluationSetupController::class, 'listCategories'])->middleware('permission:'.PermissionEnum::EVALUATION_MANAGE_SETUP->value);
+        Route::post('/', [HrEvaluationSetupController::class, 'storeCategory'])->middleware('permission:'.PermissionEnum::EVALUATION_MANAGE_SETUP->value);
+    });
 
-        Route::get(
-            '/{id}',
-            [GoalController::class, 'show']
-        );
-
-        Route::put(
-            '/{id}',
-            [GoalController::class, 'update']
-        );
-
-        Route::patch(
-            '/{id}/progress',
-            [GoalController::class, 'updateProgress']
-        );
-
-        Route::patch(
-            '/{id}/complete',
-            [GoalController::class, 'complete']
-        );
+    Route::prefix('evaluations')->group(function () {
+        Route::post('/', [EvaluationController::class, 'store'])->middleware('permission:'.PermissionEnum::EVALUATION_CREATE->value);
+        Route::put('/{id}', [EvaluationController::class, 'update'])->middleware('permission:'.PermissionEnum::EVALUATION_UPDATE->value);
+        Route::patch('/{id}/complete', [EvaluationController::class, 'complete'])->middleware('permission:'.PermissionEnum::EVALUATION_COMPLETE->value);
+        Route::get('/manager', [EvaluationController::class, 'managerEvaluations'])->middleware('permission:'.PermissionEnum::EVALUATION_VIEW_MANAGER->value);
+        Route::get('/employee', [EmployeeEvaluationController::class, 'index'])->middleware('permission:'.PermissionEnum::EVALUATION_VIEW_EMPLOYEE->value);
     });
 
     Route::get('/employee/performance', [EmployeePerformanceController::class, 'dashboard'])->middleware('permission:'.PermissionEnum::EMPLOYEE_PERFORMANCE_DASHBOARD->value);
+
+    Route::prefix('leaves')->group(function () {
+        Route::post('/leave-types', [LeaveTypeController::class, 'store'])->middleware('permission:'.PermissionEnum::LEAVE_REQUEST_CREATE->value);
+        Route::get('/leave-types', [LeaveTypeController::class, 'index'])->middleware('permission:'.PermissionEnum::LEAVE_BALANCE_VIEW->value);
+        Route::put('/leave-types/{leaveType}', [LeaveTypeController::class, 'update'])->middleware('permission:'.PermissionEnum::LEAVE_REQUEST_CREATE->value);
+        Route::patch('/leave-types/{leaveType}/activate', [LeaveTypeController::class, 'activate'])->middleware('permission:'.PermissionEnum::LEAVE_APPROVE_HR->value);
+        Route::patch('/leave-types/{leaveType}/deactivate', [LeaveTypeController::class, 'deactivate'])->middleware('permission:'.PermissionEnum::LEAVE_APPROVE_HR->value);
+        Route::get('/leave-balances', [LeaveBalanceController::class, 'index'])->middleware('permission:'.PermissionEnum::LEAVE_BALANCE_VIEW->value);
+        Route::post('/leave-requests', [LeaveRequestController::class, 'store'])->middleware('permission:'.PermissionEnum::LEAVE_REQUEST_CREATE->value);
+        Route::patch('/leave-requests/{leaveRequest}/approve', [LeaveRequestController::class, 'approve'])->middleware('permission:'.PermissionEnum::LEAVE_APPROVE_MANAGER->value);
+        Route::patch('/leave-requests/{leaveRequest}/reject', [LeaveRequestController::class, 'reject'])->middleware('permission:'.PermissionEnum::LEAVE_REJECT->value);
+        Route::get('/leave-requests', [LeaveRequestController::class, 'history'])->middleware('permission:'.PermissionEnum::LEAVE_VIEW_HISTORY->value);
+    });
 
     Route::prefix('notifications')->group(function () {
         Route::get('/', [NotificationController::class, 'index']);
@@ -526,4 +284,10 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
         Route::get('/{file}/download', [FileController::class, 'download'])->name('files.download')->middleware('permission:'.PermissionEnum::FILE_DOWNLOAD->value);
         Route::delete('/{file}', [FileController::class, 'destroy'])->name('files.destroy')->middleware('permission:'.PermissionEnum::FILE_DELETE->value);
     });
+
+    Route::get('/permissions', [PermissionController::class, 'index'])->middleware('permission:'.PermissionEnum::PERMISSION_VIEW_ALL->value);
+});
+
+Route::middleware(['auth:api', 'set.app.language'])->post('/broadcasting/auth', function (Request $request) {
+    return Broadcast::auth($request);
 });

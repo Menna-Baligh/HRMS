@@ -19,24 +19,31 @@ class ManagerController extends Controller
 
     public function employees(Request $request): JsonResponse
     {
-        $managerEmployeeId = auth('api')->user()?->employee?->id;
+        try {
+            $manager = auth('api')->user();
+            if (! $manager) {
+                return ResponseHelper::error(
+                    message: __('auth.unauthenticated'),
+                    statusCode: Response::HTTP_UNAUTHORIZED
+                );
+            }
+            $filters = $request->only(['search', 'status', 'department_id', 'employment_type', 'role']);
+            $filters['manager_id'] = $manager->id;
+            $perPage = (int) $request->get('per_page', 15);
+            $employees = $this->employeeService->getAllEmployees($filters, $perPage);
+            $paginatedData = UserResource::collection($employees)->response()->getData(true);
+            return ResponseHelper::success(
+                data: $paginatedData,
+                message: __('manager.employees_retrieved')
+            );
+        } catch (Throwable $e) {
+            report($e);
 
-        if (! $managerEmployeeId) {
             return ResponseHelper::error(
-                message: 'You are not registered as an employee.',
-                statusCode: Response::HTTP_FORBIDDEN
+                message: __('manager.failed_to_retrieve'),
+                statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
-        $filters = $request->only(['search', 'status', 'department_id', 'employment_type', 'role']);
-        $filters['manager_id'] = $managerEmployeeId;
-        $perPage = (int) $request->get('per_page', 15);
-        $employees = $this->employeeService->getAllEmployees($filters, $perPage);
-        $paginatedData = UserResource::collection($employees)->response()->getData(true);
-
-        return ResponseHelper::success(
-            data: $paginatedData,
-            message: 'Manager employees retrieved successfully.'
-        );
     }
 
     public function teamGoals(Request $request): JsonResponse

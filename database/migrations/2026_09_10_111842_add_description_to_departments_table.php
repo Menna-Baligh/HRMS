@@ -13,11 +13,7 @@ return new class extends Migration
     {
         Schema::table('departments', function (Blueprint $table) {
             $table->text('description')->nullable()->after('name');
-            $table->foreignId('manager_id')
-                ->nullable()
-                ->after('description')
-                ->constrained('employees')
-                ->nullOnDelete();
+            $table->foreignId('manager_id')->nullable()->constrained('users')->nullOnDelete();
         });
     }
 

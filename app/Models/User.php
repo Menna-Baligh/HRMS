@@ -3,14 +3,12 @@
 namespace App\Models;
 
 use App\Enums\UserRole;
-use App\Models\LeaveDecisionHistory;
-use App\Models\LeaveRequest;
-use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -19,7 +17,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, HasRoles, Notifiable;
+    use HasFactory, HasRoles, Notifiable , SoftDeletes;
 
     protected $guard_name = 'api';
 
@@ -72,6 +70,7 @@ class User extends Authenticatable implements JWTSubject
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'role' => UserRole::class,
+            'start_date'        => 'date',
         ];
     }
 
@@ -100,13 +99,13 @@ class User extends Authenticatable implements JWTSubject
     // ─── Relationships ────────────────────────────────────────────────────────
 
     /** The manager this user reports to. */
-    public function manager(): BelongsTo
+    public function manager()
     {
         return $this->belongsTo(User::class, 'manager_id');
     }
 
     /** All employees directly managed by this user. */
-    public function subordinates(): HasMany
+    public function subordinates()
     {
         return $this->hasMany(User::class, 'manager_id');
     }
@@ -207,4 +206,49 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->morphMany(File::class, 'fileable');
     }
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class, 'department_id');
+    }
+
+    public function managedDepartments()
+    {
+        return $this->hasMany(Department::class, 'manager_id');
+    }
+
+
+    public function companyLocation(): BelongsTo
+    {
+        return $this->belongsTo(CompanyLocation::class, 'company_location_id');
+    }
+
+
+    public function directReports(): HasMany
+    {
+        return $this->hasMany(User::class, 'manager_id');
+    }
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class, 'user_id');
+    }
+
+    public function todayAttendance()
+    {
+        return $this->hasOne(Attendance::class, 'user_id')->where('date', now()->toDateString());
+    }
+
+    public function scopeExcludeOwnerAndSelf($query, ?int $currentUserId = null)
+    {
+        $currentUserId = $currentUserId ?? auth('api')->id();
+
+        return $query->whereDoesntHave('roles', function ($q) {
+                $q->where('name', 'Owner');
+            })
+            ->when($currentUserId, function ($q) use ($currentUserId) {
+                $q->where('id', '!=', $currentUserId); 
+            });
+    }
+
+
 }

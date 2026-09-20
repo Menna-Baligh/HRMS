@@ -16,19 +16,24 @@ class RolesAndPermissionsSeeder extends Seeder
 
         $guard = 'api';
 
+        $validPermissionNames = collect(PermissionEnum::cases())->pluck('value')->toArray();
+        Permission::where('guard_name', $guard)
+            ->whereNotIn('name', $validPermissionNames)
+            ->delete();
+
         $roleNames = ['Owner', 'HR', 'Manager', 'Employee'];
         $roles = [];
 
         foreach ($roleNames as $name) {
             $roles[$name] = Role::firstOrCreate([
-                'name' => $name,
+                'name'       => $name,
                 'guard_name' => $guard,
             ]);
         }
 
         foreach (PermissionEnum::cases() as $permissionEnum) {
             $permission = Permission::firstOrCreate([
-                'name' => $permissionEnum->value,
+                'name'       => $permissionEnum->value,
                 'guard_name' => $guard,
             ]);
 
