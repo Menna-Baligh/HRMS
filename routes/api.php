@@ -83,8 +83,8 @@ Route::middleware('set.app.language')->prefix('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth:api', 'check.active'])->group(function () {
-    Route::get('/calendar', [CalendarController::class, 'index']);
+Route::prefix('calender')->middleware(['auth:api', 'set.app.language'])->group(function () {
+    Route::get('/', [CalendarController::class, 'index']);
 });
 
 /*
