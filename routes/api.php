@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\HrEvaluationSetupController;
 use App\Http\Controllers\Api\HrGoalController;
 use App\Http\Controllers\Api\HrPerformanceController;
 use App\Http\Controllers\Api\LeaveBalanceController;
+use App\Http\Controllers\Api\LeaveDecisionHistoryController;
 use App\Http\Controllers\Api\LeaveRequestController;
 use App\Http\Controllers\Api\LeaveTypeController;
 use App\Http\Controllers\Api\ManagerAttendanceController;
@@ -26,11 +27,6 @@ use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\SubmissionController;
 use App\Http\Controllers\Api\TaskController;
-use App\Http\Controllers\Api\V1\Calendar\LeaveCalendarController;
-use App\Http\Controllers\Api\V1\HR\HRLeaveQueueController;
-use App\Http\Controllers\Api\V1\LeaveDecisionHistory\LeaveDecisionHistoryController;
-use App\Http\Controllers\Api\V1\LeaveRequest\LeaveApprovalController;
-use App\Http\Controllers\Api\V1\Manager\ManagerLeaveQueueController;
 use App\Http\Controllers\CompanyLocations\CompanyLocationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
@@ -98,7 +94,9 @@ Route::middleware(['auth:api', 'check.active'])->group(function () {
 */
 
 
-Route::prefix('leaves')->middleware('auth:api')->group(function () {
+Route::prefix('leaves')->middleware('auth:api','set.app.language')->group(function () {
+
+   // ............................................. Leave Types........................................................
     // new leave type
     Route::post('/leave-types', [LeaveTypeController::class,'store',]);
     //get all leave types
@@ -109,14 +107,26 @@ Route::prefix('leaves')->middleware('auth:api')->group(function () {
     Route::patch('/leave-types/{leaveType}/activate', [LeaveTypeController::class,'activate',]);
     //deactivate
     Route::patch('/leave-types/{leaveType}/deactivate', [LeaveTypeController::class,'deactivate',]);
+    // ............................................. Leave balances........................................................
     //Leave Balances
     Route::get('/leave-balances', [LeaveBalanceController::class,'index',]);
+    // ..............................................Leave requests.......................................................
     // create leave
     Route::post( '/leave-requests', [LeaveRequestController::class, 'store'] );
+    //manager Pending Queue
+    Route::get('/leave-requests/manager/pending',[LeaveRequestController::class, 'managerPendingQueue'])->middleware('role:Manager');
+    // hr pending Queue
+    Route::get('/leave-requests/hr/pending',[LeaveRequestController::class, 'hrPendingQueue'])->middleware('role:HR|Owner');
+    // Leave Decision History
+    Route::get('/leave-requests/{leaveRequest}/decisions', [LeaveDecisionHistoryController::class, 'index']);
     //approve leave
     Route::patch('/leave-requests/{leaveRequest}/approve', [ LeaveRequestController::class, 'approve' ]);
     //reject leave
     Route::patch('/leave-requests/{leaveRequest}/reject', [ LeaveRequestController::class, 'reject' ]);
+    //leave attachments
+    Route::post('/leave-requests/{leaveRequest}/attachments', [LeaveRequestController::class, 'storeAttachment']);
+    // leave details
+    Route::get('/leave-requests/{leaveRequest}',[LeaveRequestController::class, 'show']);
     // leave history
     Route::get('/leave-requests', [ LeaveRequestController::class,'history']);
 });

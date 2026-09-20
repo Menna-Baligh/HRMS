@@ -23,6 +23,8 @@ class TaskController extends Controller
     ) {
 
     }
+
+    
     /**
  * Get tasks visible to the authenticated user.
  */

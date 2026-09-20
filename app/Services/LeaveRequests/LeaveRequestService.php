@@ -3,10 +3,10 @@
 namespace App\Services\LeaveRequests;
 
 use App\Enums\LeaveStatus;
-use App\Models\Employee;
 use App\Models\LeaveDecision;
 use App\Models\LeaveRequest;
 use App\Models\LeaveType;
+use App\Models\User;
 use App\Services\LeaveBalances\LeaveBalanceService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
@@ -20,21 +20,26 @@ class LeaveRequestService
     ) {
     }
 
-    /**
-     * Create a new leave request for an employee.
-     */
-    public function create(
-        Employee $employee,
-        array $data
-    ): LeaveRequest {
+    public function create(User $user, array $data): LeaveRequest
+    {
         $startDate = Carbon::parse($data['start_date'])->startOfDay();
         $endDate = Carbon::parse($data['end_date'])->startOfDay();
 
         $days = $startDate->diffInDays($endDate) + 1;
 
-        // Prevent overlapping pending or approved leave requests.
+        $leaveType = LeaveType::query()
+            ->whereKey($data['leave_type_id'])
+            ->where('is_active', true)
+            ->first();
+
+        if (! $leaveType) {
+            throw new RuntimeException(
+                __('leave_requests.leave_type_inactive')
+            );
+        }
+
         $hasOverlap = LeaveRequest::query()
-            ->where('employee_id', $employee->id)
+            ->where('user_id', $user->id)
             ->whereIn('status', [
                 LeaveStatus::Pending->value,
                 LeaveStatus::Approved->value,
@@ -45,24 +50,19 @@ class LeaveRequestService
 
         if ($hasOverlap) {
             throw new RuntimeException(
-                'You already have a leave request overlapping with these dates.'
+                __('leave_requests.overlap')
             );
         }
 
-        $leaveType = LeaveType::findOrFail(
-            $data['leave_type_id']
-        );
-
-        // Validate the employee's available balance.
         $this->leaveBalanceService->validateBalance(
-            $employee,
-            $leaveType,
-            $days,
-            $startDate->year
+            user: $user,
+            leaveType: $leaveType,
+            requestedDays: $days,
+            year: $startDate->year
         );
 
         return LeaveRequest::create([
-            'employee_id' => $employee->id,
+            'user_id' => $user->id,
             'leave_type_id' => $leaveType->id,
             'start_date' => $startDate,
             'end_date' => $endDate,
@@ -72,36 +72,34 @@ class LeaveRequestService
         ]);
     }
 
-    /**
-     * Approve a pending leave request.
-     */
-    public function approve(LeaveRequest $leaveRequest,int $reviewerId): LeaveRequest {
+    public function approve(
+        LeaveRequest $leaveRequest,
+        int $reviewerId
+    ): LeaveRequest {
         return DB::transaction(function () use (
             $leaveRequest,
             $reviewerId
         ) {
-            // Lock the leave request to prevent double approval.
             $leaveRequest = LeaveRequest::query()
                 ->lockForUpdate()
                 ->findOrFail($leaveRequest->id);
 
             if ($leaveRequest->status !== LeaveStatus::Pending) {
                 throw new RuntimeException(
-                    'Only pending leave requests can be approved.'
+                    __('leave_requests.only_pending_approve')
                 );
             }
 
-            $employee = $leaveRequest->employee;
+            $user = $leaveRequest->user;
             $leaveType = $leaveRequest->leaveType;
 
             $previousStatus = $leaveRequest->status->value;
 
-            // Deduct the balance only when the request is approved.
             $this->leaveBalanceService->deductBalance(
-                $employee,
-                $leaveType,
-                (float) $leaveRequest->days,
-                $leaveRequest->start_date->year
+                user: $user,
+                leaveType: $leaveType,
+                days: (float) $leaveRequest->days,
+                year: $leaveRequest->start_date->year
             );
 
             $leaveRequest->update([
@@ -110,7 +108,6 @@ class LeaveRequestService
                 'reviewed_at' => now(),
             ]);
 
-            // Store the approval decision in the history table.
             LeaveDecision::create([
                 'leave_request_id' => $leaveRequest->id,
                 'reviewer_id' => $reviewerId,
@@ -121,7 +118,7 @@ class LeaveRequestService
             ]);
 
             return $leaveRequest->fresh([
-                'employee',
+                'user',
                 'leaveType',
                 'reviewer',
                 'decisions.reviewer',
@@ -129,9 +126,6 @@ class LeaveRequestService
         });
     }
 
-    /**
-     * Reject a pending leave request.
-     */
     public function reject(
         LeaveRequest $leaveRequest,
         int $reviewerId,
@@ -142,14 +136,13 @@ class LeaveRequestService
             $reviewerId,
             $rejectionReason
         ) {
-            // Lock the leave request to prevent concurrent decisions.
             $leaveRequest = LeaveRequest::query()
                 ->lockForUpdate()
                 ->findOrFail($leaveRequest->id);
 
             if ($leaveRequest->status !== LeaveStatus::Pending) {
                 throw new RuntimeException(
-                    'Only pending leave requests can be rejected.'
+                    __('leave_requests.only_pending_reject')
                 );
             }
 
@@ -162,7 +155,6 @@ class LeaveRequestService
                 'reviewed_at' => now(),
             ]);
 
-            // Store the rejection decision in the history table.
             LeaveDecision::create([
                 'leave_request_id' => $leaveRequest->id,
                 'reviewer_id' => $reviewerId,
@@ -173,40 +165,100 @@ class LeaveRequestService
             ]);
 
             return $leaveRequest->fresh([
-                'employee',
+                'user',
                 'leaveType',
                 'reviewer',
                 'decisions.reviewer',
             ]);
         });
     }
-    /**
 
-* Get the authenticated employee's leave history.
-  */
-  public function getEmployeeHistory( Employee $employee,?string $status = null,?int $leaveTypeId = null,?int $year = null): Collection 
-  {
-    return LeaveRequest::query()
-    ->with([
-    'leaveType',
-    'reviewer',
-    'decisions.reviewer',
-    ])
-    ->where('employee_id', $employee->id)
-    ->when(
-    $status !== null,
-    fn ($query) => $query->where('status', $status)
-    )
-    ->when(
-    $leaveTypeId !== null,
-    fn ($query) => $query->where('leave_type_id', $leaveTypeId)
-    )
-    ->when(
-    $year !== null,
-    fn ($query) => $query->whereYear('start_date', $year)
-    )
-    ->orderByDesc('start_date')
-    ->get();
+    public function getUserHistory(
+        User $user,
+        ?string $status = null,
+        ?int $leaveTypeId = null,
+        ?int $year = null
+    ): Collection {
+        return LeaveRequest::query()
+            ->with([
+                'user',
+                'leaveType',
+                'reviewer',
+                'decisions.reviewer',
+            ])
+            ->where('user_id', $user->id)
+            ->when(
+                $status !== null,
+                fn ($query) => $query->where('status', $status)
+            )
+            ->when(
+                $leaveTypeId !== null,
+                fn ($query) => $query->where('leave_type_id', $leaveTypeId)
+            )
+            ->when(
+                $year !== null,
+                fn ($query) => $query->whereYear('start_date', $year)
+            )
+            ->orderByDesc('start_date')
+            ->get();
     }
-  
+
+    public function getDetails(LeaveRequest $leaveRequest): LeaveRequest
+{
+    return $leaveRequest->load([
+        'user',
+        'leaveType',
+        'reviewer',
+        'decisions.reviewer',
+        'files',
+    ]);
+} 
+
+
+// Manager Pending Leave Queue 
+
+public function getManagerPendingQueue(User $manager): Collection
+{
+    return LeaveRequest::query()
+        ->with([
+            'user',
+            'leaveType',
+            'reviewer',
+            'decisions.reviewer',
+            'files',
+        ])
+        ->where('status', LeaveStatus::Pending->value)
+        ->whereHas(
+            'user',
+            fn ($query) => $query->where('manager_id', $manager->id)
+        )
+        ->orderBy('created_at')
+        ->get();
+}
+// Hr Pending Queue
+public function getHrPendingQueue(): Collection
+{
+    return LeaveRequest::query()
+        ->with([
+            'user',
+            'leaveType',
+            'reviewer',
+            'decisions.reviewer',
+            'files',
+        ])
+        ->where('status', LeaveStatus::Pending->value)
+        ->orderBy('created_at')
+        ->get();
+}
+
+// Decision History
+
+public function getDecisionHistory(
+    LeaveRequest $leaveRequest
+): Collection {
+    return $leaveRequest->decisions()
+        ->with('reviewer')
+        ->orderByDesc('decided_at')
+        ->get();
+}
 }

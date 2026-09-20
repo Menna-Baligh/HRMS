@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LeaveBalances\IndexLeaveBalanceRequest;
 use App\Services\LeaveBalances\LeaveBalanceService;
@@ -15,29 +16,21 @@ class LeaveBalanceController extends Controller
     }
 
     /**
-     * Get leave balances for the authenticated employee.
+     * Get leave balances for the authenticated user.
      */
-    public function index(IndexLeaveBalanceRequest $request): JsonResponse {
-        
+    public function index(IndexLeaveBalanceRequest $request): JsonResponse
+    {
         $user = $request->user();
-        /*
-         * Assuming the authenticated User has a one-to-one
-         * relationship with the Employee model.
-         */
-        $employee = $user->employee;
-        if (!$employee) {
-            return response()->json([
-                'message' => 'Employee profile not found.',
-            ], 404);
-        }
+    
         $balances = $this->leaveBalanceService->getMyBalances(
-            employee: $employee,
+            user: $user,
             year: $request->validated('year'),
             leaveTypeId: $request->validated('leave_type_id')
         );
-        return response()->json([
-            'message' => 'Leave balances retrieved successfully.',
-            'data' => $balances,
-        ]);
+    
+        return ResponseHelper::success(
+            $balances,
+            __('leave_balances.retrieved_successfully')
+        );
     }
 }
