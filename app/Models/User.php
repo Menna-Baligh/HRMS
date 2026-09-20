@@ -238,5 +238,17 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasOne(Attendance::class, 'user_id')->where('date', now()->toDateString());
     }
 
+    public function scopeExcludeOwnerAndSelf($query, ?int $currentUserId = null)
+    {
+        $currentUserId = $currentUserId ?? auth('api')->id();
+
+        return $query->whereDoesntHave('roles', function ($q) {
+                $q->where('name', 'Owner');
+            })
+            ->when($currentUserId, function ($q) use ($currentUserId) {
+                $q->where('id', '!=', $currentUserId); 
+            });
+    }
+
 
 }
