@@ -128,7 +128,9 @@ Route::prefix('leaves')->middleware('auth:api')->group(function () {
 */
 
 
-Route::prefix('tasks')->middleware('auth:api')->group(function () {
+Route::prefix('tasks')->middleware('auth:api','set.app.language')->group(function () {
+        // Task list
+        Route::get('/', [TaskController::class, 'index']);
         // Create task
         Route::post('/', [TaskController::class, 'store']);
         // Update task
@@ -139,6 +141,10 @@ Route::prefix('tasks')->middleware('auth:api')->group(function () {
         Route::patch('/{task}/progress', [TaskController::class, 'updateProgress']);
         // Update task status
         Route::patch('/{task}/status', [TaskController::class, 'updateStatus']);
+        // Task details
+        Route::get('/{task}', [TaskController::class, 'show']);
+        // Task activity history
+        Route::get('/{task}/activities', [TaskController::class, 'activities']);
         // Submit a task
         Route::post('/{task}/submissions', [SubmissionController::class, 'store']);
         // Attach file to submission

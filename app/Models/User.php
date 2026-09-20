@@ -198,10 +198,10 @@ class User extends Authenticatable implements JWTSubject
     /**
      * Task assignments created by this user.
      */
-    public function taskAssignmentsCreated(): HasMany
-    {
-        return $this->hasMany(TaskAssignment::class, 'assigned_by');
-    }
+    public function taskAssignments()
+{
+    return $this->hasMany(TaskAssignment::class,'user_id');
+}
 
     public function files(): MorphMany
     {

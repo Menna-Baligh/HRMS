@@ -14,9 +14,11 @@ return new class extends Migration
         Schema::create('task_assignments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('task_id')->constrained('tasks')->cascadeOnDelete();
-            // Employee assigned to the task
-            $table->foreignId('employee_id')->constrained('employees')->cascadeOnDelete();
-            // User who assigned the task
+            // Employee assigned to the task with role Employee 
+            $table->foreignId('user_id')
+            ->constrained('users')
+            ->cascadeOnDelete();
+            // User who assigned the task with roles (HR,Manager,Owner)
             $table->foreignId('assigned_by')->constrained('users')->restrictOnDelete();
             $table->timestamp('assigned_at')->useCurrent();
             $table->timestamps();

@@ -26,11 +26,11 @@ class AssignTaskRequest extends FormRequest
          * Give a task to an employee.
          */
         return [
-            'employee_id' => [
-                'required',
-                'integer',
-                'exists:employees,id',
-            ],
+          'user_id' => [
+            'required',
+            'integer',
+            'exists:users,id',
+        ],
         ];
     }
 }
