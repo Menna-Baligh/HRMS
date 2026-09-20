@@ -89,21 +89,21 @@ enum PermissionEnum: string
     case EMPLOYEE_PERFORMANCE_DASHBOARD = 'employee.performance.dashboard';
 
     // ==========================================
-    // 9. Leave Management (V1)
+    // 9. Leave Management 
     // ==========================================
-    case LEAVE_TYPE_MANAGE = 'leave-type.manage';
-    case LEAVE_TYPE_VIEW = 'leave-type.view';
-    case LEAVE_BALANCE_VIEW = 'leave-balance.view';
-    case LEAVE_REQUEST_CREATE = 'leave-request.create';
-    case LEAVE_REQUEST_VIEW_OWN = 'leave-request.view-own';
-    case LEAVE_REQUEST_CANCEL = 'leave-request.cancel';
-    case LEAVE_APPROVE_MANAGER = 'leave.approve-manager';
-    case LEAVE_APPROVE_HR = 'leave.approve-hr';
-    case LEAVE_REJECT = 'leave.reject';
-    case LEAVE_VIEW_HISTORY = 'leave.view-history';
-    case LEAVE_QUEUE_MANAGER = 'leave.queue-manager';
-    case LEAVE_QUEUE_HR = 'leave.queue-hr';
-    case LEAVE_CALENDAR_VIEW = 'leave.calendar-view';
+    case LEAVE_TYPE_VIEW       = 'leave_type.view';
+    case LEAVE_TYPE_MANAGE     = 'leave_type.manage'; 
+    case LEAVE_BALANCE_VIEW    = 'leave_balance.view';
+    case LEAVE_REQUEST_VIEW_OWN= 'leave_request.view_own';
+    case LEAVE_REQUEST_CREATE  = 'leave_request.create';
+    case LEAVE_REQUEST_CANCEL  = 'leave_request.cancel';
+    case LEAVE_APPROVE_MANAGER = 'leave.approve_manager';
+    case LEAVE_APPROVE_HR      = 'leave.approve_hr';
+    case LEAVE_REJECT          = 'leave.reject';
+    case LEAVE_VIEW_HISTORY    = 'leave.view_history';
+    case LEAVE_QUEUE_MANAGER   = 'leave.queue_manager';
+    case LEAVE_QUEUE_HR        = 'leave.queue_hr';
+    case LEAVE_CALENDAR_VIEW   = 'leave.calendar_view';
 
     // ==========================================
     // 10. System, Files & Permissions
@@ -136,7 +136,8 @@ enum PermissionEnum: string
             self::PERMISSION_VIEW_ALL,
             self::LEAVE_TYPE_MANAGE,
             self::LEAVE_APPROVE_HR,
-            self::LEAVE_QUEUE_HR => ['Owner', 'HR'],
+            self::LEAVE_REJECT,
+            self::LEAVE_QUEUE_HR => ['HR', 'Owner'],
 
             // Manager, HR & Owner
             self::MANAGER_VIEW_EMPLOYEES,
@@ -156,7 +157,7 @@ enum PermissionEnum: string
             self::EVALUATION_VIEW_MANAGER,
             self::MANAGER_PERFORMANCE_TEAM,
             self::LEAVE_APPROVE_MANAGER,
-            self::LEAVE_QUEUE_MANAGER => ['Owner', 'HR', 'Manager'],
+            self::LEAVE_QUEUE_MANAGER => ['Manager', 'HR', 'Owner'],
 
             // All Roles (Owner, HR, Manager, Employee)
             self::EMPLOYEE_VIEW_PROFILE,
@@ -178,12 +179,12 @@ enum PermissionEnum: string
             self::GOAL_COMPLETE,
             self::EVALUATION_VIEW_EMPLOYEE,
             self::EMPLOYEE_PERFORMANCE_DASHBOARD,
-            self::LEAVE_TYPE_VIEW,
             self::LEAVE_BALANCE_VIEW,
-            self::LEAVE_REQUEST_CREATE,
             self::LEAVE_REQUEST_VIEW_OWN,
+            self::LEAVE_REQUEST_CREATE,
             self::LEAVE_REQUEST_CANCEL,
             self::LEAVE_VIEW_HISTORY,
+            self::LEAVE_TYPE_VIEW,
             self::LEAVE_CALENDAR_VIEW,
             self::FILE_DOWNLOAD,
             self::FILE_DELETE => ['Owner', 'HR', 'Manager', 'Employee'],
