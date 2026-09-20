@@ -122,11 +122,6 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(LeaveBalance::class);
     }
 
-    /** The employee profile associated with this user. */
-    public function employee(): HasOne
-    {
-        return $this->hasOne(Employee::class);
-    }
 
     public function taskActivities(): HasMany
     {
@@ -258,6 +253,10 @@ class User extends Authenticatable implements JWTSubject
     public function evaluationsGiven()
     {
         return $this->hasMany(Evaluation::class, 'evaluator_id');
+    }
+    public function goals(): HasMany
+    {
+        return $this->hasMany(Goal::class, 'user_id');
     }
 
 

@@ -13,7 +13,7 @@ class Goal extends Model
     use HasFactory;
 
     protected $fillable = [
-        'employee_id',
+        'user_id',
         'title',
         'description',
         'target_value',

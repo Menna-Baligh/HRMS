@@ -11,7 +11,7 @@ return new class extends Migration
     {
         Schema::create('goals', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('employee_id')->constrained('employees')->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->string('title');
             $table->text('description')->nullable();
             $table->decimal('target_value', 10, 2);
@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('status')->default(GoalStatus::ACTIVE->value);
             $table->timestamps();
 
-            $table->index(['employee_id', 'status']);
+            $table->index(['user_id', 'status']);
         });
     }
 
