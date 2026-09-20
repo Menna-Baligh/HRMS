@@ -17,20 +17,29 @@ class UserResource extends JsonResource
     public function toArray(Request $request): array
     {
         $roleValue = $this->role instanceof \BackedEnum ? $this->role->value : $this->role;
-        $avatarFile = $this->files()->latest()->first();
+
+        $isOwner = $this->hasRole('Owner') || $roleValue === 'Owner';
+
+        $avatarFile = $this->relationLoaded('files')
+            ? $this->files->sortByDesc('created_at')->first()
+            : $this->files()->latest()->first();
 
         return [
             'id'                  => $this->id,
-            'employee_id'         => $this->employee_id,
             'name'                => $this->name,
             'email'               => $this->email,
             'phone'               => $this->phone,
-            'job_title'           => $this->job_title,
-            'employment_type' => $this->employment_type
-            ? __('employment_types.' . strtolower(str_replace(' ', '-', $this->employment_type)))
-            : null,
-            'start_date'          => $this->start_date?->format('Y-m-d'),
-            'status' => $this->status ? __('statuses.' . $this->status) : null,
+
+            $this->mergeWhen(! $isOwner, [
+                'employee_code'   => $this->employee_id,
+                'job_title'       => $this->job_title,
+                'employment_type' => $this->employment_type
+                    ? __('employment_types.' . strtolower(str_replace(' ', '-', $this->employment_type)))
+                    : null,
+                'start_date'      => $this->start_date?->format('Y-m-d'),
+            ]),
+
+            'status'              => $this->status ? __('statuses.' . $this->status) : null,
             'address'             => $this->address,
             'avatar_url'          => $avatarFile ? route('files.download', $avatarFile->id) : null,
             'role'                => $roleValue,
