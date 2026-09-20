@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -196,10 +197,6 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(TaskAssignment::class, 'assigned_by');
     }
 
-    public function files(): MorphMany
-    {
-        return $this->morphMany(File::class, 'fileable');
-    }
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class, 'department_id');
@@ -256,6 +253,20 @@ class User extends Authenticatable implements JWTSubject
     public function goals(): HasMany
     {
         return $this->hasMany(Goal::class, 'user_id');
+    }
+    public function uploadedFiles(): HasMany
+    {
+        return $this->hasMany(File::class, 'user_id');
+    }
+
+    public function files(): MorphMany
+    {
+        return $this->morphMany(File::class, 'fileable');
+    }
+
+    public function avatarFile(): MorphOne
+    {
+        return $this->morphOne(File::class, 'fileable')->latestOfMany();
     }
 
 
