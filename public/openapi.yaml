@@ -3,9 +3,9 @@ info:
   title: HR API Documentation
   version: 1.0.0
 paths:
-  /api/auth/login:
+  /api/login:
     post:
-      summary: Login
+      summary: Login (This route is allowed for all roles)
       operationId: login
       tags:
         - Authentication
@@ -17,6 +17,15 @@ paths:
             type: string
             default: application/json
           example: application/json
+        - in: query
+          name: lang
+          required: false
+          description: Language for response translation (e.g. ar, en)
+          schema:
+            type: string
+            enum: [ar, en]
+            default: en
+          example: en
       requestBody:
         required: true
         content:
@@ -36,7 +45,7 @@ paths:
                   example: secret123
       responses:
         '200':
-          description: Login successfully
+          description: Logged in successfully.
           content:
             application/json:
               schema:
@@ -64,93 +73,147 @@ paths:
                         properties:
                           id:
                             type: integer
-                            example: 49
-                          employee_id:
-                            type: integer
-                            nullable: true
-                            example: 37
+                            example: 6
                           name:
                             type: string
-                            example: noni
+                            example: Noran Baligh
                           email:
                             type: string
                             format: email
-                            example: noni@gmail.com
+                            example: noran@gmail.com
                           phone:
+                            type: string
+                            nullable: true
+                            example: "01019018137"
+                          employee_code:
+                            type: string
+                            nullable: true
+                            example: "EMP-2026-24271"
+                          job_title:
+                            type: string
+                            nullable: true
+                            example: "Frontend Developer"
+                          employment_type:
+                            type: string
+                            nullable: true
+                            example: "Part-time"
+                          start_date:
+                            type: string
+                            format: date
+                            nullable: true
+                            example: "2026-09-01"
+                          status:
+                            type: string
+                            nullable: true
+                            example: "Active"
+                          address:
                             type: string
                             nullable: true
                             example: null
                           avatar_url:
                             type: string
                             nullable: true
-                            example: null
+                            example: "http://127.0.0.1:8000/api/files/2/download"
                           role:
                             type: string
-                            example: Employee
+                            example: "Employee"
+                          role_label:
+                            type: string
+                            nullable: true
+                            example: "Employee"
                           locale:
                             type: string
-                            example: en
+                            example: "en"
                           permissions:
                             type: array
                             items:
                               type: string
                             example:
-                              - edit self profile
-                              - department.view
-                              - employee.view-profile
-                              - attendance.checkin-checkout
+                              - "View Profile"
+                              - "Update Profile"
+                              - "View Departments"
+                              - "Update Task Progress"
+                              - "Update Task Status"
+                              - "Create Submission"
+                              - "Attach File to Submission"
+                              - "View Submission"
+                              - "Resubmit Submission"
+                              - "View Active Locations"
+                              - "Check-in / Check-out"
+                              - "View Personal Attendance History"
+                              - "View Own Goals"
+                              - "Create Goal"
+                              - "Update Goal"
+                              - "Update Goal Progress"
+                              - "Complete Goal"
+                              - "View Personal Evaluation"
+                              - "Personal Performance Dashboard"
+                              - "View Leave Types"
+                              - "View Leave Balances"
+                              - "View Own Leave Requests"
+                              - "Create Leave Request"
+                              - "Cancel Leave Request"
+                              - "View Leave History"
+                              - "View Leave Calendar"
+                              - "Download Files"
+                              - "Delete Files"
                           created_at:
                             type: string
-                            example: "2026-09-17 17:23:59"
+                            example: "2026-09-20 18:28:17"
               example:
                 success: true
-                message: Logged in successfully.
+                message: "Logged in successfully."
                 data:
-                  access_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
-                  token_type: bearer
-                  expires_in: 24 hours
+                  access_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3ODk5MjU5MjgsImV4cCI6MTc5MDAxMjMyOCwibmJmIjoxNzg5OTI1OTI4LCJqdGkiOijjRFgybTV4OEVWUU9sM3JGIiwic3ViIjoiNiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjciLCJyb2xlIjoiRW1wbG95ZWUifQ.4DnPJEF0SlWspAYc4y6aHE8g_A9O_Hgh-je4bLDvVSM"
+                  token_type: "bearer"
+                  expires_in: "24 hours"
                   user:
-                    id: 49
-                    employee_id: 37
-                    name: noni
-                    email: noni@gmail.com
-                    phone: null
-                    avatar_url: null
-                    role: Employee
-                    locale: en
+                    id: 6
+                    name: "Noran Baligh"
+                    email: "noran@gmail.com"
+                    phone: "01019018137"
+                    employee_code: "EMP-2026-24271"
+                    job_title: "Frontend Developer"
+                    employment_type: "Part-time"
+                    start_date: "2026-09-01"
+                    status: "Active"
+                    address: null
+                    avatar_url: "http://127.0.0.1:8000/api/files/2/download"
+                    role: "Employee"
+                    role_label: "Employee"
+                    locale: "en"
                     permissions:
-                      - edit self profile
-                      - department.view
-                      - employee.view-profile
-                      - employee.update-profile
-                      - task.update-progress
-                      - task.update-status
-                      - submission.create
-                      - submission.attach-file
-                      - submission.view
-                      - submission.resubmit
-                      - location.view-active
-                      - attendance.checkin-checkout
-                      - attendance.view-history
-                      - goal.view-own
-                      - goal.create
-                      - goal.update
-                      - goal.update-progress
-                      - goal.complete
-                      - evaluation.view-employee
-                      - employee.performance.dashboard
-                      - leave-type.view
-                      - leave-balance.view
-                      - leave-request.create
-                      - leave-request.view-own
-                      - leave-request.cancel
-                      - leave.view-history
-                      - leave.calendar-view
-                      - file.download
-                      - file.delete
-                    created_at: "2026-09-17 17:23:59"
-        '422':
-          description: Validation error or authentication failure
+                      - "View Profile"
+                      - "Update Profile"
+                      - "View Departments"
+                      - "Update Task Progress"
+                      - "Update Task Status"
+                      - "Create Submission"
+                      - "Attach File to Submission"
+                      - "View Submission"
+                      - "Resubmit Submission"
+                      - "View Active Locations"
+                      - "Check-in / Check-out"
+                      - "View Personal Attendance History"
+                      - "View Own Goals"
+                      - "Create Goal"
+                      - "Update Goal"
+                      - "Update Goal Progress"
+                      - "Complete Goal"
+                      - "View Personal Evaluation"
+                      - "Personal Performance Dashboard"
+                      - "View Leave Types"
+                      - "View Leave Balances"
+                      - "View Own Leave Requests"
+                      - "Create Leave Request"
+                      - "Cancel Leave Request"
+                      - "View Leave History"
+                      - "View Leave Calendar"
+                      - "Download Files"
+                      - "Delete Files"
+                    created_at: "2026-09-20 18:28:17"
+        '403':
+          description: Forbidden (e.g. Account inactive)
           content:
             application/json:
               schema:
@@ -161,29 +224,51 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: Validation error
+                    example: "Your account is inactive. Please activate your account first."
+                  errors:
+                    nullable: true
+                    example: null
+        '422':
+          description: Validation error or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Validation error"
                   errors:
                     type: object
                     nullable: true
               examples:
-                missingFields:
-                  summary: Missing Required Fields
-                  value:
-                    success: false
-                    message: Validation error
-                    errors:
-                      email:
-                        - The email field is required.
-                      password:
-                        - The password field is required.
                 invalidCredentials:
                   summary: Invalid Credentials
                   value:
                     success: false
-                    message: Validation error
+                    message: "Validation error"
                     errors:
                       email:
-                        - These credentials do not match our records.
+                        - "These credentials do not match our records."
+        '429':
+          description: Too Many Requests (Throttle limit exceeded)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Too many login attempts. Please try again in 60 seconds."
+                  errors:
+                    nullable: true
+                    example: null
         '500':
           description: Internal server error
           content:
@@ -196,13 +281,13 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: Something went wrong
+                    example: "Something went wrong"
                   errors:
                     nullable: true
                     example: null
   /api/auth/logout:
     post:
-      summary: Logout
+      summary: Logout (This route is allowed for all roles)
       operationId: logout
       tags:
         - Authentication
@@ -216,6 +301,15 @@ paths:
             type: string
             default: application/json
           example: application/json
+        - in: query
+          name: lang
+          required: false
+          description: Language for response translation (e.g. ar, en)
+          schema:
+            type: string
+            enum: [ar, en]
+            default: en
+          example: en
       responses:
         '200':
           description: Successfully logged out.
@@ -226,17 +320,19 @@ paths:
                 properties:
                   success:
                     type: boolean
+                    example: true
                   message:
                     type: string
+                    example: "Logged out successfully."
                   data:
                     type: array
-                    items: {}
+                    example: []
               example:
                 success: true
-                message: Logged out successfully
+                message: "Logged out successfully."
                 data: []
         '401':
-          description: Missing, expired, or invalid token.
+          description: Missing, expired, or invalid token (Unauthenticated).
           content:
             application/json:
               schema:
@@ -244,16 +340,37 @@ paths:
                 properties:
                   success:
                     type: boolean
+                    example: false
                   message:
                     type: string
+                    example: "Unauthenticated. Please log in first."
                   errors:
-                    type: string
                     nullable: true
+                    example: null
               example:
                 success: false
-                message: Unauthenticated
+                message: "Unauthenticated. Please log in first."
                 errors: null
-
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Something went wrong"
+                  errors:
+                    nullable: true
+                    example: null
+              example:
+                success: false
+                message: "Something went wrong"
+                errors: null
   /api/auth/google/redirect:
     get:
       summary: Google Login Redirect
@@ -483,10 +600,11 @@ paths:
                 errors:
                   email:
                     - Google authentication failed
+
   /api/permissions:
     get:
-      summary: Retrieve all permissions
-      description: Returns a list of all permission names configured for the 'api' guard. Requires authentication and Owner or HR role.
+      summary: Retrieve all permissions (This route is allowed for roles Owner, HR)
+      description: Returns a list of all permission labels translated based on the requested language. Requires authentication and Owner or HR role
       operationId: getPermissions
       tags:
         - Permissions
@@ -500,6 +618,15 @@ paths:
             type: string
             default: application/json
           example: application/json
+        - in: query
+          name: lang
+          required: false
+          description: Language for response translation (e.g. ar, en)
+          schema:
+            type: string
+            enum: [ar, en]
+            default: en
+          example: en
       responses:
         '200':
           description: Permissions list retrieved successfully
@@ -541,12 +668,12 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: Unauthenticated
+                    example: Unauthenticated. Please log in first.
                   errors:
                     nullable: true
               example:
                 success: false
-                message: Unauthenticated
+                message: Unauthenticated. Please log in first.
                 errors: null
         '403':
           description: Forbidden - User does not have Owner or HR role
@@ -560,12 +687,12 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: User does not have the right roles.
+                    example: You do not have the required permissions to perform this action.
                   errors:
                     nullable: true
               example:
                 success: false
-                message: User does not have the right roles.
+                message: You do not have the required permissions to perform this action.
                 errors: null
         '500':
           description: Failed to retrieve permissions
@@ -6583,7 +6710,7 @@ paths:
 
   /api/forgot-password/reset:
     post:
-      summary: Reset user password 
+      summary: Reset user password
       operationId: resetPassword
       tags:
         - Authentication
@@ -6654,7 +6781,7 @@ paths:
 
   /api/forgot-password/resend-otp:
     post:
-      summary: Resend OTP code 
+      summary: Resend OTP code
       operationId: resendOtp
       tags:
         - Authentication
