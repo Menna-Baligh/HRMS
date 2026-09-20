@@ -6,9 +6,9 @@ use App\Models\Goal;
 
 class GoalAggregatorService
 {
-    public function getMetrics(int $employeeId, string $startDate, string $endDate): array
+    public function getMetrics(int $userId, string $startDate, string $endDate): array
     {
-        $goals = Goal::where('employee_id', $employeeId)
+        $goals = Goal::where('user_id', $userId)
             ->where(function ($q) use ($startDate, $endDate) {
                 $q->whereBetween('target_date', [$startDate, $endDate])
                     ->orWhereBetween('created_at', [$startDate.' 00:00:00', $endDate.' 23:59:59']);
@@ -36,9 +36,9 @@ class GoalAggregatorService
             : 0.0;
 
         return [
-            'total_goals' => $totalGoals,
-            'completed_goals' => $completedGoals,
-            'completion_rate' => $completionRate,
+            'total_goals'      => $totalGoals,
+            'completed_goals'  => $completedGoals,
+            'completion_rate'  => $completionRate,
             'average_progress' => $averageProgress,
         ];
     }

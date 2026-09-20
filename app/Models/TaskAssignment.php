@@ -9,7 +9,7 @@ class TaskAssignment extends Model
 {
     protected $fillable = [
         'task_id',
-        'employee_id',
+        'user_id',
         'assigned_by',
         'assigned_at',
     ];

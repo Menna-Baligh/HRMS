@@ -7,10 +7,10 @@ use App\Models\Evaluation;
 
 class EvaluationAggregatorService
 {
-    public function getMetrics(int $employeeId, ?int $periodId = null, ?string $startDate = null, ?string $endDate = null): array
+    public function getMetrics(int $userId, ?int $periodId = null, ?string $startDate = null, ?string $endDate = null): array
     {
         $query = Evaluation::with('period')
-            ->where('employee_id', $employeeId)
+            ->where('user_id', $userId)
             ->where(function ($q) {
                 $q->where('status', EvaluationStatus::COMPLETED)
                     ->orWhere('status', 'completed');
@@ -37,11 +37,11 @@ class EvaluationAggregatorService
             : 0.0;
 
         return [
-            'total_evaluations' => $evaluations->count(),
-            'latest_overall_score' => $latestScore,
-            'previous_overall_score' => $previousScore,
-            'score_change' => $scoreChange,
-            'trend' => $scoreChange >= 0 ? 'improving' : 'declining',
+            'total_evaluations'     => $evaluations->count(),
+            'latest_overall_score'  => $latestScore,
+            'previous_overall_score'=> $previousScore,
+            'score_change'          => $scoreChange,
+            'trend'                 => $scoreChange >= 0 ? 'improving' : 'declining',
         ];
     }
 }

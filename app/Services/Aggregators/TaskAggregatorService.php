@@ -11,7 +11,7 @@ class TaskAggregatorService
     public function getMetrics(int $userId, string $startDate, string $endDate): array
     {
         $assignments = TaskAssignment::with('task')
-            ->where('employee_id', $userId)
+            ->where('user_id', $userId)
             ->whereHas('task', function ($q) use ($startDate, $endDate) {
                 $q->whereBetween('created_at', [$startDate.' 00:00:00', $endDate.' 23:59:59']);
             })
@@ -63,13 +63,13 @@ class TaskAggregatorService
             : 0.0;
 
         return [
-            'total_tasks' => $totalTasks,
-            'completed_tasks' => $completedTasks,
+            'total_tasks'       => $totalTasks,
+            'completed_tasks'   => $completedTasks,
             'in_progress_tasks' => $inProgressTasks,
-            'pending_tasks' => $pendingTasks,
-            'overdue_tasks' => $overdueTasks,
-            'completion_rate' => $completionRate,
-            'average_progress' => $averageProgress,
+            'pending_tasks'     => $pendingTasks,
+            'overdue_tasks'     => $overdueTasks,
+            'completion_rate'   => $completionRate,
+            'average_progress'  => $averageProgress,
         ];
     }
 }
