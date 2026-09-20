@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Attendance;
 use App\Models\Employee;
+use App\Models\User;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -153,18 +154,17 @@ class AttendanceService
             ->paginate($perPage);
     }
 
-    public function getManagerTeamTodayData(Employee $manager, ?string $date = null, ?string $statusFilter = null, ?string $search = null, int $perPage = 15): array
+    public function getManagerTeamTodayData(User $manager, ?string $date = null, ?string $statusFilter = null, ?string $search = null, int $perPage = 15): array
     {
         $targetDate = $date ? Carbon::parse($date) : now();
         $formattedDate = $targetDate->toDateString();
 
-        $subordinateIds = Employee::where('manager_id', $manager->id)
+        $subordinateIds = User::where('manager_id', $manager->id)
             ->where('status', 'active')
             ->pluck('id');
 
         $totalTeamCount = $subordinateIds->count();
-
-        $todayAttendances = Attendance::whereIn('employee_id', $subordinateIds)
+        $todayAttendances = Attendance::whereIn('user_id', $subordinateIds)
             ->where('date', $formattedDate)
             ->get();
 
@@ -176,12 +176,12 @@ class AttendanceService
 
         $totalSecondsWorked = $todayAttendances->sum('worked_seconds');
         $completedShiftsCount = $todayAttendances->whereNotNull('worked_seconds')->where('worked_seconds', '>', 0)->count();
-        $avgHours = $completedShiftsCount > 0 ? number_format(($totalSecondsWorked / $completedShiftsCount) / 3600, 1).'h' : '0.0h';
+        $avgHours = $completedShiftsCount > 0 ? number_format(($totalSecondsWorked / $completedShiftsCount) / 3600, 1) . 'h' : '0.0h';
 
         $startOfWeek = $targetDate->copy()->startOfWeek(Carbon::MONDAY);
         $endOfWeek = $targetDate->copy()->endOfWeek(Carbon::SUNDAY);
 
-        $weeklyAttendances = Attendance::whereIn('employee_id', $subordinateIds)
+        $weeklyAttendances = Attendance::whereIn('user_id', $subordinateIds)
             ->whereBetween('date', [$startOfWeek->toDateString(), $endOfWeek->toDateString()])
             ->get();
 
@@ -190,45 +190,30 @@ class AttendanceService
             $dayDate = $day->toDateString();
             $dayAtts = $weeklyAttendances->where('date', $dayDate);
 
-            $dayPresent = $dayAtts->where('status', 'Present')->count();
-            $dayLate = $dayAtts->where('status', 'Late')->count();
-            $dayCheckedIn = $dayAtts->whereNotNull('check_in')->count();
-            $dayAbsent = max(0, $totalTeamCount - $dayCheckedIn);
-
             $weeklyChart[] = [
-                'day' => $day->format('D'),
-                'date' => $dayDate,
-                'present' => $dayPresent,
-                'late' => $dayLate,
-                'absent' => $dayAbsent,
+                'day'     => $day->format('D'),
+                'date'    => $dayDate,
+                'present' => $dayAtts->where('status', 'Present')->count(),
+                'late'    => $dayAtts->where('status', 'Late')->count(),
+                'absent'  => max(0, $totalTeamCount - $dayAtts->whereNotNull('check_in')->count()),
             ];
         }
 
-        $query = Employee::with(['user', 'todayAttendance' => function ($q) use ($formattedDate) {
-            $q->where('date', $formattedDate);
-        }])
+        $query = User::with(['todayAttendance' => fn ($q) => $q->where('date', $formattedDate)])
             ->where('manager_id', $manager->id)
             ->where('status', 'active');
 
         if ($search) {
-            $query->whereHas('user', function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%");
-            });
+            $query->where('name', 'like', "%{$search}%");
         }
 
         if ($statusFilter) {
             if ($statusFilter === 'Absent') {
-                $query->whereDoesntHave('todayAttendance', function ($q) use ($formattedDate) {
-                    $q->where('date', $formattedDate);
-                });
+                $query->whereDoesntHave('todayAttendance', fn ($q) => $q->where('date', $formattedDate));
             } elseif ($statusFilter === 'On Shift') {
-                $query->whereHas('todayAttendance', function ($q) use ($formattedDate) {
-                    $q->where('date', $formattedDate)->whereNotNull('check_in')->whereNull('check_out');
-                });
+                $query->whereHas('todayAttendance', fn ($q) => $q->where('date', $formattedDate)->whereNotNull('check_in')->whereNull('check_out'));
             } else {
-                $query->whereHas('todayAttendance', function ($q) use ($formattedDate, $statusFilter) {
-                    $q->where('date', $formattedDate)->where('status', $statusFilter);
-                });
+                $query->whereHas('todayAttendance', fn ($q) => $q->where('date', $formattedDate)->where('status', $statusFilter));
             }
         }
 
@@ -236,24 +221,24 @@ class AttendanceService
 
         return [
             'selected_date' => $formattedDate,
-            'summary' => [
-                'present' => $presentCount,
-                'late' => $lateCount,
-                'absent' => $absentCount,
-                'avg_hours' => $avgHours,
-                'on_shift' => $onShiftCount,
+            'summary'       => [
+                'present'    => $presentCount,
+                'late'       => $lateCount,
+                'absent'     => $absentCount,
+                'avg_hours'  => $avgHours,
+                'on_shift'   => $onShiftCount,
                 'total_team' => $totalTeamCount,
             ],
-            'weekly_chart' => $weeklyChart,
-            'team' => $paginatedTeam,
+            'weekly_chart'  => $weeklyChart,
+            'team'          => $paginatedTeam,
         ];
     }
 
-    public function getManagerEmployeeAttendanceDetail(Employee $manager, int $employeeId, ?string $date = null): ?array
+    public function getManagerEmployeeAttendanceDetail(User $manager, int $employeeId, ?string $date = null): ?array
     {
         $formattedDate = $date ?? now()->toDateString();
 
-        $employee = Employee::with(['user', 'companyLocation'])
+        $employee = User::with(['companyLocation'])
             ->where('id', $employeeId)
             ->where('manager_id', $manager->id)
             ->first();
@@ -262,14 +247,14 @@ class AttendanceService
             return null;
         }
 
-        $attendance = Attendance::where('employee_id', $employee->id)
+        $attendance = Attendance::where('user_id', $employee->id)
             ->where('date', $formattedDate)
             ->first();
 
         return [
-            'employee' => $employee,
+            'employee'   => $employee,
             'attendance' => $attendance,
-            'date' => $formattedDate,
+            'date'       => $formattedDate,
         ];
     }
 

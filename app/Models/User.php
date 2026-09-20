@@ -3,14 +3,12 @@
 namespace App\Models;
 
 use App\Enums\UserRole;
-use App\Models\LeaveDecisionHistory;
-use App\Models\LeaveRequest;
-use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -19,7 +17,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, HasRoles, Notifiable;
+    use HasFactory, HasRoles, Notifiable , SoftDeletes;
 
     protected $guard_name = 'api';
 
@@ -228,6 +226,16 @@ class User extends Authenticatable implements JWTSubject
     public function directReports(): HasMany
     {
         return $this->hasMany(User::class, 'manager_id');
+    }
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class, 'user_id');
+    }
+
+    public function todayAttendance()
+    {
+        return $this->hasOne(Attendance::class, 'user_id')->where('date', now()->toDateString());
     }
 
 

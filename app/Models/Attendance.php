@@ -11,7 +11,7 @@ class Attendance extends Model
     use HasFactory;
 
     protected $fillable = [
-        'employee_id',
+        'user_id',
         'company_location_id',
         'date',
         'check_in',
@@ -38,9 +38,9 @@ class Attendance extends Model
         'is_exception' => 'boolean',
     ];
 
-    public function employee(): BelongsTo
+    public function user()
     {
-        return $this->belongsTo(Employee::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function companyLocation(): BelongsTo

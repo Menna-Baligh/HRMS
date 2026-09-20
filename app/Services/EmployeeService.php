@@ -59,9 +59,10 @@ class EmployeeService
 
     private function generateUniqueEmployeeId(): string
     {
-        $nextId = (Employee::withTrashed()->max('id') ?? 0) + 1;
-
-        return 'EMP-'.date('Y').'-'.str_pad($nextId, 5, '0', STR_PAD_LEFT);
+        do {
+        $code = 'EMP-' . date('Y') . '-' . mt_rand(10000, 99999);
+        } while (User::withTrashed()->where('employee_id', $code)->exists());
+        return $code;
     }
 
     public function getEmployeeById(int $id): User
@@ -72,7 +73,7 @@ class EmployeeService
     public function updateHrFields(User $user, array $data): User
     {
         $filteredData = array_filter($data, fn ($value) => $value !== null);
-    
+
         if (! empty($filteredData)) {
             $user->update($filteredData);
         }
@@ -118,7 +119,6 @@ class EmployeeService
     {
         return User::query()
             ->with(['department', 'companyLocation', 'manager', 'roles', 'files'])
-
             ->when(! empty($filters['search']), function ($query) use ($filters) {
                 $search = $filters['search'];
                 $query->where(function ($q) use ($search) {
@@ -129,17 +129,16 @@ class EmployeeService
                         ->orWhere('phone', 'like', "%{$search}%");
                 });
             })
-
             ->when(! empty($filters['status']), fn ($q) => $q->where('status', $filters['status']))
             ->when(! empty($filters['department_id']), fn ($q) => $q->where('department_id', $filters['department_id']))
             ->when(! empty($filters['manager_id']), fn ($q) => $q->where('manager_id', $filters['manager_id']))
             ->when(! empty($filters['employment_type']), fn ($q) => $q->where('employment_type', $filters['employment_type']))
-
             ->when(! empty($filters['role']), function ($query) use ($filters) {
-                $query->where('role', $filters['role'])
-                    ->orWhereHas('roles', function ($q) use ($filters) {
-                        $q->where('name', 'like', "%{$filters['role']}%");
-                    });
+                $role = $filters['role'];
+                $query->where(function ($q) use ($role) {
+                    $q->where('role', $role)
+                    ->orWhereHas('roles', fn ($r) => $r->where('name', $role));
+                });
             })
             ->latest()
             ->paginate($perPage);

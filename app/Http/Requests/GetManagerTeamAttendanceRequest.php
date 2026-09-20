@@ -8,7 +8,7 @@ class GetManagerTeamAttendanceRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth('api')->user()?->employee !== null;
+        return auth('api')->check();
     }
 
     public function rules(): array
