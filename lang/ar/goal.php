@@ -18,7 +18,11 @@ return [
     'failed_update'         => 'فشل في تحديث الهدف.',
     'failed_progress'       => 'فشل في تحديث تقدم الهدف.',
     'failed_complete'       => 'فشل في تعليم الهدف كمكتمل.',
-
+    'team_goals_retrieved'  => 'تم جلب أهداف الفريق بنجاح.',
+    'company_overview'      => 'تم جلب نظرة عامة على أهداف الشركة بنجاح.',
+    'manager_not_found'     => 'حساب المدير غير موجود.',
+    'failed_team_goals'     => 'فشل في جلب أهداف الفريق.',
+    
     'errors' => [
         'value_exceeds_target' => 'القيمة الحالية لا يمكن أن تتجاوز القيمة المستهدفة للهدف (:target).',
     ],
