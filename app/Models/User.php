@@ -175,9 +175,9 @@ class User extends Authenticatable implements JWTSubject
         return in_array($this->role, ['Owner', 'HR', 'Manager', UserRole::Owner, UserRole::HR, UserRole::Manager], true);
     }
 
-    public function notifications()
+    public function notifications(): HasMany
     {
-        return $this->hasMany(Notification::class)->latest();
+        return $this->hasMany(Notification::class, 'user_id')->latest();
     }
 
     /**
