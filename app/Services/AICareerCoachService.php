@@ -31,14 +31,22 @@ class AICareerCoachService
         ];
 
         $aiBaseUrl = config('services.ai.base_url', 'http://ai-service-url/api');
+        $rawRole = $currentUser->role instanceof \BackedEnum
+        ? $currentUser->role->value
+        : (string) $currentUser->role;
+
+        $aiRoleHeader = match (strtolower($rawRole)) {
+            'owner', 'hr' => 'hr_admin',
+            'manager'                 => 'manager',
+            default                   => 'employee',
+        };
 
         try {
-            $response = Http::timeout(15) 
+            $response = Http::timeout(15)
                 ->withHeaders([
-                    'X-Caller-ID' => $currentUser->id,
-                    'X-Role'      => $currentUser->role instanceof \BackedEnum ? $currentUser->role->value : $currentUser->role,
-                ])
-                ->post("{$aiBaseUrl}/career-coach", $payload);
+                    'X-Caller-ID' => $currentUser->employee_id ?? (string) $currentUser->id,
+                    'X-Role'      => $aiRoleHeader,
+        ])->post("{$aiBaseUrl}/career-coach", $payload);
 
             if ($response->failed()) {
                 Log::error('AI Service Error', ['response' => $response->body()]);
