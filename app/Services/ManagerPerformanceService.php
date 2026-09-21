@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Employee;
+use App\Models\User;
 use Carbon\Carbon;
 
 class ManagerPerformanceService
@@ -12,7 +12,7 @@ class ManagerPerformanceService
     ) {}
 
     public function getTeamDashboardPerformance(
-        Employee $managerEmployee,
+        User $manager,
         ?int $periodId = null,
         ?string $startDate = null,
         ?string $endDate = null,
@@ -20,29 +20,26 @@ class ManagerPerformanceService
     ): array {
         $dateRange = $this->performanceSummaryService->resolveDateRange($periodId, $startDate, $endDate);
 
-        $allTeamMembers = Employee::with('user')
-            ->where('manager_id', $managerEmployee->id)
-            ->orWhere('manager_id', $managerEmployee->user_id)
-            ->get();
+        $allTeamMembers = User::where('manager_id', $manager->id)->get();
 
         if ($allTeamMembers->isEmpty()) {
             return [
                 'period_name' => $dateRange['period_name'],
-                'start_date' => $dateRange['start_date'],
-                'end_date' => $dateRange['end_date'],
+                'start_date'  => $dateRange['start_date'],
+                'end_date'    => $dateRange['end_date'],
                 'team_summary' => [
-                    'overall_score' => 0,
-                    'total_members' => 0,
+                    'overall_score'         => 0,
+                    'total_members'         => 0,
                     'high_performers_count' => 0,
                     'needs_attention_count' => 0,
                 ],
                 'at_a_glance' => [
-                    'tasks_rate' => 0,
-                    'quality_rate' => 0,
+                    'tasks_rate'      => 0,
+                    'quality_rate'    => 0,
                     'attendance_rate' => 0,
                 ],
                 'performance_trend' => [],
-                'team_members' => Employee::whereNull('id')->paginate($perPage),
+                'team_members'      => User::whereNull('id')->paginate($perPage),
             ];
         }
 
@@ -72,34 +69,30 @@ class ManagerPerformanceService
 
         $totalMembersCount = $allTeamMembers->count();
 
-        $paginatedMembers = Employee::with('user')
-            ->where(function ($q) use ($managerEmployee) {
-                $q->where('manager_id', $managerEmployee->id)
-                    ->orWhere('manager_id', $managerEmployee->user_id);
-            })
+        $paginatedMembers = User::where('manager_id', $manager->id)
             ->paginate($perPage)
             ->through(function ($member) use ($dateRange, $periodId) {
                 $summary = $this->performanceSummaryService->getEmployeeSummary($member, $dateRange, $periodId);
                 $score = $summary['overall_score'];
                 $atAGlance = $summary['at_a_glance'];
 
-                $statusLabel = 'Good';
+                $statusLabel = __('performance.labels.good');
                 if ($score >= 80) {
-                    $statusLabel = 'High Performer';
+                    $statusLabel = __('performance.labels.high_performer');
                 } elseif ($score < 70) {
-                    $statusLabel = 'Needs Attention';
+                    $statusLabel = __('performance.labels.needs_attention');
                 }
 
                 return [
-                    'employee_id' => $member->id,
-                    'user_id' => $member->user_id,
-                    'name' => $member->user->name ?? 'N/A',
-                    'job_title' => $member->job_title ?? 'N/A',
-                    'overall_score' => $score,
-                    'tasks_rate' => $atAGlance['tasks_rate'],
+                    'user_id'         => $member->id,
+                    'employee_id'     => $member->employee_id,
+                    'name'            => $member->name ?? 'N/A',
+                    'job_title'       => $member->job_title ?? 'N/A',
+                    'overall_score'   => $score,
+                    'tasks_rate'      => $atAGlance['tasks_rate'],
                     'attendance_rate' => $atAGlance['attendance_rate'],
-                    'quality_rate' => $atAGlance['quality_rate'],
-                    'status_label' => $statusLabel,
+                    'quality_rate'    => $atAGlance['quality_rate'],
+                    'status_label'    => $statusLabel,
                 ];
             });
 
@@ -107,21 +100,21 @@ class ManagerPerformanceService
 
         return [
             'period_name' => $dateRange['period_name'],
-            'start_date' => $dateRange['start_date'],
-            'end_date' => $dateRange['end_date'],
+            'start_date'  => $dateRange['start_date'],
+            'end_date'    => $dateRange['end_date'],
             'team_summary' => [
-                'overall_score' => round($totalOverallScore / $totalMembersCount, 2),
-                'total_members' => $totalMembersCount,
+                'overall_score'         => round($totalOverallScore / $totalMembersCount, 2),
+                'total_members'         => $totalMembersCount,
                 'high_performers_count' => $highPerformersCount,
                 'needs_attention_count' => $needsAttentionCount,
             ],
             'at_a_glance' => [
-                'tasks_rate' => round($totalTasksRate / $totalMembersCount, 2),
-                'quality_rate' => round($totalQualityRate / $totalMembersCount, 2),
+                'tasks_rate'      => round($totalTasksRate / $totalMembersCount, 2),
+                'quality_rate'    => round($totalQualityRate / $totalMembersCount, 2),
                 'attendance_rate' => round($totalAttendanceRate / $totalMembersCount, 2),
             ],
             'performance_trend' => $trendChart,
-            'team_members' => $paginatedMembers,
+            'team_members'      => $paginatedMembers,
         ];
     }
 
@@ -136,9 +129,9 @@ class ManagerPerformanceService
             $monthEnd = $monthDate->copy()->endOfMonth()->toDateString();
 
             $range = [
-                'start_date' => $monthStart,
-                'end_date' => $monthEnd,
-                'period_name' => $monthDate->format('M'),
+                'start_date'  => $monthStart,
+                'end_date'    => $monthEnd,
+                'period_name' => $monthDate->translatedFormat('M'),
             ];
 
             $monthTotalScore = 0;
@@ -148,7 +141,7 @@ class ManagerPerformanceService
             }
 
             $trend[] = [
-                'month' => $monthDate->format('M'),
+                'month'         => $monthDate->translatedFormat('M'),
                 'overall_score' => round($monthTotalScore / $teamMembers->count(), 2),
             ];
         }

@@ -6,8 +6,8 @@ use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -122,11 +122,6 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(LeaveBalance::class);
     }
 
-    /** The employee profile associated with this user. */
-    public function employee(): HasOne
-    {
-        return $this->hasOne(Employee::class);
-    }
 
     public function taskActivities(): HasMany
     {
@@ -181,9 +176,9 @@ class User extends Authenticatable implements JWTSubject
         return in_array($this->role, ['Owner', 'HR', 'Manager', UserRole::Owner, UserRole::HR, UserRole::Manager], true);
     }
 
-    public function notifications()
+    public function notifications(): HasMany
     {
-        return $this->hasMany(Notification::class)->latest();
+        return $this->hasMany(Notification::class, 'user_id')->latest();
     }
 
     /**
@@ -202,10 +197,6 @@ class User extends Authenticatable implements JWTSubject
     return $this->hasMany(TaskAssignment::class,'user_id');
 }
 
-    public function files(): MorphMany
-    {
-        return $this->morphMany(File::class, 'fileable');
-    }
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class, 'department_id');
@@ -246,8 +237,36 @@ class User extends Authenticatable implements JWTSubject
                 $q->where('name', 'Owner');
             })
             ->when($currentUserId, function ($q) use ($currentUserId) {
-                $q->where('id', '!=', $currentUserId); 
+                $q->where('id', '!=', $currentUserId);
             });
+    }
+
+    public function evaluations()
+    {
+        return $this->hasMany(Evaluation::class, 'user_id');
+    }
+
+    public function evaluationsGiven()
+    {
+        return $this->hasMany(Evaluation::class, 'evaluator_id');
+    }
+    public function goals(): HasMany
+    {
+        return $this->hasMany(Goal::class, 'user_id');
+    }
+    public function uploadedFiles(): HasMany
+    {
+        return $this->hasMany(File::class, 'user_id');
+    }
+
+    public function files(): MorphMany
+    {
+        return $this->morphMany(File::class, 'fileable');
+    }
+
+    public function avatarFile(): MorphOne
+    {
+        return $this->morphOne(File::class, 'fileable')->latestOfMany();
     }
 
 

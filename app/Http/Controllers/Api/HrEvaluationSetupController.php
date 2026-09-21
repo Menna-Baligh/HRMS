@@ -27,26 +27,28 @@ class HrEvaluationSetupController extends Controller
             $status = $request->query('status');
             $periodId = $request->query('period_id') ? (int) $request->query('period_id') : null;
             $departmentId = $request->query('department_id') ? (int) $request->query('department_id') : null;
-            $employeeId = $request->query('employee_id') ? (int) $request->query('employee_id') : null;
+            $userId = $request->query('user_id') ?? $request->query('employee_id'); 
             $evaluatorId = $request->query('evaluator_id') ? (int) $request->query('evaluator_id') : null;
 
             $evaluations = $this->evaluationService->getHrEvaluationsOverview(
                 $status,
                 $periodId,
                 $departmentId,
-                $employeeId,
+                $userId ? (int) $userId : null,
                 $evaluatorId,
                 10
             );
 
             return ResponseHelper::success(
                 EvaluationResource::collection($evaluations)->response()->getData(true),
-                'Company evaluations overview retrieved successfully.'
+                __('evaluation.overview_retrieved')
             );
         } catch (Throwable $e) {
+            report($e);
+
             return ResponseHelper::error(
                 config('app.debug') ? $e->getMessage() : null,
-                'Failed to retrieve company evaluations overview.',
+                __('evaluation.failed_overview'),
                 500
             );
         }
@@ -57,9 +59,14 @@ class HrEvaluationSetupController extends Controller
         try {
             $periods = EvaluationPeriod::latest()->paginate(10);
 
-            return ResponseHelper::success(EvaluationPeriodResource::collection($periods)->response()->getData(true), 'Evaluation periods retrieved successfully.');
+            return ResponseHelper::success(
+                EvaluationPeriodResource::collection($periods)->response()->getData(true),
+                __('evaluation.periods_retrieved')
+            );
         } catch (Throwable $e) {
-            return ResponseHelper::error(null, 'Failed to retrieve periods.', 500);
+            report($e);
+
+            return ResponseHelper::error(null, __('evaluation.failed_periods'), 500);
         }
     }
 
@@ -68,9 +75,15 @@ class HrEvaluationSetupController extends Controller
         try {
             $period = EvaluationPeriod::create($request->validated());
 
-            return ResponseHelper::success(new EvaluationPeriodResource($period), 'Evaluation period created successfully.', 201);
+            return ResponseHelper::success(
+                new EvaluationPeriodResource($period),
+                __('evaluation.period_created'),
+                201
+            );
         } catch (Throwable $e) {
-            return ResponseHelper::error(null, 'Failed to create period.', 500);
+            report($e);
+
+            return ResponseHelper::error(null, __('evaluation.failed_create_period'), 500);
         }
     }
 
@@ -79,7 +92,7 @@ class HrEvaluationSetupController extends Controller
         try {
             $period = EvaluationPeriod::find($id);
             if (! $period) {
-                return ResponseHelper::error(null, 'Period not found.', 404);
+                return ResponseHelper::error(null, __('evaluation.period_not_found'), 404);
             }
 
             $newStatus = $period->status === EvaluationPeriodStatus::ACTIVE
@@ -88,9 +101,16 @@ class HrEvaluationSetupController extends Controller
 
             $period->update(['status' => $newStatus]);
 
-            return ResponseHelper::success(new EvaluationPeriodResource($period), "Evaluation period status changed to {$newStatus->value}.");
+            $statusText = __('evaluation.statuses.' . $newStatus->value);
+
+            return ResponseHelper::success(
+                new EvaluationPeriodResource($period),
+                __('evaluation.period_status_changed', ['status' => $statusText])
+            );
         } catch (Throwable $e) {
-            return ResponseHelper::error(null, 'Failed to update period status.', 500);
+            report($e);
+
+            return ResponseHelper::error(null, __('evaluation.failed_update_status'), 500);
         }
     }
 
@@ -99,9 +119,14 @@ class HrEvaluationSetupController extends Controller
         try {
             $categories = EvaluationCategory::latest()->paginate(10);
 
-            return ResponseHelper::success(EvaluationCategoryResource::collection($categories)->response()->getData(true), 'Evaluation categories retrieved successfully.');
+            return ResponseHelper::success(
+                EvaluationCategoryResource::collection($categories)->response()->getData(true),
+                __('evaluation.categories_retrieved')
+            );
         } catch (Throwable $e) {
-            return ResponseHelper::error(null, 'Failed to retrieve categories.', 500);
+            report($e);
+
+            return ResponseHelper::error(null, __('evaluation.failed_categories'), 500);
         }
     }
 
@@ -110,9 +135,15 @@ class HrEvaluationSetupController extends Controller
         try {
             $category = EvaluationCategory::create($request->validated());
 
-            return ResponseHelper::success(new EvaluationCategoryResource($category), 'Evaluation category created successfully.', 201);
+            return ResponseHelper::success(
+                new EvaluationCategoryResource($category),
+                __('evaluation.category_created'),
+                201
+            );
         } catch (Throwable $e) {
-            return ResponseHelper::error(null, 'Failed to create category.', 500);
+            report($e);
+
+            return ResponseHelper::error(null, __('evaluation.failed_create_category'), 500);
         }
     }
 }

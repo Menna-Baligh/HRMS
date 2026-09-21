@@ -15,7 +15,7 @@ class StoreEvaluationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'employee_id' => ['required', 'exists:employees,id'],
+            'user_id' => ['required', 'exists:users,id'],
             'period_id' => ['required', 'exists:evaluation_periods,id'],
             'feedback' => ['nullable', 'string'],
             'scores' => ['required', 'array', 'min:1'],

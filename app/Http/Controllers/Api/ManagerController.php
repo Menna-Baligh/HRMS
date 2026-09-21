@@ -49,25 +49,31 @@ class ManagerController extends Controller
     public function teamGoals(Request $request): JsonResponse
     {
         try {
-            $manager = $request->user()->employee;
+            $manager = $request->user(); 
 
             if (! $manager) {
-                return ResponseHelper::error(null, 'Employee profile not found.', 404);
+                return ResponseHelper::error(null, __('goal.manager_not_found'), 404);
             }
 
             $status = $request->query('status');
-            $employeeId = $request->query('employee_id') ? (int) $request->query('employee_id') : null;
+            $userId = $request->query('user_id') ?? $request->query('employee_id');
 
-            $goals = $this->goalService->getManagerTeamGoals($manager, $status, $employeeId);
+            $goals = $this->goalService->getManagerTeamGoals(
+                $manager,
+                $status,
+                $userId ? (int) $userId : null
+            );
 
             return ResponseHelper::success(
                 GoalResource::collection($goals)->response()->getData(true),
-                'Team goals retrieved successfully.'
+                __('goal.team_goals_retrieved')
             );
         } catch (Throwable $e) {
+            report($e);
+
             return ResponseHelper::error(
                 config('app.debug') ? $e->getMessage() : null,
-                'Failed to retrieve team goals.',
+                __('goal.failed_team_goals'),
                 500
             );
         }

@@ -30,12 +30,14 @@ class HrPerformanceController extends Controller
 
             return ResponseHelper::success(
                 $data,
-                'Company performance dashboard retrieved successfully.'
+                __('performance.company_dashboard_success')
             );
         } catch (Throwable $e) {
+            report($e);
+
             return ResponseHelper::error(
                 config('app.debug') ? $e->getMessage() : null,
-                'Failed to retrieve company performance dashboard.',
+                __('performance.failed_company_dashboard'),
                 500
             );
         }

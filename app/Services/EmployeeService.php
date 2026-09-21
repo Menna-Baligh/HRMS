@@ -27,7 +27,7 @@ class EmployeeService
                 $managerId = $department?->manager_id;
             }
 
-            $locationId = $data['company_location_id'] ?? CompanyLocation::where('is_active', true)->value('id');
+            $locationId = $data['company_location_id'] ?? CompanyLocation::latest('id')->value('id');
 
             $user = User::create([
                 'name'                => $data['name'],

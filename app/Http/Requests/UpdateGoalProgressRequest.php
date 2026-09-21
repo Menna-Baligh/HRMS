@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Goal;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateGoalProgressRequest extends FormRequest
@@ -13,7 +14,8 @@ class UpdateGoalProgressRequest extends FormRequest
 
     public function rules(): array
     {
-        $goal = $this->route('goal');
+        $goalId = $this->route('id');
+        $goal = Goal::find($goalId);
 
         return [
             'current_value' => [
@@ -22,11 +24,21 @@ class UpdateGoalProgressRequest extends FormRequest
                 'min:0',
                 function ($attribute, $value, $fail) use ($goal) {
                     if ($goal && $value > $goal->target_value) {
-                        $fail("accepted value for {$attribute} must not exceed the target value of {$goal->target_value}.");
+                        $fail(__('goal.errors.value_exceeds_target', [
+                            'target' => $goal->target_value,
+                        ]));
                     }
                 },
             ],
             'note' => ['nullable', 'string', 'max:500'],
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'current_value' => __('goal.attributes.current_value'),
+            'note'          => __('goal.attributes.note'),
         ];
     }
 }
