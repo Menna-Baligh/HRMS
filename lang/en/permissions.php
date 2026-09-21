@@ -94,4 +94,11 @@ return [
     // company events
     'company_event.view' => 'View company events',
     'company_event.manage' => 'Manage company events',
+    // policies
+    'policy.view' => 'View company policies',
+    'policy.manage' => 'Manage company policies',
+    'policy.version_create' => 'Create policy versions',
+    'policy.version_activate' => 'Activate policy versions',
+    'policy.active_view' => 'View active policies',
+    'policy.audit_view' => 'View policy audit history',
 ];

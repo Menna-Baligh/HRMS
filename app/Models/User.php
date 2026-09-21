@@ -270,4 +270,15 @@ class User extends Authenticatable implements JWTSubject
     }
 
 
+    public function policies(): HasMany
+    {
+        return $this->hasMany(Policy::class, 'created_by');
+    }
+
+    public function policyVersions(): HasMany
+    {
+        return $this->hasMany(PolicyVersion::class, 'created_by');
+    }
+
+
 }

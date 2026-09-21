@@ -112,7 +112,17 @@ enum PermissionEnum: string
     case COMPANY_EVENT_MANAGE = 'company_event.manage';
 
     // ==========================================
-    // 11. System, Files & Permissions
+    // 11. Company Policies
+    // ==========================================
+    case POLICY_VIEW = 'policy.view';
+    case POLICY_MANAGE = 'policy.manage';
+    case POLICY_VERSION_CREATE = 'policy.version_create';
+    case POLICY_VERSION_ACTIVATE = 'policy.version_activate';
+    case POLICY_ACTIVE_VIEW = 'policy.active_view';
+    case POLICY_AUDIT_VIEW = 'policy.audit_view';
+
+    // ==========================================
+    // 12. System, Files & Permissions
     // ==========================================
     case PERMISSION_VIEW_ALL = 'permission.view-all';
     case FILE_DOWNLOAD = 'file.download';
@@ -144,6 +154,10 @@ enum PermissionEnum: string
             self::LEAVE_APPROVE_HR,
             self::LEAVE_REJECT,
             self::COMPANY_EVENT_MANAGE,
+            self::POLICY_MANAGE,
+            self::POLICY_VERSION_CREATE,
+            self::POLICY_VERSION_ACTIVATE,
+            self::POLICY_AUDIT_VIEW,
             self::LEAVE_QUEUE_HR => ['HR', 'Owner'],
 
             // Manager, HR & Owner
@@ -195,6 +209,8 @@ enum PermissionEnum: string
             self::LEAVE_CALENDAR_VIEW,
             self::FILE_DOWNLOAD,
             self::COMPANY_EVENT_VIEW,
+            self::POLICY_VIEW,
+            self::POLICY_ACTIVE_VIEW,
             self::FILE_DELETE => ['Owner', 'HR', 'Manager', 'Employee'],
 
             default => ['Owner', 'HR'],

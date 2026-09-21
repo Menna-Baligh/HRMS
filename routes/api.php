@@ -27,6 +27,7 @@ use App\Http\Controllers\Api\ManagerController;
 use App\Http\Controllers\Api\ManagerPerformanceController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PermissionController;
+use App\Http\Controllers\Api\PolicyController;
 use App\Http\Controllers\Api\SubmissionController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\CompanyLocations\CompanyLocationController;
@@ -186,6 +187,29 @@ Route::prefix('tasks')->middleware('auth:api','set.app.language')->group(functio
         Route::patch('/submissions/{submission}/request-changes',[SubmissionController::class, 'requestChanges']);
         // Resubmit
         Route::post('/submissions/{submission}/resubmit',[SubmissionController::class, 'resubmit']);
+    });
+
+
+/*
+|--------------------------------------------------------------------------
+| policies Management Routes
+|--------------------------------------------------------------------------
+*/
+    Route::prefix('policies')->middleware('auth:api')->group(function () {
+
+        Route::post('/', [PolicyController::class, 'store'])->middleware('permission:policy.manage');
+
+        Route::post('/{policy}/versions', [PolicyController::class, 'storeVersion'])->middleware('permission:policy.version_create');
+
+        Route::post('/{policy}/versions/{version}/activate', [PolicyController::class, 'activateVersion'])->middleware('permission:policy.version_activate');
+
+        Route::get('/{policy}/active', [PolicyController::class, 'active'])->middleware('permission:policy.active_view');
+
+
+        Route::get('/{policy}/audits', [PolicyController::class, 'auditHistory'])->middleware('permission:policy.audit_view');        
+        Route::get('/', [PolicyController::class, 'index'])->middleware('permission:policy.view');
+
+
     });
 
 /*
