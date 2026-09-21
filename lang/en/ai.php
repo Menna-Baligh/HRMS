@@ -16,6 +16,11 @@ return [
     'attention_signal_success' => 'Employee attention signal retrieved successfully.',
     'employees_forbidden_attention' => 'Employees are not authorized to access administrative attention signals.',
     'insufficient_attention_data' => 'No approved records found to calculate attention signal.',
+    'team_insight_success'      => 'Team insight summary retrieved successfully.',
+    'employees_forbidden_team'  => 'Employees are not authorized to access Team Insight.',
+    'insufficient_team_data'   => 'Insufficient approved team data for this department and period.',
+    'unauthorized_department'   => 'You are not authorized to view insights for this department.',
+
 
     'attributes' => [
         'employee_id' => 'Employee ID',
@@ -25,6 +30,7 @@ return [
         'target_role' => 'Target Role',
         'target_skills' => 'Target Skills',
         'target_period' => 'Target Period',
+        'department' => 'Department',
     ],
 
 ];

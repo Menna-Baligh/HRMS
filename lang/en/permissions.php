@@ -97,4 +97,5 @@ return [
     'ai.evaluation_draft' => 'Generate AI Evaluation Draft',
     'ai.skill_gap' => 'Analyze AI Skill-Gap & Development',
     'ai.attention_signal' => 'View AI Employee Attention Signal',
+    'ai.team_insight' => 'View AI Team Insight Summary',
 ];
