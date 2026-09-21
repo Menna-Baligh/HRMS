@@ -9,7 +9,6 @@ use App\Models\User;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Support\Collection;
-use Illuminate\Validation\ValidationException;
 
 class CalendarService
 {
@@ -18,8 +17,8 @@ class CalendarService
      *
      * @return Collection<int, array<string, mixed>>
      */
-    public function getEvents( User $user,Carbon $from, Carbon $to): Collection
-     {
+    public function getEvents(User $user, Carbon $from, Carbon $to): Collection
+    {
         $events = collect();
 
         // Add approved leave events.
@@ -50,7 +49,7 @@ class CalendarService
      * @return Collection<int, array<string, mixed>>
      */
     private function getApprovedLeaveEvents(User $user, Carbon $from, Carbon $to): Collection
-     {
+    {
         $employee = $user->employee;
 
         if (! $employee) {
@@ -100,7 +99,7 @@ class CalendarService
      *
      * @return Collection<int, array<string, mixed>>
      */
-    private function getTaskDeadlineEvents( User $user, Carbon $from, Carbon $to ): Collection
+    private function getTaskDeadlineEvents(User $user, Carbon $from, Carbon $to): Collection
     {
         $employee = $user->employee;
 

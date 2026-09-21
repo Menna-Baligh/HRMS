@@ -47,7 +47,6 @@ return [
     'throttle' => 'عدد محاولات كثير جداً. يرجى المحاولة مرة أخرى بعد :seconds ثانية.',
     'login_success' => 'تم تسجيل الدخول بنجاح.',
     'logout_success' => 'تم تسجيل الخروج بنجاح.',
-    'validation_error' => 'خطأ في البيانات المدخلة.',
     'something_went_wrong' => 'حدث خطأ ما، يرجى المحاولة لاحقاً.',
     'google_url_generated' => 'تم إنشاء رابط التوجيه لـ Google بنجاح.',
     'google_login_success' => 'تم تسجيل الدخول عبر Google بنجاح.',

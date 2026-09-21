@@ -37,13 +37,13 @@ class FileService
         $path = $file->storeAs($folder, $uniqueFileName, 'local');
 
         return File::create([
-            'user_id'       => $user->id,
+            'user_id' => $user->id,
             'original_name' => $file->getClientOriginalName(),
-            'path'          => $path,
-            'mime_type'     => $file->getClientMimeType(),
-            'size'          => $file->getSize(),
+            'path' => $path,
+            'mime_type' => $file->getClientMimeType(),
+            'size' => $file->getSize(),
             'fileable_type' => $fileable ? get_class($fileable) : null,
-            'fileable_id'   => $fileable ? $fileable->id : null,
+            'fileable_id' => $fileable ? $fileable->id : null,
         ]);
     }
 
@@ -84,26 +84,28 @@ class FileService
 
         return $uploadedAvatar;
     }
-    public function uploadSubmissionAttachment( UploadedFile $file,User $user, Submission $submission): SubmissionAttachment {
-        $folder = 'uploads/tasks/' . date('Y/m');
-    
+
+    public function uploadSubmissionAttachment(UploadedFile $file, User $user, Submission $submission): SubmissionAttachment
+    {
+        $folder = 'uploads/tasks/'.date('Y/m');
+
         $filenameOnly = pathinfo(
             $file->getClientOriginalName(),
             PATHINFO_FILENAME
         );
-    
+
         $extension = $file->getClientOriginalExtension();
-    
+
         $uniqueFileName = \Str::slug($filenameOnly)
-            . '_' . time()
-            . '.' . $extension;
-    
+            .'_'.time()
+            .'.'.$extension;
+
         $path = $file->storeAs(
             $folder,
             $uniqueFileName,
             'local'
         );
-    
+
         try {
             return SubmissionAttachment::create([
                 'submission_id' => $submission->id,
@@ -116,7 +118,7 @@ class FileService
         } catch (\Throwable $e) {
             // Delete the uploaded file if database insertion fails.
             Storage::disk('local')->delete($path);
-    
+
             throw $e;
         }
     }

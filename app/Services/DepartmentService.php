@@ -28,10 +28,10 @@ class DepartmentService
     public function createDepartment(array $data): Department
     {
         $department = Department::create([
-            'name'        => $data['name'],
+            'name' => $data['name'],
             'description' => $data['description'] ?? null,
-            'manager_id'  => $data['manager_id'] ?? null,
-            'status'      => 'active',
+            'manager_id' => $data['manager_id'] ?? null,
+            'status' => 'active',
         ]);
 
         return $department->load('manager');

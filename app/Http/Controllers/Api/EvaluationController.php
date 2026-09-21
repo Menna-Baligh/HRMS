@@ -98,10 +98,10 @@ class EvaluationController extends Controller
                         'period_name' => $evaluation->period?->name ?? 'the evaluation period',
                     ],
                     metadata: [
-                        'screen'        => 'evaluation_summary',
+                        'screen' => 'evaluation_summary',
                         'evaluation_id' => $completedEvaluation->id,
-                        'period_id'     => $completedEvaluation->period_id,
-                        'click_action'  => 'FLUTTER_NOTIFICATION_CLICK',
+                        'period_id' => $completedEvaluation->period_id,
+                        'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
                     ]
                 );
             }
@@ -124,7 +124,7 @@ class EvaluationController extends Controller
     public function managerEvaluations(Request $request): JsonResponse
     {
         try {
-            $manager = $request->user(); 
+            $manager = $request->user();
 
             if (! $manager) {
                 return ResponseHelper::error(null, __('evaluation.user_not_found'), 404);

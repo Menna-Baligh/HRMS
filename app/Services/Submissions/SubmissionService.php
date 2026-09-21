@@ -26,7 +26,8 @@ class SubmissionService
     /**
      * Create a new submission for a task.
      */
-    public function create(Task $task,array $data): Submission {
+    public function create(Task $task, array $data): Submission
+    {
         $submission = DB::transaction(function () use ($task, $data) {
 
             $user = $this->getAuthenticatedEmployee();
@@ -92,19 +93,19 @@ class SubmissionService
             $file
         ) {
             $user = $this->getAuthenticatedEmployee();
-    
+
             if ((int) $submission->user_id !== (int) $user->id) {
                 throw ValidationException::withMessages([
                     'submission' => 'You are not the owner of this submission.',
                 ]);
             }
-    
+
             if ($submission->status === SubmissionStatus::APPROVED) {
                 throw ValidationException::withMessages([
                     'submission' => 'Approved submissions cannot be modified.',
                 ]);
             }
-    
+
             return $this->fileService->uploadSubmissionAttachment(
                 file: $file,
                 user: $user,
@@ -211,26 +212,27 @@ class SubmissionService
     /**
      * Approve a submission.
      */
-    public function approve( Submission $submission): Submission {
+    public function approve(Submission $submission): Submission
+    {
         $submission = DB::transaction(function () use ($submission) {
-    
+
             $this->ensureReviewerCanAccess($submission);
-    
+
             $this->ensureSubmissionCanBeReviewed($submission);
-    
+
             $submission->update([
                 'status' => SubmissionStatus::APPROVED,
             ]);
-    
+
             $this->createReview(
                 submission: $submission,
                 action: 'approved',
                 feedback: null
             );
-    
+
             return $submission->refresh();
         });
-    
+
         if ($submission->user) {
             SendNotificationJob::dispatch(
                 user: $submission->user,
@@ -245,14 +247,15 @@ class SubmissionService
                 ]
             );
         }
-    
+
         return $submission;
     }
 
     /**
      * Reject a submission.
      */
-    public function reject(Submission $submission, string $feedback): Submission {
+    public function reject(Submission $submission, string $feedback): Submission
+    {
         $submission = DB::transaction(function () use (
             $submission,
             $feedback
@@ -296,7 +299,8 @@ class SubmissionService
     /**
      * Request changes on a submission.
      */
-    public function requestChanges(Submission $submission,string $feedback): Submission {
+    public function requestChanges(Submission $submission, string $feedback): Submission
+    {
         $submission = DB::transaction(function () use (
             $submission,
             $feedback
@@ -339,7 +343,8 @@ class SubmissionService
     /**
      * Resubmit a submission after changes were requested.
      */
-    public function resubmit( Submission $submission,?string $note = null): Submission {
+    public function resubmit(Submission $submission, ?string $note = null): Submission
+    {
         return DB::transaction(function () use (
             $submission,
             $note
@@ -357,7 +362,7 @@ class SubmissionService
                 SubmissionStatus::CHANGES_REQUESTED
             ) {
                 throw ValidationException::withMessages([
-                    'submissions.only_changes_requested_can_be_resubmitted'
+                    'submissions.only_changes_requested_can_be_resubmitted',
                 ]);
             }
 
@@ -428,48 +433,51 @@ class SubmissionService
     /**
      * Make sure the submission is waiting for review.
      */
-    private function ensureSubmissionCanBeReviewed(Submission $submission ): void {
+    private function ensureSubmissionCanBeReviewed(Submission $submission): void
+    {
         if (
-            $submission->status !==SubmissionStatus::PENDING_REVIEW
+            $submission->status !== SubmissionStatus::PENDING_REVIEW
         ) {
             throw ValidationException::withMessages([
                 'submission' => __('submissions.not_waiting_for_review'),
             ]);
         }
     }
+
     /**
      * Make sure the authenticated reviewer
      * can access the submission.
      */
-    private function ensureReviewerCanAccess(Submission $submission): void {
+    private function ensureReviewerCanAccess(Submission $submission): void
+    {
         $user = Auth::user();
-    
+
         if ($user->isOwner() || $user->isHR()) {
             return;
         }
-    
+
         if (! $user->isManager()) {
             throw ValidationException::withMessages([
                 'reviewer' => __('submissions.unauthorized_review'),
             ]);
         }
-    
+
         if (
             (int) $submission->task->created_by ===
             (int) $user->id
         ) {
             return;
         }
-    
+
         $assignedByManager = $submission->task
             ->assignments()
             ->where('assigned_by', $user->id)
             ->exists();
-    
+
         if ($assignedByManager) {
             return;
         }
-    
+
         throw ValidationException::withMessages([
             'submission' => __('submissions.unauthorized_review'),
         ]);
@@ -495,7 +503,8 @@ class SubmissionService
     /**
      * Load submission relationships.
      */
-    private function loadSubmission(Submission $submission): Submission {
+    private function loadSubmission(Submission $submission): Submission
+    {
         return $submission->load([
             'task',
             'user',

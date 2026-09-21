@@ -12,8 +12,7 @@ class LeaveBalanceController extends Controller
 {
     public function __construct(
         protected LeaveBalanceService $leaveBalanceService
-    ) {
-    }
+    ) {}
 
     /**
      * Get leave balances for the authenticated user.
@@ -21,13 +20,13 @@ class LeaveBalanceController extends Controller
     public function index(IndexLeaveBalanceRequest $request): JsonResponse
     {
         $user = $request->user();
-    
+
         $balances = $this->leaveBalanceService->getMyBalances(
             user: $user,
             year: $request->validated('year'),
             leaveTypeId: $request->validated('leave_type_id')
         );
-    
+
         return ResponseHelper::success(
             $balances,
             __('leave_balances.retrieved_successfully')

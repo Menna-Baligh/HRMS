@@ -38,7 +38,7 @@ class UpdateGoalProgressRequest extends FormRequest
     {
         return [
             'current_value' => __('goal.attributes.current_value'),
-            'note'          => __('goal.attributes.note'),
+            'note' => __('goal.attributes.note'),
         ];
     }
 }

@@ -89,21 +89,21 @@ enum PermissionEnum: string
     case EMPLOYEE_PERFORMANCE_DASHBOARD = 'employee.performance.dashboard';
 
     // ==========================================
-    // 9. Leave Management 
+    // 9. Leave Management
     // ==========================================
-    case LEAVE_TYPE_VIEW       = 'leave_type.view';
-    case LEAVE_TYPE_MANAGE     = 'leave_type.manage'; 
-    case LEAVE_BALANCE_VIEW    = 'leave_balance.view';
-    case LEAVE_REQUEST_VIEW_OWN= 'leave_request.view_own';
-    case LEAVE_REQUEST_CREATE  = 'leave_request.create';
-    case LEAVE_REQUEST_CANCEL  = 'leave_request.cancel';
+    case LEAVE_TYPE_VIEW = 'leave_type.view';
+    case LEAVE_TYPE_MANAGE = 'leave_type.manage';
+    case LEAVE_BALANCE_VIEW = 'leave_balance.view';
+    case LEAVE_REQUEST_VIEW_OWN = 'leave_request.view_own';
+    case LEAVE_REQUEST_CREATE = 'leave_request.create';
+    case LEAVE_REQUEST_CANCEL = 'leave_request.cancel';
     case LEAVE_APPROVE_MANAGER = 'leave.approve_manager';
-    case LEAVE_APPROVE_HR      = 'leave.approve_hr';
-    case LEAVE_REJECT          = 'leave.reject';
-    case LEAVE_VIEW_HISTORY    = 'leave.view_history';
-    case LEAVE_QUEUE_MANAGER   = 'leave.queue_manager';
-    case LEAVE_QUEUE_HR        = 'leave.queue_hr';
-    case LEAVE_CALENDAR_VIEW   = 'leave.calendar_view';
+    case LEAVE_APPROVE_HR = 'leave.approve_hr';
+    case LEAVE_REJECT = 'leave.reject';
+    case LEAVE_VIEW_HISTORY = 'leave.view_history';
+    case LEAVE_QUEUE_MANAGER = 'leave.queue_manager';
+    case LEAVE_QUEUE_HR = 'leave.queue_hr';
+    case LEAVE_CALENDAR_VIEW = 'leave.calendar_view';
 
     // ==========================================
     // 10. System, Files & Permissions
@@ -111,6 +111,15 @@ enum PermissionEnum: string
     case PERMISSION_VIEW_ALL = 'permission.view-all';
     case FILE_DOWNLOAD = 'file.download';
     case FILE_DELETE = 'file.delete';
+
+    // 11. AI Features
+    case AI_CAREER_COACH = 'ai.career_coach';
+    case AI_PERFORMANCE_INSIGHT = 'ai.performance_insight';
+    case AI_EVALUATION_DRAFT = 'ai.evaluation_draft';
+    case AI_SKILL_GAP = 'ai.skill_gap';
+    case AI_ATTENTION_SIGNAL = 'ai.attention_signal';
+    case AI_TEAM_INSIGHT = 'ai.team_insight';
+    case AI_POLICY_ASSISTANT = 'ai.policy_assistant';
 
     public function defaultRoles(): array
     {
@@ -157,7 +166,10 @@ enum PermissionEnum: string
             self::EVALUATION_VIEW_MANAGER,
             self::MANAGER_PERFORMANCE_TEAM,
             self::LEAVE_APPROVE_MANAGER,
-            self::LEAVE_QUEUE_MANAGER => ['Manager', 'HR', 'Owner'],
+            self::LEAVE_QUEUE_MANAGER,
+            self::AI_EVALUATION_DRAFT,
+            self::AI_ATTENTION_SIGNAL,
+            self::AI_TEAM_INSIGHT => ['Manager', 'HR', 'Owner'],
 
             // All Roles (Owner, HR, Manager, Employee)
             self::EMPLOYEE_VIEW_PROFILE,
@@ -187,13 +199,18 @@ enum PermissionEnum: string
             self::LEAVE_TYPE_VIEW,
             self::LEAVE_CALENDAR_VIEW,
             self::FILE_DOWNLOAD,
-            self::FILE_DELETE => ['Owner', 'HR', 'Manager', 'Employee'],
+            self::FILE_DELETE,
+            self::AI_CAREER_COACH,
+            self::AI_PERFORMANCE_INSIGHT,
+            self::AI_SKILL_GAP,
+            self::AI_POLICY_ASSISTANT => ['Owner', 'HR', 'Manager', 'Employee'],
 
             default => ['Owner', 'HR'],
         };
     }
+
     public function label(): string
     {
-        return __('permissions.' . $this->value);
+        return __('permissions.'.$this->value);
     }
 }

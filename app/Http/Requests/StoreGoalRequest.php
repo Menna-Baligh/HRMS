@@ -14,20 +14,20 @@ class StoreGoalRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title'        => ['required', 'string', 'max:255'],
-            'description'  => ['nullable', 'string'],
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
             'target_value' => ['required', 'numeric', 'min:1'],
-            'target_date'  => ['required', 'date', 'after_or_equal:today'],
+            'target_date' => ['required', 'date', 'after_or_equal:today'],
         ];
     }
 
     public function attributes(): array
     {
         return [
-            'title'        => 'عنوان الهدف',
-            'description'  => 'وصف الهدف',
+            'title' => 'عنوان الهدف',
+            'description' => 'وصف الهدف',
             'target_value' => 'القيمة المستهدفة',
-            'target_date'  => 'تاريخ الاستهداف',
+            'target_date' => 'تاريخ الاستهداف',
         ];
     }
 }

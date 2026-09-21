@@ -2,17 +2,6 @@
 
 return [
 
-    /*
-    |--------------------------------------------------------------------------
-    | Authentication Language Lines
-    |--------------------------------------------------------------------------
-    |
-    | The following language lines are used during authentication for various
-    | messages that we need to display to the user. You are free to modify
-    | these language lines according to your application's requirements.
-    |
-    */
-
     'failed' => 'These credentials do not match our records.',
     'password' => 'The provided password is incorrect.',
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
@@ -28,6 +17,17 @@ return [
     'password_reset' => 'Password reset successfully.',
     'otp_resent' => 'OTP resent successfully.',
     'otp_sent' => 'OTP sent successfully.',
+    'login_success' => 'Logged in successfully.',
+    'logout_success' => 'Logged out successfully.',
+    'something_went_wrong' => 'Something went wrong.',
+    'google_url_generated' => 'Google redirect URL generated successfully.',
+    'google_login_success' => 'Logged in with Google successfully.',
+    'google_login_failed' => 'Google authentication failed.',
+    'account_inactive' => 'Your account is inactive. Please activate your account first.',
+    'unauthenticated' => 'Unauthenticated. Please log in first.',
+    'unauthorized_action' => 'You do not have the required permissions to perform this action.',
+    'resource_not_found' => 'The requested resource was not found.',
+
     'validation' => [
         'name' => [
             'required' => 'The name field is required.',
@@ -35,32 +35,17 @@ return [
             'min' => 'The name must be at least :min characters.',
             'max' => 'The name may not be greater than :max characters.',
         ],
-    'login_success'           => 'Logged in successfully.',
-    'logout_success'          => 'Logged out successfully.',
-    'validation_error'        => 'Validation error.',
-    'something_went_wrong'    => 'Something went wrong.',
-    'google_url_generated'    => 'Google redirect URL generated successfully.',
-    'google_login_success'    => 'Logged in with Google successfully.',
-    'google_login_failed'     => 'Google authentication failed.',
-    'account_inactive' => 'Your account is inactive. Please activate your account first.',
-    'unauthenticated'     => 'Unauthenticated. Please log in first.',
-    'unauthorized_action' => 'You do not have the required permissions to perform this action.',
-    'resource_not_found'  => 'The requested resource was not found.',
-    'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
-
         'email' => [
             'required' => 'The email field is required.',
             'email' => 'The email must be a valid email address.',
             'max' => 'The email may not be greater than :max characters.',
             'unique' => 'The email has already been taken.',
         ],
-
         'phone' => [
             'string' => 'The phone must be a string.',
             'max' => 'The phone may not be greater than :max characters.',
             'unique' => 'The phone has already been taken.',
         ],
-
         'password' => [
             'required' => 'The password field is required.',
             'confirmed' => 'The password confirmation does not match.',

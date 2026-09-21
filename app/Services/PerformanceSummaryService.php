@@ -26,8 +26,8 @@ class PerformanceSummaryService
             $period = EvaluationPeriod::find($periodId);
             if ($period) {
                 return [
-                    'start_date'  => Carbon::parse($period->start_date)->toDateString(),
-                    'end_date'    => Carbon::parse($period->end_date)->toDateString(),
+                    'start_date' => Carbon::parse($period->start_date)->toDateString(),
+                    'end_date' => Carbon::parse($period->end_date)->toDateString(),
                     'period_name' => $period->name,
                 ];
             }
@@ -35,8 +35,8 @@ class PerformanceSummaryService
 
         if ($startDate && $endDate) {
             return [
-                'start_date'  => Carbon::parse($startDate)->toDateString(),
-                'end_date'    => Carbon::parse($endDate)->toDateString(),
+                'start_date' => Carbon::parse($startDate)->toDateString(),
+                'end_date' => Carbon::parse($endDate)->toDateString(),
                 'period_name' => __('performance.periods.custom_period'),
             ];
         }
@@ -45,8 +45,8 @@ class PerformanceSummaryService
         $end = Carbon::now()->endOfMonth();
 
         return [
-            'start_date'  => $start->toDateString(),
-            'end_date'    => $end->toDateString(),
+            'start_date' => $start->toDateString(),
+            'end_date' => $end->toDateString(),
             'period_name' => $start->translatedFormat('F Y'),
         ];
     }
@@ -70,16 +70,16 @@ class PerformanceSummaryService
         $metricData = new PerformanceMetricData($attendance, $tasks, $goals, $evaluations);
 
         return [
-            'period_name'   => $dateRange['period_name'],
-            'start_date'    => $startDate,
-            'end_date'      => $endDate,
+            'period_name' => $dateRange['period_name'],
+            'start_date' => $startDate,
+            'end_date' => $endDate,
             'overall_score' => $overallScore,
-            'at_a_glance'   => [
-                'tasks_rate'      => $taskRate,
-                'quality_rate'    => $qualityRate,
+            'at_a_glance' => [
+                'tasks_rate' => $taskRate,
+                'quality_rate' => $qualityRate,
                 'attendance_rate' => $attendanceRate,
             ],
-            'metrics'       => $metricData->toArray(),
+            'metrics' => $metricData->toArray(),
         ];
     }
 
@@ -91,8 +91,8 @@ class PerformanceSummaryService
         $prevEnd = Carbon::parse($currentRange['start_date'])->subMonth()->endOfMonth()->toDateString();
 
         $prevRange = [
-            'start_date'  => $prevStart,
-            'end_date'    => $prevEnd,
+            'start_date' => $prevStart,
+            'end_date' => $prevEnd,
             'period_name' => Carbon::parse($prevStart)->translatedFormat('F Y'),
         ];
 
@@ -105,19 +105,19 @@ class PerformanceSummaryService
 
         return [
             'current_period' => [
-                'name'          => $currentSummary['period_name'],
+                'name' => $currentSummary['period_name'],
                 'overall_score' => $currentOverall,
-                'at_a_glance'   => $currentSummary['at_a_glance'],
+                'at_a_glance' => $currentSummary['at_a_glance'],
             ],
             'previous_period' => [
-                'name'          => $previousSummary['period_name'],
+                'name' => $previousSummary['period_name'],
                 'overall_score' => $prevOverall,
-                'at_a_glance'   => $previousSummary['at_a_glance'],
+                'at_a_glance' => $previousSummary['at_a_glance'],
             ],
             'comparison' => [
                 'overall_change' => $overallChange,
-                'trend'          => $overallChange >= 0 ? 'up' : 'down',
-                'change_label'   => ($overallChange >= 0 ? "+{$overallChange}%" : "{$overallChange}%").' '.__('performance.periods.from_last_month'),
+                'trend' => $overallChange >= 0 ? 'up' : 'down',
+                'change_label' => ($overallChange >= 0 ? "+{$overallChange}%" : "{$overallChange}%").' '.__('performance.periods.from_last_month'),
             ],
         ];
     }
@@ -131,17 +131,17 @@ class PerformanceSummaryService
         $trendChart = $this->getSixMonthTrend($user, $dateRange['start_date']);
 
         return [
-            'period_name'       => $dateRange['period_name'],
-            'start_date'        => $dateRange['start_date'],
-            'end_date'          => $dateRange['end_date'],
-            'overall'           => [
-                'score'        => $summary['overall_score'],
+            'period_name' => $dateRange['period_name'],
+            'start_date' => $dateRange['start_date'],
+            'end_date' => $dateRange['end_date'],
+            'overall' => [
+                'score' => $summary['overall_score'],
                 'change_label' => $comparison['comparison']['change_label'],
-                'trend'        => $comparison['comparison']['trend'],
+                'trend' => $comparison['comparison']['trend'],
             ],
-            'at_a_glance'       => $summary['at_a_glance'],
+            'at_a_glance' => $summary['at_a_glance'],
             'performance_trend' => $trendChart,
-            'metrics'           => $summary['metrics'],
+            'metrics' => $summary['metrics'],
         ];
     }
 
@@ -156,15 +156,15 @@ class PerformanceSummaryService
             $monthEnd = $monthDate->copy()->endOfMonth()->toDateString();
 
             $range = [
-                'start_date'  => $monthStart,
-                'end_date'    => $monthEnd,
+                'start_date' => $monthStart,
+                'end_date' => $monthEnd,
                 'period_name' => $monthDate->translatedFormat('M'),
             ];
 
             $monthSummary = $this->getEmployeeSummary($user, $range);
 
             $trend[] = [
-                'month'         => $monthDate->translatedFormat('M'),
+                'month' => $monthDate->translatedFormat('M'),
                 'overall_score' => $monthSummary['overall_score'],
             ];
         }

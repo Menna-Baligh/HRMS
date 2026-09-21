@@ -36,7 +36,7 @@ class AuthController extends Controller
         $data = $this->registerService->register(
             $request->validated()
         );
-    
+
         return ResponseHelper::success(
             data: $data,
             message: __('auth.registered'),
@@ -49,11 +49,11 @@ class AuthController extends Controller
         $data = $this->forgotPasswordService->sendOtp(
             $request->validated('email')
         );
-    
+
         return ResponseHelper::success(
             data: $data,
             message: __('auth.otp_sent')
-                );
+        );
     }
 
     public function verifyForgotPasswordOtp(VerifyForgotPasswordOtpRequest $request)
@@ -66,7 +66,7 @@ class AuthController extends Controller
         return ResponseHelper::success(
             data: $data,
             message: __('auth.otp_verified')
-                );
+        );
 
     }
 
@@ -76,7 +76,7 @@ class AuthController extends Controller
             $request->validated('reset_token'),
             $request->validated('password')
         );
-    
+
         return ResponseHelper::success(
             message: __('auth.password_reset')
         );
@@ -87,7 +87,7 @@ class AuthController extends Controller
         $data = $this->forgotPasswordService->resendOtp(
             $request->validated('email')
         );
-    
+
         return ResponseHelper::success(
             data: $data,
             message: __('auth.otp_resent')
@@ -108,10 +108,10 @@ class AuthController extends Controller
                 statusCode: Response::HTTP_UNPROCESSABLE_ENTITY,
             );
         } catch (AuthorizationException $e) {
-        return ResponseHelper::error(
-            message: $e->getMessage() ?: __('auth.account_inactive'),
-            statusCode: Response::HTTP_FORBIDDEN,
-        );
+            return ResponseHelper::error(
+                message: $e->getMessage() ?: __('auth.account_inactive'),
+                statusCode: Response::HTTP_FORBIDDEN,
+            );
         } catch (Throwable $e) {
             report($e);
 

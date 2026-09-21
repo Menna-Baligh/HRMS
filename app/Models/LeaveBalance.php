@@ -20,6 +20,7 @@ class LeaveBalance extends Model
         'allocated_days' => 'decimal:2',
         'used_days' => 'decimal:2',
     ];
+
     protected $appends = [
         'remaining_days',
     ];

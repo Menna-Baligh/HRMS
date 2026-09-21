@@ -24,9 +24,9 @@ class StoreDepartmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'        => ['required', 'string', 'max:255', 'unique:departments,name'],
+            'name' => ['required', 'string', 'max:255', 'unique:departments,name'],
             'description' => ['nullable', 'string', 'max:1000'],
-            'manager_id'  => [
+            'manager_id' => [
                 'nullable',
                 'integer',
                 'exists:users,id',
@@ -38,7 +38,7 @@ class StoreDepartmentRequest extends FormRequest
                             $fail(__('validation.custom.manager_id.invalid_role'));
                         }
                     }
-                }
+                },
             ],
         ];
     }

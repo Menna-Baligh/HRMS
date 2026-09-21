@@ -40,9 +40,9 @@ class ManagerAttendanceController extends Controller
             return ResponseHelper::success(
                 data: [
                     'selected_date' => $result['selected_date'],
-                    'summary'       => $result['summary'],
-                    'weekly_chart'  => $result['weekly_chart'],
-                    'team'          => ManagerTeamAttendanceResource::collection($result['team'])->response()->getData(true),
+                    'summary' => $result['summary'],
+                    'weekly_chart' => $result['weekly_chart'],
+                    'team' => ManagerTeamAttendanceResource::collection($result['team'])->response()->getData(true),
                 ],
                 message: __('attendance.team_attendance_retrieved')
             );

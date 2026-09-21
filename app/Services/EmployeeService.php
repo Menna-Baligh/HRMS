@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Mail\EmployeeInvitationMail;
 use App\Models\CompanyLocation;
 use App\Models\Department;
-use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
@@ -30,20 +29,20 @@ class EmployeeService
             $locationId = $data['company_location_id'] ?? CompanyLocation::latest('id')->value('id');
 
             $user = User::create([
-                'name'                => $data['name'],
-                'email'               => $data['email'],
-                'phone'               => $data['phone'] ?? null,
-                'password'            => Hash::make($data['password']),
-                'role'                => $data['role'],
-                'employee_id'         => $this->generateUniqueEmployeeId(),
-                'job_title'           => $data['job_title'],
-                'employment_type'     => $data['employment_type'],
-                'start_date'          => $data['start_date'],
-                'status'              => 'inactive',
-                'department_id'       => $data['department_id'] ?? null,
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'phone' => $data['phone'] ?? null,
+                'password' => Hash::make($data['password']),
+                'role' => $data['role'],
+                'employee_id' => $this->generateUniqueEmployeeId(),
+                'job_title' => $data['job_title'],
+                'employment_type' => $data['employment_type'],
+                'start_date' => $data['start_date'],
+                'status' => 'inactive',
+                'department_id' => $data['department_id'] ?? null,
                 'company_location_id' => $locationId,
-                'manager_id'          => $managerId,
-                'address'             => $data['address'] ?? null,
+                'manager_id' => $managerId,
+                'address' => $data['address'] ?? null,
             ]);
 
             $user->assignRole($data['role']);
@@ -60,8 +59,9 @@ class EmployeeService
     private function generateUniqueEmployeeId(): string
     {
         do {
-        $code = 'EMP-' . date('Y') . '-' . mt_rand(10000, 99999);
+            $code = 'EMP-'.date('Y').'-'.mt_rand(10000, 99999);
         } while (User::withTrashed()->where('employee_id', $code)->exists());
+
         return $code;
     }
 
@@ -84,18 +84,18 @@ class EmployeeService
     public function updateProfile(User $user, array $data): User
     {
         return DB::transaction(function () use ($user, $data) {
-        if (isset($data['avatar']) && $data['avatar'] instanceof UploadedFile) {
-            $this->fileService->updateAvatar($data['avatar'], $user);
-            unset($data['avatar']);
-        }
+            if (isset($data['avatar']) && $data['avatar'] instanceof UploadedFile) {
+                $this->fileService->updateAvatar($data['avatar'], $user);
+                unset($data['avatar']);
+            }
 
-        $updateData = array_intersect_key($data, array_flip(['name', 'phone', 'locale', 'address']));
+            $updateData = array_intersect_key($data, array_flip(['name', 'phone', 'locale', 'address']));
 
-        if (! empty($updateData)) {
-            $user->update(array_filter($updateData, fn ($val) => $val !== null));
-        }
+            if (! empty($updateData)) {
+                $user->update(array_filter($updateData, fn ($val) => $val !== null));
+            }
 
-        return $user->fresh()->load(['department', 'companyLocation', 'manager', 'files']);
+            return $user->fresh()->load(['department', 'companyLocation', 'manager', 'files']);
         });
     }
 
@@ -137,7 +137,7 @@ class EmployeeService
                 $role = $filters['role'];
                 $query->where(function ($q) use ($role) {
                     $q->where('role', $role)
-                    ->orWhereHas('roles', fn ($r) => $r->where('name', $role));
+                        ->orWhereHas('roles', fn ($r) => $r->where('name', $role));
                 });
             })
             ->latest()

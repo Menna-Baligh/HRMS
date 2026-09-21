@@ -12,12 +12,12 @@ class EvaluationPeriodResource extends JsonResource
         $statusVal = $this->status->value ?? $this->status;
 
         return [
-            'id'          => $this->id,
-            'name'        => $this->name,
-            'start_date'  => $this->start_date?->format('Y-m-d'),
-            'end_date'    => $this->end_date?->format('Y-m-d'),
-            'status'      => __('evaluation.statuses.' . $statusVal),
-            'created_at'  => $this->created_at?->format('Y-m-d H:i:s'),
+            'id' => $this->id,
+            'name' => $this->name,
+            'start_date' => $this->start_date?->format('Y-m-d'),
+            'end_date' => $this->end_date?->format('Y-m-d'),
+            'status' => __('evaluation.statuses.'.$statusVal),
+            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
         ];
     }
 }

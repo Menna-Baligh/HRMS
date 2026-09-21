@@ -36,8 +36,8 @@ class HrAttendanceController extends Controller
 
             return ResponseHelper::success(
                 data: [
-                    'date'      => $result['date'],
-                    'summary'   => $result['summary'],
+                    'date' => $result['date'],
+                    'summary' => $result['summary'],
                     'employees' => HrDailyAttendanceResource::collection($result['data'])->response()->getData(true),
                 ],
                 message: __('hr.daily_attendance_retrieved')

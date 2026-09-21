@@ -42,11 +42,11 @@ class EvaluationService
                 }
 
                 $evaluation = Evaluation::create([
-                    'user_id'      => $data['user_id'],
+                    'user_id' => $data['user_id'],
                     'evaluator_id' => $evaluatorUserId,
-                    'period_id'    => $data['period_id'],
-                    'feedback'     => $data['feedback'] ?? null,
-                    'status'       => EvaluationStatus::DRAFT,
+                    'period_id' => $data['period_id'],
+                    'feedback' => $data['feedback'] ?? null,
+                    'status' => EvaluationStatus::DRAFT,
                 ]);
             }
 
@@ -59,7 +59,7 @@ class EvaluationService
                     EvaluationScore::updateOrCreate(
                         [
                             'evaluation_id' => $evaluation->id,
-                            'category_id'   => $scoreData['category_id'],
+                            'category_id' => $scoreData['category_id'],
                         ],
                         ['score' => $scoreData['score']]
                     );
@@ -71,7 +71,7 @@ class EvaluationService
                 foreach ($data['evidence_goal_ids'] as $goalId) {
                     EvaluationEvidence::create([
                         'evaluation_id' => $evaluation->id,
-                        'goal_id'       => $goalId,
+                        'goal_id' => $goalId,
                     ]);
                 }
             }
@@ -79,10 +79,10 @@ class EvaluationService
 
             EvaluationAuditLog::create([
                 'evaluation_id' => $evaluation->id,
-                'user_id'       => $evaluatorUserId,
-                'action'        => $action,
-                'details'       => [
-                    'scores_count'      => count($data['scores'] ?? []),
+                'user_id' => $evaluatorUserId,
+                'action' => $action,
+                'details' => [
+                    'scores_count' => count($data['scores'] ?? []),
                     'feedback_provided' => ! empty($data['feedback']),
                 ],
             ]);
@@ -135,16 +135,16 @@ class EvaluationService
 
             $evaluation->update([
                 'overall_score' => $overallScore,
-                'status'        => EvaluationStatus::COMPLETED,
+                'status' => EvaluationStatus::COMPLETED,
             ]);
 
             EvaluationAuditLog::create([
                 'evaluation_id' => $evaluation->id,
-                'user_id'       => auth('api')->id() ?? $evaluation->evaluator_id,
-                'action'        => 'completed',
-                'details'       => [
+                'user_id' => auth('api')->id() ?? $evaluation->evaluator_id,
+                'action' => 'completed',
+                'details' => [
                     'final_overall_score' => $overallScore,
-                    'completed_at'        => now()->toDateTimeString(),
+                    'completed_at' => now()->toDateTimeString(),
                 ],
             ]);
 
@@ -185,7 +185,7 @@ class EvaluationService
             'scores.category',
             'evidence.goal',
         ])
-        ->whereHas('user', fn ($q) => $q->excludeOwnerAndSelf());
+            ->whereHas('user', fn ($q) => $q->excludeOwnerAndSelf());
 
         if ($status) {
             $query->where('status', $status);
