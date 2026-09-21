@@ -14,15 +14,15 @@ class AIAttentionSignalRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'employee_id'   => ['required', 'string', 'exists:users,employee_id'],
-            'target_period' => ['required', 'string', 'min:1'], 
+            'employee_id' => ['required', 'string', 'exists:users,employee_id'],
+            'target_period' => ['required', 'string', 'min:1'],
         ];
     }
 
     public function attributes(): array
     {
         return [
-            'employee_id'   => __('ai.attributes.employee_id'),
+            'employee_id' => __('ai.attributes.employee_id'),
             'target_period' => __('ai.attributes.target_period'),
         ];
     }

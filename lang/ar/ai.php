@@ -16,11 +16,10 @@ return [
     'attention_signal_success' => 'تم جلب مؤشر تنبيه الموظف بنجاح.',
     'employees_forbidden_attention' => 'غير مصرح للموظفين بالوصول إلى ميزات مؤشرات التنبيه الإدارية.',
     'insufficient_attention_data' => 'لا توجد سجلات معتمدة كافية لحساب مؤشر التنبيه لهذا الموظف.',
-    'team_insight_success'      => 'تم جلب ملخص تحليلات الفريق بنجاح.',
-    'employees_forbidden_team'  => 'غير مصرح للموظفين بالوصول إلى تحليلات الفريق الإدارية.',
-    'insufficient_team_data'   => 'لا توجد بيانات معتمدة كافية للفريق في هذا القسم خلال الفترة المحددة.',
-    'unauthorized_department'   => 'غير مصرح لك بالوصول إلى تحليلات هذا القسم.',
-
+    'team_insight_success' => 'تم جلب ملخص تحليلات الفريق بنجاح.',
+    'employees_forbidden_team' => 'غير مصرح للموظفين بالوصول إلى تحليلات الفريق الإدارية.',
+    'insufficient_team_data' => 'لا توجد بيانات معتمدة كافية للفريق في هذا القسم خلال الفترة المحددة.',
+    'unauthorized_department' => 'غير مصرح لك بالوصول إلى تحليلات هذا القسم.',
 
     'attributes' => [
         'employee_id' => 'كود الموظف',

@@ -4,36 +4,36 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\AIAttentionSignalRequest;
-use App\Services\AIAttentionSignalService;
+use App\Http\Requests\AITeamInsightRequest;
+use App\Services\AITeamInsightService;
 use Illuminate\Http\JsonResponse;
 use Throwable;
 
-class AIAttentionSignalController extends Controller
+class AITeamInsightController extends Controller
 {
-    public function __construct(private AIAttentionSignalService $aiService) {}
+    public function __construct(private AITeamInsightService $aiService) {}
 
-    public function __invoke(AIAttentionSignalRequest $request): JsonResponse
+    public function __invoke(AITeamInsightRequest $request): JsonResponse
     {
         try {
             $user = $request->user();
 
-            $result = $this->aiService->getAttentionSignal(
+            $result = $this->aiService->getTeamInsight(
                 currentUser: $user,
-                targetEmployeeCode: $request->validated('employee_id'),
-                targetPeriod: $request->validated('target_period')
+                departmentName: $request->validated('department'),
+                period: $request->validated('period')
             );
 
             if (isset($result['status']) && $result['status'] === 'insufficient_data') {
                 return ResponseHelper::success(
                     $result,
-                    __('ai.insufficient_attention_data')
+                    __('ai.insufficient_team_data')
                 );
             }
 
             return ResponseHelper::success(
                 $result,
-                __('ai.attention_signal_success')
+                __('ai.team_insight_success')
             );
         } catch (Throwable $e) {
             report($e);

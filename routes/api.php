@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AICareerCoachController;
 use App\Http\Controllers\Api\AIEvaluationDraftController;
 use App\Http\Controllers\Api\AIPerformanceInsightController;
 use App\Http\Controllers\Api\AISkillGapController;
+use App\Http\Controllers\Api\AITeamInsightController;
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CalendarController;
@@ -324,5 +325,8 @@ Route::prefix('ai')->middleware(['auth:api', 'set.app.language'])->group(functio
         ->middleware('permission:'.PermissionEnum::AI_SKILL_GAP->value);
 
     Route::post('/attention-signal', AIAttentionSignalController::class)
-        ->middleware('permission:' . PermissionEnum::AI_ATTENTION_SIGNAL->value);
+        ->middleware('permission:'.PermissionEnum::AI_ATTENTION_SIGNAL->value);
+
+    Route::post('/team-insight', AITeamInsightController::class)
+        ->middleware('permission:'.PermissionEnum::AI_TEAM_INSIGHT->value);
 });
