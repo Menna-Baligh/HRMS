@@ -14,8 +14,7 @@ class LeaveTypeController extends Controller
 {
     public function __construct(
         protected LeaveTypeService $leaveTypeService
-    ) {
-    }
+    ) {}
 
     /**
      * Get all leave types.
@@ -47,7 +46,8 @@ class LeaveTypeController extends Controller
     /**
      * Update a leave type.
      */
-    public function update(UpdateLeaveTypeRequest $request,LeaveType $leaveType): JsonResponse {
+    public function update(UpdateLeaveTypeRequest $request, LeaveType $leaveType): JsonResponse
+    {
         $leaveType = $this->leaveTypeService->update(
             $leaveType,
             $request->validated()

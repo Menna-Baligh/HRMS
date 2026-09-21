@@ -70,7 +70,7 @@ class User extends Authenticatable implements JWTSubject
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'role' => UserRole::class,
-            'start_date'        => 'date',
+            'start_date' => 'date',
         ];
     }
 
@@ -121,7 +121,6 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(LeaveBalance::class);
     }
-
 
     public function taskActivities(): HasMany
     {
@@ -193,9 +192,9 @@ class User extends Authenticatable implements JWTSubject
      * Task assignments created by this user.
      */
     public function taskAssignments()
-{
-    return $this->hasMany(TaskAssignment::class,'user_id');
-}
+    {
+        return $this->hasMany(TaskAssignment::class, 'user_id');
+    }
 
     public function department(): BelongsTo
     {
@@ -207,12 +206,10 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Department::class, 'manager_id');
     }
 
-
     public function companyLocation(): BelongsTo
     {
         return $this->belongsTo(CompanyLocation::class, 'company_location_id');
     }
-
 
     public function directReports(): HasMany
     {
@@ -234,8 +231,8 @@ class User extends Authenticatable implements JWTSubject
         $currentUserId = $currentUserId ?? auth('api')->id();
 
         return $query->whereDoesntHave('roles', function ($q) {
-                $q->where('name', 'Owner');
-            })
+            $q->where('name', 'Owner');
+        })
             ->when($currentUserId, function ($q) use ($currentUserId) {
                 $q->where('id', '!=', $currentUserId);
             });
@@ -250,10 +247,12 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Evaluation::class, 'evaluator_id');
     }
+
     public function goals(): HasMany
     {
         return $this->hasMany(Goal::class, 'user_id');
     }
+
     public function uploadedFiles(): HasMany
     {
         return $this->hasMany(File::class, 'user_id');

@@ -25,21 +25,21 @@ class HrCompanyPerformanceService
         if ($allEmployees->isEmpty()) {
             return [
                 'period_name' => $dateRange['period_name'],
-                'start_date'  => $dateRange['start_date'],
-                'end_date'    => $dateRange['end_date'],
+                'start_date' => $dateRange['start_date'],
+                'end_date' => $dateRange['end_date'],
                 'company_summary' => [
-                    'overall_score'         => 0,
-                    'total_employees'       => 0,
-                    'total_departments'     => Department::count(),
+                    'overall_score' => 0,
+                    'total_employees' => 0,
+                    'total_departments' => Department::count(),
                     'high_performers_count' => 0,
                     'needs_attention_count' => 0,
                 ],
                 'at_a_glance' => [
-                    'tasks_rate'      => 0,
-                    'quality_rate'    => 0,
+                    'tasks_rate' => 0,
+                    'quality_rate' => 0,
                     'attendance_rate' => 0,
                 ],
-                'performance_trend'       => [],
+                'performance_trend' => [],
                 'departments_performance' => Department::paginate($perPage),
             ];
         }
@@ -75,14 +75,14 @@ class HrCompanyPerformanceService
 
             if ($deptEmployees->isEmpty()) {
                 return [
-                    'department_id'   => $department->id,
-                    'name'            => $department->name,
+                    'department_id' => $department->id,
+                    'name' => $department->name,
                     'total_employees' => 0,
-                    'overall_score'   => 0,
-                    'tasks_rate'      => 0,
+                    'overall_score' => 0,
+                    'tasks_rate' => 0,
                     'attendance_rate' => 0,
-                    'quality_rate'    => 0,
-                    'status_label'    => __('performance.labels.no_data'),
+                    'quality_rate' => 0,
+                    'status_label' => __('performance.labels.no_data'),
                 ];
             }
 
@@ -110,14 +110,14 @@ class HrCompanyPerformanceService
             }
 
             return [
-                'department_id'   => $department->id,
-                'name'            => $department->name,
+                'department_id' => $department->id,
+                'name' => $department->name,
                 'total_employees' => $empCount,
-                'overall_score'   => $avgScore,
-                'tasks_rate'      => round($deptTasksSum / $empCount, 2),
+                'overall_score' => $avgScore,
+                'tasks_rate' => round($deptTasksSum / $empCount, 2),
                 'attendance_rate' => round($deptAttendanceSum / $empCount, 2),
-                'quality_rate'    => round($deptQualitySum / $empCount, 2),
-                'status_label'    => $statusLabel,
+                'quality_rate' => round($deptQualitySum / $empCount, 2),
+                'status_label' => $statusLabel,
             ];
         });
 
@@ -125,21 +125,21 @@ class HrCompanyPerformanceService
 
         return [
             'period_name' => $dateRange['period_name'],
-            'start_date'  => $dateRange['start_date'],
-            'end_date'    => $dateRange['end_date'],
+            'start_date' => $dateRange['start_date'],
+            'end_date' => $dateRange['end_date'],
             'company_summary' => [
-                'overall_score'         => round($totalOverallScore / $totalCount, 2),
-                'total_employees'       => $totalCount,
-                'total_departments'     => Department::count(),
+                'overall_score' => round($totalOverallScore / $totalCount, 2),
+                'total_employees' => $totalCount,
+                'total_departments' => Department::count(),
                 'high_performers_count' => $highPerformersCount,
                 'needs_attention_count' => $needsAttentionCount,
             ],
             'at_a_glance' => [
-                'tasks_rate'      => round($totalTasksRate / $totalCount, 2),
-                'quality_rate'    => round($totalQualityRate / $totalCount, 2),
+                'tasks_rate' => round($totalTasksRate / $totalCount, 2),
+                'quality_rate' => round($totalQualityRate / $totalCount, 2),
                 'attendance_rate' => round($totalAttendanceRate / $totalCount, 2),
             ],
-            'performance_trend'       => $trendChart,
+            'performance_trend' => $trendChart,
             'departments_performance' => $paginatedDepartments,
         ];
     }
@@ -155,8 +155,8 @@ class HrCompanyPerformanceService
             $monthEnd = $monthDate->copy()->endOfMonth()->toDateString();
 
             $range = [
-                'start_date'  => $monthStart,
-                'end_date'    => $monthEnd,
+                'start_date' => $monthStart,
+                'end_date' => $monthEnd,
                 'period_name' => $monthDate->translatedFormat('M'),
             ];
 
@@ -167,7 +167,7 @@ class HrCompanyPerformanceService
             }
 
             $trend[] = [
-                'month'         => $monthDate->translatedFormat('M'),
+                'month' => $monthDate->translatedFormat('M'),
                 'overall_score' => round($monthTotalScore / $allEmployees->count(), 2),
             ];
         }

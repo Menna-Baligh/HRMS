@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\LeaveRequestStatus;
 use App\Enums\LeaveStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;

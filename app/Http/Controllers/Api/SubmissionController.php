@@ -23,7 +23,8 @@ class SubmissionController extends Controller
     /**
      * Create a task submission.
      */
-    public function store(StoreSubmissionRequest $request,Task $task): JsonResponse {
+    public function store(StoreSubmissionRequest $request, Task $task): JsonResponse
+    {
         $submission = $this->submissionService->create(
             $task,
             $request->validated()
@@ -39,7 +40,8 @@ class SubmissionController extends Controller
     /**
      * Attach a file to a submission.
      */
-    public function attachFile(AttachSubmissionFileRequest $request,Submission $submission): JsonResponse {
+    public function attachFile(AttachSubmissionFileRequest $request, Submission $submission): JsonResponse
+    {
         $file = $this->submissionService->attachFile(
             $submission,
             $request->file('file')
@@ -58,7 +60,7 @@ class SubmissionController extends Controller
     public function show(Submission $submission): JsonResponse
     {
         $submission = $this->submissionService->show($submission);
-    
+
         return ResponseHelper::success(
             $submission,
             __('submissions.retrieved_successfully')
@@ -71,7 +73,7 @@ class SubmissionController extends Controller
     public function reviewQueue(): JsonResponse
     {
         $submissions = $this->submissionService->reviewQueue();
-    
+
         return ResponseHelper::success(
             $submissions,
             __('submissions.review_queue_retrieved_successfully')
@@ -82,19 +84,19 @@ class SubmissionController extends Controller
      * Approve submission.
      */
     public function approve(Submission $submission): JsonResponse
-{
-    $submission = $this->submissionService->approve($submission);
+    {
+        $submission = $this->submissionService->approve($submission);
 
-    return ResponseHelper::success(
-        $submission,
-        __('submissions.approved_successfully')
-    );
-}
+        return ResponseHelper::success(
+            $submission,
+            __('submissions.approved_successfully')
+        );
+    }
 
     /**
      * Reject submission.
      */
-    public function reject( RejectSubmissionRequest $request, Submission $submission): JsonResponse 
+    public function reject(RejectSubmissionRequest $request, Submission $submission): JsonResponse
     {
         $submission = $this->submissionService->reject(
             $submission,
@@ -110,7 +112,8 @@ class SubmissionController extends Controller
     /**
      * Request changes from employee.
      */
-    public function requestChanges(RequestChangesRequest $request,Submission $submission): JsonResponse {
+    public function requestChanges(RequestChangesRequest $request, Submission $submission): JsonResponse
+    {
         $submission = $this->submissionService->requestChanges(
             $submission,
             $request->validated('feedback')
@@ -125,7 +128,8 @@ class SubmissionController extends Controller
     /**
      * Resubmit a submission after requested changes.
      */
-    public function resubmit(ResubmitSubmissionRequest $request,Submission $submission ): JsonResponse {
+    public function resubmit(ResubmitSubmissionRequest $request, Submission $submission): JsonResponse
+    {
         $submission = $this->submissionService->resubmit(
             $submission,
             $request->validated('note')

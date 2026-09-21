@@ -74,9 +74,9 @@ class AttendanceController extends Controller
                     'time' => $checkInTime,
                 ],
                 metadata: [
-                    'screen'        => 'attendance_history',
+                    'screen' => 'attendance_history',
                     'attendance_id' => $attendance->id,
-                    'click_action'  => 'FLUTTER_NOTIFICATION_CLICK',
+                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
                 ]
             );
 
@@ -87,8 +87,8 @@ class AttendanceController extends Controller
             );
         } catch (\Exception $e) {
             $errorResponses = [
-                'DUPLICATE_CHECKIN'       => [Response::HTTP_UNPROCESSABLE_ENTITY, __('attendance.errors.duplicate_checkin')],
-                'OUTSIDE_RADIUS'          => [Response::HTTP_UNPROCESSABLE_ENTITY, __('attendance.errors.outside_radius')],
+                'DUPLICATE_CHECKIN' => [Response::HTTP_UNPROCESSABLE_ENTITY, __('attendance.errors.duplicate_checkin')],
+                'OUTSIDE_RADIUS' => [Response::HTTP_UNPROCESSABLE_ENTITY, __('attendance.errors.outside_radius')],
                 'LOCATION_NOT_CONFIGURED' => [Response::HTTP_UNPROCESSABLE_ENTITY, __('attendance.errors.location_not_configured')],
             ];
 
@@ -130,9 +130,9 @@ class AttendanceController extends Controller
                     'time' => $checkOutTime,
                 ],
                 metadata: [
-                    'screen'        => 'attendance_history',
+                    'screen' => 'attendance_history',
                     'attendance_id' => $attendance->id,
-                    'click_action'  => 'FLUTTER_NOTIFICATION_CLICK',
+                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
                 ]
             );
 
@@ -142,9 +142,9 @@ class AttendanceController extends Controller
             );
         } catch (\Exception $e) {
             $errorResponses = [
-                'NO_OPEN_CHECKIN'     => [Response::HTTP_UNPROCESSABLE_ENTITY, __('attendance.errors.no_open_checkin')],
+                'NO_OPEN_CHECKIN' => [Response::HTTP_UNPROCESSABLE_ENTITY, __('attendance.errors.no_open_checkin')],
                 'ALREADY_CHECKED_OUT' => [Response::HTTP_UNPROCESSABLE_ENTITY, __('attendance.errors.already_checked_out')],
-                'OUTSIDE_RADIUS'      => [Response::HTTP_UNPROCESSABLE_ENTITY, __('attendance.errors.outside_radius')],
+                'OUTSIDE_RADIUS' => [Response::HTTP_UNPROCESSABLE_ENTITY, __('attendance.errors.outside_radius')],
             ];
 
             [$statusCode, $message] = $errorResponses[$e->getMessage()] ?? [Response::HTTP_BAD_REQUEST, $e->getMessage()];

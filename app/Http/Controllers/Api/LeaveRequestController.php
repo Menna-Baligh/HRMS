@@ -9,10 +9,10 @@ use App\Http\Requests\LeaveRequest\StoreLeaveAttachmentRequest;
 use App\Http\Requests\LeaveRequest\StoreLeaveRequest;
 use App\Models\LeaveRequest;
 use App\Services\FileService;
-use Illuminate\Support\Facades\Log;
 use App\Services\LeaveRequests\LeaveRequestService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use RuntimeException;
 
 class LeaveRequestController extends Controller
@@ -21,8 +21,7 @@ class LeaveRequestController extends Controller
         protected LeaveRequestService $leaveRequestService,
         protected FileService $fileService
 
-    ) {
-    }
+    ) {}
 
     public function store(StoreLeaveRequest $request): JsonResponse
     {
@@ -127,53 +126,53 @@ class LeaveRequestController extends Controller
     }
 
     public function show(int $leaveRequest): JsonResponse
-{
-    $leaveRequestModel = LeaveRequest::findOrFail($leaveRequest);
+    {
+        $leaveRequestModel = LeaveRequest::findOrFail($leaveRequest);
 
-    $leaveRequest = $this->leaveRequestService->getDetails(
-        leaveRequest: $leaveRequestModel
-    );
+        $leaveRequest = $this->leaveRequestService->getDetails(
+            leaveRequest: $leaveRequestModel
+        );
 
-    return ResponseHelper::success(
-        data: $leaveRequest,
-        message: __('leave_requests.details_retrieved_successfully')
-    );
-}
+        return ResponseHelper::success(
+            data: $leaveRequest,
+            message: __('leave_requests.details_retrieved_successfully')
+        );
+    }
 
-// Manager Pending Leave Queue 
+    // Manager Pending Leave Queue
 
-public function managerPendingQueue(Request $request): JsonResponse
-{
-    $manager = $request->user();
+    public function managerPendingQueue(Request $request): JsonResponse
+    {
+        $manager = $request->user();
 
-    $leaveRequests = $this->leaveRequestService->getManagerPendingQueue(
-        manager: $manager
-    );
+        $leaveRequests = $this->leaveRequestService->getManagerPendingQueue(
+            manager: $manager
+        );
 
-    return ResponseHelper::success(
-        data: $leaveRequests,
-        message: __('leave_requests.manager_queue_retrieved_successfully')
-    );
-}
- // hr Pending Queue
+        return ResponseHelper::success(
+            data: $leaveRequests,
+            message: __('leave_requests.manager_queue_retrieved_successfully')
+        );
+    }
+    // hr Pending Queue
 
-public function hrPendingQueue(): JsonResponse
-{
-    $leaveRequests = $this->leaveRequestService->getHrPendingQueue();
+    public function hrPendingQueue(): JsonResponse
+    {
+        $leaveRequests = $this->leaveRequestService->getHrPendingQueue();
 
-    return ResponseHelper::success(
-        data: $leaveRequests,
-        message: __('leave_requests.hr_queue_retrieved_successfully')
-    );
-}
+        return ResponseHelper::success(
+            data: $leaveRequests,
+            message: __('leave_requests.hr_queue_retrieved_successfully')
+        );
+    }
 
-
-    public function storeAttachment(StoreLeaveAttachmentRequest $request, int $leaveRequest): JsonResponse {
+    public function storeAttachment(StoreLeaveAttachmentRequest $request, int $leaveRequest): JsonResponse
+    {
         try {
             $leaveRequestModel = LeaveRequest::findOrFail($leaveRequest);
-    
+
             $user = $request->user();
-    
+
             if ($leaveRequestModel->user_id !== $user->id) {
                 return ResponseHelper::error(
                     errors: null,
@@ -181,13 +180,13 @@ public function hrPendingQueue(): JsonResponse
                     statusCode: 403
                 );
             }
-    
+
             $file = $this->fileService->uploadFile(
                 file: $request->file('file'),
                 user: $user,
                 fileable: $leaveRequestModel
             );
-    
+
             return ResponseHelper::success(
                 data: $file,
                 message: __('leave_requests.attachment_uploaded_successfully'),
@@ -197,7 +196,7 @@ public function hrPendingQueue(): JsonResponse
             Log::error(
                 'Leave attachment upload error: '.$exception->getMessage()
             );
-    
+
             return ResponseHelper::error(
                 errors: null,
                 message: __('leave_requests.attachment_upload_failed'),

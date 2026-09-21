@@ -21,5 +21,4 @@ return [
     'details_retrieved_successfully' => 'تم استرجاع تفاصيل المهمة بنجاح.',
     'activities_retrieved_successfully' => 'تم استرجاع سجل نشاط المهمة بنجاح.',
 
-
 ];

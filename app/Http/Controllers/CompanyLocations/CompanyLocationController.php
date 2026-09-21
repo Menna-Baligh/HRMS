@@ -22,7 +22,7 @@ class CompanyLocationController extends Controller
         $location = $this->companyLocationService->create(
             $request->validated()
         );
-    
+
         return ResponseHelper::success(
             data: $location,
             message: __('company_location.created'),
@@ -33,51 +33,53 @@ class CompanyLocationController extends Controller
     /**
      * Update company location.
      */
-    public function update( UpdateCompanyLocationRequest $request, int $id ) 
-    { 
+    public function update(UpdateCompanyLocationRequest $request, int $id)
+    {
         // dd($request->validated());
-        $location = $this->companyLocationService->update( $id, $request->validated() );
-         return ResponseHelper::success(
-             data: $location,
-             message: __('company_location.updated')
-             ); 
-            }
+        $location = $this->companyLocationService->update($id, $request->validated());
+
+        return ResponseHelper::success(
+            data: $location,
+            message: __('company_location.updated')
+        );
+    }
 
     /**
      * Deactivate company location.
      */
-    public function deactivate(int $id) 
+    public function deactivate(int $id)
     {
-         $location = $this->companyLocationService->deactivate($id);
-          return ResponseHelper::success(
-             data: $location,
-             message: __('company_location.deactivated')
-             );
-             }
+        $location = $this->companyLocationService->deactivate($id);
+
+        return ResponseHelper::success(
+            data: $location,
+            message: __('company_location.deactivated')
+        );
+    }
 
     /**
      * Activate company location.
      */
-    public function activate(int $id) 
+    public function activate(int $id)
     {
-         $location = $this->companyLocationService->activate($id);
-          return ResponseHelper::success( 
-            data: $location, 
+        $location = $this->companyLocationService->activate($id);
+
+        return ResponseHelper::success(
+            data: $location,
             message: __('company_location.activated')
-         );
-         }
+        );
+    }
 
     /**
      * Get active company location.
      */
+    public function activeLocation()
+    {
+        $location = $this->companyLocationService->getActiveLocation();
 
-public function activeLocation()
-{
-    $location = $this->companyLocationService->getActiveLocation();
-
-    return ResponseHelper::success(
-        data: $location,
-        message: __('company_location.active_retrieved')
-    );
-}
+        return ResponseHelper::success(
+            data: $location,
+            message: __('company_location.active_retrieved')
+        );
+    }
 }

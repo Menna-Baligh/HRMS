@@ -13,15 +13,15 @@ class AttendanceHistoryResource extends JsonResource
         $minutes = floor(($this->worked_seconds % 3600) / 60);
 
         return [
-            'id'                     => $this->id,
-            'date'                   => $this->date?->format('Y-m-d'),
-            'day_name'               => $this->date?->translatedFormat('l') ?? $this->date?->format('l'),
-            'check_in'               => $this->check_in?->format('h:i A'),
-            'check_out'              => $this->check_out?->format('h:i A'),
-            'status'                 => __('attendance.status.' . $this->status),
-            'worked_seconds'         => $this->worked_seconds,
+            'id' => $this->id,
+            'date' => $this->date?->format('Y-m-d'),
+            'day_name' => $this->date?->translatedFormat('l') ?? $this->date?->format('l'),
+            'check_in' => $this->check_in?->format('h:i A'),
+            'check_out' => $this->check_out?->format('h:i A'),
+            'status' => __('attendance.status.'.$this->status),
+            'worked_seconds' => $this->worked_seconds,
             'worked_hours_formatted' => sprintf('%dh %dm', $hours, $minutes),
-            'is_exception'           => (bool) $this->is_exception,
+            'is_exception' => (bool) $this->is_exception,
         ];
     }
 }

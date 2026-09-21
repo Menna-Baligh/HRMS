@@ -53,14 +53,15 @@ class UpdateCompanyLocationRequest extends FormRequest
             ],
         ];
     }
-    public function withValidator(Validator $validator): void 
+
+    public function withValidator(Validator $validator): void
     {
-         $validator->after(function (Validator $validator)
-          {
-             if (empty($this->validated()))
-              { $validator->errors()->add(
-                 'update', __('company_location.no_fields_to_update')
-                 ); 
-                } }); 
+        $validator->after(function (Validator $validator) {
+            if (empty($this->validated())) {
+                $validator->errors()->add(
+                    'update', __('company_location.no_fields_to_update')
+                );
             }
+        });
+    }
 }

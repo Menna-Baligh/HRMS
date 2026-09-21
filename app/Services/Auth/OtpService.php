@@ -22,7 +22,7 @@ class OtpService
         $response = $this->otp->generate($email, 'numeric', 6, 10);
         if (! $response->status) {
             throw ValidationException::withMessages([
-               'email' => [__('auth.unable_to_generate_otp')],
+                'email' => [__('auth.unable_to_generate_otp')],
             ]);
         } $otp = $response->token;
         // Send OTP email
@@ -37,7 +37,7 @@ class OtpService
         $response = $this->otp->validate($email, $token);
         if (! $response->status) {
             throw ValidationException::withMessages([
-               'otp' => [__('auth.invalid_or_expired_otp')],
+                'otp' => [__('auth.invalid_or_expired_otp')],
             ]);
         }
 

@@ -44,7 +44,7 @@ class HrMonthlySummaryExport implements FromCollection, ShouldAutoSize, WithHead
 
     public function map($row): array
     {
-        $totalWorkedHours = number_format(($row['total_worked_seconds'] ?? 0) / 3600, 1) . 'h';
+        $totalWorkedHours = number_format(($row['total_worked_seconds'] ?? 0) / 3600, 1).'h';
         $user = $row['user'];
 
         return [

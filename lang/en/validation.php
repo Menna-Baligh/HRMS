@@ -201,16 +201,16 @@ return [
     */
 
     'attributes' => [
-    'email'           => 'email address',
-    'role'            => 'role',
-    'employment_type' => 'employment type',
-    'manager'         => 'manager',
-    'manager_id'      => 'manager',
-    'name'            => 'name',
-    'password'        => 'password',
-    'phone'           => 'phone number',
-    'job_title'       => 'job title',
-    'department_id'   => 'department',
+        'email' => 'email address',
+        'role' => 'role',
+        'employment_type' => 'employment type',
+        'manager' => 'manager',
+        'manager_id' => 'manager',
+        'name' => 'name',
+        'password' => 'password',
+        'phone' => 'phone number',
+        'job_title' => 'job title',
+        'department_id' => 'department',
     ],
 
 ];

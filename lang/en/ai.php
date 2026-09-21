@@ -1,0 +1,40 @@
+<?php
+
+return [
+    'career_coach_success' => 'Career coach guidance retrieved successfully.',
+    'unauthorized_employee' => 'You are not authorized to access this employee\'s records.',
+    'user_not_found' => 'Employee profile not found.',
+    'service_failed' => 'AI service is currently unavailable.',
+    'validation_error' => 'Validation error.',
+    'performance_insight_success' => 'Performance insight retrieved successfully.',
+    'insufficient_performance_data' => 'Insufficient approved performance data for this period.',
+    'evaluation_draft_success' => 'Evaluation draft generated successfully.',
+    'employees_forbidden_draft' => 'Employees are not authorized to access manager-level AI features.',
+    'insufficient_evaluation_data' => 'Insufficient evaluation data to generate draft.',
+    'skill_gap_success' => 'Skill gaps analyzed and recommendations retrieved successfully.',
+    'insufficient_skill_data' => 'Not enough approved employee data to analyze skill gaps.',
+    'attention_signal_success' => 'Employee attention signal retrieved successfully.',
+    'employees_forbidden_attention' => 'Employees are not authorized to access administrative attention signals.',
+    'insufficient_attention_data' => 'No approved records found to calculate attention signal.',
+    'team_insight_success' => 'Team insight summary retrieved successfully.',
+    'employees_forbidden_team' => 'Employees are not authorized to access Team Insight.',
+    'insufficient_team_data' => 'Insufficient approved team data for this department and period.',
+    'unauthorized_department' => 'You are not authorized to view insights for this department.',
+    'policy_assistant_success' => 'Policy question answered successfully.',
+    'policy_unsupported_question' => 'The question is outside the approved policy scope.',
+    'unauthorized_session' => 'Forbidden: chat session belongs to another employee.',
+
+    'attributes' => [
+        'employee_id' => 'Employee ID',
+        'period' => 'Period',
+        'evaluation_scores' => 'Evaluation Scores',
+        'manager_notes' => 'Manager Notes',
+        'target_role' => 'Target Role',
+        'target_skills' => 'Target Skills',
+        'target_period' => 'Target Period',
+        'department' => 'Department',
+        'question' => 'Question',
+        'session_id' => 'Session ID',
+    ],
+
+];

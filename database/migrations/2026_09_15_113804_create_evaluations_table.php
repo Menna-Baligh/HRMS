@@ -11,7 +11,7 @@ return new class extends Migration
     {
         Schema::create('evaluations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete(); 
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('evaluator_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('period_id')->constrained('evaluation_periods')->cascadeOnDelete();
             $table->decimal('overall_score', 5, 2)->nullable();

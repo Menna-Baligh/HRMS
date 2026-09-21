@@ -19,13 +19,13 @@ return new class extends Migration
 
             $table->foreignId('department_id')->nullable()->constrained('departments')->nullOnDelete()->after('status');
             $table->foreignId('company_location_id')->nullable()->constrained('company_locations')->nullOnDelete()->after('department_id');
-            
+
             if (! Schema::hasColumn('users', 'manager_id')) {
                 $table->foreignId('manager_id')->nullable()->constrained('users')->nullOnDelete()->after('company_location_id');
             }
         });
 
-        DB::statement("
+        DB::statement('
             UPDATE users u
             JOIN employees e ON u.id = e.user_id
             SET 
@@ -37,15 +37,15 @@ return new class extends Migration
                 u.department_id = e.department_id,
                 u.company_location_id = e.company_location_id,
                 u.address = e.address
-        ");
+        ');
 
-        DB::statement("
+        DB::statement('
             UPDATE users u
             JOIN employees e ON u.id = e.user_id
             JOIN employees m ON e.manager_id = m.id
             SET u.manager_id = m.user_id
             WHERE e.manager_id IS NOT NULL
-        ");
+        ');
     }
 
     public function down(): void

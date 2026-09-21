@@ -10,46 +10,43 @@ use App\Http\Requests\Tasks\StoreTaskRequest;
 use App\Http\Requests\Tasks\TaskIndexRequest;
 use App\Http\Requests\Tasks\UpdateTaskProgressRequest;
 use App\Http\Requests\Tasks\UpdateTaskRequest;
-use Illuminate\Http\Request;
 use App\Http\Requests\Tasks\UpdateTaskStatusRequest;
 use App\Models\Task;
 use App\Services\Tasks\TaskService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
     public function __construct(
         private TaskService $taskService
-    ) {
+    ) {}
 
-    }
-
-    
     /**
- * Get tasks visible to the authenticated user.
- */
-public function index(TaskIndexRequest $request)
-{
-    $tasks = $this->taskService->index(
-        user: $request->user(),
-        filters: $request->validated(),
-    );
+     * Get tasks visible to the authenticated user.
+     */
+    public function index(TaskIndexRequest $request)
+    {
+        $tasks = $this->taskService->index(
+            user: $request->user(),
+            filters: $request->validated(),
+        );
 
-    return ResponseHelper::success(
-        data: $tasks,
-        message: __('tasks.retrieved_successfully')
-    );
-}
+        return ResponseHelper::success(
+            data: $tasks,
+            message: __('tasks.retrieved_successfully')
+        );
+    }
 
     public function store(StoreTaskRequest $request)
     {
         $task = $this->taskService->create($request->validated());
 
-        return ResponseHelper::success( 
+        return ResponseHelper::success(
             data: $task,
             message: __('tasks.created'),
-            statusCode: 201 
-            );
+            statusCode: 201
+        );
     }
 
     public function update(UpdateTaskRequest $request, Task $task)
@@ -60,20 +57,21 @@ public function index(TaskIndexRequest $request)
         );
 
         return ResponseHelper::success(
-             data: $task,
-              message: __('tasks.updated')
-             );
+            data: $task,
+            message: __('tasks.updated')
+        );
     }
 
     public function assign(AssignTaskRequest $request, Task $task)
-     {
-         $assignment = $this->taskService->assign( $task, $request->integer('user_id')
-         ); 
-         return ResponseHelper::success( 
+    {
+        $assignment = $this->taskService->assign($task, $request->integer('user_id')
+        );
+
+        return ResponseHelper::success(
             data: $assignment,
-             message: __('tasks.assigned'),
-              statusCode: 201 );
-             }
+            message: __('tasks.assigned'),
+            statusCode: 201);
+    }
 
     /**
      * Update task progress.
@@ -90,49 +88,52 @@ public function index(TaskIndexRequest $request)
             message: __('tasks.progress_updated')
         );
     }
+
     /**
      * Update task status.
      */
-    public function updateStatus(UpdateTaskStatusRequest $request,Task $task)
-     {
+    public function updateStatus(UpdateTaskStatusRequest $request, Task $task)
+    {
         $task = $this->taskService->updateStatus(
             $task,
             TaskStatus::from($request->validated('status'))
         );
-    
+
         return ResponseHelper::success(
             data: $task,
             message: __('tasks.status_updated')
         );
     }
-        /**
+
+    /**
      * Get task details.
      */
-     public function show(Request $request, Task $task): JsonResponse
-     {
-         $task = $this->taskService->show(
-             task: $task,
-             user: $request->user(),
-         );
-     
-         return ResponseHelper::success(
-             data: $task,
-             message: __('tasks.details_retrieved_successfully')
-            );
-     }
-   /**
-    * Get task activity history.
-    */
-   public function activities(Request $request, Task $task): JsonResponse
-   {
-       $activities = $this->taskService->activities(
-           task: $task,
-           user: $request->user(),
-       );
-
-       return ResponseHelper::success(
-           data: $activities,
-           message: __('tasks.activities_retrieved_successfully')
+    public function show(Request $request, Task $task): JsonResponse
+    {
+        $task = $this->taskService->show(
+            task: $task,
+            user: $request->user(),
         );
-   }
-   }
+
+        return ResponseHelper::success(
+            data: $task,
+            message: __('tasks.details_retrieved_successfully')
+        );
+    }
+
+    /**
+     * Get task activity history.
+     */
+    public function activities(Request $request, Task $task): JsonResponse
+    {
+        $activities = $this->taskService->activities(
+            task: $task,
+            user: $request->user(),
+        );
+
+        return ResponseHelper::success(
+            data: $activities,
+            message: __('tasks.activities_retrieved_successfully')
+        );
+    }
+}

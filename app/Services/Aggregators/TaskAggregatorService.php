@@ -63,13 +63,13 @@ class TaskAggregatorService
             : 0.0;
 
         return [
-            'total_tasks'       => $totalTasks,
-            'completed_tasks'   => $completedTasks,
+            'total_tasks' => $totalTasks,
+            'completed_tasks' => $completedTasks,
             'in_progress_tasks' => $inProgressTasks,
-            'pending_tasks'     => $pendingTasks,
-            'overdue_tasks'     => $overdueTasks,
-            'completion_rate'   => $completionRate,
-            'average_progress'  => $averageProgress,
+            'pending_tasks' => $pendingTasks,
+            'overdue_tasks' => $overdueTasks,
+            'completion_rate' => $completionRate,
+            'average_progress' => $averageProgress,
         ];
     }
 }

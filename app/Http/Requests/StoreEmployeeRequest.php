@@ -15,10 +15,10 @@ class StoreEmployeeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['required', 'email', 'unique:users,email'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8'],
-            'role'     => [
+            'role' => [
                 'required',
                 'string',
                 'in:HR,Manager,Employee',
@@ -28,15 +28,15 @@ class StoreEmployeeRequest extends FormRequest
                     }
                 },
             ],
-            'job_title'           => ['required', 'string', 'max:255'],
-            'permissions'         => ['sometimes', 'array'],
-            'permissions.*'       => ['string', 'exists:permissions,name'],
-            'employment_type'     => ['required', 'in:Full-time,Part-time,Contract'],
-            'start_date'          => ['required', 'date'],
-            'department_id'       => ['nullable', 'exists:departments,id'],
-            'manager_id'          => [
+            'job_title' => ['required', 'string', 'max:255'],
+            'permissions' => ['sometimes', 'array'],
+            'permissions.*' => ['string', 'exists:permissions,name'],
+            'employment_type' => ['required', 'in:Full-time,Part-time,Contract'],
+            'start_date' => ['required', 'date'],
+            'department_id' => ['nullable', 'exists:departments,id'],
+            'manager_id' => [
                 'nullable',
-                'exists:users,id', 
+                'exists:users,id',
                 function ($attribute, $value, $fail) {
                     $manager = User::find($value);
                     if ($manager && ! $manager->hasRole('Manager')) {
@@ -44,8 +44,8 @@ class StoreEmployeeRequest extends FormRequest
                     }
                 },
             ],
-            'phone'               => ['nullable', 'string', 'max:20', 'unique:users,phone'],
-            'address'             => ['nullable', 'string'],
+            'phone' => ['nullable', 'string', 'max:20', 'unique:users,phone'],
+            'address' => ['nullable', 'string'],
             'company_location_id' => ['nullable', 'exists:company_locations,id'],
         ];
     }
@@ -53,10 +53,10 @@ class StoreEmployeeRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'email.unique'       => __('validation.unique', ['attribute' => __('validation.attributes.email')]),
-            'role.in'            => __('validation.in', ['attribute' => __('validation.attributes.role')]),
+            'email.unique' => __('validation.unique', ['attribute' => __('validation.attributes.email')]),
+            'role.in' => __('validation.in', ['attribute' => __('validation.attributes.role')]),
             'employment_type.in' => __('validation.in', ['attribute' => __('validation.attributes.employment_type')]),
-            'manager_id.exists'  => __('validation.exists', ['attribute' => __('validation.attributes.manager')]),
+            'manager_id.exists' => __('validation.exists', ['attribute' => __('validation.attributes.manager')]),
         ];
     }
 }

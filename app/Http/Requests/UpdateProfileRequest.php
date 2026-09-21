@@ -17,11 +17,11 @@ class UpdateProfileRequest extends FormRequest
         $userId = auth('api')->id();
 
         return [
-            'name'    => ['sometimes', 'nullable', 'string', 'max:255'],
-            'phone'   => ['sometimes', 'nullable', 'string', 'max:20', Rule::unique('users', 'phone')->ignore($userId)],
+            'name' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'phone' => ['sometimes', 'nullable', 'string', 'max:20', Rule::unique('users', 'phone')->ignore($userId)],
             'address' => ['sometimes', 'nullable', 'string', 'max:500'],
-            'avatar'  => ['sometimes', 'nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
-            'locale'  => ['sometimes', 'string', 'in:ar,en'],
+            'avatar' => ['sometimes', 'nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
+            'locale' => ['sometimes', 'string', 'in:ar,en'],
         ];
     }
 }
