@@ -2,6 +2,7 @@
 
 use App\Enums\PermissionEnum;
 use App\Http\Controllers\Api\AICareerCoachController;
+use App\Http\Controllers\Api\AIPerformanceInsightController;
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CalendarController;
@@ -311,4 +312,6 @@ Route::middleware(['auth:api', 'set.app.language'])->post('/broadcasting/auth', 
 Route::prefix('ai')->middleware(['auth:api','set.app.language'])->group(function () {
     Route::post('/career-coach', AICareerCoachController::class)
         ->middleware('permission:' . PermissionEnum::AI_CAREER_COACH->value);
+    Route::post('/performance-insight', AIPerformanceInsightController::class)
+        ->middleware('permission:' . PermissionEnum::AI_PERFORMANCE_INSIGHT->value);
 });
