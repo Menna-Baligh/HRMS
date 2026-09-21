@@ -29,6 +29,7 @@ enum PermissionEnum: string
     case MANAGER_VIEW_ATTENDANCE = 'manager.view-attendance';
     case MANAGER_VIEW_TEAM_GOALS = 'manager.view-team-goals';
 
+
     // ==========================================
     // 4. Tasks & Submissions
     // ==========================================
@@ -89,10 +90,10 @@ enum PermissionEnum: string
     case EMPLOYEE_PERFORMANCE_DASHBOARD = 'employee.performance.dashboard';
 
     // ==========================================
-    // 9. Leave Management 
+    // 9. Leave Management
     // ==========================================
     case LEAVE_TYPE_VIEW       = 'leave_type.view';
-    case LEAVE_TYPE_MANAGE     = 'leave_type.manage'; 
+    case LEAVE_TYPE_MANAGE     = 'leave_type.manage';
     case LEAVE_BALANCE_VIEW    = 'leave_balance.view';
     case LEAVE_REQUEST_VIEW_OWN= 'leave_request.view_own';
     case LEAVE_REQUEST_CREATE  = 'leave_request.create';
@@ -111,6 +112,9 @@ enum PermissionEnum: string
     case PERMISSION_VIEW_ALL = 'permission.view-all';
     case FILE_DOWNLOAD = 'file.download';
     case FILE_DELETE = 'file.delete';
+
+
+    case AI_CAREER_COACH = 'ai.career_coach';
 
     public function defaultRoles(): array
     {
@@ -187,7 +191,8 @@ enum PermissionEnum: string
             self::LEAVE_TYPE_VIEW,
             self::LEAVE_CALENDAR_VIEW,
             self::FILE_DOWNLOAD,
-            self::FILE_DELETE => ['Owner', 'HR', 'Manager', 'Employee'],
+            self::FILE_DELETE,
+            self::AI_CAREER_COACH => ['Owner', 'HR', 'Manager', 'Employee'],
 
             default => ['Owner', 'HR'],
         };

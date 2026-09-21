@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\PermissionEnum;
+use App\Http\Controllers\Api\AICareerCoachController;
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CalendarController;
@@ -82,7 +83,7 @@ Route::prefix('leaves')->middleware('auth:api','set.app.language')->group(functi
     // new leave type
     Route::post('/leave-types', [LeaveTypeController::class,'store',]);
     //get all leave types
-    Route::get('/leave-types', [LeaveTypeController::class,'index',]); 
+    Route::get('/leave-types', [LeaveTypeController::class,'index',]);
     //update leave type
     Route::put('/leave-types/{leaveType}', [LeaveTypeController::class,'update',]);
     //activate leave
@@ -176,6 +177,21 @@ Route::middleware('auth:api','set.app.language')
         // Get active company location
         Route::get('company/location/active',[CompanyLocationController::class, 'activeLocation']
         );
+    });
+    Route::prefix('employees')->group(function () {
+        Route::get('/', [EmployeeController::class, 'index'])->middleware('permission:'.PermissionEnum::EMPLOYEE_VIEW_ALL->value);
+        Route::post('/', [EmployeeController::class, 'store'])->middleware('permission:'.PermissionEnum::EMPLOYEE_CREATE->value);
+        Route::patch('/profile', [EmployeeController::class, 'updateProfile'])->middleware('permission:'.PermissionEnum::EMPLOYEE_UPDATE_PROFILE->value);
+        Route::get('/{id}', [EmployeeController::class, 'show'])->middleware('permission:'.PermissionEnum::EMPLOYEE_VIEW_PROFILE->value);
+        Route::patch('/{id}/hr-fields', [EmployeeController::class, 'updateHrFields'])->middleware('permission:'.PermissionEnum::EMPLOYEE_EDIT_HR_FIELDS->value);
+        Route::patch('/{id}/change-account-status', [EmployeeController::class, 'changeAccountStatus'])->middleware('permission:'.PermissionEnum::EMPLOYEE_CHANGE_ACCOUNT_STATUS->value);
+    });
+
+    Route::prefix('departments')->group(function () {
+        Route::get('/', [DepartmentController::class, 'index'])->middleware('permission:'.PermissionEnum::DEPARTMENT_VIEW->value);
+        Route::post('/', [DepartmentController::class, 'store'])->middleware('permission:'.PermissionEnum::DEPARTMENT_CREATE->value);
+        Route::patch('/{id}', [DepartmentController::class, 'update'])->middleware('permission:'.PermissionEnum::DEPARTMENT_EDIT->value);
+        Route::patch('/{id}/change-status', [DepartmentController::class, 'changeStatus'])->middleware('permission:'.PermissionEnum::DEPARTMENT_CHANGE_STATUS->value);
     });
 
     Route::prefix('locations/company/location')->group(function () {
@@ -286,8 +302,11 @@ Route::middleware('auth:api','set.app.language')
     });
 
     Route::get('/permissions', [PermissionController::class, 'index'])->middleware('permission:'.PermissionEnum::PERMISSION_VIEW_ALL->value);
+
 });
 
 Route::middleware(['auth:api', 'set.app.language'])->post('/broadcasting/auth', function (Request $request) {
     return Broadcast::auth($request);
 });
+Route::post('/career-coach', [AICareerCoachController::class, 'generate'])
+    ->middleware(['auth:api', 'permission:' . PermissionEnum::CAREER_COACH_VIEW->value]);

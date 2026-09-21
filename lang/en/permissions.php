@@ -91,4 +91,6 @@ return [
     'permission.view-all' => 'View All Permissions',
     'file.download'       => 'Download Files',
     'file.delete'         => 'Delete Files',
+
+    'ai.career_coach' => 'Use AI Career Coach',
 ];

@@ -86,9 +86,11 @@ return [
     'leave.queue_manager'     => 'قائمة انتظار إجازات الفريق',
     'leave.queue_hr'          => 'قائمة انتظار إجازات الموارد البشرية',
     'leave.calendar_view'     => 'عرض تقويم الإجازات',
-    
+
     // System & Files
     'permission.view-all' => 'عرض جميع الصلاحيات',
     'file.download'       => 'تحميل الملفات',
     'file.delete'         => 'حذف الملفات',
+
+    'ai.career_coach' => 'استخدام مستشار المسار الوظيفي الذكي (AI Career Coach)',
 ];
