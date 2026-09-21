@@ -10,4 +10,6 @@ return [
         'employee_id' => 'Employee ID',
         'period'      => 'Period',
     ],
+    'performance_insight_success' => 'Performance insight retrieved successfully.',
+    'insufficient_performance_data' => 'Insufficient approved performance data for this period.',
 ];

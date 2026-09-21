@@ -93,4 +93,5 @@ return [
     'file.delete'         => 'Delete Files',
 
     'ai.career_coach' => 'Use AI Career Coach',
+    'ai.performance_insight' => 'View AI Performance Insight',
 ];

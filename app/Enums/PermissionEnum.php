@@ -113,8 +113,9 @@ enum PermissionEnum: string
     case FILE_DOWNLOAD = 'file.download';
     case FILE_DELETE = 'file.delete';
 
-
+    // 11. AI Features
     case AI_CAREER_COACH = 'ai.career_coach';
+    case AI_PERFORMANCE_INSIGHT = 'ai.performance_insight';
 
     public function defaultRoles(): array
     {
@@ -192,7 +193,8 @@ enum PermissionEnum: string
             self::LEAVE_CALENDAR_VIEW,
             self::FILE_DOWNLOAD,
             self::FILE_DELETE,
-            self::AI_CAREER_COACH => ['Owner', 'HR', 'Manager', 'Employee'],
+            self::AI_CAREER_COACH,
+            self::AI_PERFORMANCE_INSIGHT => ['Owner', 'HR', 'Manager', 'Employee'],
 
             default => ['Owner', 'HR'],
         };

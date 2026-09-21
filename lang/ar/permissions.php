@@ -93,4 +93,5 @@ return [
     'file.delete'         => 'حذف الملفات',
 
     'ai.career_coach' => 'استخدام مستشار المسار الوظيفي الذكي (AI Career Coach)',
+    'ai.performance_insight' => 'عرض تحليلات الأداء الذكية (AI Performance Insight)',
 ];

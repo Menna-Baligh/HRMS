@@ -10,4 +10,6 @@ return [
         'employee_id' => 'كود الموظف',
         'period'      => 'الفترة الزمنية',
     ],
+    'performance_insight_success' => 'تم جلب تحليلات الأداء بنجاح.',
+    'insufficient_performance_data' => 'لا توجد بيانات أداء كافية معتمدة لهذا الموظف في الفترة المحمولة.',
 ];
