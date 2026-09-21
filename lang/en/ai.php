@@ -9,7 +9,13 @@ return [
     'attributes' => [
         'employee_id' => 'Employee ID',
         'period'      => 'Period',
+        'evaluation_scores' => 'Evaluation Scores',
+        'manager_notes'     => 'Manager Notes',
     ],
     'performance_insight_success' => 'Performance insight retrieved successfully.',
     'insufficient_performance_data' => 'Insufficient approved performance data for this period.',
+    'evaluation_draft_success'       => 'Evaluation draft generated successfully.',
+    'employees_forbidden_draft'     => 'Employees are not authorized to access manager-level AI features.',
+    'insufficient_evaluation_data'  => 'Insufficient evaluation data to generate draft.',
+
 ];

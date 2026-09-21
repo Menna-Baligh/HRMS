@@ -116,6 +116,7 @@ enum PermissionEnum: string
     // 11. AI Features
     case AI_CAREER_COACH = 'ai.career_coach';
     case AI_PERFORMANCE_INSIGHT = 'ai.performance_insight';
+    case AI_EVALUATION_DRAFT = 'ai.evaluation_draft';
 
     public function defaultRoles(): array
     {
@@ -162,7 +163,8 @@ enum PermissionEnum: string
             self::EVALUATION_VIEW_MANAGER,
             self::MANAGER_PERFORMANCE_TEAM,
             self::LEAVE_APPROVE_MANAGER,
-            self::LEAVE_QUEUE_MANAGER => ['Manager', 'HR', 'Owner'],
+            self::LEAVE_QUEUE_MANAGER,
+            self::AI_EVALUATION_DRAFT => ['Manager', 'HR', 'Owner'],
 
             // All Roles (Owner, HR, Manager, Employee)
             self::EMPLOYEE_VIEW_PROFILE,

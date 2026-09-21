@@ -94,4 +94,5 @@ return [
 
     'ai.career_coach' => 'استخدام مستشار المسار الوظيفي الذكي (AI Career Coach)',
     'ai.performance_insight' => 'عرض تحليلات الأداء الذكية (AI Performance Insight)',
+    'ai.evaluation_draft' => 'توليد مسودة التقييم الذكية (AI Evaluation Draft)',
 ];
