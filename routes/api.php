@@ -308,5 +308,7 @@ Route::middleware('auth:api','set.app.language')
 Route::middleware(['auth:api', 'set.app.language'])->post('/broadcasting/auth', function (Request $request) {
     return Broadcast::auth($request);
 });
-Route::post('/career-coach', [AICareerCoachController::class, 'generate'])
-    ->middleware(['auth:api', 'permission:' . PermissionEnum::CAREER_COACH_VIEW->value]);
+Route::prefix('ai')->middleware(['auth:api','set.app.language'])->group(function () {
+    Route::post('/career-coach', AICareerCoachController::class)
+        ->middleware('permission:' . PermissionEnum::AI_CAREER_COACH->value);
+});

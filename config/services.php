@@ -41,4 +41,8 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'ai' => [
+        'base_url' => env('AI_SERVICE_BASE_URL', 'http://127.0.0.1:8000/api'),
+    ],
+
 ];

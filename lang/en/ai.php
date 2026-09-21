@@ -6,4 +6,8 @@ return [
     'user_not_found'         => 'Employee profile not found.',
     'service_failed'         => 'AI service is currently unavailable.',
     'validation_error'       => 'Validation error.',
+    'attributes' => [
+        'employee_id' => 'Employee ID',
+        'period'      => 'Period',
+    ],
 ];
