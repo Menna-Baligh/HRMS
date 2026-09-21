@@ -13,8 +13,7 @@ class CalendarController extends Controller
 {
     public function __construct(
         protected CalendarService $calendarService
-    ) {
-    }
+    ) {}
 
     /**
      * Return the authenticated user's unified calendar feed.

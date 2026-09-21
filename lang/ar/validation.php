@@ -9,11 +9,11 @@ return [
     */
 
     'required' => 'حقل :attribute مطلوب.',
-    'unique'   => 'قيمة :attribute مُستخدمة من قبل.',
-    'exists'   => 'عذراً، :attribute المحدد غير موجود.',
-    'in'       => 'قيمة :attribute المختارة غير صالحة.',
-    'email'    => 'يجب أن يكون :attribute عنوان بريد إلكتروني صحيح.',
-    'min'      => [
+    'unique' => 'قيمة :attribute مُستخدمة من قبل.',
+    'exists' => 'عذراً، :attribute المحدد غير موجود.',
+    'in' => 'قيمة :attribute المختارة غير صالحة.',
+    'email' => 'يجب أن يكون :attribute عنوان بريد إلكتروني صحيح.',
+    'min' => [
         'string' => 'يجب أن يحتوي :attribute على :min أحرف على الأقل.',
     ],
 
@@ -24,29 +24,29 @@ return [
     */
 
     'attributes' => [
-    'email'           => 'البريد الإلكتروني',
-    'role'            => 'الدور',
-    'employment_type' => 'نوع التوظيف',
-    'manager'         => 'المدير المباشر',
-    'manager_id'      => 'المدير المباشر',
-    'name'            => 'الاسم',
-    'password'        => 'كلمة المرور',
-    'phone'           => 'رقم الهاتف',
-    'job_title'       => 'المسمى الوظيفي',
-    'department_id'   => 'القسم',
-    'user_id'              => 'الموظف',
-    'period_id'            => 'فترة التقييم',
-    'feedback'             => 'الملاحظات',
-    'scores'               => 'الدرجات',
-    'scores.*.category_id' => 'فئة التقييم',
-    'scores.*.score'       => 'الدرجة',
-    'evidence_goal_ids'    => 'الأهداف المرتبطة',
-    'evidence_goal_ids.*'  => 'الهدف المرتبط',
+        'email' => 'البريد الإلكتروني',
+        'role' => 'الدور',
+        'employment_type' => 'نوع التوظيف',
+        'manager' => 'المدير المباشر',
+        'manager_id' => 'المدير المباشر',
+        'name' => 'الاسم',
+        'password' => 'كلمة المرور',
+        'phone' => 'رقم الهاتف',
+        'job_title' => 'المسمى الوظيفي',
+        'department_id' => 'القسم',
+        'user_id' => 'الموظف',
+        'period_id' => 'فترة التقييم',
+        'feedback' => 'الملاحظات',
+        'scores' => 'الدرجات',
+        'scores.*.category_id' => 'فئة التقييم',
+        'scores.*.score' => 'الدرجة',
+        'evidence_goal_ids' => 'الأهداف المرتبطة',
+        'evidence_goal_ids.*' => 'الهدف المرتبط',
     ],
 
     'custom' => [
-    'manager_id' => [
-        'invalid_role' => 'المستخدم المحدد يجب أن يمتلك دور مدير أو أعلى.',
+        'manager_id' => [
+            'invalid_role' => 'المستخدم المحدد يجب أن يمتلك دور مدير أو أعلى.',
+        ],
     ],
-],
 ];

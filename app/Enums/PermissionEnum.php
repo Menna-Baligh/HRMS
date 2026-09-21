@@ -29,7 +29,6 @@ enum PermissionEnum: string
     case MANAGER_VIEW_ATTENDANCE = 'manager.view-attendance';
     case MANAGER_VIEW_TEAM_GOALS = 'manager.view-team-goals';
 
-
     // ==========================================
     // 4. Tasks & Submissions
     // ==========================================
@@ -92,19 +91,19 @@ enum PermissionEnum: string
     // ==========================================
     // 9. Leave Management
     // ==========================================
-    case LEAVE_TYPE_VIEW       = 'leave_type.view';
-    case LEAVE_TYPE_MANAGE     = 'leave_type.manage';
-    case LEAVE_BALANCE_VIEW    = 'leave_balance.view';
-    case LEAVE_REQUEST_VIEW_OWN= 'leave_request.view_own';
-    case LEAVE_REQUEST_CREATE  = 'leave_request.create';
-    case LEAVE_REQUEST_CANCEL  = 'leave_request.cancel';
+    case LEAVE_TYPE_VIEW = 'leave_type.view';
+    case LEAVE_TYPE_MANAGE = 'leave_type.manage';
+    case LEAVE_BALANCE_VIEW = 'leave_balance.view';
+    case LEAVE_REQUEST_VIEW_OWN = 'leave_request.view_own';
+    case LEAVE_REQUEST_CREATE = 'leave_request.create';
+    case LEAVE_REQUEST_CANCEL = 'leave_request.cancel';
     case LEAVE_APPROVE_MANAGER = 'leave.approve_manager';
-    case LEAVE_APPROVE_HR      = 'leave.approve_hr';
-    case LEAVE_REJECT          = 'leave.reject';
-    case LEAVE_VIEW_HISTORY    = 'leave.view_history';
-    case LEAVE_QUEUE_MANAGER   = 'leave.queue_manager';
-    case LEAVE_QUEUE_HR        = 'leave.queue_hr';
-    case LEAVE_CALENDAR_VIEW   = 'leave.calendar_view';
+    case LEAVE_APPROVE_HR = 'leave.approve_hr';
+    case LEAVE_REJECT = 'leave.reject';
+    case LEAVE_VIEW_HISTORY = 'leave.view_history';
+    case LEAVE_QUEUE_MANAGER = 'leave.queue_manager';
+    case LEAVE_QUEUE_HR = 'leave.queue_hr';
+    case LEAVE_CALENDAR_VIEW = 'leave.calendar_view';
 
     // ==========================================
     // 10. System, Files & Permissions
@@ -203,8 +202,9 @@ enum PermissionEnum: string
             default => ['Owner', 'HR'],
         };
     }
+
     public function label(): string
     {
-        return __('permissions.' . $this->value);
+        return __('permissions.'.$this->value);
     }
 }

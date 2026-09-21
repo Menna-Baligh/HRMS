@@ -23,21 +23,21 @@ class ManagerTeamAttendanceResource extends JsonResource
 
         $hoursFormatted = '—';
         if ($attendance?->worked_seconds) {
-            $hoursFormatted = number_format($attendance->worked_seconds / 3600, 1) . 'h';
+            $hoursFormatted = number_format($attendance->worked_seconds / 3600, 1).'h';
         }
 
         return [
-            'user_id'            => $this->id,
-            'name'                   => $this->name,
-            'job_title'              => $this->job_title,
-            'avatar'                 => $this->avatar_url ?? $this->avatar,
-            'attendance_id'          => $attendance?->id,
-            'check_in'               => $attendance?->check_in?->format('H:i') ?? '—',
-            'check_out'              => $attendance?->check_out?->format('H:i') ?? '—',
-            'status' => __('attendance.status.' . $shiftStatus),
+            'user_id' => $this->id,
+            'name' => $this->name,
+            'job_title' => $this->job_title,
+            'avatar' => $this->avatar_url ?? $this->avatar,
+            'attendance_id' => $attendance?->id,
+            'check_in' => $attendance?->check_in?->format('H:i') ?? '—',
+            'check_out' => $attendance?->check_out?->format('H:i') ?? '—',
+            'status' => __('attendance.status.'.$shiftStatus),
             'worked_hours_formatted' => $hoursFormatted,
-            'worked_seconds'         => $attendance?->worked_seconds ?? 0,
-            'is_exception'           => (bool) ($attendance?->is_exception),
+            'worked_seconds' => $attendance?->worked_seconds ?? 0,
+            'is_exception' => (bool) ($attendance?->is_exception),
         ];
     }
 }

@@ -15,7 +15,7 @@ class AIPerformanceInsightRequest extends FormRequest
     {
         return [
             'employee_id' => ['required', 'string', 'exists:users,employee_id'],
-            'period'      => ['required', 'string', 'min:1'], 
+            'period' => ['required', 'string', 'min:1'],
         ];
     }
 
@@ -23,7 +23,7 @@ class AIPerformanceInsightRequest extends FormRequest
     {
         return [
             'employee_id' => __('ai.attributes.employee_id'),
-            'period'      => __('ai.attributes.period'),
+            'period' => __('ai.attributes.period'),
         ];
     }
 }

@@ -33,15 +33,15 @@ class AIEvaluationDraftService
         $rawRole = $currentUser->role instanceof \BackedEnum ? $currentUser->role->value : (string) $currentUser->role;
         $aiRoleHeader = match (strtolower($rawRole)) {
             'owner', 'hr' => 'hr_admin',
-            'manager'                 => 'manager',
-            default                   => 'employee',
+            'manager' => 'manager',
+            default => 'employee',
         };
 
         $payload = array_filter([
-            'employee_id'       => $targetEmployeeCode,
-            'period'            => $period,
+            'employee_id' => $targetEmployeeCode,
+            'period' => $period,
             'evaluation_scores' => $evaluationScores,
-            'manager_notes'     => $managerNotes,
+            'manager_notes' => $managerNotes,
         ], fn ($value) => ! is_null($value));
 
         $aiBaseUrl = config('services.ai.base_url', 'http://127.0.0.1:8000/api');
@@ -50,7 +50,7 @@ class AIEvaluationDraftService
             $response = Http::timeout(15)
                 ->withHeaders([
                     'X-Caller-ID' => $currentUser->employee_id ?? (string) $currentUser->id,
-                    'X-Role'      => $aiRoleHeader,
+                    'X-Role' => $aiRoleHeader,
                 ])
                 ->post("{$aiBaseUrl}/evaluation-draft", $payload);
 

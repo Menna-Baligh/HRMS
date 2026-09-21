@@ -36,9 +36,9 @@ class GoalAggregatorService
             : 0.0;
 
         return [
-            'total_goals'      => $totalGoals,
-            'completed_goals'  => $completedGoals,
-            'completion_rate'  => $completionRate,
+            'total_goals' => $totalGoals,
+            'completed_goals' => $completedGoals,
+            'completion_rate' => $completionRate,
             'average_progress' => $averageProgress,
         ];
     }

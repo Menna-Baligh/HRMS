@@ -17,7 +17,7 @@ class EmployeeEvaluationController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $user = $request->user(); 
+            $user = $request->user();
 
             if (! $user) {
                 return ResponseHelper::error(null, __('evaluation.user_not_found'), 404);

@@ -17,8 +17,7 @@ class LeaveRequestService
 {
     public function __construct(
         protected LeaveBalanceService $leaveBalanceService
-    ) {
-    }
+    ) {}
 
     public function create(User $user, array $data): LeaveRequest
     {
@@ -204,61 +203,61 @@ class LeaveRequestService
     }
 
     public function getDetails(LeaveRequest $leaveRequest): LeaveRequest
-{
-    return $leaveRequest->load([
-        'user',
-        'leaveType',
-        'reviewer',
-        'decisions.reviewer',
-        'files',
-    ]);
-} 
-
-
-// Manager Pending Leave Queue 
-
-public function getManagerPendingQueue(User $manager): Collection
-{
-    return LeaveRequest::query()
-        ->with([
+    {
+        return $leaveRequest->load([
             'user',
             'leaveType',
             'reviewer',
             'decisions.reviewer',
             'files',
-        ])
-        ->where('status', LeaveStatus::Pending->value)
-        ->whereHas(
-            'user',
-            fn ($query) => $query->where('manager_id', $manager->id)
-        )
-        ->orderBy('created_at')
-        ->get();
-}
-// Hr Pending Queue
-public function getHrPendingQueue(): Collection
-{
-    return LeaveRequest::query()
-        ->with([
-            'user',
-            'leaveType',
-            'reviewer',
-            'decisions.reviewer',
-            'files',
-        ])
-        ->where('status', LeaveStatus::Pending->value)
-        ->orderBy('created_at')
-        ->get();
-}
+        ]);
+    }
 
-// Decision History
+    // Manager Pending Leave Queue
 
-public function getDecisionHistory(
-    LeaveRequest $leaveRequest
-): Collection {
-    return $leaveRequest->decisions()
-        ->with('reviewer')
-        ->orderByDesc('decided_at')
-        ->get();
-}
+    public function getManagerPendingQueue(User $manager): Collection
+    {
+        return LeaveRequest::query()
+            ->with([
+                'user',
+                'leaveType',
+                'reviewer',
+                'decisions.reviewer',
+                'files',
+            ])
+            ->where('status', LeaveStatus::Pending->value)
+            ->whereHas(
+                'user',
+                fn ($query) => $query->where('manager_id', $manager->id)
+            )
+            ->orderBy('created_at')
+            ->get();
+    }
+
+    // Hr Pending Queue
+    public function getHrPendingQueue(): Collection
+    {
+        return LeaveRequest::query()
+            ->with([
+                'user',
+                'leaveType',
+                'reviewer',
+                'decisions.reviewer',
+                'files',
+            ])
+            ->where('status', LeaveStatus::Pending->value)
+            ->orderBy('created_at')
+            ->get();
+    }
+
+    // Decision History
+
+    public function getDecisionHistory(
+        LeaveRequest $leaveRequest
+    ): Collection {
+        return $leaveRequest->decisions()
+            ->with('reviewer')
+            ->orderByDesc('decided_at')
+            ->get();
+    }
 }

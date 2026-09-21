@@ -14,21 +14,21 @@ class AIEvaluationDraftRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'employee_id'                  => ['required', 'string', 'exists:users,employee_id'],
-            'period'                       => ['required', 'string', 'min:1'],
-            'evaluation_scores'            => ['required', 'array'],
+            'employee_id' => ['required', 'string', 'exists:users,employee_id'],
+            'period' => ['required', 'string', 'min:1'],
+            'evaluation_scores' => ['required', 'array'],
             'evaluation_scores.overall_score' => ['nullable', 'numeric', 'min:0', 'max:100'],
-            'manager_notes'                => ['nullable', 'string'],
+            'manager_notes' => ['nullable', 'string'],
         ];
     }
 
     public function attributes(): array
     {
         return [
-            'employee_id'       => __('ai.attributes.employee_id'),
-            'period'            => __('ai.attributes.period'),
+            'employee_id' => __('ai.attributes.employee_id'),
+            'period' => __('ai.attributes.period'),
             'evaluation_scores' => __('ai.attributes.evaluation_scores'),
-            'manager_notes'     => __('ai.attributes.manager_notes'),
+            'manager_notes' => __('ai.attributes.manager_notes'),
         ];
     }
 }

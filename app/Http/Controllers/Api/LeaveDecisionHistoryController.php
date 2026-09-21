@@ -12,8 +12,7 @@ class LeaveDecisionHistoryController extends Controller
 {
     public function __construct(
         protected LeaveRequestService $leaveRequestService
-    ) {
-    }
+    ) {}
 
     public function index(int $leaveRequest): JsonResponse
     {

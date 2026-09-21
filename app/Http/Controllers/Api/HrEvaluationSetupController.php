@@ -27,7 +27,7 @@ class HrEvaluationSetupController extends Controller
             $status = $request->query('status');
             $periodId = $request->query('period_id') ? (int) $request->query('period_id') : null;
             $departmentId = $request->query('department_id') ? (int) $request->query('department_id') : null;
-            $userId = $request->query('user_id') ?? $request->query('employee_id'); 
+            $userId = $request->query('user_id') ?? $request->query('employee_id');
             $evaluatorId = $request->query('evaluator_id') ? (int) $request->query('evaluator_id') : null;
 
             $evaluations = $this->evaluationService->getHrEvaluationsOverview(
@@ -101,7 +101,7 @@ class HrEvaluationSetupController extends Controller
 
             $period->update(['status' => $newStatus]);
 
-            $statusText = __('evaluation.statuses.' . $newStatus->value);
+            $statusText = __('evaluation.statuses.'.$newStatus->value);
 
             return ResponseHelper::success(
                 new EvaluationPeriodResource($period),

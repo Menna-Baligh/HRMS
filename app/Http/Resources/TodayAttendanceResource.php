@@ -16,14 +16,14 @@ class TodayAttendanceResource extends JsonResource
         $statusCode = ($hasCheckedIn && ! $hasCheckedOut) ? 'On shift' : 'Off shift';
 
         return [
-            'status'           => __('attendance.status.' . $statusCode),
-            'check_in_time'    => $this['check_in_time'],
-            'check_out_time'   => $this['check_out_time'],
-            'worked_seconds'   => $this['worked_seconds'],
-            'distance_meters'  => $this['distance_meters'],
+            'status' => __('attendance.status.'.$statusCode),
+            'check_in_time' => $this['check_in_time'],
+            'check_out_time' => $this['check_out_time'],
+            'worked_seconds' => $this['worked_seconds'],
+            'distance_meters' => $this['distance_meters'],
             'is_inside_radius' => $isInside,
-            'can_check_in'     => ! $hasCheckedIn && $isInside,
-            'can_check_out'    => $hasCheckedIn && ! $hasCheckedOut && $isInside,
+            'can_check_in' => ! $hasCheckedIn && $isInside,
+            'can_check_out' => $hasCheckedIn && ! $hasCheckedOut && $isInside,
         ];
     }
 }

@@ -28,13 +28,13 @@ class AIPerformanceInsightService
         $rawRole = $currentUser->role instanceof \BackedEnum ? $currentUser->role->value : (string) $currentUser->role;
         $aiRoleHeader = match (strtolower($rawRole)) {
             'owner', 'hr' => 'hr_admin',
-            'manager'                 => 'manager',
-            default                   => 'employee',
+            'manager' => 'manager',
+            default => 'employee',
         };
 
         $payload = [
             'employee_id' => $targetEmployeeCode,
-            'period'      => $period,
+            'period' => $period,
         ];
 
         $aiBaseUrl = config('services.ai.base_url', 'http://127.0.0.1:8000/api');
@@ -43,7 +43,7 @@ class AIPerformanceInsightService
             $response = Http::timeout(15)
                 ->withHeaders([
                     'X-Caller-ID' => $currentUser->employee_id ?? (string) $currentUser->id,
-                    'X-Role'      => $aiRoleHeader,
+                    'X-Role' => $aiRoleHeader,
                 ])
                 ->post("{$aiBaseUrl}/performance-insight", $payload);
 

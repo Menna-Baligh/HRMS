@@ -37,11 +37,11 @@ class EvaluationAggregatorService
             : 0.0;
 
         return [
-            'total_evaluations'     => $evaluations->count(),
-            'latest_overall_score'  => $latestScore,
-            'previous_overall_score'=> $previousScore,
-            'score_change'          => $scoreChange,
-            'trend'                 => $scoreChange >= 0 ? 'improving' : 'declining',
+            'total_evaluations' => $evaluations->count(),
+            'latest_overall_score' => $latestScore,
+            'previous_overall_score' => $previousScore,
+            'score_change' => $scoreChange,
+            'trend' => $scoreChange >= 0 ? 'improving' : 'declining',
         ];
     }
 }

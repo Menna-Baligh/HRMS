@@ -16,7 +16,7 @@ class ManagerPerformanceController extends Controller
     public function teamDashboard(Request $request): JsonResponse
     {
         try {
-            $manager = $request->user(); 
+            $manager = $request->user();
 
             if (! $manager) {
                 return ResponseHelper::error(null, __('performance.manager_not_found'), 404);

@@ -21,5 +21,4 @@ return [
     'radius_invalid' => 'Radius must be greater than zero.',
     'no_fields_to_update' => 'Please provide at least one field to update.',
 
-
 ];

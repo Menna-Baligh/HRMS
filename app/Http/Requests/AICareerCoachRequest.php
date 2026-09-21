@@ -15,7 +15,7 @@ class AICareerCoachRequest extends FormRequest
     {
         return [
             'employee_id' => ['required', 'string', 'exists:users,employee_id'],
-            'period'      => ['nullable', 'string'],
+            'period' => ['nullable', 'string'],
         ];
     }
 
@@ -23,7 +23,7 @@ class AICareerCoachRequest extends FormRequest
     {
         return [
             'employee_id' => __('ai.attributes.employee_id'),
-            'period'      => __('ai.attributes.period'),
+            'period' => __('ai.attributes.period'),
         ];
     }
 }

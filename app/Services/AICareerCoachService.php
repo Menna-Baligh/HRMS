@@ -27,7 +27,7 @@ class AICareerCoachService
 
         $payload = [
             'employee_id' => $targetEmployeeCode,
-            'period'      => $period ?? now()->format('Y-\Q').ceil(now()->month / 3),
+            'period' => $period ?? now()->format('Y-\Q').ceil(now()->month / 3),
         ];
 
         $aiBaseUrl = config('services.ai.base_url', 'http://ai-service-url/api');
@@ -37,16 +37,16 @@ class AICareerCoachService
 
         $aiRoleHeader = match (strtolower($rawRole)) {
             'owner', 'hr' => 'hr_admin',
-            'manager'                 => 'manager',
-            default                   => 'employee',
+            'manager' => 'manager',
+            default => 'employee',
         };
 
         try {
             $response = Http::timeout(15)
                 ->withHeaders([
                     'X-Caller-ID' => $currentUser->employee_id ?? (string) $currentUser->id,
-                    'X-Role'      => $aiRoleHeader,
-        ])->post("{$aiBaseUrl}/career-coach", $payload);
+                    'X-Role' => $aiRoleHeader,
+                ])->post("{$aiBaseUrl}/career-coach", $payload);
 
             if ($response->failed()) {
                 Log::error('AI Service Error', ['response' => $response->body()]);

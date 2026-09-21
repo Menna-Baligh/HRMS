@@ -7,7 +7,6 @@ use Illuminate\Validation\ValidationException;
 
 class LoginService
 {
-
     public function login(array $credentials): array
     {
         if (! $token = auth('api')->attempt($credentials)) {

@@ -22,5 +22,4 @@ return [
     'details_retrieved_successfully' => 'Task details retrieved successfully.',
     'activities_retrieved_successfully' => 'Task activities retrieved successfully.',
 
-
 ];

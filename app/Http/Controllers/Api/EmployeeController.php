@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeHrFieldsRequest;
 use App\Http\Requests\UpdateProfileRequest;
-use App\Http\Resources\EmployeeResource;
 use App\Http\Resources\UserResource;
 use App\Jobs\SendNotificationJob;
 use App\Services\EmployeeService;
@@ -50,14 +49,14 @@ class EmployeeController extends Controller
     public function show(int $id): JsonResponse
     {
         try {
-        $user = $this->employeeService->getEmployeeById($id);
+            $user = $this->employeeService->getEmployeeById($id);
 
-        Gate::authorize('view', $user);
+            Gate::authorize('view', $user);
 
-        return ResponseHelper::success(
-            data: new UserResource($user),
-            message: __('employees.retrieved_details_successfully')
-        );
+            return ResponseHelper::success(
+                data: new UserResource($user),
+                message: __('employees.retrieved_details_successfully')
+            );
         } catch (AuthorizationException $e) {
             return ResponseHelper::error(
                 message: __('employees.unauthorized_view_profile'),
@@ -81,16 +80,16 @@ class EmployeeController extends Controller
     public function updateHrFields(UpdateEmployeeHrFieldsRequest $request, int $id): JsonResponse
     {
         try {
-        $user = $this->employeeService->getEmployeeById($id);
+            $user = $this->employeeService->getEmployeeById($id);
 
-        Gate::authorize('updateHrFields', $user);
+            Gate::authorize('updateHrFields', $user);
 
-        $updatedUser = $this->employeeService->updateHrFields($user, $request->validated());
+            $updatedUser = $this->employeeService->updateHrFields($user, $request->validated());
 
-        return ResponseHelper::success(
-            data: new UserResource($updatedUser),
-            message: __('employees.hr_fields_updated')
-        );
+            return ResponseHelper::success(
+                data: new UserResource($updatedUser),
+                message: __('employees.hr_fields_updated')
+            );
         } catch (AuthorizationException $e) {
             return ResponseHelper::error(
                 message: __('employees.unauthorized_update_hr_fields'),
@@ -114,15 +113,15 @@ class EmployeeController extends Controller
     public function updateProfile(UpdateProfileRequest $request): JsonResponse
     {
         try {
-        $user = $this->employeeService->updateProfile(
-            auth('api')->user(),
-            $request->validated()
-        );
+            $user = $this->employeeService->updateProfile(
+                auth('api')->user(),
+                $request->validated()
+            );
 
-        return ResponseHelper::success(
-            data: new UserResource($user),
-            message: __('employees.profile_updated_successfully')
-        );
+            return ResponseHelper::success(
+                data: new UserResource($user),
+                message: __('employees.profile_updated_successfully')
+            );
         } catch (Throwable $e) {
             report($e);
 
@@ -136,46 +135,46 @@ class EmployeeController extends Controller
     public function changeAccountStatus(int $id, NotificationService $notificationService): JsonResponse
     {
         try {
-        $user = $this->employeeService->changeAccountStatus($id);
+            $user = $this->employeeService->changeAccountStatus($id);
 
-        $isActive = $user->status === 'active';
+            $isActive = $user->status === 'active';
 
-        $message = $isActive
-            ? __('employees.account_activated')
-            : __('employees.account_deactivated');
+            $message = $isActive
+                ? __('employees.account_activated')
+                : __('employees.account_deactivated');
 
-        SendNotificationJob::dispatch(
-            user: $user,
-            type: $isActive ? 'account_activated' : 'account_deactivated',
-            titleKey: $isActive ? 'notifications.account_activated_title' : 'notifications.account_deactivated_title',
-            bodyKey: $isActive ? 'notifications.account_activated_body' : 'notifications.account_deactivated_body',
-            parameters: [],
-            metadata: [
-                'screen'       => 'profile_overview',
-                'status'       => $user->status,
-                'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
-            ]
-        );
+            SendNotificationJob::dispatch(
+                user: $user,
+                type: $isActive ? 'account_activated' : 'account_deactivated',
+                titleKey: $isActive ? 'notifications.account_activated_title' : 'notifications.account_deactivated_title',
+                bodyKey: $isActive ? 'notifications.account_activated_body' : 'notifications.account_deactivated_body',
+                parameters: [],
+                metadata: [
+                    'screen' => 'profile_overview',
+                    'status' => $user->status,
+                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                ]
+            );
 
-        return ResponseHelper::success(
-            data: new UserResource($user),
-            message: $message
-        );
-    } catch (ValidationException $e) {
-        throw $e; 
-    } catch (ModelNotFoundException $e) {
-        return ResponseHelper::error(
-            message: __('employees.not_found'),
-            statusCode: Response::HTTP_NOT_FOUND
-        );
-    } catch (Throwable $e) {
-        report($e);
+            return ResponseHelper::success(
+                data: new UserResource($user),
+                message: $message
+            );
+        } catch (ValidationException $e) {
+            throw $e;
+        } catch (ModelNotFoundException $e) {
+            return ResponseHelper::error(
+                message: __('employees.not_found'),
+                statusCode: Response::HTTP_NOT_FOUND
+            );
+        } catch (Throwable $e) {
+            report($e);
 
-        return ResponseHelper::error(
-            message: __('employees.failed_to_change_status'),
-            statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
-        );
-    }
+            return ResponseHelper::error(
+                message: __('employees.failed_to_change_status'),
+                statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
     }
 
     public function index(Request $request): JsonResponse

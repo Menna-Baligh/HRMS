@@ -32,6 +32,7 @@ class ManagerController extends Controller
             $perPage = (int) $request->get('per_page', 15);
             $employees = $this->employeeService->getAllEmployees($filters, $perPage);
             $paginatedData = UserResource::collection($employees)->response()->getData(true);
+
             return ResponseHelper::success(
                 data: $paginatedData,
                 message: __('manager.employees_retrieved')
@@ -49,7 +50,7 @@ class ManagerController extends Controller
     public function teamGoals(Request $request): JsonResponse
     {
         try {
-            $manager = $request->user(); 
+            $manager = $request->user();
 
             if (! $manager) {
                 return ResponseHelper::error(null, __('goal.manager_not_found'), 404);

@@ -6,7 +6,6 @@ use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use RuntimeException;
 
 class ForgotPasswordService
 {
@@ -15,36 +14,37 @@ class ForgotPasswordService
     ) {}
 
     public function sendOtp(string $email): array
-     { 
+    {
         $user = User::where('email', $email)->first();
-         if (! $user) 
-         { throw ValidationException::withMessages([
-            'email' => [__('auth.email_not_found')],
-        ]);
-         } $this->otpService->generate($user->email); 
-         return [ 'email' => $user->email, ]; 
-        
-        }
+        if (! $user) {
+            throw ValidationException::withMessages([
+                'email' => [__('auth.email_not_found')],
+            ]);
+        } $this->otpService->generate($user->email);
+
+        return ['email' => $user->email];
+
+    }
 
     public function verifyOtp($email, $otp)
     {
 
         $user = User::where('email', $email)->first();
 
-        if (! $user) 
-        { throw ValidationException::withMessages([ 
-            'email' => [__('auth.email_not_found')],
-         ]); 
+        if (! $user) {
+            throw ValidationException::withMessages([
+                'email' => [__('auth.email_not_found')],
+            ]);
         }
         $isValid = $this->otpService->verify(
             $user->email,
             $otp
         );
 
-        if (! $isValid)
-         { throw ValidationException::withMessages([ 
-            'otp' => [__('auth.invalid_or_expired_otp')],
-         ]); 
+        if (! $isValid) {
+            throw ValidationException::withMessages([
+                'otp' => [__('auth.invalid_or_expired_otp')],
+            ]);
         }
 
         $resetToken = Str::random(64);
@@ -65,20 +65,18 @@ class ForgotPasswordService
         $key = 'password_reset:'.$resetToken;
         $email = Cache::get($key);
 
-        if (! $email)
-         {
-             throw ValidationException::withMessages([ 
+        if (! $email) {
+            throw ValidationException::withMessages([
                 'reset_token' => [__('auth.invalid_or_expired_reset_token')],
-             ]);
-             }
+            ]);
+        }
 
         $user = User::where('email', $email)->first();
-        if (! $user)
-         {
-             throw ValidationException::withMessages([ 
+        if (! $user) {
+            throw ValidationException::withMessages([
                 'email' => [__('auth.user_not_found')],
-             ]);
-             }
+            ]);
+        }
         $user->update([
             'password' => $password,
         ]);

@@ -8,7 +8,7 @@ class AttendanceAggregatorService
 {
     public function getMetrics(int $userId, string $startDate, string $endDate): array
     {
-        $attendances = Attendance::where('user_id', $userId) 
+        $attendances = Attendance::where('user_id', $userId)
             ->whereBetween('date', [$startDate, $endDate])
             ->get();
 
@@ -23,11 +23,11 @@ class AttendanceAggregatorService
             : 0.0;
 
         return [
-            'total_days'         => $totalRecords,
-            'present_days'       => $presentCount,
-            'late_days'          => $lateCount,
-            'absent_days'        => $absentCount,
-            'attendance_rate'    => $attendanceRate,
+            'total_days' => $totalRecords,
+            'present_days' => $presentCount,
+            'late_days' => $lateCount,
+            'absent_days' => $absentCount,
+            'attendance_rate' => $attendanceRate,
             'total_worked_hours' => round($totalWorkedSeconds / 3600, 2),
         ];
     }
