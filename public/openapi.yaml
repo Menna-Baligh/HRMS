@@ -6844,6 +6844,744 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /api/ai/career-coach:
+    post:
+      summary: AI Career Coach Guidance (For All Roles)
+      description: Generates personalized career development guidance based on approved employee data.
+      operationId: getCareerCoachGuidance
+      tags:
+        - AI Features
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: query
+          name: lang
+          required: false
+          description: Language for response translation (e.g. ar, en)
+          schema:
+            type: string
+            enum: [ar, en]
+            default: en
+          example: en
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - employee_id
+              properties:
+                employee_id:
+                  type: string
+                  example: "EMP-2026-001"
+                period:
+                  type: string
+                  nullable: true
+                  example: "2026-Q3"
+      responses:
+        '200':
+          description: Career coach guidance retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Career coach guidance retrieved successfully."
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "success"
+                      employee_id:
+                        type: string
+                        example: "EMP-2026-001"
+                      development_focus:
+                        type: string
+                        example: "Prioritize: System Design"
+                      strengths:
+                        type: array
+                        items:
+                          type: string
+                        example: ["Clean Code", "Problem Solving"]
+                      development_areas:
+                        type: array
+                        items:
+                          type: string
+                        example: ["System Architecture"]
+                      development_plan:
+                        type: array
+                        items:
+                          type: string
+                        example: ["Complete Laravel Microservices Course"]
+                      follow_up:
+                        type: object
+                        properties:
+                          checkpoint:
+                            type: string
+                            example: "Next review"
+                          review_focus:
+                            type: string
+                            example: "Review progress"
+                      created_at:
+                        type: string
+                        format: date-time
+                        example: "2026-09-21T10:00:00Z"
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: "Unauthenticated. Please log in first."
+                errors: null
+        '403':
+          description: Forbidden (e.g. Employee accessing another employee's profile)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: "You are not authorized to access this employee's records."
+                errors: null
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: "Validation error."
+                errors:
+                  employee_id:
+                    - "The selected employee_id is invalid."
+        '500':
+          description: AI Service Failure / Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: "AI service is currently unavailable."
+                errors: null
+
+  /api/ai/performance-insight:
+    post:
+      summary: AI Performance Insight (For All Roles)
+      description: Explains approved performance metrics and trends for an employee.
+      operationId: getPerformanceInsight
+      tags:
+        - AI Features
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [ar, en]
+            default: en
+          example: en
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - employee_id
+                - period
+              properties:
+                employee_id:
+                  type: string
+                  example: "EMP-2026-001"
+                period:
+                  type: string
+                  example: "2026-Q3"
+      responses:
+        '200':
+          description: Performance insight retrieved successfully or insufficient data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Performance insight retrieved successfully."
+                  data:
+                    type: object
+              examples:
+                successCase:
+                  summary: Success
+                  value:
+                    success: true
+                    message: "Performance insight retrieved successfully."
+                    data:
+                      status: "success"
+                      employee_id: "EMP-2026-001"
+                      verified_facts:
+                        target_period: "2026-Q3"
+                        metrics_by_period: []
+                      calculated_trends: {}
+                      interpretation: {}
+                      recommended_actions: []
+                      created_at: "2026-09-21T10:00:00Z"
+                insufficientDataCase:
+                  summary: Insufficient Data
+                  value:
+                    success: true
+                    message: "Insufficient approved performance data for this period."
+                    data:
+                      status: "insufficient_data"
+                      employee_id: "EMP-2026-001"
+                      reason: "Insufficient approved performance data"
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '422':
+          $ref: '#/components/responses/422ValidationError'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+
+  /api/ai/evaluation-draft:
+    post:
+      summary: AI Evaluation Draft Assistant (Manager / HR / Owner only)
+      description: Generates an editable evaluation draft. This route is forbidden for Employees.
+      operationId: generateEvaluationDraft
+      tags:
+        - AI Features
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [ar, en]
+            default: en
+          example: en
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - employee_id
+                - period
+                - evaluation_scores
+              properties:
+                employee_id:
+                  type: string
+                  example: "EMP-2026-001"
+                period:
+                  type: string
+                  example: "2026-Q3"
+                evaluation_scores:
+                  type: object
+                  example:
+                    overall_score: 88
+                manager_notes:
+                  type: string
+                  nullable: true
+                  example: "Strong delivery on recent deliverables."
+      responses:
+        '200':
+          description: Evaluation draft generated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Evaluation draft generated successfully."
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "success"
+                      employee_id:
+                        type: string
+                        example: "EMP-2026-001"
+                      period:
+                        type: string
+                        example: "2026-Q3"
+                      evaluation_narrative:
+                        type: string
+                        example: "Draft narrative for manager review."
+                      strengths:
+                        type: array
+                        items:
+                          type: string
+                      improvement_areas:
+                        type: array
+                        items:
+                          type: string
+                      human_review_required:
+                        type: boolean
+                        example: true
+                      created_at:
+                        type: string
+                        format: date-time
+                        example: "2026-09-21T10:00:00Z"
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          description: Forbidden for employees
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: "Employees are not authorized to access manager-level AI features."
+                errors: null
+        '422':
+          $ref: '#/components/responses/422ValidationError'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+
+  /api/ai/skill-gap:
+    post:
+      summary: AI Skill-Gap Analysis (For All Roles)
+      description: Identifies evidence-backed skill gaps and recommends target development actions.
+      operationId: getSkillGapAnalysis
+      tags:
+        - AI Features
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [ar, en]
+            default: en
+          example: en
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - employee_id
+              properties:
+                employee_id:
+                  type: string
+                  example: "EMP-2026-001"
+                period:
+                  type: string
+                  nullable: true
+                  example: "2026-Q3"
+                target_role:
+                  type: string
+                  nullable: true
+                  example: "Senior Backend Engineer"
+                target_skills:
+                  type: array
+                  nullable: true
+                  items:
+                    type: string
+                  example: ["Python", "System Design", "Microservices"]
+      responses:
+        '200':
+          description: Skill gaps analyzed successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Skill gaps analyzed and recommendations retrieved successfully."
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "success"
+                      employee_id:
+                        type: string
+                        example: "EMP-2026-001"
+                      target_role:
+                        type: string
+                        example: "Senior Backend Engineer"
+                      skill_gaps:
+                        type: array
+                        items:
+                          type: string
+                      recommendations:
+                        type: array
+                        items:
+                          type: string
+                      disclaimer:
+                        type: string
+                        example: "AI-generated and advisory."
+                      created_at:
+                        type: string
+                        format: date-time
+                        example: "2026-09-21T10:00:00Z"
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '422':
+          $ref: '#/components/responses/422ValidationError'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+
+  /api/ai/attention-signal:
+    post:
+      summary: AI Employee Attention Signal (Manager / HR / Owner only)
+      description: Returns an advisory Low/Medium/High signal regarding changes in recent employee work indicators.
+      operationId: getAttentionSignal
+      tags:
+        - AI Features
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [ar, en]
+            default: en
+          example: en
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - employee_id
+                - target_period
+              properties:
+                employee_id:
+                  type: string
+                  example: "EMP-2026-001"
+                target_period:
+                  type: string
+                  example: "2026-Q3"
+      responses:
+        '200':
+          description: Attention signal retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Employee attention signal retrieved successfully."
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "success"
+                      employee_id:
+                        type: string
+                        example: "EMP-2026-001"
+                      target_period:
+                        type: string
+                        example: "2026-Q3"
+                      comparison_period:
+                        type: string
+                        example: "2026-Q2"
+                      attention_level:
+                        type: string
+                        enum: [Low, Medium, High]
+                        example: "Low"
+                      explanation:
+                        type: string
+                        example: "Advisory explanation."
+                      contributing_indicators:
+                        type: array
+                        items:
+                          type: string
+                      recommended_follow_up:
+                        type: array
+                        items:
+                          type: string
+                      advisory_only:
+                        type: boolean
+                        example: true
+                      human_review_required:
+                        type: boolean
+                        example: true
+                      created_at:
+                        type: string
+                        format: date-time
+                        example: "2026-09-21T10:00:00Z"
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '422':
+          $ref: '#/components/responses/422ValidationError'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+
+  /api/ai/team-insight:
+    post:
+      summary: AI Team Insight Summary (Manager / HR / Owner only)
+      description: Generates a team-level summary of patterns and workload for a specific department.
+      operationId: getTeamInsight
+      tags:
+        - AI Features
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [ar, en]
+            default: en
+          example: en
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - department
+                - period
+              properties:
+                department:
+                  type: string
+                  example: "Engineering"
+                period:
+                  type: string
+                  example: "2026-Q3"
+      responses:
+        '200':
+          description: Team insight summary retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Team insight summary retrieved successfully."
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "success"
+                      department:
+                        type: string
+                        example: "Engineering"
+                      period:
+                        type: string
+                        example: "2026-Q3"
+                      team_size:
+                        type: integer
+                        example: 5
+                      summary:
+                        type: string
+                        example: "Team-level summary."
+                      top_common_skills:
+                        type: array
+                        items:
+                          type: string
+                      top_common_gaps:
+                        type: array
+                        items:
+                          type: string
+                      recommended_management_actions:
+                        type: array
+                        items:
+                          type: string
+                      created_at:
+                        type: string
+                        format: date-time
+                        example: "2026-09-21T10:00:00Z"
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '422':
+          $ref: '#/components/responses/422ValidationError'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+
+  /api/ai/policy-assistant:
+    post:
+      summary: AI HR Policy Assistant (For All Roles)
+      description: Answers employee policy questions grounded in company policies and employee facts.
+      operationId: askPolicyQuestion
+      tags:
+        - AI Features
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [ar, en]
+            default: en
+          example: en
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - employee_id
+                - question
+              properties:
+                employee_id:
+                  type: string
+                  example: "EMP-2026-001"
+                question:
+                  type: string
+                  minLength: 3
+                  example: "What is the remote work policy?"
+                session_id:
+                  type: string
+                  nullable: true
+                  example: "session-abc-123"
+      responses:
+        '200':
+          description: Answer generated successfully or question unsupported.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Policy question answered successfully."
+                  data:
+                    type: object
+              examples:
+                supportedCase:
+                  summary: Supported Question
+                  value:
+                    success: true
+                    message: "Policy question answered successfully."
+                    data:
+                      status: "success"
+                      session_id: "session-abc-123"
+                      employee_id: "EMP-2026-001"
+                      answer: "Remote work is allowed up to 2 days per week with manager approval."
+                      policy_references: ["Section 4.2 - Remote Work"]
+                      employee_facts_used: ["leave_balance: 14 days"]
+                      created_at: "2026-09-21T10:00:00Z"
+                unsupportedCase:
+                  summary: Unsupported Question
+                  value:
+                    success: true
+                    message: "The question is outside the approved policy scope."
+                    data:
+                      status: "unsupported"
+                      employee_id: "EMP-2026-001"
+                      message: "The question is outside the approved policy scope."
+                      created_at: "2026-09-21T10:00:00Z"
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '422':
+          $ref: '#/components/responses/422ValidationError'
+        '500':
+          $ref: '#/components/responses/500ServerError'
 components:
   securitySchemes:
     bearerAuth:
