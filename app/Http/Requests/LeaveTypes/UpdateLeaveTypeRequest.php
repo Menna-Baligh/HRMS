@@ -36,6 +36,11 @@ class UpdateLeaveTypeRequest extends FormRequest
                 'sometimes',
                 'boolean',
             ],
+            'default_days' => [
+                'sometimes',
+                'numeric',
+                'min:0',
+            ],
 
             'requires_balance' => [
                 'sometimes',

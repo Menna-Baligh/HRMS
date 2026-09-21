@@ -2,16 +2,19 @@
 
 namespace App\Services\LeaveBalances;
 
-use App\Models\Employee;
 use App\Models\LeaveBalance;
 use App\Models\LeaveType;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use RuntimeException;
 
 class LeaveBalanceService
 {
+    /**
+     * Get leave balances for the authenticated user.
+     */
     public function getMyBalances(
-        Employee $employee,
+        User $user,
         ?int $year = null,
         ?int $leaveTypeId = null
     ): Collection {
@@ -19,7 +22,7 @@ class LeaveBalanceService
 
         return LeaveBalance::query()
             ->with('leaveType')
-            ->where('employee_id', $employee->id)
+            ->where('user_id', $user->id)
             ->where('year', $year)
             ->when(
                 $leaveTypeId !== null,
@@ -32,8 +35,12 @@ class LeaveBalanceService
             ->get();
     }
 
-    public function createBalancesForEmployee(
-        Employee $employee,
+    /**
+     * Create balances for all active leave types
+     * that require a balance.
+     */
+    public function createBalancesForUser(
+        User $user,
         ?int $year = null
     ): Collection {
         $year ??= now()->year;
@@ -46,7 +53,7 @@ class LeaveBalanceService
         foreach ($leaveTypes as $leaveType) {
             LeaveBalance::firstOrCreate(
                 [
-                    'employee_id' => $employee->id,
+                    'user_id' => $user->id,
                     'leave_type_id' => $leaveType->id,
                     'year' => $year,
                 ],
@@ -57,11 +64,17 @@ class LeaveBalanceService
             );
         }
 
-        return $this->getMyBalances($employee, $year);
+        return $this->getMyBalances(
+            user: $user,
+            year: $year
+        );
     }
 
+    /**
+     * Validate that the user has enough leave balance.
+     */
     public function validateBalance(
-        Employee $employee,
+        User $user,
         LeaveType $leaveType,
         float $requestedDays,
         ?int $year = null
@@ -73,14 +86,14 @@ class LeaveBalanceService
         $year ??= now()->year;
 
         $balance = LeaveBalance::query()
-            ->where('employee_id', $employee->id)
+            ->where('user_id', $user->id)
             ->where('leave_type_id', $leaveType->id)
             ->where('year', $year)
             ->first();
 
         if (! $balance) {
             throw new RuntimeException(
-                'Leave balance does not exist for this employee.'
+                __('leave_balances.balance_not_found')
             );
         }
 
@@ -90,25 +103,30 @@ class LeaveBalanceService
 
         if ($requestedDays > $remaining) {
             throw new RuntimeException(
-                "Insufficient leave balance. Remaining balance: {$remaining} days."
+                __('leave_balances.insufficient_balance', [
+                    'remaining' => $remaining,
+                ])
             );
         }
     }
 
+    /**
+     * Deduct leave balance after approval.
+     */
     public function deductBalance(
-        Employee $employee,
+        User $user,
         LeaveType $leaveType,
         float $days,
         int $year
     ): LeaveBalance {
         if (! $leaveType->requires_balance) {
             throw new RuntimeException(
-                'This leave type does not require a balance.'
+                __('leave_balances.not_required')
             );
         }
 
         $balance = LeaveBalance::query()
-            ->where('employee_id', $employee->id)
+            ->where('user_id', $user->id)
             ->where('leave_type_id', $leaveType->id)
             ->where('year', $year)
             ->lockForUpdate()

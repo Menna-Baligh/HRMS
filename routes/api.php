@@ -3,6 +3,7 @@
 use App\Enums\PermissionEnum;
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CalendarController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\EmployeeEvaluationController;
@@ -16,6 +17,7 @@ use App\Http\Controllers\Api\HrEvaluationSetupController;
 use App\Http\Controllers\Api\HrGoalController;
 use App\Http\Controllers\Api\HrPerformanceController;
 use App\Http\Controllers\Api\LeaveBalanceController;
+use App\Http\Controllers\Api\LeaveDecisionHistoryController;
 use App\Http\Controllers\Api\LeaveRequestController;
 use App\Http\Controllers\Api\LeaveTypeController;
 use App\Http\Controllers\Api\ManagerAttendanceController;
@@ -30,6 +32,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 
+/*
+|--------------------------------------------------------------------------
+| Authentication Routes
+|--------------------------------------------------------------------------
+*/
+
+// Route::middleware('set.app.language')->prefix('auth')->group(function () {
 
 Route::middleware('set.app.language')->prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
@@ -50,22 +59,123 @@ Route::middleware('set.app.language')->prefix('auth')->group(function () {
 });
 
 
+/*
+|--------------------------------------------------------------------------
+| calender Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('calender')->middleware(['auth:api', 'set.app.language'])->group(function () {
+    Route::get('/', [CalendarController::class, 'index']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| leave Management Routes
+|--------------------------------------------------------------------------
+*/
+
+
+Route::prefix('leaves')->middleware('auth:api','set.app.language')->group(function () {
+
+   // ............................................. Leave Types........................................................
+    // new leave type
+    Route::post('/leave-types', [LeaveTypeController::class,'store',]);
+    //get all leave types
+    Route::get('/leave-types', [LeaveTypeController::class,'index',]); 
+    //update leave type
+    Route::put('/leave-types/{leaveType}', [LeaveTypeController::class,'update',]);
+    //activate leave
+    Route::patch('/leave-types/{leaveType}/activate', [LeaveTypeController::class,'activate',]);
+    //deactivate
+    Route::patch('/leave-types/{leaveType}/deactivate', [LeaveTypeController::class,'deactivate',]);
+    // ............................................. Leave balances........................................................
+    //Leave Balances
+    Route::get('/leave-balances', [LeaveBalanceController::class,'index',]);
+    // ..............................................Leave requests.......................................................
+    // create leave
+    Route::post( '/leave-requests', [LeaveRequestController::class, 'store'] );
+    //manager Pending Queue
+    Route::get('/leave-requests/manager/pending',[LeaveRequestController::class, 'managerPendingQueue'])->middleware('role:Manager');
+    // hr pending Queue
+    Route::get('/leave-requests/hr/pending',[LeaveRequestController::class, 'hrPendingQueue'])->middleware('role:HR|Owner');
+    // Leave Decision History
+    Route::get('/leave-requests/{leaveRequest}/decisions', [LeaveDecisionHistoryController::class, 'index']);
+    //approve leave
+    Route::patch('/leave-requests/{leaveRequest}/approve', [ LeaveRequestController::class, 'approve' ]);
+    //reject leave
+    Route::patch('/leave-requests/{leaveRequest}/reject', [ LeaveRequestController::class, 'reject' ]);
+    //leave attachments
+    Route::post('/leave-requests/{leaveRequest}/attachments', [LeaveRequestController::class, 'storeAttachment']);
+    // leave details
+    Route::get('/leave-requests/{leaveRequest}',[LeaveRequestController::class, 'show']);
+    // leave history
+    Route::get('/leave-requests', [ LeaveRequestController::class,'history']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Task Management Routes
+|--------------------------------------------------------------------------
+*/
+
 Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(function () {
 
-    Route::prefix('employees')->group(function () {
-        Route::get('/', [EmployeeController::class, 'index'])->middleware('permission:'.PermissionEnum::EMPLOYEE_VIEW_ALL->value);
-        Route::post('/', [EmployeeController::class, 'store'])->middleware('permission:'.PermissionEnum::EMPLOYEE_CREATE->value);
-        Route::patch('/profile', [EmployeeController::class, 'updateProfile'])->middleware('permission:'.PermissionEnum::EMPLOYEE_UPDATE_PROFILE->value);
-        Route::get('/{id}', [EmployeeController::class, 'show'])->middleware('permission:'.PermissionEnum::EMPLOYEE_VIEW_PROFILE->value);
-        Route::patch('/{id}/hr-fields', [EmployeeController::class, 'updateHrFields'])->middleware('permission:'.PermissionEnum::EMPLOYEE_EDIT_HR_FIELDS->value);
-        Route::patch('/{id}/change-account-status', [EmployeeController::class, 'changeAccountStatus'])->middleware('permission:'.PermissionEnum::EMPLOYEE_CHANGE_ACCOUNT_STATUS->value);
+Route::prefix('tasks')->middleware('auth:api','set.app.language')->group(function () {
+        // Task list
+        Route::get('/', [TaskController::class, 'index']);
+        // Create task
+        Route::post('/', [TaskController::class, 'store']);
+        // Update task
+        Route::put('/{task}', [TaskController::class, 'update']);
+        // Assign task to employee
+        Route::post('/{task}/assign', [TaskController::class, 'assign']);
+        // Update task progress
+        Route::patch('/{task}/progress', [TaskController::class, 'updateProgress']);
+        // Update task status
+        Route::patch('/{task}/status', [TaskController::class, 'updateStatus']);
+        // Task details
+        Route::get('/{task}', [TaskController::class, 'show']);
+        // Task activity history
+        Route::get('/{task}/activities', [TaskController::class, 'activities']);
+        // Submit a task
+        Route::post('/{task}/submissions', [SubmissionController::class, 'store']);
+        // Attach file to submission
+        Route::post('/submissions/{submission}/attachments',[SubmissionController::class, 'attachFile']);
+        // Review queue
+        Route::get('/submissions/review',[SubmissionController::class, 'reviewQueue']);
+        // Submission details
+        Route::get('/submissions/{submission}',[SubmissionController::class, 'show']);
+        // Approve submission
+        Route::patch('/submissions/{submission}/approve',[SubmissionController::class, 'approve']);
+        // Reject submission
+        Route::patch('/submissions/{submission}/reject',[SubmissionController::class, 'reject']);
+        // Request changes
+        Route::patch('/submissions/{submission}/request-changes',[SubmissionController::class, 'requestChanges']);
+        // Resubmit
+        Route::post('/submissions/{submission}/resubmit',[SubmissionController::class, 'resubmit']);
     });
 
-    Route::prefix('departments')->group(function () {
-        Route::get('/', [DepartmentController::class, 'index'])->middleware('permission:'.PermissionEnum::DEPARTMENT_VIEW->value);
-        Route::post('/', [DepartmentController::class, 'store'])->middleware('permission:'.PermissionEnum::DEPARTMENT_CREATE->value);
-        Route::patch('/{id}', [DepartmentController::class, 'update'])->middleware('permission:'.PermissionEnum::DEPARTMENT_EDIT->value);
-        Route::patch('/{id}/change-status', [DepartmentController::class, 'changeStatus'])->middleware('permission:'.PermissionEnum::DEPARTMENT_CHANGE_STATUS->value);
+/*
+|--------------------------------------------------------------------------
+| Company Location Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware('auth:api','set.app.language')
+    ->prefix('locations')
+    ->group(function () {
+        // Create company location
+        Route::post('company/location',[CompanyLocationController::class, 'store']);
+        // Update company location
+        Route::put('company/location/{id}',[CompanyLocationController::class, 'update']);
+        // Deactivate company location
+        Route::patch('company/location/{id}/deactivate',[CompanyLocationController::class, 'deactivate']);
+        // Activate company location
+        Route::patch('company/location/{id}/activate',[CompanyLocationController::class, 'activate']);
+        // Get active company location
+        Route::get('company/location/active',[CompanyLocationController::class, 'activeLocation']
+        );
     });
 
     Route::prefix('locations/company/location')->group(function () {

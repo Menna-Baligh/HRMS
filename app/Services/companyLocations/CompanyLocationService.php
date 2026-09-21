@@ -17,8 +17,8 @@ class CompanyLocationService
         if (CompanyLocation::exists()) {
             throw ValidationException::withMessages([
                 'location' => [
-                    'The company already has a location.',
-                ],
+                     __('company_location.already_exists'),
+                     ],
             ]);
         }
 
@@ -129,16 +129,16 @@ class CompanyLocationService
         if ($latitude < -90 || $latitude > 90) {
             throw ValidationException::withMessages([
                 'latitude' => [
-                    'Latitude must be between -90 and 90.',
-                ],
+                     __('company_location.latitude_invalid'),
+                     ],
             ]);
         }
 
         if ($longitude < -180 || $longitude > 180) {
             throw ValidationException::withMessages([
                 'longitude' => [
-                    'Longitude must be between -180 and 180.',
-                ],
+                     __('company_location.longitude_invalid'),
+                     ],
             ]);
         }
     }
@@ -150,9 +150,9 @@ class CompanyLocationService
     {
         if ($radius <= 0) {
             throw ValidationException::withMessages([
-                'radius' => [
-                    'Radius must be greater than zero.',
-                ],
+               'radius' => [
+                 __('company_location.radius_invalid'),
+                 ],
             ]);
         }
     }

@@ -26,6 +26,11 @@ class StoreLeaveTypeRequest extends FormRequest
                 'nullable',
                 'string',
             ],
+            'default_days' => [
+                'required',
+                'numeric',
+                'min:0',
+            ],
 
             'is_active' => [
                 'sometimes',

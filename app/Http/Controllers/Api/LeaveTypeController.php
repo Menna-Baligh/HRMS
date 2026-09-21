@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LeaveTypes\StoreLeaveTypeRequest;
 use App\Http\Requests\LeaveTypes\UpdateLeaveTypeRequest;
@@ -21,10 +22,10 @@ class LeaveTypeController extends Controller
      */
     public function index(): JsonResponse
     {
-        return response()->json([
-            'message' => 'Leave types retrieved successfully.',
-            'data' => $this->leaveTypeService->index(),
-        ]);
+        return ResponseHelper::success(
+            $this->leaveTypeService->index(),
+            __('leave_types.retrieved_successfully')
+        );
     }
 
     /**
@@ -36,10 +37,11 @@ class LeaveTypeController extends Controller
             $request->validated()
         );
 
-        return response()->json([
-            'message' => 'Leave type created successfully.',
-            'data' => $leaveType,
-        ], 201);
+        return ResponseHelper::success(
+            $leaveType,
+            __('leave_types.created_successfully'),
+            201
+        );
     }
 
     /**
@@ -51,10 +53,10 @@ class LeaveTypeController extends Controller
             $request->validated()
         );
 
-        return response()->json([
-            'message' => 'Leave type updated successfully.',
-            'data' => $leaveType,
-        ]);
+        return ResponseHelper::success(
+            $leaveType,
+            __('leave_types.updated_successfully')
+        );
     }
 
     /**
@@ -64,10 +66,10 @@ class LeaveTypeController extends Controller
     {
         $leaveType = $this->leaveTypeService->activate($leaveType);
 
-        return response()->json([
-            'message' => 'Leave type activated successfully.',
-            'data' => $leaveType,
-        ]);
+        return ResponseHelper::success(
+            $leaveType,
+            __('leave_types.activated_successfully')
+        );
     }
 
     /**
@@ -77,9 +79,9 @@ class LeaveTypeController extends Controller
     {
         $leaveType = $this->leaveTypeService->deactivate($leaveType);
 
-        return response()->json([
-            'message' => 'Leave type deactivated successfully.',
-            'data' => $leaveType,
-        ]);
+        return ResponseHelper::success(
+            $leaveType,
+            __('leave_types.deactivated_successfully')
+        );
     }
 }

@@ -27,6 +27,7 @@ class LeaveTypeService
             return LeaveType::create([
                 'name' => $data['name'],
                 'description' => $data['description'] ?? null,
+                'default_days' => $data['default_days'],
                 'is_active' => $data['is_active'] ?? true,
                 'requires_balance' => $data['requires_balance'] ?? true,
                 'requires_attachment' => $data['requires_attachment'] ?? false,

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class LeaveBalance extends Model
 {
     protected $fillable = [
-        'employee_id',
+        'user_id',
         'leave_type_id',
         'year',
         'allocated_days',
@@ -20,10 +20,13 @@ class LeaveBalance extends Model
         'allocated_days' => 'decimal:2',
         'used_days' => 'decimal:2',
     ];
+    protected $appends = [
+        'remaining_days',
+    ];
 
-    public function employee(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Employee::class);
+        return $this->belongsTo(User::class);
     }
 
     public function leaveType(): BelongsTo

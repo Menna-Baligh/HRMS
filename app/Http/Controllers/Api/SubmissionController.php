@@ -23,10 +23,7 @@ class SubmissionController extends Controller
     /**
      * Create a task submission.
      */
-    public function store(
-        StoreSubmissionRequest $request,
-        Task $task
-    ): JsonResponse {
+    public function store(StoreSubmissionRequest $request,Task $task): JsonResponse {
         $submission = $this->submissionService->create(
             $task,
             $request->validated()
@@ -42,10 +39,7 @@ class SubmissionController extends Controller
     /**
      * Attach a file to a submission.
      */
-    public function attachFile(
-        AttachSubmissionFileRequest $request,
-        Submission $submission
-    ): JsonResponse {
+    public function attachFile(AttachSubmissionFileRequest $request,Submission $submission): JsonResponse {
         $file = $this->submissionService->attachFile(
             $submission,
             $request->file('file')
@@ -53,7 +47,7 @@ class SubmissionController extends Controller
 
         return ResponseHelper::success(
             $file,
-            __('File attached successfully.'),
+            __('submissions.file_attached_successfully'),
             201
         );
     }
@@ -64,9 +58,10 @@ class SubmissionController extends Controller
     public function show(Submission $submission): JsonResponse
     {
         $submission = $this->submissionService->show($submission);
-
+    
         return ResponseHelper::success(
-            $submission
+            $submission,
+            __('submissions.retrieved_successfully')
         );
     }
 
@@ -76,35 +71,31 @@ class SubmissionController extends Controller
     public function reviewQueue(): JsonResponse
     {
         $submissions = $this->submissionService->reviewQueue();
-
+    
         return ResponseHelper::success(
-            $submissions
+            $submissions,
+            __('submissions.review_queue_retrieved_successfully')
         );
     }
 
     /**
      * Approve submission.
      */
-    public function approve(
-        Submission $submission
-    ): JsonResponse {
-        $submission = $this->submissionService->approve(
-            $submission
-        );
+    public function approve(Submission $submission): JsonResponse
+{
+    $submission = $this->submissionService->approve($submission);
 
-        return ResponseHelper::success(
-            $submission,
-            __('Submission approved successfully.')
-        );
-    }
+    return ResponseHelper::success(
+        $submission,
+        __('submissions.approved_successfully')
+    );
+}
 
     /**
      * Reject submission.
      */
-    public function reject(
-        RejectSubmissionRequest $request,
-        Submission $submission
-    ): JsonResponse {
+    public function reject( RejectSubmissionRequest $request, Submission $submission): JsonResponse 
+    {
         $submission = $this->submissionService->reject(
             $submission,
             $request->validated('feedback')
@@ -112,17 +103,14 @@ class SubmissionController extends Controller
 
         return ResponseHelper::success(
             $submission,
-            __('Submission rejected successfully.')
+            __('submissions.rejected_successfully')
         );
     }
 
     /**
      * Request changes from employee.
      */
-    public function requestChanges(
-        RequestChangesRequest $request,
-        Submission $submission
-    ): JsonResponse {
+    public function requestChanges(RequestChangesRequest $request,Submission $submission): JsonResponse {
         $submission = $this->submissionService->requestChanges(
             $submission,
             $request->validated('feedback')
@@ -130,17 +118,14 @@ class SubmissionController extends Controller
 
         return ResponseHelper::success(
             $submission,
-            __('Changes requested successfully.')
+            __('submissions.changes_requested_successfully')
         );
     }
 
     /**
      * Resubmit a submission after requested changes.
      */
-    public function resubmit(
-        ResubmitSubmissionRequest $request,
-        Submission $submission
-    ): JsonResponse {
+    public function resubmit(ResubmitSubmissionRequest $request,Submission $submission ): JsonResponse {
         $submission = $this->submissionService->resubmit(
             $submission,
             $request->validated('note')
@@ -148,7 +133,7 @@ class SubmissionController extends Controller
 
         return ResponseHelper::success(
             $submission,
-            __('Submission resubmitted successfully.')
+            __('submissions.resubmitted_successfully')
         );
     }
 }

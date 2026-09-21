@@ -5,11 +5,12 @@ namespace App\Services\Submissions;
 use App\Enums\SubmissionStatus;
 use App\Enums\TaskStatus;
 use App\Jobs\SendNotificationJob;
-use App\Models\Employee;
 use App\Models\File;
 use App\Models\Submission;
+use App\Models\SubmissionAttachment;
 use App\Models\SubmissionReview;
 use App\Models\Task;
+use App\Models\User;
 use App\Services\FileService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
@@ -18,26 +19,27 @@ use Illuminate\Validation\ValidationException;
 
 class SubmissionService
 {
-    public function __construct(protected FileService $fileService) {}
+    public function __construct(
+        protected FileService $fileService
+    ) {}
 
     /**
-     * Create a task submission.
+     * Create a new submission for a task.
      */
-    public function create(Task $task, array $data): Submission
-    {
+    public function create(Task $task,array $data): Submission {
         $submission = DB::transaction(function () use ($task, $data) {
 
-            $employee = $this->getAuthenticatedEmployee();
+            $user = $this->getAuthenticatedEmployee();
 
             $this->ensureTaskCanBeSubmitted($task);
 
-            $this->ensureEmployeeAssignedToTask(
-                $task,
-                $employee
+            $this->ensureUserAssignedToTask(
+                task: $task,
+                user: $user
             );
 
             $existingSubmission = Submission::where('task_id', $task->id)
-                ->where('employee_id', $employee->id)
+                ->where('user_id', $user->id)
                 ->whereIn('status', [
                     SubmissionStatus::PENDING_REVIEW->value,
                     SubmissionStatus::APPROVED->value,
@@ -52,169 +54,210 @@ class SubmissionService
 
             return Submission::create([
                 'task_id' => $task->id,
-                'employee_id' => $employee->id,
+                'user_id' => $user->id,
                 'note' => $data['note'] ?? null,
                 'status' => SubmissionStatus::PENDING_REVIEW,
                 'submitted_at' => now(),
             ]);
         });
+
         if ($task->creator) {
             SendNotificationJob::dispatch(
                 user: $task->creator,
                 type: 'submission_created',
                 titleKey: 'notifications.submission_created_title',
                 bodyKey: 'notifications.submission_created_body',
-                parameters: ['title' => $task->title],
-                metadata: ['submission_id' => $submission->id, 'task_id' => $task->id]
+                parameters: [
+                    'title' => $task->title,
+                ],
+                metadata: [
+                    'submission_id' => $submission->id,
+                    'task_id' => $task->id,
+                ]
             );
         }
 
         return $submission;
     }
 
+    /**
+     * Attach a file to a submission.
+     */
     public function attachFile(
         Submission $submission,
         UploadedFile $file
-    ): File {
-        return DB::transaction(function () use ($submission, $file) {
-
-            $employee = $this->getAuthenticatedEmployee();
-
-            if ($submission->employee_id !== $employee->id) {
+    ): SubmissionAttachment {
+        return DB::transaction(function () use (
+            $submission,
+            $file
+        ) {
+            $user = $this->getAuthenticatedEmployee();
+    
+            if ((int) $submission->user_id !== (int) $user->id) {
                 throw ValidationException::withMessages([
                     'submission' => 'You are not the owner of this submission.',
                 ]);
             }
-
+    
             if ($submission->status === SubmissionStatus::APPROVED) {
                 throw ValidationException::withMessages([
                     'submission' => 'Approved submissions cannot be modified.',
                 ]);
             }
-
-            return $this->fileService->uploadFile(
+    
+            return $this->fileService->uploadSubmissionAttachment(
                 file: $file,
-                user: Auth::user(),
-                fileable: $submission
+                user: $user,
+                submission: $submission
             );
         });
     }
 
     /**
-     * Get submission details.
+     * Show a submission.
      */
     public function show(Submission $submission): Submission
     {
         $user = Auth::user();
 
-        $employee = Employee::where('user_id', $user->id)->first();
-
-        if ($employee && $submission->employee_id === $employee->id) {
-            return $submission->load([
-                'task',
-                'employee',
-                'files',
-                'reviews.reviewer',
+        if (! $user) {
+            throw ValidationException::withMessages([
+                'user' => __('submissions.unauthenticated'),
             ]);
         }
 
-        // Temporary manager/HR access.
-        if (in_array($user->role, ['Owner', 'HR', 'Manager'], true)) {
-            return $submission->load([
-                'task',
-                'employee',
-                'files',
-                'reviews.reviewer',
-            ]);
+        /*
+         * The submission owner can always view their submission.
+         */
+        if ((int) $submission->user_id === (int) $user->id) {
+            return $this->loadSubmission($submission);
+        }
+
+        /*
+         * Owner and HR can view all submissions.
+         */
+        if ($user->isOwner() || $user->isHR()) {
+            return $this->loadSubmission($submission);
+        }
+
+        /*
+         * Managers can only view submissions related
+         * to tasks they created or assigned.
+         */
+        if ($user->isManager()) {
+            $this->ensureReviewerCanAccess($submission);
+
+            return $this->loadSubmission($submission);
         }
 
         throw ValidationException::withMessages([
-            'submission' => 'You are not authorized to view this submission.',
+            'submission' => __('submissions.unauthorized_view'),
         ]);
     }
 
+    /**
+     * Get pending submissions available for review.
+     */
     public function reviewQueue()
     {
         $user = Auth::user();
 
         $query = Submission::with([
             'task',
-            'employee',
-            'files',
-        ])
-            ->where(
-                'status',
-                SubmissionStatus::PENDING_REVIEW
-            );
+            'user',
+            'attachments',
+        ])->where(
+            'status',
+            SubmissionStatus::PENDING_REVIEW
+        );
 
-        if (in_array($user->role, ['Owner', 'HR'], true)) {
+        /*
+         * Owner and HR can review all pending submissions.
+         */
+        if ($user->isOwner() || $user->isHR()) {
             return $query
                 ->latest('submitted_at')
                 ->paginate(15);
         }
 
-        $manager = Employee::where(
-            'user_id',
-            $user->id
-        )->first();
-
-        if (! $manager) {
-            throw ValidationException::withMessages([
-                'reviewer' => 'The authenticated user is not linked to an employee.',
-            ]);
+        /*
+         * Managers can review submissions related
+         * to tasks they created or assigned.
+         */
+        if ($user->isManager()) {
+            return $query
+                ->whereHas('task', function ($taskQuery) use ($user) {
+                    $taskQuery
+                        ->where('created_by', $user->id)
+                        ->orWhereHas(
+                            'assignments',
+                            function ($assignmentQuery) use ($user) {
+                                $assignmentQuery->where(
+                                    'assigned_by',
+                                    $user->id
+                                );
+                            }
+                        );
+                })
+                ->latest('submitted_at')
+                ->paginate(15);
         }
 
-        return $query
-            ->whereHas('employee.department', function ($departmentQuery) use ($manager) {
-                $departmentQuery->where('manager_id', $manager->id);
-            })
-            ->latest('submitted_at')
-            ->paginate(15);
+        throw ValidationException::withMessages([
+            'reviewer' => __('submissions.unauthorized_review'),
+        ]);
     }
 
     /**
      * Approve a submission.
      */
-    public function approve(Submission $submission): Submission
-    {
+    public function approve( Submission $submission): Submission {
         $submission = DB::transaction(function () use ($submission) {
-
+    
+            $this->ensureReviewerCanAccess($submission);
+    
             $this->ensureSubmissionCanBeReviewed($submission);
-
+    
             $submission->update([
                 'status' => SubmissionStatus::APPROVED,
             ]);
-
+    
             $this->createReview(
                 submission: $submission,
                 action: 'approved',
                 feedback: null
             );
-
+    
             return $submission->refresh();
         });
-        if ($submission->employee?->user) {
+    
+        if ($submission->user) {
             SendNotificationJob::dispatch(
-                user: $submission->employee->user,
+                user: $submission->user,
                 type: 'submission_approved',
                 titleKey: 'notifications.submission_approved_title',
                 bodyKey: 'notifications.submission_approved_body',
-                parameters: ['title' => $submission->task?->title],
-                metadata: ['submission_id' => $submission->id]
+                parameters: [
+                    'title' => $submission->task?->title,
+                ],
+                metadata: [
+                    'submission_id' => $submission->id,
+                ]
             );
         }
-
+    
         return $submission;
     }
 
     /**
      * Reject a submission.
      */
-    public function reject(
-        Submission $submission,
-        string $feedback
-    ): Submission {
-        $submission = DB::transaction(function () use ($submission, $feedback) {
+    public function reject(Submission $submission, string $feedback): Submission {
+        $submission = DB::transaction(function () use (
+            $submission,
+            $feedback
+        ) {
+            $this->ensureReviewerCanAccess($submission);
 
             $this->ensureSubmissionCanBeReviewed($submission);
 
@@ -230,14 +273,20 @@ class SubmissionService
 
             return $submission->refresh();
         });
-        if ($submission->employee?->user) {
+
+        if ($submission->user) {
             SendNotificationJob::dispatch(
-                user: $submission->employee->user,
+                user: $submission->user,
                 type: 'submission_rejected',
                 titleKey: 'notifications.submission_rejected_title',
                 bodyKey: 'notifications.submission_rejected_body',
-                parameters: ['title' => $submission->task?->title],
-                metadata: ['submission_id' => $submission->id, 'feedback' => $feedback]
+                parameters: [
+                    'title' => $submission->task?->title,
+                ],
+                metadata: [
+                    'submission_id' => $submission->id,
+                    'feedback' => $feedback,
+                ]
             );
         }
 
@@ -245,13 +294,14 @@ class SubmissionService
     }
 
     /**
-     * Request changes from employee.
+     * Request changes on a submission.
      */
-    public function requestChanges(
-        Submission $submission,
-        string $feedback
-    ): Submission {
-        $submission = DB::transaction(function () use ($submission, $feedback) {
+    public function requestChanges(Submission $submission,string $feedback): Submission {
+        $submission = DB::transaction(function () use (
+            $submission,
+            $feedback
+        ) {
+            $this->ensureReviewerCanAccess($submission);
 
             $this->ensureSubmissionCanBeReviewed($submission);
 
@@ -267,14 +317,19 @@ class SubmissionService
 
             return $submission->refresh();
         });
-        if ($submission->employee?->user) {
+
+        if ($submission->user) {
             SendNotificationJob::dispatch(
-                user: $submission->employee->user,
+                user: $submission->user,
                 type: 'submission_changes_requested',
                 titleKey: 'notifications.submission_changes_title',
                 bodyKey: 'notifications.submission_changes_body',
-                parameters: ['title' => $submission->task?->title],
-                metadata: ['submission_id' => $submission->id, 'feedback' => $feedback]
+                parameters: [
+                    'title' => $submission->task?->title,
+                ],
+                metadata: [
+                    'submission_id' => $submission->id,
+                ]
             );
         }
 
@@ -282,23 +337,146 @@ class SubmissionService
     }
 
     /**
-     * Make sure the submission can be reviewed.
+     * Resubmit a submission after changes were requested.
      */
-    private function ensureSubmissionCanBeReviewed(
-        Submission $submission
-    ): void {
-        if (
-            $submission->status !==
-            SubmissionStatus::PENDING_REVIEW
+    public function resubmit( Submission $submission,?string $note = null): Submission {
+        return DB::transaction(function () use (
+            $submission,
+            $note
         ) {
+            $user = $this->getAuthenticatedEmployee();
+
+            if ((int) $submission->user_id !== (int) $user->id) {
+                throw ValidationException::withMessages([
+                    'submission' => __('submissions.not_submission_owner'),
+                ]);
+            }
+
+            if (
+                $submission->status !==
+                SubmissionStatus::CHANGES_REQUESTED
+            ) {
+                throw ValidationException::withMessages([
+                    'submissions.only_changes_requested_can_be_resubmitted'
+                ]);
+            }
+
+            $submission->update([
+                'status' => SubmissionStatus::PENDING_REVIEW,
+                'note' => $note ?? $submission->note,
+                'submitted_at' => now(),
+            ]);
+
+            return $submission->refresh();
+        });
+    }
+
+    /**
+     * Get the authenticated user and make sure
+     * the user has the Employee role.
+     */
+    private function getAuthenticatedEmployee(): User
+    {
+        $user = Auth::user();
+
+        if (! $user) {
             throw ValidationException::withMessages([
-                'submission' => 'This submission is not waiting for review.',
+                'user' => 'Unauthenticated user.',
+            ]);
+        }
+
+        if (! $user->isEmployee()) {
+            throw ValidationException::withMessages([
+                'user' => 'Only employees can submit tasks.',
+            ]);
+        }
+
+        return $user;
+    }
+
+    /**
+     * Make sure the task can receive submissions.
+     */
+    private function ensureTaskCanBeSubmitted(
+        Task $task
+    ): void {
+        if ($task->status === TaskStatus::CLOSED) {
+            throw ValidationException::withMessages([
+                'task' => 'Closed tasks cannot receive submissions.',
             ]);
         }
     }
 
     /**
-     * Create a submission review history record.
+     * Make sure the user is assigned to the task.
+     */
+    private function ensureUserAssignedToTask(
+        Task $task,
+        User $user
+    ): void {
+        $assigned = $task->assignments()
+            ->where('user_id', $user->id)
+            ->exists();
+
+        if (! $assigned) {
+            throw ValidationException::withMessages([
+                'task' => 'You are not assigned to this task.',
+            ]);
+        }
+    }
+
+    /**
+     * Make sure the submission is waiting for review.
+     */
+    private function ensureSubmissionCanBeReviewed(Submission $submission ): void {
+        if (
+            $submission->status !==SubmissionStatus::PENDING_REVIEW
+        ) {
+            throw ValidationException::withMessages([
+                'submission' => __('submissions.not_waiting_for_review'),
+            ]);
+        }
+    }
+    /**
+     * Make sure the authenticated reviewer
+     * can access the submission.
+     */
+    private function ensureReviewerCanAccess(Submission $submission): void {
+        $user = Auth::user();
+    
+        if ($user->isOwner() || $user->isHR()) {
+            return;
+        }
+    
+        if (! $user->isManager()) {
+            throw ValidationException::withMessages([
+                'reviewer' => __('submissions.unauthorized_review'),
+            ]);
+        }
+    
+        if (
+            (int) $submission->task->created_by ===
+            (int) $user->id
+        ) {
+            return;
+        }
+    
+        $assignedByManager = $submission->task
+            ->assignments()
+            ->where('assigned_by', $user->id)
+            ->exists();
+    
+        if ($assignedByManager) {
+            return;
+        }
+    
+        throw ValidationException::withMessages([
+            'submission' => __('submissions.unauthorized_review'),
+        ]);
+    }
+
+    /**
+     * Create a review record.
      */
     private function createReview(
         Submission $submission,
@@ -315,126 +493,14 @@ class SubmissionService
     }
 
     /**
-     * Resubmit a submission after changes were requested.
+     * Load submission relationships.
      */
-    public function resubmit(
-        Submission $submission,
-        ?string $note = null
-    ): Submission {
-        return DB::transaction(function () use ($submission, $note) {
-
-            $employee = $this->getAuthenticatedEmployee();
-
-            if ($submission->employee_id !== $employee->id) {
-                throw ValidationException::withMessages([
-                    'submission' => 'You are not the owner of this submission.',
-                ]);
-            }
-
-            if (
-                $submission->status !==
-                SubmissionStatus::CHANGES_REQUESTED
-            ) {
-                throw ValidationException::withMessages([
-                    'submission' => 'Only submissions with requested changes can be resubmitted.',
-                ]);
-            }
-
-            $submission->update([
-                'status' => SubmissionStatus::PENDING_REVIEW,
-                'note' => $note ?? $submission->note,
-                'submitted_at' => now(),
-            ]);
-
-            return $submission->refresh();
-        });
-    }
-
-    /**
-     * Get authenticated employee.
-     */
-    private function getAuthenticatedEmployee(): Employee
-    {
-        $employee = Employee::where('user_id', Auth::id())->first();
-
-        if (! $employee) {
-            throw ValidationException::withMessages([
-                'employee' => 'The authenticated user is not linked to an employee.',
-            ]);
-        }
-
-        return $employee;
-    }
-
-    /**
-     * Make sure the task accepts submissions.
-     */
-    private function ensureTaskCanBeSubmitted(Task $task): void
-    {
-        if ($task->status === TaskStatus::CLOSED) {
-            throw ValidationException::withMessages([
-                'task' => 'Closed tasks cannot receive submissions.',
-            ]);
-        }
-    }
-
-    /**
-     * Make sure the employee is assigned to the task.
-     */
-    private function ensureEmployeeAssignedToTask(
-        Task $task,
-        Employee $employee
-    ): void {
-        $assigned = $task->assignments()
-            ->where('employee_id', $employee->id)
-            ->exists();
-
-        if (! $assigned) {
-            throw ValidationException::withMessages([
-                'task' => 'You are not assigned to this task.',
-            ]);
-        }
-    }
-
-    /**
-     * Make sure the authenticated user can review
-     * the selected submission.
-     */
-    private function ensureReviewerCanAccess(
-        Submission $submission
-    ): void {
-        $user = Auth::user();
-
-        // Owner and HR can review submissions.
-        if (in_array($user->role, ['Owner', 'HR'], true)) {
-            return;
-        }
-
-        // Manager must be linked to an employee.
-        $manager = Employee::where('user_id', $user->id)->first();
-
-        if (! $manager) {
-            throw ValidationException::withMessages([
-                'reviewer' => 'The authenticated user is not linked to an employee.',
-            ]);
-        }
-
-        $employee = $submission->employee()->first();
-
-        if (! $employee) {
-            throw ValidationException::withMessages([
-                'submission' => 'Submission employee was not found.',
-            ]);
-        }
-
-        $isManagerOfEmployee = $employee->department()
-            ->where('manager_id', $manager->id)
-            ->exists();
-
-        if (! $isManagerOfEmployee) {
-            throw ValidationException::withMessages([
-                'submission' => 'You are not authorized to review this submission.',
-            ]);
-        }
+    private function loadSubmission(Submission $submission): Submission {
+        return $submission->load([
+            'task',
+            'user',
+            'attachments',
+            'reviews.reviewer',
+        ]);
     }
 }

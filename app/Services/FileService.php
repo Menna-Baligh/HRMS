@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\File;
+use App\Models\Submission;
+use App\Models\SubmissionAttachment;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
@@ -81,5 +83,41 @@ class FileService
         $user->update(['avatar' => $uploadedAvatar->path]);
 
         return $uploadedAvatar;
+    }
+    public function uploadSubmissionAttachment( UploadedFile $file,User $user, Submission $submission): SubmissionAttachment {
+        $folder = 'uploads/tasks/' . date('Y/m');
+    
+        $filenameOnly = pathinfo(
+            $file->getClientOriginalName(),
+            PATHINFO_FILENAME
+        );
+    
+        $extension = $file->getClientOriginalExtension();
+    
+        $uniqueFileName = \Str::slug($filenameOnly)
+            . '_' . time()
+            . '.' . $extension;
+    
+        $path = $file->storeAs(
+            $folder,
+            $uniqueFileName,
+            'local'
+        );
+    
+        try {
+            return SubmissionAttachment::create([
+                'submission_id' => $submission->id,
+                'uploaded_by' => $user->id,
+                'file_name' => $file->getClientOriginalName(),
+                'file_path' => $path,
+                'mime_type' => $file->getClientMimeType(),
+                'file_size' => $file->getSize(),
+            ]);
+        } catch (\Throwable $e) {
+            // Delete the uploaded file if database insertion fails.
+            Storage::disk('local')->delete($path);
+    
+            throw $e;
+        }
     }
 }

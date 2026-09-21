@@ -14,30 +14,17 @@ class TaskAssignment extends Model
         'assigned_at',
     ];
 
-    protected $casts = [
-        'assigned_at' => 'datetime',
-    ];
-
-    /**
-     * The task assigned to the employee.
-     */
     public function task(): BelongsTo
     {
         return $this->belongsTo(Task::class);
     }
 
-    /**
-     * The employee assigned to the task.
-     */
-    public function employee(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Employee::class);
+        return $this->belongsTo(User::class);
     }
 
-    /**
-     * User who assigned the task.
-     */
-    public function assigner(): BelongsTo
+    public function assignedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_by');
     }

@@ -25,7 +25,7 @@ class CompanyLocationController extends Controller
     
         return ResponseHelper::success(
             data: $location,
-            message: 'Company location created successfully.',
+            message: __('company_location.created'),
             statusCode: 201
         );
     }
@@ -35,10 +35,11 @@ class CompanyLocationController extends Controller
      */
     public function update( UpdateCompanyLocationRequest $request, int $id ) 
     { 
+        // dd($request->validated());
         $location = $this->companyLocationService->update( $id, $request->validated() );
          return ResponseHelper::success(
              data: $location,
-              message: 'Company location updated successfully.'
+             message: __('company_location.updated')
              ); 
             }
 
@@ -50,7 +51,7 @@ class CompanyLocationController extends Controller
          $location = $this->companyLocationService->deactivate($id);
           return ResponseHelper::success(
              data: $location,
-              message: 'Company location deactivated successfully.'
+             message: __('company_location.deactivated')
              );
              }
 
@@ -62,7 +63,7 @@ class CompanyLocationController extends Controller
          $location = $this->companyLocationService->activate($id);
           return ResponseHelper::success( 
             data: $location, 
-            message: 'Company location activated successfully.'
+            message: __('company_location.activated')
          );
          }
 
@@ -76,7 +77,7 @@ public function activeLocation()
 
     return ResponseHelper::success(
         data: $location,
-        message: 'Active company location retrieved successfully.'
+        message: __('company_location.active_retrieved')
     );
 }
 }

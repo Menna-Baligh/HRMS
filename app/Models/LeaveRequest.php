@@ -2,19 +2,16 @@
 
 namespace App\Models;
 
-use App\Enums\LeaveRequestStatus;
 use App\Enums\LeaveStatus;
-use App\Models\LeaveDecision;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class LeaveRequest extends Model
 {
     protected $fillable = [
-        'employee_id',
+        'user_id',
         'leave_type_id',
         'start_date',
         'end_date',
@@ -34,9 +31,9 @@ class LeaveRequest extends Model
         'status' => LeaveStatus::class,
     ];
 
-    public function employee(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Employee::class);
+        return $this->belongsTo(User::class);
     }
 
     public function leaveType(): BelongsTo
@@ -53,4 +50,8 @@ class LeaveRequest extends Model
     {
         return $this->hasMany(LeaveDecision::class);
     }
+    public function files(): MorphMany
+{
+    return $this->morphMany(File::class, 'fileable');
+}
 }
