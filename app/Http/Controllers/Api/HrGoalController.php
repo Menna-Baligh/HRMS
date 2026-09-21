@@ -19,18 +19,24 @@ class HrGoalController extends Controller
         try {
             $status = $request->query('status');
             $departmentId = $request->query('department_id') ? (int) $request->query('department_id') : null;
-            $employeeId = $request->query('employee_id') ? (int) $request->query('employee_id') : null;
+            $userId = $request->query('user_id') ?? $request->query('employee_id');
 
-            $goals = $this->goalService->getHrGoalsOverview($status, $departmentId, $employeeId);
+            $goals = $this->goalService->getHrGoalsOverview(
+                $status,
+                $departmentId,
+                $userId ? (int) $userId : null
+            );
 
             return ResponseHelper::success(
                 GoalResource::collection($goals)->response()->getData(true),
-                'Company goals overview retrieved successfully.'
+                __('goal.company_overview')
             );
         } catch (Throwable $e) {
+            report($e);
+
             return ResponseHelper::error(
                 config('app.debug') ? $e->getMessage() : null,
-                'Failed to retrieve company goals overview.',
+                __('goal.failed_company_overview'),
                 500
             );
         }

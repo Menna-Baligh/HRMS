@@ -9,9 +9,11 @@ use App\Services\FileService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Throwable;
 
 class FileController extends Controller
 {
@@ -35,8 +37,8 @@ class FileController extends Controller
                 __('files.file_not_found'),
                 404
             );
-        } catch (\Throwable $e) {
-            \Log::error('File download error: '.$e->getMessage());
+        } catch (Throwable $e) {
+            Log::error('File download error: '.$e->getMessage());
 
             return ResponseHelper::error(
                 null,
@@ -63,8 +65,8 @@ class FileController extends Controller
                 __('files.unauthorized_delete'),
                 403
             );
-        } catch (\Throwable $e) {
-            \Log::error('File deletion error: '.$e->getMessage());
+        } catch (Throwable $e) {
+            Log::error('File deletion error: '.$e->getMessage());
 
             return ResponseHelper::error(
                 null,

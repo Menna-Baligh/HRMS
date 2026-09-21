@@ -13,7 +13,7 @@ class Evaluation extends Model
     use HasFactory;
 
     protected $fillable = [
-        'employee_id',
+        'user_id',
         'evaluator_id',
         'period_id',
         'overall_score',
@@ -26,9 +26,9 @@ class Evaluation extends Model
         'status' => EvaluationStatus::class,
     ];
 
-    public function employee(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Employee::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function evaluator(): BelongsTo

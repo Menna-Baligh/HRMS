@@ -1,6 +1,19 @@
 <?php
 
 return [
+    'retrieved'             => 'Notifications retrieved successfully.',
+    'unread_count'          => 'Unread notifications count retrieved successfully.',
+    'marked_as_read'        => 'Notification marked as read successfully.',
+    'all_marked_as_read'    => 'All notifications marked as read successfully.',
+    'all_cleared'           => 'All notifications cleared successfully.',
+    'fcm_token_updated'     => 'FCM token updated successfully.',
+    'not_found'             => 'Notification not found.',
+    'unauthorized'          => 'Unauthorized access to this notification.',
+    'failed'                => 'An error occurred while processing notifications.',
+
+    'attributes' => [
+        'fcm_token' => 'FCM Token',
+    ],
 
     'attendance_reminder_title' => 'Attendance Reminder',
     'attendance_reminder_body' => 'Please remember to check-in for your shift today.',

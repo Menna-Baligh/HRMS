@@ -13,7 +13,7 @@ class Goal extends Model
     use HasFactory;
 
     protected $fillable = [
-        'employee_id',
+        'user_id',
         'title',
         'description',
         'target_value',
@@ -42,9 +42,9 @@ class Goal extends Model
         return min(100, round($percentage, 2));
     }
 
-    public function employee(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Employee::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function histories(): HasMany

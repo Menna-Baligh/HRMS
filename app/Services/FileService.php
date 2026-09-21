@@ -21,6 +21,7 @@ class FileService
             $entityFolder = match (true) {
                 str_contains($modelName, 'submission') || str_contains($modelName, 'task') => 'tasks',
                 str_contains($modelName, 'leave') => 'leaves',
+                str_contains($modelName, 'user') => 'users',
                 default => $modelName.'s',
             };
         }
@@ -34,20 +35,20 @@ class FileService
         $path = $file->storeAs($folder, $uniqueFileName, 'local');
 
         return File::create([
-            'user_id' => $user->id,
+            'user_id'       => $user->id,
             'original_name' => $file->getClientOriginalName(),
-            'path' => $path,
-            'mime_type' => $file->getClientMimeType(),
-            'size' => $file->getSize(),
+            'path'          => $path,
+            'mime_type'     => $file->getClientMimeType(),
+            'size'          => $file->getSize(),
             'fileable_type' => $fileable ? get_class($fileable) : null,
-            'fileable_id' => $fileable ? $fileable->id : null,
+            'fileable_id'   => $fileable ? $fileable->id : null,
         ]);
     }
 
     public function downloadFile(File $file): BinaryFileResponse
     {
         if (! Storage::disk('local')->exists($file->path)) {
-            abort(404, 'File not found on storage.');
+            abort(404, __('files.file_not_found'));
         }
 
         $fullPath = Storage::disk('local')->path($file->path);
@@ -75,6 +76,10 @@ class FileService
             $this->deleteFile($oldAvatar);
         }
 
-        return $this->uploadFile($file, $user, $user);
+        $uploadedAvatar = $this->uploadFile($file, $user, $user);
+
+        $user->update(['avatar' => $uploadedAvatar->path]);
+
+        return $uploadedAvatar;
     }
 }

@@ -21,23 +21,25 @@ class GoalController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $employee = $request->user()->employee;
+            $user = $request->user();
 
-            if (! $employee) {
-                return ResponseHelper::error(null, 'Employee profile not found.', 404);
+            if (! $user) {
+                return ResponseHelper::error(null, __('goal.user_not_found'), 404);
             }
 
             $status = $request->query('status');
-            $goals = $this->goalService->getEmployeeGoals($employee, $status);
+            $goals = $this->goalService->getEmployeeGoals($user, $status);
 
             return ResponseHelper::success(
                 GoalResource::collection($goals)->response()->getData(true),
-                'Employee goals retrieved successfully.'
+                __('goal.retrieved')
             );
         } catch (Throwable $e) {
+            report($e);
+
             return ResponseHelper::error(
                 config('app.debug') ? $e->getMessage() : null,
-                'Failed to retrieve goals.',
+                __('goal.failed_retrieve'),
                 500
             );
         }
@@ -46,26 +48,28 @@ class GoalController extends Controller
     public function show(Request $request, int $id): JsonResponse
     {
         try {
-            $employee = $request->user()->employee;
+            $user = $request->user();
 
-            if (! $employee) {
-                return ResponseHelper::error(null, 'Employee profile not found.', 404);
+            if (! $user) {
+                return ResponseHelper::error(null, __('goal.user_not_found'), 404);
             }
 
-            $goal = $this->goalService->getEmployeeGoalDetails($employee, $id);
+            $goal = $this->goalService->getEmployeeGoalDetails($user, $id);
 
             if (! $goal) {
-                return ResponseHelper::error(null, 'Goal not found or access denied.', 404);
+                return ResponseHelper::error(null, __('goal.not_found'), 404);
             }
 
             return ResponseHelper::success(
                 new GoalResource($goal),
-                'Goal details retrieved successfully.'
+                __('goal.details_retrieved')
             );
         } catch (Throwable $e) {
+            report($e);
+
             return ResponseHelper::error(
                 config('app.debug') ? $e->getMessage() : null,
-                'Failed to retrieve goal details.',
+                __('goal.failed_details'),
                 500
             );
         }
@@ -74,27 +78,25 @@ class GoalController extends Controller
     public function store(StoreGoalRequest $request): JsonResponse
     {
         try {
-            $employee = $request->user()->employee;
+            $user = $request->user();
 
-            if (! $employee) {
-                return ResponseHelper::error(
-                    null,
-                    'Employee profile not found for the authenticated user.',
-                    404
-                );
+            if (! $user) {
+                return ResponseHelper::error(null, __('goal.user_not_found'), 404);
             }
 
-            $goal = $this->goalService->createGoal($employee, $request->validated());
+            $goal = $this->goalService->createGoal($user, $request->validated());
 
             return ResponseHelper::success(
                 new GoalResource($goal),
-                'Goal created successfully.',
+                __('goal.created'),
                 201
             );
         } catch (Throwable $e) {
+            report($e);
+
             return ResponseHelper::error(
                 config('app.debug') ? $e->getMessage() : null,
-                'Failed to create goal.',
+                __('goal.failed_create'),
                 500
             );
         }
@@ -103,32 +105,34 @@ class GoalController extends Controller
     public function update(UpdateGoalRequest $request, int $id): JsonResponse
     {
         try {
-            $employee = $request->user()->employee;
+            $user = $request->user();
 
-            if (! $employee) {
-                return ResponseHelper::error(null, 'Employee profile not found.', 404);
+            if (! $user) {
+                return ResponseHelper::error(null, __('goal.user_not_found'), 404);
             }
 
-            $goal = $this->goalService->getEmployeeGoalDetails($employee, $id);
+            $goal = $this->goalService->getEmployeeGoalDetails($user, $id);
 
             if (! $goal) {
-                return ResponseHelper::error(null, 'Goal not found or access denied.', 404);
+                return ResponseHelper::error(null, __('goal.not_found'), 404);
             }
 
             if ($goal->status === GoalStatus::COMPLETED || $goal->status === GoalStatus::CANCELLED) {
-                return ResponseHelper::error(null, 'Completed or cancelled goals cannot be modified.', 422);
+                return ResponseHelper::error(null, __('goal.cannot_modify_closed'), 422);
             }
 
             $updatedGoal = $this->goalService->updateGoal($goal, $request->validated());
 
             return ResponseHelper::success(
                 new GoalResource($updatedGoal),
-                'Goal details updated successfully.'
+                __('goal.updated')
             );
         } catch (Throwable $e) {
+            report($e);
+
             return ResponseHelper::error(
                 config('app.debug') ? $e->getMessage() : null,
-                'Failed to update goal details.',
+                __('goal.failed_update'),
                 500
             );
         }
@@ -138,20 +142,19 @@ class GoalController extends Controller
     {
         try {
             $user = $request->user();
-            $employee = $user->employee;
 
-            if (! $employee) {
-                return ResponseHelper::error(null, 'Employee profile not found.', 404);
+            if (! $user) {
+                return ResponseHelper::error(null, __('goal.user_not_found'), 404);
             }
 
-            $goal = $this->goalService->getEmployeeGoalDetails($employee, $id);
+            $goal = $this->goalService->getEmployeeGoalDetails($user, $id);
 
             if (! $goal) {
-                return ResponseHelper::error(null, 'Goal not found or access denied.', 404);
+                return ResponseHelper::error(null, __('goal.not_found'), 404);
             }
 
             if ($goal->status === GoalStatus::CANCELLED) {
-                return ResponseHelper::error(null, 'Cannot update progress for a cancelled goal.', 422);
+                return ResponseHelper::error(null, __('goal.cannot_update_cancelled'), 422);
             }
 
             $updatedGoal = $this->goalService->updateProgress(
@@ -163,12 +166,14 @@ class GoalController extends Controller
 
             return ResponseHelper::success(
                 new GoalResource($updatedGoal),
-                'Goal progress updated successfully.'
+                __('goal.progress_updated')
             );
         } catch (Throwable $e) {
+            report($e);
+
             return ResponseHelper::error(
                 config('app.debug') ? $e->getMessage() : null,
-                'Failed to update goal progress.',
+                __('goal.failed_progress'),
                 500
             );
         }
@@ -177,32 +182,34 @@ class GoalController extends Controller
     public function complete(Request $request, int $id): JsonResponse
     {
         try {
-            $employee = $request->user()->employee;
+            $user = $request->user();
 
-            if (! $employee) {
-                return ResponseHelper::error(null, 'Employee profile not found.', 404);
+            if (! $user) {
+                return ResponseHelper::error(null, __('goal.user_not_found'), 404);
             }
 
-            $goal = $this->goalService->getEmployeeGoalDetails($employee, $id);
+            $goal = $this->goalService->getEmployeeGoalDetails($user, $id);
 
             if (! $goal) {
-                return ResponseHelper::error(null, 'Goal not found or access denied.', 404);
+                return ResponseHelper::error(null, __('goal.not_found'), 404);
             }
 
             if ($goal->status === GoalStatus::COMPLETED) {
-                return ResponseHelper::error(null, 'Goal is already marked as completed.', 422);
+                return ResponseHelper::error(null, __('goal.already_completed'), 422);
             }
 
             $completedGoal = $this->goalService->markAsCompleted($goal);
 
             return ResponseHelper::success(
                 new GoalResource($completedGoal),
-                'Goal marked as completed successfully.'
+                __('goal.completed')
             );
         } catch (Throwable $e) {
+            report($e);
+
             return ResponseHelper::error(
                 config('app.debug') ? $e->getMessage() : null,
-                'Failed to mark goal as completed.',
+                __('goal.failed_complete'),
                 500
             );
         }

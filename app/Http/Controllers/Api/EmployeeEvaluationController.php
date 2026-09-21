@@ -17,22 +17,24 @@ class EmployeeEvaluationController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $employee = $request->user()->employee;
+            $user = $request->user(); 
 
-            if (! $employee) {
-                return ResponseHelper::error(null, 'Employee profile not found.', 404);
+            if (! $user) {
+                return ResponseHelper::error(null, __('evaluation.user_not_found'), 404);
             }
 
-            $evaluations = $this->evaluationService->getEmployeeEvaluationsHistory($employee, 10);
+            $evaluations = $this->evaluationService->getEmployeeEvaluationsHistory($user, 10);
 
             return ResponseHelper::success(
                 EvaluationResource::collection($evaluations)->response()->getData(true),
-                'Completed evaluation history retrieved successfully.'
+                __('evaluation.history_retrieved')
             );
         } catch (Throwable $e) {
+            report($e);
+
             return ResponseHelper::error(
                 config('app.debug') ? $e->getMessage() : null,
-                'Failed to retrieve evaluation history.',
+                __('evaluation.failed_history'),
                 500
             );
         }

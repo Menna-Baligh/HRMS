@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('task_id')->constrained('tasks')->cascadeOnDelete();
             // Employee assigned to the task
-            $table->foreignId('employee_id')->constrained('employees')->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             // User who assigned the task
             $table->foreignId('assigned_by')->constrained('users')->restrictOnDelete();
             $table->timestamp('assigned_at')->useCurrent();
