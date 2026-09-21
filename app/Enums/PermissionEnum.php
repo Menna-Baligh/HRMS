@@ -119,6 +119,7 @@ enum PermissionEnum: string
     case AI_SKILL_GAP = 'ai.skill_gap';
     case AI_ATTENTION_SIGNAL = 'ai.attention_signal';
     case AI_TEAM_INSIGHT = 'ai.team_insight';
+    case AI_POLICY_ASSISTANT = 'ai.policy_assistant';
 
     public function defaultRoles(): array
     {
@@ -201,7 +202,8 @@ enum PermissionEnum: string
             self::FILE_DELETE,
             self::AI_CAREER_COACH,
             self::AI_PERFORMANCE_INSIGHT,
-            self::AI_SKILL_GAP => ['Owner', 'HR', 'Manager', 'Employee'],
+            self::AI_SKILL_GAP,
+            self::AI_POLICY_ASSISTANT => ['Owner', 'HR', 'Manager', 'Employee'],
 
             default => ['Owner', 'HR'],
         };

@@ -20,6 +20,9 @@ return [
     'employees_forbidden_team' => 'غير مصرح للموظفين بالوصول إلى تحليلات الفريق الإدارية.',
     'insufficient_team_data' => 'لا توجد بيانات معتمدة كافية للفريق في هذا القسم خلال الفترة المحددة.',
     'unauthorized_department' => 'غير مصرح لك بالوصول إلى تحليلات هذا القسم.',
+    'policy_assistant_success' => 'تم الإجابة على استفسار السياسات بنجاح.',
+    'policy_unsupported_question' => 'السؤال المدخل خارج نطاق سياسات الشركة المعتمدة.',
+    'unauthorized_session' => 'جلسة المحادثة هذه خاصة بموظف آخر.',
 
     'attributes' => [
         'employee_id' => 'كود الموظف',
@@ -30,5 +33,7 @@ return [
         'target_skills' => 'المهارات المستهدفة',
         'target_period' => 'الفترة المستهدفة',
         'department' => 'القسم',
+        'question' => 'السؤال',
+        'session_id' => 'معرف الجلسة',
     ],
 ];

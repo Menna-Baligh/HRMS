@@ -98,4 +98,5 @@ return [
     'ai.skill_gap' => 'Analyze AI Skill-Gap & Development',
     'ai.attention_signal' => 'View AI Employee Attention Signal',
     'ai.team_insight' => 'View AI Team Insight Summary',
+    'ai.policy_assistant' => 'Use AI HR Policy Assistant',
 ];

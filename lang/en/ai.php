@@ -20,6 +20,9 @@ return [
     'employees_forbidden_team' => 'Employees are not authorized to access Team Insight.',
     'insufficient_team_data' => 'Insufficient approved team data for this department and period.',
     'unauthorized_department' => 'You are not authorized to view insights for this department.',
+    'policy_assistant_success' => 'Policy question answered successfully.',
+    'policy_unsupported_question' => 'The question is outside the approved policy scope.',
+    'unauthorized_session' => 'Forbidden: chat session belongs to another employee.',
 
     'attributes' => [
         'employee_id' => 'Employee ID',
@@ -30,6 +33,8 @@ return [
         'target_skills' => 'Target Skills',
         'target_period' => 'Target Period',
         'department' => 'Department',
+        'question' => 'Question',
+        'session_id' => 'Session ID',
     ],
 
 ];
