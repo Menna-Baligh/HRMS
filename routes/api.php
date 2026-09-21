@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\PermissionEnum;
+use App\Http\Controllers\Api\AIAttentionSignalController;
 use App\Http\Controllers\Api\AICareerCoachController;
 use App\Http\Controllers\Api\AIEvaluationDraftController;
 use App\Http\Controllers\Api\AIPerformanceInsightController;
@@ -321,4 +322,7 @@ Route::prefix('ai')->middleware(['auth:api', 'set.app.language'])->group(functio
 
     Route::post('/skill-gap', AISkillGapController::class)
         ->middleware('permission:'.PermissionEnum::AI_SKILL_GAP->value);
+
+    Route::post('/attention-signal', AIAttentionSignalController::class)
+        ->middleware('permission:' . PermissionEnum::AI_ATTENTION_SIGNAL->value);
 });
