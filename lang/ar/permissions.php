@@ -91,4 +91,7 @@ return [
     'permission.view-all' => 'عرض جميع الصلاحيات',
     'file.download'       => 'تحميل الملفات',
     'file.delete'         => 'حذف الملفات',
+     // company events
+    'company_event.view' => 'عرض فعاليات الشركة',
+    'company_event.manage' => 'إدارة فعاليات الشركة',
 ];

@@ -91,4 +91,7 @@ return [
     'permission.view-all' => 'View All Permissions',
     'file.download'       => 'Download Files',
     'file.delete'         => 'Delete Files',
+    // company events
+    'company_event.view' => 'View company events',
+    'company_event.manage' => 'Manage company events',
 ];

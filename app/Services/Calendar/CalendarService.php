@@ -3,13 +3,14 @@
 namespace App\Services\Calendar;
 
 use App\Enums\LeaveStatus;
+use App\Models\CompanyEvent;
+use App\Models\Holiday;
 use App\Models\LeaveRequest;
 use App\Models\Task;
 use App\Models\User;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Support\Collection;
-use Illuminate\Validation\ValidationException;
 
 class CalendarService
 {
@@ -18,18 +19,41 @@ class CalendarService
      *
      * @return Collection<int, array<string, mixed>>
      */
-    public function getEvents( User $user,Carbon $from, Carbon $to): Collection
-     {
+    public function getEvents(User $user, Carbon $from, Carbon $to): Collection {
         $events = collect();
 
         // Add approved leave events.
         $events = $events->merge(
-            $this->getApprovedLeaveEvents($user, $from, $to)
+            $this->getApprovedLeaveEvents(
+                user: $user,
+                from: $from,
+                to: $to
+            )
         );
 
         // Add assigned task deadline events.
         $events = $events->merge(
-            $this->getTaskDeadlineEvents($user, $from, $to)
+            $this->getTaskDeadlineEvents(
+                user: $user,
+                from: $from,
+                to: $to
+            )
+        );
+
+        // Add active company holiday events.
+        $events = $events->merge(
+            $this->getHolidayEvents(
+                from: $from,
+                to: $to
+            )
+        );
+    // Add active company events.
+        $events = $events->merge(
+            $this->getCompanyEventEvents(
+                user: $user,
+                from: $from,
+                to: $to
+            )
         );
 
         return $events
@@ -42,23 +66,13 @@ class CalendarService
     }
 
     /**
-     * Get approved leave events for the authenticated employee.
-     *
-     * A leave request can span multiple days, so one calendar
-     * event is generated for each day inside the requested range.
+     * Get approved leave events for the authenticated user.
      *
      * @return Collection<int, array<string, mixed>>
      */
-    private function getApprovedLeaveEvents(User $user, Carbon $from, Carbon $to): Collection
-     {
-        $employee = $user->employee;
-
-        if (! $employee) {
-            return collect();
-        }
-
+    private function getApprovedLeaveEvents(User $user, Carbon $from,Carbon $to): Collection {
         $leaveRequests = LeaveRequest::query()
-            ->where('employee_id', $employee->id)
+            ->where('user_id', $user->id)
             ->where('status', LeaveStatus::Approved)
             ->whereDate('start_date', '<=', $to->toDateString())
             ->whereDate('end_date', '>=', $from->toDateString())
@@ -94,26 +108,17 @@ class CalendarService
     }
 
     /**
-     * Get deadlines for tasks assigned to the authenticated employee.
-     *
-     * Only tasks assigned to the current employee are included.
+     * Get deadlines for tasks assigned to the authenticated user.
      *
      * @return Collection<int, array<string, mixed>>
      */
-    private function getTaskDeadlineEvents( User $user, Carbon $from, Carbon $to ): Collection
-    {
-        $employee = $user->employee;
-
-        if (! $employee) {
-            return collect();
-        }
-
+    private function getTaskDeadlineEvents( User $user, Carbon $from,Carbon $to): Collection {
         return Task::query()
             ->whereHas(
                 'assignments',
                 fn ($query) => $query->where(
-                    'employee_id',
-                    $employee->id
+                    'user_id',
+                    $user->id
                 )
             )
             ->whereBetween('deadline', [
@@ -131,5 +136,80 @@ class CalendarService
                     'reference' => $task->id,
                 ]
             );
+    }
+
+    /**
+     * Get active company holidays overlapping the requested period.
+     *
+     * Holidays are visible to all authenticated users.
+     *
+     * @return Collection<int, array<string, mixed>>
+     */
+    private function getHolidayEvents( Carbon $from,Carbon $to): Collection {
+        $holidays = Holiday::query()
+            ->where('is_active', true)
+            ->whereDate('start_date', '<=', $to->toDateString())
+            ->whereDate('end_date', '>=', $from->toDateString())
+            ->get([
+                'id',
+                'start_date',
+                'end_date',
+            ]);
+
+        return $holidays->flatMap(
+            function (Holiday $holiday) use ($from, $to) {
+                $start = Carbon::parse($holiday->start_date)
+                    ->max($from->copy()->startOfDay());
+
+                $end = Carbon::parse($holiday->end_date)
+                    ->min($to->copy()->startOfDay());
+
+                if ($start->gt($end)) {
+                    return collect();
+                }
+
+                return collect(
+                    CarbonPeriod::create($start, $end)
+                )->map(
+                    fn (Carbon $date) => [
+                        'date' => $date->toDateString(),
+                        'type' => 'holiday',
+                        'reference' => $holiday->id,
+                    ]
+                );
+            }
+        );
+    }
+    private function getCompanyEventEvents(User $user,Carbon $from,Carbon $to): Collection {
+        if (! $user->can('company_event.view')) {
+            return collect();
+        }
+    
+        $events = CompanyEvent::query()
+            ->where('is_active', true)
+            ->whereDate('start_date', '<=', $to->toDateString())
+            ->whereDate('end_date', '>=', $from->toDateString())
+            ->get(['id', 'start_date', 'end_date']);
+    
+        return $events->flatMap(
+            function (CompanyEvent $event) use ($from, $to) {
+                $start = Carbon::parse($event->start_date)
+                    ->max($from->copy()->startOfDay());
+    
+                $end = Carbon::parse($event->end_date)
+                    ->min($to->copy()->startOfDay());
+    
+                if ($start->gt($end)) {
+                    return collect();
+                }
+    
+                return collect(CarbonPeriod::create($start, $end))
+                    ->map(fn (Carbon $date) => [
+                        'date' => $date->toDateString(),
+                        'type' => 'company_event',
+                        'reference' => $event->id,
+                    ]);
+            }
+        );
     }
 }

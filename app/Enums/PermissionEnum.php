@@ -106,7 +106,13 @@ enum PermissionEnum: string
     case LEAVE_CALENDAR_VIEW   = 'leave.calendar_view';
 
     // ==========================================
-    // 10. System, Files & Permissions
+    // 10. Company Events
+    // ==========================================
+    case COMPANY_EVENT_VIEW = 'company_event.view';
+    case COMPANY_EVENT_MANAGE = 'company_event.manage';
+
+    // ==========================================
+    // 11. System, Files & Permissions
     // ==========================================
     case PERMISSION_VIEW_ALL = 'permission.view-all';
     case FILE_DOWNLOAD = 'file.download';
@@ -137,6 +143,7 @@ enum PermissionEnum: string
             self::LEAVE_TYPE_MANAGE,
             self::LEAVE_APPROVE_HR,
             self::LEAVE_REJECT,
+            self::COMPANY_EVENT_MANAGE,
             self::LEAVE_QUEUE_HR => ['HR', 'Owner'],
 
             // Manager, HR & Owner
@@ -187,6 +194,7 @@ enum PermissionEnum: string
             self::LEAVE_TYPE_VIEW,
             self::LEAVE_CALENDAR_VIEW,
             self::FILE_DOWNLOAD,
+            self::COMPANY_EVENT_VIEW,
             self::FILE_DELETE => ['Owner', 'HR', 'Manager', 'Employee'],
 
             default => ['Owner', 'HR'],

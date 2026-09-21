@@ -4,6 +4,7 @@ use App\Enums\PermissionEnum;
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CalendarController;
+use App\Http\Controllers\Api\CompanyEventController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\EmployeeEvaluationController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\Api\EvaluationController;
 use App\Http\Controllers\Api\FileController;
 use App\Http\Controllers\Api\GoalController;
 use App\Http\Controllers\Api\GoogleAuthController;
+use App\Http\Controllers\Api\HolidayController;
 use App\Http\Controllers\Api\HrAttendanceController;
 use App\Http\Controllers\Api\HrEvaluationSetupController;
 use App\Http\Controllers\Api\HrGoalController;
@@ -58,16 +60,46 @@ Route::middleware('set.app.language')->prefix('auth')->group(function () {
     });
 });
 
+// holiday 
+Route::prefix('holidays')->middleware(['auth:api', 'set.app.language'])->group(function () {
+
+        Route::get('/', [HolidayController::class, 'index']);
+
+        Route::middleware('role:HR|Owner')->group(function () {
+            Route::post('/', [HolidayController::class, 'store']);
+
+            Route::put('/{holiday}', [HolidayController::class, 'update']);
+
+            Route::delete('/{holiday}', [HolidayController::class, 'destroy']);
+        });
+    });
+
+
+// company events
+    Route::prefix('company-events')->middleware(['auth:api', 'set.app.language'])->group(function () {
+
+        // All authenticated users can view company events.
+        Route::get('/', [CompanyEventController::class, 'index'])->middleware('permission:company_event.view');
+
+        // Only users with manage permission can create, update, or delete events.
+        Route::middleware('permission:company_event.manage')->group(function () {
+            Route::post('/', [CompanyEventController::class, 'store']);
+
+            Route::put('/{companyEvent}', [CompanyEventController::class,'update']);
+
+            Route::delete('/{companyEvent}', [CompanyEventController::class,'destroy']);
+        });
+    });
+
 
 /*
 |--------------------------------------------------------------------------
 | calender Routes
 |--------------------------------------------------------------------------
 */
-
 Route::prefix('calender')->middleware(['auth:api', 'set.app.language'])->group(function () {
-    Route::get('/', [CalendarController::class, 'index']);
-});
+        Route::get('/calendar', [CalendarController::class, 'index']);
+    });;
 
 /*
 |--------------------------------------------------------------------------
@@ -176,6 +208,22 @@ Route::middleware('auth:api','set.app.language')
         // Get active company location
         Route::get('company/location/active',[CompanyLocationController::class, 'activeLocation']
         );
+    });
+
+    Route::prefix('employees')->group(function () {
+        Route::get('/', [EmployeeController::class, 'index'])->middleware('permission:'.PermissionEnum::EMPLOYEE_VIEW_ALL->value);
+        Route::post('/', [EmployeeController::class, 'store'])->middleware('permission:'.PermissionEnum::EMPLOYEE_CREATE->value);
+        Route::patch('/profile', [EmployeeController::class, 'updateProfile'])->middleware('permission:'.PermissionEnum::EMPLOYEE_UPDATE_PROFILE->value);
+        Route::get('/{id}', [EmployeeController::class, 'show'])->middleware('permission:'.PermissionEnum::EMPLOYEE_VIEW_PROFILE->value);
+        Route::patch('/{id}/hr-fields', [EmployeeController::class, 'updateHrFields'])->middleware('permission:'.PermissionEnum::EMPLOYEE_EDIT_HR_FIELDS->value);
+        Route::patch('/{id}/change-account-status', [EmployeeController::class, 'changeAccountStatus'])->middleware('permission:'.PermissionEnum::EMPLOYEE_CHANGE_ACCOUNT_STATUS->value);
+    });
+
+    Route::prefix('departments')->group(function () {
+        Route::get('/', [DepartmentController::class, 'index'])->middleware('permission:'.PermissionEnum::DEPARTMENT_VIEW->value);
+        Route::post('/', [DepartmentController::class, 'store'])->middleware('permission:'.PermissionEnum::DEPARTMENT_CREATE->value);
+        Route::patch('/{id}', [DepartmentController::class, 'update'])->middleware('permission:'.PermissionEnum::DEPARTMENT_EDIT->value);
+        Route::patch('/{id}/change-status', [DepartmentController::class, 'changeStatus'])->middleware('permission:'.PermissionEnum::DEPARTMENT_CHANGE_STATUS->value);
     });
 
     Route::prefix('locations/company/location')->group(function () {
