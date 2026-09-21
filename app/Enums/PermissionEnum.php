@@ -117,6 +117,7 @@ enum PermissionEnum: string
     case AI_CAREER_COACH = 'ai.career_coach';
     case AI_PERFORMANCE_INSIGHT = 'ai.performance_insight';
     case AI_EVALUATION_DRAFT = 'ai.evaluation_draft';
+    case AI_SKILL_GAP = 'ai.skill_gap';
 
     public function defaultRoles(): array
     {
@@ -196,7 +197,8 @@ enum PermissionEnum: string
             self::FILE_DOWNLOAD,
             self::FILE_DELETE,
             self::AI_CAREER_COACH,
-            self::AI_PERFORMANCE_INSIGHT => ['Owner', 'HR', 'Manager', 'Employee'],
+            self::AI_PERFORMANCE_INSIGHT,
+            self::AI_SKILL_GAP => ['Owner', 'HR', 'Manager', 'Employee'],
 
             default => ['Owner', 'HR'],
         };
