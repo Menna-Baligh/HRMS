@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AIAttentionSignalController;
 use App\Http\Controllers\Api\AICareerCoachController;
 use App\Http\Controllers\Api\AIEvaluationDraftController;
 use App\Http\Controllers\Api\AIPerformanceInsightController;
+use App\Http\Controllers\Api\AIPolicyAssistantController;
 use App\Http\Controllers\Api\AISkillGapController;
 use App\Http\Controllers\Api\AITeamInsightController;
 use App\Http\Controllers\Api\AttendanceController;
@@ -329,4 +330,7 @@ Route::prefix('ai')->middleware(['auth:api', 'set.app.language'])->group(functio
 
     Route::post('/team-insight', AITeamInsightController::class)
         ->middleware('permission:'.PermissionEnum::AI_TEAM_INSIGHT->value);
+
+    Route::post('/policy-assistant', AIPolicyAssistantController::class)
+        ->middleware('permission:'.PermissionEnum::AI_POLICY_ASSISTANT->value);
 });
