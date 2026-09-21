@@ -13,6 +13,9 @@ return [
     'insufficient_evaluation_data' => 'Insufficient evaluation data to generate draft.',
     'skill_gap_success' => 'Skill gaps analyzed and recommendations retrieved successfully.',
     'insufficient_skill_data' => 'Not enough approved employee data to analyze skill gaps.',
+    'attention_signal_success' => 'Employee attention signal retrieved successfully.',
+    'employees_forbidden_attention' => 'Employees are not authorized to access administrative attention signals.',
+    'insufficient_attention_data' => 'No approved records found to calculate attention signal.',
 
     'attributes' => [
         'employee_id' => 'Employee ID',
@@ -21,6 +24,7 @@ return [
         'manager_notes' => 'Manager Notes',
         'target_role' => 'Target Role',
         'target_skills' => 'Target Skills',
+        'target_period' => 'Target Period',
     ],
 
 ];

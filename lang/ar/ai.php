@@ -13,6 +13,9 @@ return [
     'insufficient_evaluation_data' => 'بيانات التقييم المدخلة غير كافية لتوليد المسودة.',
     'skill_gap_success' => 'تم تحليل الفجوات المهارية وجلب التوصيات بنجاح.',
     'insufficient_skill_data' => 'لا توجد بيانات مهارات معتمدة كافية لهذا الموظف.',
+    'attention_signal_success' => 'تم جلب مؤشر تنبيه الموظف بنجاح.',
+    'employees_forbidden_attention' => 'غير مصرح للموظفين بالوصول إلى ميزات مؤشرات التنبيه الإدارية.',
+    'insufficient_attention_data' => 'لا توجد سجلات معتمدة كافية لحساب مؤشر التنبيه لهذا الموظف.',
 
     'attributes' => [
         'employee_id' => 'كود الموظف',
@@ -21,5 +24,6 @@ return [
         'manager_notes' => 'ملاحظات المدير',
         'target_role' => 'المسمى الوظيفي المستهدف',
         'target_skills' => 'المهارات المستهدفة',
+        'target_period' => 'الفترة المستهدفة',
     ],
 ];

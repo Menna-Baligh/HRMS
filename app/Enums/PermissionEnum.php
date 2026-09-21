@@ -117,6 +117,7 @@ enum PermissionEnum: string
     case AI_PERFORMANCE_INSIGHT = 'ai.performance_insight';
     case AI_EVALUATION_DRAFT = 'ai.evaluation_draft';
     case AI_SKILL_GAP = 'ai.skill_gap';
+    case AI_ATTENTION_SIGNAL = 'ai.attention_signal';
 
     public function defaultRoles(): array
     {
@@ -164,7 +165,8 @@ enum PermissionEnum: string
             self::MANAGER_PERFORMANCE_TEAM,
             self::LEAVE_APPROVE_MANAGER,
             self::LEAVE_QUEUE_MANAGER,
-            self::AI_EVALUATION_DRAFT => ['Manager', 'HR', 'Owner'],
+            self::AI_EVALUATION_DRAFT,
+            self::AI_ATTENTION_SIGNAL => ['Manager', 'HR', 'Owner'],
 
             // All Roles (Owner, HR, Manager, Employee)
             self::EMPLOYEE_VIEW_PROFILE,

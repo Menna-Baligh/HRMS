@@ -96,4 +96,5 @@ return [
     'ai.performance_insight' => 'عرض تحليلات الأداء الذكية (AI Performance Insight)',
     'ai.evaluation_draft' => 'توليد مسودة التقييم الذكية (AI Evaluation Draft)',
     'ai.skill_gap' => 'تحليل الفجوات المهارية والتوصيات الذكية (AI Skill-Gap & Development)',
+    'ai.attention_signal' => 'عرض مؤشر تنبيه أداء الموظفين الذكي (AI Employee Attention Signal)',
 ];
