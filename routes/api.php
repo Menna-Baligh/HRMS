@@ -4,6 +4,7 @@ use App\Enums\PermissionEnum;
 use App\Http\Controllers\Api\AICareerCoachController;
 use App\Http\Controllers\Api\AIEvaluationDraftController;
 use App\Http\Controllers\Api\AIPerformanceInsightController;
+use App\Http\Controllers\Api\AISkillGapController;
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CalendarController;
@@ -317,4 +318,7 @@ Route::prefix('ai')->middleware(['auth:api', 'set.app.language'])->group(functio
 
     Route::post('/evaluation-draft', AIEvaluationDraftController::class)
         ->middleware('permission:'.PermissionEnum::AI_EVALUATION_DRAFT->value);
+
+    Route::post('/skill-gap', AISkillGapController::class)
+        ->middleware('permission:'.PermissionEnum::AI_SKILL_GAP->value);
 });
