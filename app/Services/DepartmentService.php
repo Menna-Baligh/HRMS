@@ -3,7 +3,10 @@
 namespace App\Services;
 
 use App\Models\Department;
+use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 
 class DepartmentService
 {
@@ -27,22 +30,51 @@ class DepartmentService
 
     public function createDepartment(array $data): Department
     {
-        $department = Department::create([
-            'name' => $data['name'],
-            'description' => $data['description'] ?? null,
-            'manager_id' => $data['manager_id'] ?? null,
-            'status' => 'active',
-        ]);
+        return DB::transaction(function () use ($data) {
+            $managerId = $data['manager_id'] ?? null;
 
-        return $department->load('manager');
+            $department = Department::create([
+                'name' => $data['name'],
+                'description' => $data['description'] ?? null,
+                'manager_id' => $managerId,
+                'status' => 'active',
+            ]);
+
+            if ($managerId) {
+                User::where('department_id', $department->id)
+                    ->where('id', '!=', $managerId)
+                    ->where('role', 'Employee')
+                    ->update([
+                        'manager_id' => $managerId,
+                    ]);
+            }
+
+            return $department->load('manager');
+        });
     }
 
     public function updateDepartment(int $id, array $data): Department
     {
-        $department = Department::findOrFail($id);
-        $department->update($data);
+        return DB::transaction(function () use ($id, $data) {
+            $department = Department::findOrFail($id);
 
-        return $department->load('manager');
+            $oldManagerId = $department->manager_id;
+
+            $department->update($data);
+
+            if (array_key_exists('manager_id', $data) && $data['manager_id'] != $oldManagerId) {
+                $newManagerId = $data['manager_id'];
+
+                User::where('department_id', $department->id)
+                    ->where('role', 'Employee')
+                    ->where('id', '!=', $newManagerId)
+                    ->update([
+                        'manager_id' => $newManagerId,
+                    ]);
+            }
+
+            return $department->load('manager');
+        });
     }
 
     public function changeDepartmentStatus(int $id): Department
@@ -52,5 +84,18 @@ class DepartmentService
         $department->update(['status' => $newStatus]);
 
         return $department->load('manager');
+    }
+    public function getManagersForDropdown(): Collection
+    {
+        return User::query()
+            ->where(function ($query) {
+                $query->whereIn('role', ['Manager'])
+                    ->orWhereHas('roles', function ($q) {
+                        $q->whereIn('name', ['Manager']);
+                    });
+            })
+            ->select(['id', 'name'])
+            ->orderBy('name')
+            ->get();
     }
 }

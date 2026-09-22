@@ -111,4 +111,14 @@ class DepartmentController extends Controller
             );
         }
     }
+    public function GetManagersDropdown() :JsonResponse
+    {
+        $managers = $this->departmentService->getManagersForDropdown();
+
+        return ResponseHelper::success(
+            data: $managers,
+            message: __('departments.managers_retrieved_successfully'),
+            statusCode: Response::HTTP_OK
+        );
+    }
 }

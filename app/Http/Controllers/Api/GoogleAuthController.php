@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Services\Auth\GoogleAuthService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
@@ -36,29 +37,17 @@ class GoogleAuthController extends Controller
         }
     }
 
-    public function callback(): JsonResponse
+    public function callback(): RedirectResponse
     {
+        $frontendUrl = config('app.frontend_url');
         try {
             $result = $this->googleAuthService->handleGoogleCallback();
-            $result['user'] = new UserResource($result['user']);
-
-            return ResponseHelper::success(
-                data: $result,
-                message: __('auth.google_login_success')
-            );
+            return redirect()->to("{$frontendUrl}#token={$result['access_token']}");
         } catch (ValidationException $e) {
-            return ResponseHelper::error(
-                errors: $e->errors(),
-                message: __('auth.google_login_failed'),
-                statusCode: Response::HTTP_UNPROCESSABLE_ENTITY
-            );
+            return redirect()->to("{$frontendUrl}?message=not_authorized");
         } catch (Throwable $e) {
             report($e);
-
-            return ResponseHelper::error(
-                message: __('auth.google_login_failed'),
-                statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
-            );
+            return redirect()->to("{$frontendUrl}?message=auth_failed");
         }
     }
 }

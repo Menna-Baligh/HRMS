@@ -211,6 +211,7 @@ return [
         'phone' => 'phone number',
         'job_title' => 'job title',
         'department_id' => 'department',
+        'department' => 'department',
     ],
 
 ];

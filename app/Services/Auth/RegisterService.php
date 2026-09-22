@@ -2,6 +2,7 @@
 
 namespace App\Services\Auth;
 
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -31,12 +32,12 @@ class RegisterService
 
         // Generate JWT access token
         $token = JWTAuth::fromUser($user);
-
+        $user = $user->fresh();
         return [
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => (auth('api')->factory()->getTTL() / 60).' hours',
-            'user' => $user->load('roles', 'permissions'),
+            'user' => new UserResource($user),
         ];
 
     }

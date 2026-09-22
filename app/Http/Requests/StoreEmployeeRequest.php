@@ -33,20 +33,14 @@ class StoreEmployeeRequest extends FormRequest
             'permissions.*' => ['string', 'exists:permissions,name'],
             'employment_type' => ['required', 'in:Full-time,Part-time,Contract'],
             'start_date' => ['required', 'date'],
-            'department_id' => ['nullable', 'exists:departments,id'],
-            'manager_id' => [
+            'department_id' => [
                 'nullable',
-                'exists:users,id',
-                function ($attribute, $value, $fail) {
-                    $manager = User::find($value);
-                    if ($manager && ! $manager->hasRole('Manager')) {
-                        $fail(__('employees.manager_must_be_manager_role'));
-                    }
-                },
+                'required_if:role,Employee,Manager',
+                'exists:departments,id',
             ],
+
             'phone' => ['nullable', 'string', 'max:20', 'unique:users,phone'],
             'address' => ['nullable', 'string'],
-            'company_location_id' => ['nullable', 'exists:company_locations,id'],
         ];
     }
 
@@ -56,7 +50,7 @@ class StoreEmployeeRequest extends FormRequest
             'email.unique' => __('validation.unique', ['attribute' => __('validation.attributes.email')]),
             'role.in' => __('validation.in', ['attribute' => __('validation.attributes.role')]),
             'employment_type.in' => __('validation.in', ['attribute' => __('validation.attributes.employment_type')]),
-            'manager_id.exists' => __('validation.exists', ['attribute' => __('validation.attributes.manager')]),
+            'department_id.required_if' => __('validation.required', ['attribute' => __('validation.attributes.department')]),
         ];
     }
 }

@@ -42,6 +42,7 @@ return [
         'scores.*.score' => 'الدرجة',
         'evidence_goal_ids' => 'الأهداف المرتبطة',
         'evidence_goal_ids.*' => 'الهدف المرتبط',
+        'department' => 'القسم',
     ],
 
     'custom' => [

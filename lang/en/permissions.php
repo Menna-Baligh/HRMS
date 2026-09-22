@@ -111,4 +111,6 @@ return [
     'ai.attention_signal' => 'View AI Employee Attention Signal',
     'ai.team_insight' => 'View AI Team Insight Summary',
     'ai.policy_assistant' => 'Use AI HR Policy Assistant',
+    
+    'department.view-managers-dropdown' => 'View Managers Dropdown',
 ];
