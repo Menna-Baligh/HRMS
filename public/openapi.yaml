@@ -7,6 +7,15 @@ servers:
     description: Local Development Server
   - url: https://api.yourdomain.com
     description: Production Server (Staging/Live)
+tags:
+  - name: Authentication
+  - name: Permissions
+  - name: Employees
+  - name: Departments
+  - name: Managers
+  - name: Notifications
+  - name: Broadcasting
+  - name: Files
 paths:
   /api/auth/login:
     post:
@@ -332,7 +341,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "Logged out successfully."
+                    example: Logged out successfully.
                   data:
                     type: array
                     items:
@@ -340,7 +349,7 @@ paths:
                     example: []
               example:
                 success: true
-                message: "Logged out successfully."
+                message: Logged out successfully.
                 data: []
         "401":
           description: Missing, expired, or invalid token (Unauthenticated).
@@ -374,7 +383,6 @@ paths:
                   errors:
                     nullable: true
                     example: null
-
   /api/auth/google/redirect:
     get:
       summary: Google Login (Only For Role Owner)
@@ -411,7 +419,6 @@ paths:
                 message: Google redirect URL generated successfully
                 data:
                   url: https://accounts.google.com/o/oauth2/v2/auth?client_id=123456789.apps.googleusercontent.com&redirect_uri=http%3A%2F%2Flocalhost%3A8000%2Fapi%2Fauth%2Fgoogle%2Fcallback&response_type=code&scope=openid+profile+email
-
   /api/permissions:
     get:
       summary: Retrieve all permissions (This route is allowed for roles Owner, HR)
@@ -684,17 +691,8 @@ paths:
                         example: 1
     post:
       summary: Create a new employee (Allowed for Owner and HR roles)
-      description: |
-        Creates a new employee account and sends an invitation email.
-
-        **Business Logic & Validation Rules:**
-        - **Permissions**: Allowed for `Owner` and `HR` roles only. Only `Owner` can create `HR` accounts.
-        - **Department Logic**:
-          - Mandatory (`required`) for `Employee` and `Manager` roles.
-          - Optional / Ignored (`nullable`) for `HR` role.
-        - **Manager Auto-Assignment**:
-          - Creating an `Employee` automatically sets their manager to the designated `Department` manager.
-          - Creating a `Manager` automatically sets them as the head manager for that `Department` and links all department employees to them.
+      description: Creates a new employee account and sends an invitation email.
+        Department is required for Employee and Manager roles, optional for HR.
       operationId: storeEmployee
       tags:
         - Employees
@@ -714,7 +712,9 @@ paths:
           description: Language for response translation (e.g. ar, en)
           schema:
             type: string
-            enum: [ar, en]
+            enum:
+              - ar
+              - en
             default: en
           example: en
       requestBody:
@@ -760,8 +760,8 @@ paths:
                   items:
                     type: string
                   example:
-                    - "View Profile"
-                    - "Update Task Progress"
+                    - View Profile
+                    - Update Task Progress
                 employment_type:
                   type: string
                   enum:
@@ -772,7 +772,7 @@ paths:
                 start_date:
                   type: string
                   format: date
-                  example: "2026-09-22"
+                  example: 2026-09-22
                 department_id:
                   type: integer
                   nullable: true
@@ -786,10 +786,9 @@ paths:
                 address:
                   type: string
                   nullable: true
-                  example: "Cairo, Egypt"
-                
+                  example: Cairo, Egypt
       responses:
-        '201':
+        "201":
           description: Employee created successfully
           content:
             application/json:
@@ -831,14 +830,14 @@ paths:
                       start_date:
                         type: string
                         format: date
-                        example: "2026-09-22"
+                        example: 2026-09-22
                       status:
                         type: string
                         example: Inactive
                       address:
                         type: string
                         nullable: true
-                        example: "Cairo, Egypt"
+                        example: Cairo, Egypt
                       avatar_url:
                         type: string
                         nullable: true
@@ -887,95 +886,58 @@ paths:
                         items:
                           type: string
                         example:
-                          - "View Profile"
-                          - "Update Task Progress"
+                          - View Profile
+                          - Update Task Progress
                       created_at:
                         type: string
-                        example: "2026-09-22 12:15:00"
+                        example: 2026-09-22 12:15:00
               example:
                 success: true
                 message: Employee created successfully.
                 data:
                   id: 15
-                  name: "Jane Doe"
-                  email: "jane.doe@example.com"
+                  name: Jane Doe
+                  email: jane.doe@example.com
                   phone: "+201234567890"
-                  employee_code: "EMP-2026-84920"
-                  job_title: "Software Engineer"
-                  employment_type: "Full-time"
-                  start_date: "2026-09-22"
-                  status: "Inactive"
-                  address: "Cairo, Egypt"
+                  employee_code: EMP-2026-84920
+                  job_title: Software Engineer
+                  employment_type: Full-time
+                  start_date: 2026-09-22
+                  status: Inactive
+                  address: Cairo, Egypt
                   avatar_url: null
-                  role: "Employee"
-                  role_label: "Employee"
-                  locale: "en"
+                  role: Employee
+                  role_label: Employee
+                  locale: en
                   department:
                     id: 1
-                    name: "Engineering"
+                    name: Engineering
                   company_location:
                     id: 1
-                    name: "Headquarter"
+                    name: Headquarter
                   manager:
                     id: 2
-                    name: "John Manager"
+                    name: John Manager
                   permissions:
-                    - "View Profile"
-                    - "Update Task Progress"
-                  created_at: "2026-09-22 12:15:00"
-        '401':
-          $ref: '#/components/responses/401Unauthorized'
-        '403':
+                    - View Profile
+                    - Update Task Progress
+                  created_at: 2026-09-22 12:15:00
+        "401":
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
           description: Forbidden (User is not Owner or HR)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
               example:
                 success: false
-                message: "You do not have the required permissions to perform this action."
+                message: You do not have the required permissions to perform this action.
                 errors: null
-        '422':
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                missingDepartment:
-                  summary: Missing Department for Employee/Manager
-                  value:
-                    success: false
-                    message: "Validation error."
-                    errors:
-                      department_id:
-                        - "The department field is required when role is Employee or Manager."
-                onlyOwnerCanCreateHR:
-                  summary: Non-Owner creating HR Role
-                  value:
-                    success: false
-                    message: "Validation error."
-                    errors:
-                      role:
-                        - "Only system owners can create HR accounts."
-                emailTaken:
-                  summary: Email Already Taken
-                  value:
-                    success: false
-                    message: "Validation error."
-                    errors:
-                      email:
-                        - "The email address has already been taken."
-        '500':
-          description: Internal Server Error (Failed to create employee)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              example:
-                success: false
-                message: "Failed to create employee account."
-                errors: null
+        "422":
+          $ref: "#/components/responses/422StoreValidationError"
+        "500":
+          $ref: "#/components/responses/500ServerError"
   /api/employees/profile:
     patch:
       summary: Update authenticated user's profile
@@ -6114,10 +6076,10 @@ paths:
                         type: integer
                         example: 3
                 example:
-                    success: true
-                    message: Unread notifications count retrieved successfully.
-                    data:
-                        unread_count: 3
+                  success: true
+                  message: Unread notifications count retrieved successfully.
+                  data:
+                    unread_count: 3
         "401":
           description: Unauthenticated
           content:
@@ -6421,14 +6383,14 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "File deleted successfully"
+                    example: File deleted successfully
                   data:
                     type: array
                     items: {}
                     example: []
               example:
                 success: true
-                message: "File deleted successfully"
+                message: File deleted successfully
                 data: []
         "401":
           description: Unauthenticated
@@ -6474,7 +6436,9 @@ paths:
           description: Language for response translation (e.g. ar, en)
           schema:
             type: string
-            enum: [ar, en]
+            enum:
+              - ar
+              - en
             default: en
           example: en
       requestBody:
@@ -6510,7 +6474,7 @@ paths:
                   format: password
                   example: Password123!
       responses:
-        '201':
+        "201":
           description: User registered successfully.
           content:
             application/json:
@@ -6578,109 +6542,110 @@ paths:
                               type: string
                           created_at:
                             type: string
-                            example: "2026-09-22 10:50:23"
+                            example: 2026-09-22 10:50:23
               example:
                 success: true
                 message: User registered successfully.
                 data:
-                  access_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2F1dGgvcmVnaXN0ZXIiLCJpYXQiOjE3OTAwNjM0MjMsImV4cCI6MTc5MDE0OTgyMywibmJmIjoxNzkwMDYzNDIzLCJqdGkiOiJwZ1FrZjQxbUxoWkhXNXBsIiwic3ViIjoiMTQiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3Iiwicm9sZSI6Ik93bmVyIn0.hMOfMgoUIH1r6paG087NNzPj5RIIR5FzycX-ckrNA64"
-                  token_type: "bearer"
-                  expires_in: "24 hours"
+                  access_token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2F1dGgvcmVnaXN0ZXIiLCJpYXQiOjE3OTAwNjM0MjMsImV4cCI6MTc5MDE0OTgyMywibmJmIjoxNzkwMDYzNDIzLCJqdGkiOiJwZ1FrZjQxbUxoWkhXNXBsIiwic3ViIjoiMTQiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3Iiwicm9sZSI6Ik93bmVyIn0.hMOfMgoUIH1r6paG087NNzPj5RIIR5FzycX-ckrNA64
+                  token_type: bearer
+                  expires_in: 24 hours
                   user:
                     id: 14
-                    name: "Menna"
-                    email: "mennabaligh@gmail.com"
+                    name: Menna
+                    email: mennabaligh@gmail.com
                     phone: null
-                    status: "Active"
+                    status: Active
                     address: null
                     avatar_url: null
-                    role: "Owner"
-                    role_label: "System Owner"
-                    locale: "en"
+                    role: Owner
+                    role_label: System Owner
+                    locale: en
                     permissions:
-                      - "Create Employee"
-                      - "Edit HR Fields"
-                      - "Change Account Status"
-                      - "View All Employees"
-                      - "View Profile"
-                      - "Update Profile"
-                      - "View Departments"
-                      - "Create Department"
-                      - "Edit Department"
-                      - "Change Department Status"
-                      - "View Team Employees"
-                      - "View Team Attendance"
-                      - "View Team Goals"
-                      - "Create Task"
-                      - "Update Task"
-                      - "Assign Task"
-                      - "Update Task Progress"
-                      - "Update Task Status"
-                      - "Create Submission"
-                      - "Attach File to Submission"
-                      - "View Submission Queue"
-                      - "View Submission"
-                      - "Approve Submission"
-                      - "Reject Submission"
-                      - "Request Changes on Submission"
-                      - "Resubmit Submission"
-                      - "Create Company Location"
-                      - "Update Company Location"
-                      - "Deactivate Location"
-                      - "Activate Location"
-                      - "View Active Locations"
-                      - "Check-in / Check-out"
-                      - "View Personal Attendance History"
-                      - "View Daily Attendance"
-                      - "View Attendance Exceptions"
-                      - "View Attendance Summary"
-                      - "Export Attendance Reports"
-                      - "View Own Goals"
-                      - "Create Goal"
-                      - "Update Goal"
-                      - "Update Goal Progress"
-                      - "Complete Goal"
-                      - "Company Goals Overview"
-                      - "Manage Evaluation Setup"
-                      - "Create Evaluation"
-                      - "Update Evaluation"
-                      - "Complete Evaluation"
-                      - "View Manager Evaluations"
-                      - "View Personal Evaluation"
-                      - "Company Performance"
-                      - "Team Performance"
-                      - "Personal Performance Dashboard"
-                      - "View Leave Types"
-                      - "Manage Leave Types"
-                      - "View Leave Balances"
-                      - "View Own Leave Requests"
-                      - "Create Leave Request"
-                      - "Cancel Leave Request"
-                      - "Manager Approve Leave"
-                      - "HR Approve Leave"
-                      - "Reject Leave Request"
-                      - "View Leave History"
-                      - "Team Leave Queue"
-                      - "HR Leave Queue"
-                      - "View Leave Calendar"
-                      - "View All Permissions"
-                      - "Download Files"
-                      - "Delete Files"
-                      - "Use AI Career Coach"
-                      - "View AI Performance Insight"
-                      - "Generate AI Evaluation Draft"
-                      - "Analyze AI Skill-Gap & Development"
-                      - "View AI Employee Attention Signal"
-                      - "View AI Team Insight Summary"
-                      - "Use AI HR Policy Assistant"
-                    created_at: "2026-09-22 10:50:23"
-        '422':
-          $ref: '#/components/responses/422RegistrationValidationError'
-        '429':
-          $ref: '#/components/responses/429TooManyRequests'
+                      - Create Employee
+                      - Edit HR Fields
+                      - Change Account Status
+                      - View All Employees
+                      - View Profile
+                      - Update Profile
+                      - View Departments
+                      - Create Department
+                      - Edit Department
+                      - Change Department Status
+                      - View Team Employees
+                      - View Team Attendance
+                      - View Team Goals
+                      - Create Task
+                      - Update Task
+                      - Assign Task
+                      - Update Task Progress
+                      - Update Task Status
+                      - Create Submission
+                      - Attach File to Submission
+                      - View Submission Queue
+                      - View Submission
+                      - Approve Submission
+                      - Reject Submission
+                      - Request Changes on Submission
+                      - Resubmit Submission
+                      - Create Company Location
+                      - Update Company Location
+                      - Deactivate Location
+                      - Activate Location
+                      - View Active Locations
+                      - Check-in / Check-out
+                      - View Personal Attendance History
+                      - View Daily Attendance
+                      - View Attendance Exceptions
+                      - View Attendance Summary
+                      - Export Attendance Reports
+                      - View Own Goals
+                      - Create Goal
+                      - Update Goal
+                      - Update Goal Progress
+                      - Complete Goal
+                      - Company Goals Overview
+                      - Manage Evaluation Setup
+                      - Create Evaluation
+                      - Update Evaluation
+                      - Complete Evaluation
+                      - View Manager Evaluations
+                      - View Personal Evaluation
+                      - Company Performance
+                      - Team Performance
+                      - Personal Performance Dashboard
+                      - View Leave Types
+                      - Manage Leave Types
+                      - View Leave Balances
+                      - View Own Leave Requests
+                      - Create Leave Request
+                      - Cancel Leave Request
+                      - Manager Approve Leave
+                      - HR Approve Leave
+                      - Reject Leave Request
+                      - View Leave History
+                      - Team Leave Queue
+                      - HR Leave Queue
+                      - View Leave Calendar
+                      - View All Permissions
+                      - Download Files
+                      - Delete Files
+                      - Use AI Career Coach
+                      - View AI Performance Insight
+                      - Generate AI Evaluation Draft
+                      - Analyze AI Skill-Gap & Development
+                      - View AI Employee Attention Signal
+                      - View AI Team Insight Summary
+                      - Use AI HR Policy Assistant
+                    created_at: 2026-09-22 10:50:23
+        "422":
+          $ref: "#/components/responses/422RegistrationValidationError"
+        "429":
+          $ref: "#/components/responses/429TooManyRequests"
   /api/auth/forget-password:
     post:
-      summary: Forget password request to send OTP via email (This route is allowed for all roles)
+      summary: Forget password request to send OTP via email (This route is allowed
+        for all roles)
       operationId: forgotPassword
       tags:
         - Authentication
@@ -6726,15 +6691,14 @@ paths:
                         type: string
                         example: john@example.com
                 example:
-                    success: true
-                    message: OTP sent successfully.
-                    data:
-                        email: john@example.com
-        '422':
-          $ref: '#/components/responses/422RegistrationValidationError'
-        '429':
-          $ref: '#/components/responses/429TooManyRequests'
-
+                  success: true
+                  message: OTP sent successfully.
+                  data:
+                    email: john@example.com
+        "422":
+          $ref: "#/components/responses/422RegistrationValidationError"
+        "429":
+          $ref: "#/components/responses/429TooManyRequests"
   /api/auth/forgot-password/verify-otp:
     post:
       summary: Verify OTP code (This route is allowed for all roles)
@@ -6790,15 +6754,15 @@ paths:
                         type: string
                         example: 64-character-random-token-string
                 example:
-                    success: true
-                    message: OTP verified successfully
-                    data:
-                        email: john@example.com
-                        reset_token: 9f8e7d6c5b4a3...
-        '422':
-          $ref: '#/components/responses/422OtpValidationError'
-        '429':
-          $ref: '#/components/responses/429TooManyRequests'
+                  success: true
+                  message: OTP verified successfully
+                  data:
+                    email: john@example.com
+                    reset_token: 9f8e7d6c5b4a3...
+        "422":
+          $ref: "#/components/responses/422OtpValidationError"
+        "429":
+          $ref: "#/components/responses/429TooManyRequests"
   /api/auth/forgot-password/reset:
     post:
       summary: Reset user password (This route is allowed for all roles)
@@ -6855,13 +6819,13 @@ paths:
                     nullable: true
                     example: null
                 example:
-                    success: true
-                    message: password reset successfully.
-                    data: null
-        '422':
-          $ref: '#/components/responses/422ResetTokenValidationError'
-        '429':
-          $ref: '#/components/responses/429TooManyRequests'
+                  success: true
+                  message: password reset successfully.
+                  data: null
+        "422":
+          $ref: "#/components/responses/422ResetTokenValidationError"
+        "429":
+          $ref: "#/components/responses/429TooManyRequests"
   /api/auth/forgot-password/resend-otp:
     post:
       summary: Resend OTP code (This route is allowed for all roles)
@@ -6910,20 +6874,19 @@ paths:
                         type: string
                         example: john@example.com
                 example:
-                    success: true
-                    message: OTP resnd successfully
-                    data:
-                        email: john@example.com
-        '422':
-          $ref: '#/components/responses/422ResendOtpValidationError'
-        '429':
-          $ref: '#/components/responses/429TooManyRequests'
-
-
+                  success: true
+                  message: OTP resnd successfully
+                  data:
+                    email: john@example.com
+        "422":
+          $ref: "#/components/responses/422ResendOtpValidationError"
+        "429":
+          $ref: "#/components/responses/429TooManyRequests"
   /api/ai/career-coach:
     post:
       summary: AI Career Coach Guidance (For All Roles)
-      description: Generates personalized career development guidance based on approved employee data.
+      description: Generates personalized career development guidance based on
+        approved employee data.
       operationId: getCareerCoachGuidance
       tags:
         - AI Features
@@ -6943,7 +6906,9 @@ paths:
           description: Language for response translation (e.g. ar, en)
           schema:
             type: string
-            enum: [ar, en]
+            enum:
+              - ar
+              - en
             default: en
           example: en
       requestBody:
@@ -6957,13 +6922,13 @@ paths:
               properties:
                 employee_id:
                   type: string
-                  example: "EMP-2026-001"
+                  example: EMP-2026-001
                 period:
                   type: string
                   nullable: true
-                  example: "2026-Q3"
+                  example: 2026-Q3
       responses:
-        '200':
+        "200":
           description: Career coach guidance retrieved successfully.
           content:
             application/json:
@@ -6975,16 +6940,16 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "Career coach guidance retrieved successfully."
+                    example: Career coach guidance retrieved successfully.
                   data:
                     type: object
                     properties:
                       status:
                         type: string
-                        example: "success"
+                        example: success
                       employee_id:
                         type: string
-                        example: "EMP-2026-001"
+                        example: EMP-2026-001
                       development_focus:
                         type: string
                         example: "Prioritize: System Design"
@@ -6992,47 +6957,50 @@ paths:
                         type: array
                         items:
                           type: string
-                        example: ["Clean Code", "Problem Solving"]
+                        example:
+                          - Clean Code
+                          - Problem Solving
                       development_areas:
                         type: array
                         items:
                           type: string
-                        example: ["System Architecture"]
+                        example:
+                          - System Architecture
                       development_plan:
                         type: array
                         items:
                           type: string
-                        example: ["Complete Laravel Microservices Course"]
+                        example:
+                          - Complete Laravel Microservices Course
                       follow_up:
                         type: object
                         properties:
                           checkpoint:
                             type: string
-                            example: "Next review"
+                            example: Next review
                           review_focus:
                             type: string
-                            example: "Review progress"
+                            example: Review progress
                       created_at:
                         type: string
                         format: date-time
-                        example: "2026-09-21T10:00:00Z"
-        '401':
-          $ref: '#/components/responses/401Unauthorized'
-        '403':
+                        example: 2026-09-21T10:00:00Z
+        "401":
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
           description: Forbidden (e.g. Employee accessing another employee's profile)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
               example:
                 success: false
-                message: "You are not authorized to access this employee's records."
+                message: You are not authorized to access this employee's records.
                 errors: null
-        '422':
-          $ref: '#/components/responses/422ValidationError'
-        '500':
-          $ref: '#/components/responses/500ServerError'
-
+        "422":
+          $ref: "#/components/responses/422ValidationError"
+        "500":
+          $ref: "#/components/responses/500ServerError"
   /api/ai/performance-insight:
     post:
       summary: AI Performance Insight (For All Roles)
@@ -7055,7 +7023,9 @@ paths:
           required: false
           schema:
             type: string
-            enum: [ar, en]
+            enum:
+              - ar
+              - en
             default: en
           example: en
       requestBody:
@@ -7070,12 +7040,12 @@ paths:
               properties:
                 employee_id:
                   type: string
-                  example: "EMP-2026-001"
+                  example: EMP-2026-001
                 period:
                   type: string
-                  example: "2026-Q3"
+                  example: 2026-Q3
       responses:
-        '200':
+        "200":
           description: Performance insight retrieved successfully or insufficient data.
           content:
             application/json:
@@ -7087,7 +7057,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "Performance insight retrieved successfully."
+                    example: Performance insight retrieved successfully.
                   data:
                     type: object
               examples:
@@ -7095,39 +7065,39 @@ paths:
                   summary: Success
                   value:
                     success: true
-                    message: "Performance insight retrieved successfully."
+                    message: Performance insight retrieved successfully.
                     data:
-                      status: "success"
-                      employee_id: "EMP-2026-001"
+                      status: success
+                      employee_id: EMP-2026-001
                       verified_facts:
-                        target_period: "2026-Q3"
+                        target_period: 2026-Q3
                         metrics_by_period: []
                       calculated_trends: {}
                       interpretation: {}
                       recommended_actions: []
-                      created_at: "2026-09-21T10:00:00Z"
+                      created_at: 2026-09-21T10:00:00Z
                 insufficientDataCase:
                   summary: Insufficient Data
                   value:
                     success: true
-                    message: "Insufficient approved performance data for this period."
+                    message: Insufficient approved performance data for this period.
                     data:
-                      status: "insufficient_data"
-                      employee_id: "EMP-2026-001"
-                      reason: "Insufficient approved performance data"
-        '401':
-          $ref: '#/components/responses/401Unauthorized'
-        '403':
-          $ref: '#/components/responses/403Forbidden'
-        '422':
-          $ref: '#/components/responses/422ValidationError'
-        '500':
-          $ref: '#/components/responses/500ServerError'
-
+                      status: insufficient_data
+                      employee_id: EMP-2026-001
+                      reason: Insufficient approved performance data
+        "401":
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+        "422":
+          $ref: "#/components/responses/422ValidationError"
+        "500":
+          $ref: "#/components/responses/500ServerError"
   /api/ai/evaluation-draft:
     post:
       summary: AI Evaluation Draft Assistant (Manager / HR / Owner only)
-      description: Generates an editable evaluation draft. This route is forbidden for Employees.
+      description: Generates an editable evaluation draft. This route is forbidden for
+        Employees.
       operationId: generateEvaluationDraft
       tags:
         - AI Features
@@ -7146,7 +7116,9 @@ paths:
           required: false
           schema:
             type: string
-            enum: [ar, en]
+            enum:
+              - ar
+              - en
             default: en
           example: en
       requestBody:
@@ -7162,10 +7134,10 @@ paths:
               properties:
                 employee_id:
                   type: string
-                  example: "EMP-2026-001"
+                  example: EMP-2026-001
                 period:
                   type: string
-                  example: "2026-Q3"
+                  example: 2026-Q3
                 evaluation_scores:
                   type: object
                   example:
@@ -7173,9 +7145,9 @@ paths:
                 manager_notes:
                   type: string
                   nullable: true
-                  example: "Strong delivery on recent deliverables."
+                  example: Strong delivery on recent deliverables.
       responses:
-        '200':
+        "200":
           description: Evaluation draft generated successfully.
           content:
             application/json:
@@ -7187,22 +7159,22 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "Evaluation draft generated successfully."
+                    example: Evaluation draft generated successfully.
                   data:
                     type: object
                     properties:
                       status:
                         type: string
-                        example: "success"
+                        example: success
                       employee_id:
                         type: string
-                        example: "EMP-2026-001"
+                        example: EMP-2026-001
                       period:
                         type: string
-                        example: "2026-Q3"
+                        example: 2026-Q3
                       evaluation_narrative:
                         type: string
-                        example: "Draft narrative for manager review."
+                        example: Draft narrative for manager review.
                       strengths:
                         type: array
                         items:
@@ -7217,28 +7189,28 @@ paths:
                       created_at:
                         type: string
                         format: date-time
-                        example: "2026-09-21T10:00:00Z"
-        '401':
-          $ref: '#/components/responses/401Unauthorized'
-        '403':
+                        example: 2026-09-21T10:00:00Z
+        "401":
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
           description: Forbidden for employees
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
               example:
                 success: false
-                message: "Employees are not authorized to access manager-level AI features."
+                message: Employees are not authorized to access manager-level AI features.
                 errors: null
-        '422':
-          $ref: '#/components/responses/422ValidationError'
-        '500':
-          $ref: '#/components/responses/500ServerError'
-
+        "422":
+          $ref: "#/components/responses/422ValidationError"
+        "500":
+          $ref: "#/components/responses/500ServerError"
   /api/ai/skill-gap:
     post:
       summary: AI Skill-Gap Analysis (For All Roles)
-      description: Identifies evidence-backed skill gaps and recommends target development actions.
+      description: Identifies evidence-backed skill gaps and recommends target
+        development actions.
       operationId: getSkillGapAnalysis
       tags:
         - AI Features
@@ -7257,7 +7229,9 @@ paths:
           required: false
           schema:
             type: string
-            enum: [ar, en]
+            enum:
+              - ar
+              - en
             default: en
           example: en
       requestBody:
@@ -7271,23 +7245,26 @@ paths:
               properties:
                 employee_id:
                   type: string
-                  example: "EMP-2026-001"
+                  example: EMP-2026-001
                 period:
                   type: string
                   nullable: true
-                  example: "2026-Q3"
+                  example: 2026-Q3
                 target_role:
                   type: string
                   nullable: true
-                  example: "Senior Backend Engineer"
+                  example: Senior Backend Engineer
                 target_skills:
                   type: array
                   nullable: true
                   items:
                     type: string
-                  example: ["Python", "System Design", "Microservices"]
+                  example:
+                    - Python
+                    - System Design
+                    - Microservices
       responses:
-        '200':
+        "200":
           description: Skill gaps analyzed successfully.
           content:
             application/json:
@@ -7299,19 +7276,19 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "Skill gaps analyzed and recommendations retrieved successfully."
+                    example: Skill gaps analyzed and recommendations retrieved successfully.
                   data:
                     type: object
                     properties:
                       status:
                         type: string
-                        example: "success"
+                        example: success
                       employee_id:
                         type: string
-                        example: "EMP-2026-001"
+                        example: EMP-2026-001
                       target_role:
                         type: string
-                        example: "Senior Backend Engineer"
+                        example: Senior Backend Engineer
                       skill_gaps:
                         type: array
                         items:
@@ -7322,24 +7299,24 @@ paths:
                           type: string
                       disclaimer:
                         type: string
-                        example: "AI-generated and advisory."
+                        example: AI-generated and advisory.
                       created_at:
                         type: string
                         format: date-time
-                        example: "2026-09-21T10:00:00Z"
-        '401':
-          $ref: '#/components/responses/401Unauthorized'
-        '403':
-          $ref: '#/components/responses/403Forbidden'
-        '422':
-          $ref: '#/components/responses/422ValidationError'
-        '500':
-          $ref: '#/components/responses/500ServerError'
-
+                        example: 2026-09-21T10:00:00Z
+        "401":
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+        "422":
+          $ref: "#/components/responses/422ValidationError"
+        "500":
+          $ref: "#/components/responses/500ServerError"
   /api/ai/attention-signal:
     post:
       summary: AI Employee Attention Signal (Manager / HR / Owner only)
-      description: Returns an advisory Low/Medium/High signal regarding changes in recent employee work indicators.
+      description: Returns an advisory Low/Medium/High signal regarding changes in
+        recent employee work indicators.
       operationId: getAttentionSignal
       tags:
         - AI Features
@@ -7358,7 +7335,9 @@ paths:
           required: false
           schema:
             type: string
-            enum: [ar, en]
+            enum:
+              - ar
+              - en
             default: en
           example: en
       requestBody:
@@ -7373,12 +7352,12 @@ paths:
               properties:
                 employee_id:
                   type: string
-                  example: "EMP-2026-001"
+                  example: EMP-2026-001
                 target_period:
                   type: string
-                  example: "2026-Q3"
+                  example: 2026-Q3
       responses:
-        '200':
+        "200":
           description: Attention signal retrieved successfully.
           content:
             application/json:
@@ -7390,29 +7369,32 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "Employee attention signal retrieved successfully."
+                    example: Employee attention signal retrieved successfully.
                   data:
                     type: object
                     properties:
                       status:
                         type: string
-                        example: "success"
+                        example: success
                       employee_id:
                         type: string
-                        example: "EMP-2026-001"
+                        example: EMP-2026-001
                       target_period:
                         type: string
-                        example: "2026-Q3"
+                        example: 2026-Q3
                       comparison_period:
                         type: string
-                        example: "2026-Q2"
+                        example: 2026-Q2
                       attention_level:
                         type: string
-                        enum: [Low, Medium, High]
-                        example: "Low"
+                        enum:
+                          - Low
+                          - Medium
+                          - High
+                        example: Low
                       explanation:
                         type: string
-                        example: "Advisory explanation."
+                        example: Advisory explanation.
                       contributing_indicators:
                         type: array
                         items:
@@ -7430,20 +7412,20 @@ paths:
                       created_at:
                         type: string
                         format: date-time
-                        example: "2026-09-21T10:00:00Z"
-        '401':
-          $ref: '#/components/responses/401Unauthorized'
-        '403':
-          $ref: '#/components/responses/403Forbidden'
-        '422':
-          $ref: '#/components/responses/422ValidationError'
-        '500':
-          $ref: '#/components/responses/500ServerError'
-
+                        example: 2026-09-21T10:00:00Z
+        "401":
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+        "422":
+          $ref: "#/components/responses/422ValidationError"
+        "500":
+          $ref: "#/components/responses/500ServerError"
   /api/ai/team-insight:
     post:
       summary: AI Team Insight Summary (Manager / HR / Owner only)
-      description: Generates a team-level summary of patterns and workload for a specific department.
+      description: Generates a team-level summary of patterns and workload for a
+        specific department.
       operationId: getTeamInsight
       tags:
         - AI Features
@@ -7462,7 +7444,9 @@ paths:
           required: false
           schema:
             type: string
-            enum: [ar, en]
+            enum:
+              - ar
+              - en
             default: en
           example: en
       requestBody:
@@ -7477,12 +7461,12 @@ paths:
               properties:
                 department:
                   type: string
-                  example: "Engineering"
+                  example: Engineering
                 period:
                   type: string
-                  example: "2026-Q3"
+                  example: 2026-Q3
       responses:
-        '200':
+        "200":
           description: Team insight summary retrieved successfully.
           content:
             application/json:
@@ -7494,25 +7478,25 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "Team insight summary retrieved successfully."
+                    example: Team insight summary retrieved successfully.
                   data:
                     type: object
                     properties:
                       status:
                         type: string
-                        example: "success"
+                        example: success
                       department:
                         type: string
-                        example: "Engineering"
+                        example: Engineering
                       period:
                         type: string
-                        example: "2026-Q3"
+                        example: 2026-Q3
                       team_size:
                         type: integer
                         example: 5
                       summary:
                         type: string
-                        example: "Team-level summary."
+                        example: Team-level summary.
                       top_common_skills:
                         type: array
                         items:
@@ -7528,20 +7512,20 @@ paths:
                       created_at:
                         type: string
                         format: date-time
-                        example: "2026-09-21T10:00:00Z"
-        '401':
-          $ref: '#/components/responses/401Unauthorized'
-        '403':
-          $ref: '#/components/responses/403Forbidden'
-        '422':
-          $ref: '#/components/responses/422ValidationError'
-        '500':
-          $ref: '#/components/responses/500ServerError'
-
+                        example: 2026-09-21T10:00:00Z
+        "401":
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+        "422":
+          $ref: "#/components/responses/422ValidationError"
+        "500":
+          $ref: "#/components/responses/500ServerError"
   /api/ai/policy-assistant:
     post:
       summary: AI HR Policy Assistant (For All Roles)
-      description: Answers employee policy questions grounded in company policies and employee facts.
+      description: Answers employee policy questions grounded in company policies and
+        employee facts.
       operationId: askPolicyQuestion
       tags:
         - AI Features
@@ -7560,7 +7544,9 @@ paths:
           required: false
           schema:
             type: string
-            enum: [ar, en]
+            enum:
+              - ar
+              - en
             default: en
           example: en
       requestBody:
@@ -7575,17 +7561,17 @@ paths:
               properties:
                 employee_id:
                   type: string
-                  example: "EMP-2026-001"
+                  example: EMP-2026-001
                 question:
                   type: string
                   minLength: 3
-                  example: "What is the remote work policy?"
+                  example: What is the remote work policy?
                 session_id:
                   type: string
                   nullable: true
-                  example: "session-abc-123"
+                  example: session-abc-123
       responses:
-        '200':
+        "200":
           description: Answer generated successfully or question unsupported.
           content:
             application/json:
@@ -7597,7 +7583,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "Policy question answered successfully."
+                    example: Policy question answered successfully.
                   data:
                     type: object
               examples:
@@ -7605,34 +7591,35 @@ paths:
                   summary: Supported Question
                   value:
                     success: true
-                    message: "Policy question answered successfully."
+                    message: Policy question answered successfully.
                     data:
-                      status: "success"
-                      session_id: "session-abc-123"
-                      employee_id: "EMP-2026-001"
-                      answer: "Remote work is allowed up to 2 days per week with manager approval."
-                      policy_references: ["Section 4.2 - Remote Work"]
-                      employee_facts_used: ["leave_balance: 14 days"]
-                      created_at: "2026-09-21T10:00:00Z"
+                      status: success
+                      session_id: session-abc-123
+                      employee_id: EMP-2026-001
+                      answer: Remote work is allowed up to 2 days per week with manager approval.
+                      policy_references:
+                        - Section 4.2 - Remote Work
+                      employee_facts_used:
+                        - "leave_balance: 14 days"
+                      created_at: 2026-09-21T10:00:00Z
                 unsupportedCase:
                   summary: Unsupported Question
                   value:
                     success: true
-                    message: "The question is outside the approved policy scope."
+                    message: The question is outside the approved policy scope.
                     data:
-                      status: "unsupported"
-                      employee_id: "EMP-2026-001"
-                      message: "The question is outside the approved policy scope."
-                      created_at: "2026-09-21T10:00:00Z"
-        '401':
-          $ref: '#/components/responses/401Unauthorized'
-        '403':
-          $ref: '#/components/responses/403Forbidden'
-        '422':
-          $ref: '#/components/responses/422ValidationError'
-        '500':
-          $ref: '#/components/responses/500ServerError'
-
+                      status: unsupported
+                      employee_id: EMP-2026-001
+                      message: The question is outside the approved policy scope.
+                      created_at: 2026-09-21T10:00:00Z
+        "401":
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+        "422":
+          $ref: "#/components/responses/422ValidationError"
+        "500":
+          $ref: "#/components/responses/500ServerError"
 components:
   securitySchemes:
     bearerAuth:
@@ -7645,29 +7632,27 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
           example:
             success: false
             message: Unauthenticated.
             errors: null
-
     Forbidden:
       description: Forbidden - User lacks sufficient permissions.
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
           example:
             success: false
             message: This action is unauthorized.
             errors: null
-
     InternalServerError:
       description: Internal Server Error.
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
           example:
             success: false
             message: Failed to retrieve performance dashboard.
@@ -7677,45 +7662,42 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
           example:
             success: false
-            message: "Unauthenticated. Please log in first."
+            message: Unauthenticated. Please log in first.
             errors: null
-
     403Forbidden:
       description: Forbidden - Unauthorized scope or user role
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
           example:
             success: false
-            message: "You do not have the required permissions to perform this action."
+            message: You do not have the required permissions to perform this action.
             errors: null
-
     422ValidationError:
       description: Validation error
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
           example:
             success: false
-            message: "Validation error."
+            message: Validation error.
             errors:
               employee_id:
-                - "The employee_id field is required."
-
+                - The employee_id field is required.
     500ServerError:
       description: Internal server error / AI Provider Failure
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
           example:
             success: false
-            message: "AI service is currently unavailable."
+            message: AI service is currently unavailable.
             errors: null
     422RegistrationValidationError:
       description: Validation error
@@ -7729,20 +7711,19 @@ components:
                 example: false
               message:
                 type: string
-                example: "Validation error."
+                example: Validation error.
               errors:
                 type: object
                 nullable: true
                 example:
                   email:
-                    - "The email has already been taken."
+                    - The email has already been taken.
           example:
             success: false
-            message: "Validation error."
+            message: Validation error.
             errors:
               email:
-                - "The email has already been taken."
-
+                - The email has already been taken.
     429TooManyRequests:
       description: Too Many Requests (Throttle limit exceeded)
       content:
@@ -7755,16 +7736,15 @@ components:
                 example: false
               message:
                 type: string
-                example: "Too many login attempts. Please try again in 46 seconds."
+                example: Too many login attempts. Please try again in 46 seconds.
               errors:
                 type: string
                 nullable: true
                 example: null
           example:
             success: false
-            message: "Too many login attempts. Please try again in 46 seconds."
+            message: Too many login attempts. Please try again in 46 seconds.
             errors: null
-
     422OtpValidationError:
       description: OTP Validation error (Invalid or expired OTP)
       content:
@@ -7777,7 +7757,7 @@ components:
                 example: false
               message:
                 type: string
-                example: "Validation error."
+                example: Validation error.
               errors:
                 type: object
                 properties:
@@ -7786,14 +7766,13 @@ components:
                     items:
                       type: string
                     example:
-                      - "Invalid or expired OTP."
+                      - Invalid or expired OTP.
           example:
             success: false
-            message: "Validation error."
+            message: Validation error.
             errors:
               otp:
-                - "Invalid or expired OTP."
-
+                - Invalid or expired OTP.
     422ResetTokenValidationError:
       description: Reset Token Validation error (Invalid or expired reset token)
       content:
@@ -7806,7 +7785,7 @@ components:
                 example: false
               message:
                 type: string
-                example: "Validation error."
+                example: Validation error.
               errors:
                 type: object
                 properties:
@@ -7815,13 +7794,13 @@ components:
                     items:
                       type: string
                     example:
-                      - "Invalid or expired reset token."
+                      - Invalid or expired reset token.
           example:
             success: false
-            message: "Validation error."
+            message: Validation error.
             errors:
               reset_token:
-                - "Invalid or expired reset token."
+                - Invalid or expired reset token.
     422ResendOtpValidationError:
       description: Resend OTP Validation error (Email not found)
       content:
@@ -7834,7 +7813,7 @@ components:
                 example: false
               message:
                 type: string
-                example: "Validation error."
+                example: Validation error.
               errors:
                 type: object
                 properties:
@@ -7843,13 +7822,38 @@ components:
                     items:
                       type: string
                     example:
-                      - "Email not found."
+                      - Email not found.
           example:
             success: false
-            message: "Validation error."
+            message: Validation error.
             errors:
               email:
-                - "Email not found."
+                - Email not found.
+    422StoreValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: Validation error.
+              errors:
+                type: object
+                nullable: true
+                example:
+                  department_id:
+                    - The department field is required.
+          example:
+            success: false
+            message: Validation error.
+            errors:
+              department_id:
+                - The department field is required.
   schemas:
     EvaluationPeriod:
       type: object
@@ -7863,18 +7867,17 @@ components:
         start_date:
           type: string
           format: date
-          example: "2026-01-01"
+          example: 2026-01-01
         end_date:
           type: string
           format: date
-          example: "2026-03-31"
+          example: 2026-03-31
         status:
           type: string
           example: active
         created_at:
           type: string
-          example: "2026-01-01 10:00:00"
-
+          example: 2026-01-01 10:00:00
     EvaluationCategory:
       type: object
       properties:
@@ -7886,14 +7889,13 @@ components:
           example: Technical Skills
         max_score:
           type: number
-          example: 10.0
+          example: 10
         weight:
           type: number
           example: 1.5
         created_at:
           type: string
-          example: "2026-01-01 10:00:00"
-
+          example: 2026-01-01 10:00:00
     Evaluation:
       type: object
       properties:
@@ -7991,11 +7993,10 @@ components:
                 type: object
               created_at:
                 type: string
-                example: "2026-03-31 15:30:00"
+                example: 2026-03-31 15:30:00
         created_at:
           type: string
-          example: "2026-03-01 09:00:00"
-
+          example: 2026-03-01 09:00:00
     ErrorResponse:
       type: object
       properties:
@@ -8009,7 +8010,6 @@ components:
           type: object
           nullable: true
           example: null
-
     AtAGlanceMetrics:
       type: object
       properties:
@@ -8021,14 +8021,13 @@ components:
         quality_rate:
           type: number
           format: float
-          example: 92.0
+          example: 92
           description: Quality score rating based on evaluations.
         attendance_rate:
           type: number
           format: float
           example: 96.4
           description: Attendance rate percentage.
-
     TrendItem:
       type: object
       properties:
@@ -8041,7 +8040,6 @@ components:
           format: float
           example: 88.5
           description: Overall score recorded for that month.
-
     AttendanceMetrics:
       type: object
       properties:
@@ -8065,7 +8063,6 @@ components:
           type: number
           format: float
           example: 168.5
-
     TaskMetrics:
       type: object
       properties:
@@ -8087,12 +8084,11 @@ components:
         completion_rate:
           type: number
           format: float
-          example: 80.0
+          example: 80
         average_progress:
           type: number
           format: float
           example: 88.33
-
     GoalMetrics:
       type: object
       properties:
@@ -8105,12 +8101,11 @@ components:
         completion_rate:
           type: number
           format: float
-          example: 75.0
+          example: 75
         average_progress:
           type: number
           format: float
           example: 82.5
-
     EvaluationMetrics:
       type: object
       properties:
@@ -8120,32 +8115,32 @@ components:
         latest_overall_score:
           type: number
           format: float
-          example: 90.0
+          example: 90
         previous_overall_score:
           type: number
           format: float
-          example: 85.0
+          example: 85
         score_change:
           type: number
           format: float
-          example: 5.0
+          example: 5
         trend:
           type: string
-          enum: [improving, declining]
+          enum:
+            - improving
+            - declining
           example: improving
-
     PerformanceMetrics:
       type: object
       properties:
         attendance:
-          $ref: '#/components/schemas/AttendanceMetrics'
+          $ref: "#/components/schemas/AttendanceMetrics"
         tasks:
-          $ref: '#/components/schemas/TaskMetrics'
+          $ref: "#/components/schemas/TaskMetrics"
         goals:
-          $ref: '#/components/schemas/GoalMetrics'
+          $ref: "#/components/schemas/GoalMetrics"
         evaluations:
-          $ref: '#/components/schemas/EvaluationMetrics'
-
+          $ref: "#/components/schemas/EvaluationMetrics"
     EmployeeDashboardData:
       type: object
       properties:
@@ -8155,11 +8150,11 @@ components:
         start_date:
           type: string
           format: date
-          example: "2026-09-01"
+          example: 2026-09-01
         end_date:
           type: string
           format: date
-          example: "2026-09-30"
+          example: 2026-09-30
         overall:
           type: object
           properties:
@@ -8169,20 +8164,21 @@ components:
               example: 87.65
             change_label:
               type: string
-              example: "+3.5% from last month"
+              example: +3.5% from last month
             trend:
               type: string
-              enum: [up, down]
+              enum:
+                - up
+                - down
               example: up
         at_a_glance:
-          $ref: '#/components/schemas/AtAGlanceMetrics'
+          $ref: "#/components/schemas/AtAGlanceMetrics"
         performance_trend:
           type: array
           items:
-            $ref: '#/components/schemas/TrendItem'
+            $ref: "#/components/schemas/TrendItem"
         metrics:
-          $ref: '#/components/schemas/PerformanceMetrics'
-
+          $ref: "#/components/schemas/PerformanceMetrics"
     TeamSummary:
       type: object
       properties:
@@ -8199,7 +8195,6 @@ components:
         needs_attention_count:
           type: integer
           example: 1
-
     TeamMemberPerformance:
       type: object
       properties:
@@ -8222,20 +8217,22 @@ components:
         tasks_rate:
           type: number
           format: float
-          example: 90.0
+          example: 90
         attendance_rate:
           type: number
           format: float
-          example: 95.0
+          example: 95
         quality_rate:
           type: number
           format: float
-          example: 88.0
+          example: 88
         status_label:
           type: string
-          enum: [High Performer, Good, Needs Attention]
+          enum:
+            - High Performer
+            - Good
+            - Needs Attention
           example: High Performer
-
     PaginatedTeamMembers:
       type: object
       properties:
@@ -8245,10 +8242,10 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/TeamMemberPerformance'
+            $ref: "#/components/schemas/TeamMemberPerformance"
         first_page_url:
           type: string
-          example: "https://api.domain.com/api/manager/team-performance?page=1"
+          example: https://api.domain.com/api/manager/team-performance?page=1
         from:
           type: integer
           nullable: true
@@ -8258,7 +8255,7 @@ components:
           example: 1
         last_page_url:
           type: string
-          example: "https://api.domain.com/api/manager/team-performance?page=1"
+          example: https://api.domain.com/api/manager/team-performance?page=1
         links:
           type: array
           items:
@@ -8267,7 +8264,7 @@ components:
               url:
                 type: string
                 nullable: true
-                example: "https://api.domain.com/api/manager/team-performance?page=1"
+                example: https://api.domain.com/api/manager/team-performance?page=1
               label:
                 type: string
                 example: "1"
@@ -8280,7 +8277,7 @@ components:
           example: null
         path:
           type: string
-          example: "https://api.domain.com/api/manager/team-performance"
+          example: https://api.domain.com/api/manager/team-performance
         per_page:
           type: integer
           example: 10
@@ -8295,7 +8292,6 @@ components:
         total:
           type: integer
           example: 8
-
     TeamDashboardData:
       type: object
       properties:
@@ -8305,22 +8301,21 @@ components:
         start_date:
           type: string
           format: date
-          example: "2026-09-01"
+          example: 2026-09-01
         end_date:
           type: string
           format: date
-          example: "2026-09-30"
+          example: 2026-09-30
         team_summary:
-          $ref: '#/components/schemas/TeamSummary'
+          $ref: "#/components/schemas/TeamSummary"
         at_a_glance:
-          $ref: '#/components/schemas/AtAGlanceMetrics'
+          $ref: "#/components/schemas/AtAGlanceMetrics"
         performance_trend:
           type: array
           items:
-            $ref: '#/components/schemas/TrendItem'
+            $ref: "#/components/schemas/TrendItem"
         team_members:
-          $ref: '#/components/schemas/PaginatedTeamMembers'
-
+          $ref: "#/components/schemas/PaginatedTeamMembers"
     CompanySummary:
       type: object
       properties:
@@ -8340,7 +8335,6 @@ components:
         needs_attention_count:
           type: integer
           example: 8
-
     DepartmentPerformance:
       type: object
       properties:
@@ -8360,7 +8354,7 @@ components:
         tasks_rate:
           type: number
           format: float
-          example: 88.0
+          example: 88
         attendance_rate:
           type: number
           format: float
@@ -8368,12 +8362,15 @@ components:
         quality_rate:
           type: number
           format: float
-          example: 85.0
+          example: 85
         status_label:
           type: string
-          enum: [High Performing Dept, Good, Needs Attention, No Data]
+          enum:
+            - High Performing Dept
+            - Good
+            - Needs Attention
+            - No Data
           example: High Performing Dept
-
     PaginatedDepartments:
       type: object
       properties:
@@ -8383,10 +8380,10 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/DepartmentPerformance'
+            $ref: "#/components/schemas/DepartmentPerformance"
         first_page_url:
           type: string
-          example: "https://api.domain.com/api/hr/company-performance?page=1"
+          example: https://api.domain.com/api/hr/company-performance?page=1
         from:
           type: integer
           nullable: true
@@ -8396,7 +8393,7 @@ components:
           example: 1
         last_page_url:
           type: string
-          example: "https://api.domain.com/api/hr/company-performance?page=1"
+          example: https://api.domain.com/api/hr/company-performance?page=1
         links:
           type: array
           items:
@@ -8405,7 +8402,7 @@ components:
               url:
                 type: string
                 nullable: true
-                example: "https://api.domain.com/api/hr/company-performance?page=1"
+                example: https://api.domain.com/api/hr/company-performance?page=1
               label:
                 type: string
                 example: "1"
@@ -8418,7 +8415,7 @@ components:
           example: null
         path:
           type: string
-          example: "https://api.domain.com/api/hr/company-performance"
+          example: https://api.domain.com/api/hr/company-performance
         per_page:
           type: integer
           example: 10
@@ -8433,7 +8430,6 @@ components:
         total:
           type: integer
           example: 6
-
     CompanyDashboardData:
       type: object
       properties:
@@ -8443,22 +8439,21 @@ components:
         start_date:
           type: string
           format: date
-          example: "2026-09-01"
+          example: 2026-09-01
         end_date:
           type: string
           format: date
-          example: "2026-09-30"
+          example: 2026-09-30
         company_summary:
-          $ref: '#/components/schemas/CompanySummary'
+          $ref: "#/components/schemas/CompanySummary"
         at_a_glance:
-          $ref: '#/components/schemas/AtAGlanceMetrics'
+          $ref: "#/components/schemas/AtAGlanceMetrics"
         performance_trend:
           type: array
           items:
-            $ref: '#/components/schemas/TrendItem'
+            $ref: "#/components/schemas/TrendItem"
         departments_performance:
-          $ref: '#/components/schemas/PaginatedDepartments'
-
+          $ref: "#/components/schemas/PaginatedDepartments"
     Goal:
       type: object
       properties:
@@ -8496,26 +8491,25 @@ components:
           example: 100
         current_value:
           type: number
-          example: 45.0
+          example: 45
         progress_percentage:
           type: number
           example: 45
         target_date:
           type: string
           format: date
-          example: '2026-11-30'
+          example: 2026-11-30
         status:
           type: string
           example: active
         histories:
           type: array
           items:
-            $ref: '#/components/schemas/GoalProgressHistory'
+            $ref: "#/components/schemas/GoalProgressHistory"
         created_at:
           type: string
           format: date-time
-          example: '2026-09-15T18:00:00.000000Z'
-
+          example: 2026-09-15T18:00:00.000000Z
     GoalProgressHistory:
       type: object
       properties:
@@ -8530,10 +8524,10 @@ components:
           example: 12
         previous_value:
           type: number
-          example: 20.0
+          example: 20
         new_value:
           type: number
-          example: 45.0
+          example: 45
         note:
           type: string
           nullable: true
@@ -8541,24 +8535,23 @@ components:
         created_at:
           type: string
           format: date-time
-          example: '2026-09-15T18:30:00.000000Z'
-
+          example: 2026-09-15T18:30:00.000000Z
     GoalPaginatedResponse:
       type: object
       properties:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/Goal'
+            $ref: "#/components/schemas/Goal"
         links:
           type: object
           properties:
             first:
               type: string
-              example: 'http://api.example.com/goals?page=1'
+              example: http://api.example.com/goals?page=1
             last:
               type: string
-              example: 'http://api.example.com/goals?page=3'
+              example: http://api.example.com/goals?page=3
             prev:
               type: string
               nullable: true
@@ -8566,7 +8559,7 @@ components:
             next:
               type: string
               nullable: true
-              example: 'http://api.example.com/goals?page=2'
+              example: http://api.example.com/goals?page=2
         meta:
           type: object
           properties:
@@ -8598,22 +8591,21 @@ components:
           type: string
         active:
           type: boolean
-
     Notification:
       type: object
       properties:
         id:
           type: string
-          example: "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"
+          example: 9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d
         type:
           type: string
-          example: "App\\Notifications\\NewTaskNotification"
+          example: App\Notifications\NewTaskNotification
         data:
           type: object
           additionalProperties: true
           example:
-            title: "New Task"
-            body: "You have been assigned a new task."
+            title: New Task
+            body: You have been assigned a new task.
         read_at:
           type: string
           nullable: true
@@ -8623,6 +8615,4 @@ components:
           example: false
         created_at:
           type: string
-          example: "2026-09-17 21:00:00"
-
-
+          example: 2026-09-17 21:00:00
