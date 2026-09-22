@@ -30,7 +30,7 @@ class EmployeeInvitationMail extends Mailable implements ShouldQueue
         $activationUrl = config('app.frontend_url').'/reset-password?email='.urlencode($this->user->email); // * ensure from frontend team what is the correct url for activate account page, this is just a placeholder for now
 
         return new Content(
-            markdown: 'emails.employee-invitation',
+            view: 'emails.employee-invitation',
             with: [
                 'activationUrl' => $activationUrl,
             ],
