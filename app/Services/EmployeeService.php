@@ -20,13 +20,17 @@ class EmployeeService
     public function createEmployee(array $data): User
     {
         return DB::transaction(function () use ($data) {
-            $managerId = $data['manager_id'] ?? null;
-            if (empty($managerId) && ! empty($data['department_id']) && $data['role'] === 'Employee') {
-                $department = Department::find($data['department_id']);
-                $managerId = $department?->manager_id;
+            $role = $data['role'];
+            $departmentId = $role === 'HR' ? null : ($data['department_id'] ?? null);
+            $managerId = null;
+            if ($departmentId) {
+                $department = Department::find($departmentId);
+                if ($role === 'Employee') {
+                    $managerId = $department?->manager_id;
+                }
             }
 
-            $locationId = $data['company_location_id'] ?? CompanyLocation::latest('id')->value('id');
+            $locationId =  CompanyLocation::latest('id')->value('id');
 
             $user = User::create([
                 'name' => $data['name'],
@@ -39,7 +43,7 @@ class EmployeeService
                 'employment_type' => $data['employment_type'],
                 'start_date' => $data['start_date'],
                 'status' => 'inactive',
-                'department_id' => $data['department_id'] ?? null,
+                'department_id' => $departmentId,
                 'company_location_id' => $locationId,
                 'manager_id' => $managerId,
                 'address' => $data['address'] ?? null,
@@ -49,6 +53,18 @@ class EmployeeService
             if (! empty($data['permissions'])) {
                 $user->givePermissionTo($data['permissions']);
             }
+            if ($role === 'Manager' && $departmentId) {
+                Department::where('id', $departmentId)->update([
+                    'manager_id' => $user->id,
+                ]);
+
+                User::where('department_id', $departmentId)
+                    ->where('id', '!=', $user->id)
+                    ->update([
+                        'manager_id' => $user->id,
+                    ]);
+            }
+            $user = $user->fresh();
 
             Mail::to($user->email)->send(new EmployeeInvitationMail($user));
 

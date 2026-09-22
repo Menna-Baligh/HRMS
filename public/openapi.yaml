@@ -683,7 +683,18 @@ paths:
                         type: integer
                         example: 1
     post:
-      summary: Create a new employee
+      summary: Create a new employee (Allowed for Owner and HR roles)
+      description: |
+        Creates a new employee account and sends an invitation email.
+
+        **Business Logic & Validation Rules:**
+        - **Permissions**: Allowed for `Owner` and `HR` roles only. Only `Owner` can create `HR` accounts.
+        - **Department Logic**:
+          - Mandatory (`required`) for `Employee` and `Manager` roles.
+          - Optional / Ignored (`nullable`) for `HR` role.
+        - **Manager Auto-Assignment**:
+          - Creating an `Employee` automatically sets their manager to the designated `Department` manager.
+          - Creating a `Manager` automatically sets them as the head manager for that `Department` and links all department employees to them.
       operationId: storeEmployee
       tags:
         - Employees
@@ -697,6 +708,15 @@ paths:
             type: string
             default: application/json
           example: application/json
+        - in: query
+          name: lang
+          required: false
+          description: Language for response translation (e.g. ar, en)
+          schema:
+            type: string
+            enum: [ar, en]
+            default: en
+          example: en
       requestBody:
         required: true
         content:
@@ -723,7 +743,7 @@ paths:
                 password:
                   type: string
                   minLength: 8
-                  example: password123
+                  example: Password123!
                 role:
                   type: string
                   enum:
@@ -740,7 +760,8 @@ paths:
                   items:
                     type: string
                   example:
-                    - employee.view-all
+                    - "View Profile"
+                    - "Update Task Progress"
                 employment_type:
                   type: string
                   enum:
@@ -751,26 +772,24 @@ paths:
                 start_date:
                   type: string
                   format: date
-                  example: 2026-01-15
+                  example: "2026-09-22"
                 department_id:
                   type: integer
                   nullable: true
+                  description: Required if role is Employee or Manager. Optional/Null for HR.
                   example: 1
-                manager_id:
-                  type: integer
-                  nullable: true
-                  example: 2
                 phone:
                   type: string
                   maxLength: 20
                   nullable: true
-                  example: "+1234567890"
+                  example: "+201234567890"
                 address:
                   type: string
                   nullable: true
-                  example: 123 Main St
+                  example: "Cairo, Egypt"
+                
       responses:
-        "201":
+        '201':
           description: Employee created successfully
           content:
             application/json:
@@ -782,16 +801,13 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Employee created successfully
+                    example: Employee created successfully.
                   data:
                     type: object
                     properties:
                       id:
                         type: integer
-                        example: 1
-                      employee_id:
-                        type: string
-                        example: EMP-2026-00001
+                        example: 15
                       name:
                         type: string
                         example: Jane Doe
@@ -799,38 +815,63 @@ paths:
                         type: string
                         format: email
                         example: jane.doe@example.com
-                      role:
-                        type: string
-                        example: Employee
-                      avatar:
+                      phone:
                         type: string
                         nullable: true
-                        example: null
+                        example: "+201234567890"
+                      employee_code:
+                        type: string
+                        example: EMP-2026-84920
                       job_title:
                         type: string
                         example: Software Engineer
                       employment_type:
                         type: string
                         example: Full-time
-                      status:
-                        type: string
-                        example: inactive
                       start_date:
                         type: string
                         format: date
-                        example: 2026-01-15
-                      phone:
+                        example: "2026-09-22"
+                      status:
                         type: string
-                        nullable: true
-                        example: "+1234567890"
+                        example: Inactive
                       address:
                         type: string
                         nullable: true
-                        example: 123 Main St
-                      department:
+                        example: "Cairo, Egypt"
+                      avatar_url:
                         type: string
                         nullable: true
-                        example: Engineering
+                        example: null
+                      role:
+                        type: string
+                        example: Employee
+                      role_label:
+                        type: string
+                        example: Employee
+                      locale:
+                        type: string
+                        example: en
+                      department:
+                        type: object
+                        nullable: true
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          name:
+                            type: string
+                            example: Engineering
+                      company_location:
+                        type: object
+                        nullable: true
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          name:
+                            type: string
+                            example: Headquarter
                       manager:
                         type: object
                         nullable: true
@@ -838,73 +879,103 @@ paths:
                           id:
                             type: integer
                             example: 2
-                          employee_id:
-                            type: string
-                            example: EMP-2026-00002
                           name:
                             type: string
                             example: John Manager
-                      created_at:
-                        type: string
-                        example: 2026-09-10 21:30:00
                       permissions:
                         type: array
                         items:
                           type: string
                         example:
-                          - employee.view-all
-        "422":
+                          - "View Profile"
+                          - "Update Task Progress"
+                      created_at:
+                        type: string
+                        example: "2026-09-22 12:15:00"
+              example:
+                success: true
+                message: Employee created successfully.
+                data:
+                  id: 15
+                  name: "Jane Doe"
+                  email: "jane.doe@example.com"
+                  phone: "+201234567890"
+                  employee_code: "EMP-2026-84920"
+                  job_title: "Software Engineer"
+                  employment_type: "Full-time"
+                  start_date: "2026-09-22"
+                  status: "Inactive"
+                  address: "Cairo, Egypt"
+                  avatar_url: null
+                  role: "Employee"
+                  role_label: "Employee"
+                  locale: "en"
+                  department:
+                    id: 1
+                    name: "Engineering"
+                  company_location:
+                    id: 1
+                    name: "Headquarter"
+                  manager:
+                    id: 2
+                    name: "John Manager"
+                  permissions:
+                    - "View Profile"
+                    - "Update Task Progress"
+                  created_at: "2026-09-22 12:15:00"
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          description: Forbidden (User is not Owner or HR)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: "You do not have the required permissions to perform this action."
+                errors: null
+        '422':
           description: Validation error
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Validation error
-                  errors:
-                    type: object
-                    additionalProperties:
-                      type: array
-                      items:
-                        type: string
+                $ref: '#/components/schemas/ErrorResponse'
               examples:
+                missingDepartment:
+                  summary: Missing Department for Employee/Manager
+                  value:
+                    success: false
+                    message: "Validation error."
+                    errors:
+                      department_id:
+                        - "The department field is required when role is Employee or Manager."
+                onlyOwnerCanCreateHR:
+                  summary: Non-Owner creating HR Role
+                  value:
+                    success: false
+                    message: "Validation error."
+                    errors:
+                      role:
+                        - "Only system owners can create HR accounts."
                 emailTaken:
                   summary: Email Already Taken
                   value:
                     success: false
-                    message: Validation error
+                    message: "Validation error."
                     errors:
                       email:
-                        - The email address is already in use.
-                invalidRole:
-                  summary: Invalid Role Selected
-                  value:
-                    success: false
-                    message: Validation error
-                    errors:
-                      role:
-                        - "The selected role is invalid. Allowed roles are: HR,
-                          Manager, Employee."
-        "500":
-          description: Failed to create employee
+                        - "The email address has already been taken."
+        '500':
+          description: Internal Server Error (Failed to create employee)
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Failed to create employee
-                  errors:
-                    nullable: true
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: "Failed to create employee account."
+                errors: null
   /api/employees/profile:
     patch:
       summary: Update authenticated user's profile
