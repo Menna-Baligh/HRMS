@@ -7620,6 +7620,77 @@ paths:
           $ref: "#/components/responses/422ValidationError"
         "500":
           $ref: "#/components/responses/500ServerError"
+  /api/departments/managers-dropdown:
+    get:
+      summary: Get list of managers for dropdown selection (Allowed for Owner and HR)
+      description: Returns a simplified array of all users who can manage departments (ID and Name only) to populate dropdown filters and forms.
+      operationId: getManagersDropdown
+      tags:
+        - Departments
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: query
+          name: lang
+          required: false
+          description: Language for response translation (ar, en)
+          schema:
+            type: string
+            enum: [ar, en]
+            default: en
+          example: en
+      responses:
+        '200':
+          description: Managers list retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Managers list retrieved successfully."
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 2
+                        name:
+                          type: string
+                          example: "John Manager"
+              example:
+                success: true
+                message: "Managers list retrieved successfully."
+                data:
+                  - id: 2
+                    name: "John Manager"
+                  - id: 5
+                    name: "Sarah HR"
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          description: Forbidden (User lacks required permission)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: "You do not have the required permissions to perform this action."
+                errors: null
 components:
   securitySchemes:
     bearerAuth:

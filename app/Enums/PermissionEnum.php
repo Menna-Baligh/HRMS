@@ -121,6 +121,9 @@ enum PermissionEnum: string
     case AI_TEAM_INSIGHT = 'ai.team_insight';
     case AI_POLICY_ASSISTANT = 'ai.policy_assistant';
 
+    // 12. DropDown
+    case VIEW_MANAGERS_DROPDOWN = 'department.view-managers-dropdown';
+
     public function defaultRoles(): array
     {
         return match ($this) {
@@ -146,7 +149,8 @@ enum PermissionEnum: string
             self::LEAVE_TYPE_MANAGE,
             self::LEAVE_APPROVE_HR,
             self::LEAVE_REJECT,
-            self::LEAVE_QUEUE_HR => ['HR', 'Owner'],
+            self::LEAVE_QUEUE_HR,
+            self::VIEW_MANAGERS_DROPDOWN => ['HR', 'Owner'],
 
             // Manager, HR & Owner
             self::MANAGER_VIEW_EMPLOYEES,

@@ -8,4 +8,5 @@ return [
     'deactivated_successfully' => 'Deactivated department successfully with keeping employee records.',
     'failed_to_process' => 'Failed to process department request.',
     'not_found' => 'Department not found.',
+    'managers_retrieved_successfully' => 'Managers list retrieved successfully.',
 ];

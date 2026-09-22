@@ -196,6 +196,7 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
         Route::post('/', [DepartmentController::class, 'store'])->middleware('permission:'.PermissionEnum::DEPARTMENT_CREATE->value);
         Route::patch('/{id}', [DepartmentController::class, 'update'])->middleware('permission:'.PermissionEnum::DEPARTMENT_EDIT->value);
         Route::patch('/{id}/change-status', [DepartmentController::class, 'changeStatus'])->middleware('permission:'.PermissionEnum::DEPARTMENT_CHANGE_STATUS->value);
+        Route::get('/managers-dropdown', [DepartmentController::class,'GetManagersDropdown'])->middleware('permission:'.PermissionEnum::VIEW_MANAGERS_DROPDOWN->value);
     });
 
     Route::prefix('locations/company/location')->group(function () {

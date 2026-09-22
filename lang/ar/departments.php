@@ -8,4 +8,5 @@ return [
     'deactivated_successfully' => 'تم إلغاء تفعيل القسم بنجاح مع الاحتفاظ بسجلات الموظفين.',
     'failed_to_process' => 'فشل في معالجة طلب القسم.',
     'not_found' => 'القسم المطلوب غير موجود.',
+    'managers_retrieved_successfully' => 'تم جلب قائمة المدراء بنجاح.',
 ];

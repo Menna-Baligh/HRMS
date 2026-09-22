@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Department;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
 class DepartmentService
@@ -83,5 +84,18 @@ class DepartmentService
         $department->update(['status' => $newStatus]);
 
         return $department->load('manager');
+    }
+    public function getManagersForDropdown(): Collection
+    {
+        return User::query()
+            ->where(function ($query) {
+                $query->whereIn('role', ['Manager'])
+                    ->orWhereHas('roles', function ($q) {
+                        $q->whereIn('name', ['Manager']);
+                    });
+            })
+            ->select(['id', 'name'])
+            ->orderBy('name')
+            ->get();
     }
 }
