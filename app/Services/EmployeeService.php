@@ -60,6 +60,7 @@ class EmployeeService
 
                 User::where('department_id', $departmentId)
                     ->where('id', '!=', $user->id)
+                    ->where('role', 'Employee')
                     ->update([
                         'manager_id' => $user->id,
                     ]);
