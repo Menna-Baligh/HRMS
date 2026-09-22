@@ -2,8 +2,13 @@ openapi: 3.0.3
 info:
   title: HR API Documentation
   version: 1.0.0
+servers:
+  - url: http://127.0.0.1:8000
+    description: Local Development Server
+  - url: https://api.yourdomain.com
+    description: Production Server (Staging/Live)
 paths:
-  /api/login:
+  /api/auth/login:
     post:
       summary: Login (This route is allowed for all roles)
       operationId: login
@@ -6378,7 +6383,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-  /api/register:
+  /api/auth/register:
     post:
       summary: Register a new user (Only For Role Owner)
       operationId: registerUser
@@ -6602,7 +6607,7 @@ paths:
           $ref: '#/components/responses/422RegistrationValidationError'
         '429':
           $ref: '#/components/responses/429TooManyRequests'
-  /api/forget-password:
+  /api/auth/forget-password:
     post:
       summary: Forget password request to send OTP via email (This route is allowed for all roles)
       operationId: forgotPassword
@@ -6659,7 +6664,7 @@ paths:
         '429':
           $ref: '#/components/responses/429TooManyRequests'
 
-  /api/forgot-password/verify-otp:
+  /api/auth/forgot-password/verify-otp:
     post:
       summary: Verify OTP code (This route is allowed for all roles)
       operationId: verifyForgotPasswordOtp
@@ -6723,7 +6728,7 @@ paths:
           $ref: '#/components/responses/422OtpValidationError'
         '429':
           $ref: '#/components/responses/429TooManyRequests'
-  /api/forgot-password/reset:
+  /api/auth/forgot-password/reset:
     post:
       summary: Reset user password (This route is allowed for all roles)
       operationId: resetPassword
@@ -6786,7 +6791,7 @@ paths:
           $ref: '#/components/responses/422ResetTokenValidationError'
         '429':
           $ref: '#/components/responses/429TooManyRequests'
-  /api/forgot-password/resend-otp:
+  /api/auth/forgot-password/resend-otp:
     post:
       summary: Resend OTP code (This route is allowed for all roles)
       operationId: resendOtp
