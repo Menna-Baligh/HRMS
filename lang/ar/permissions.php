@@ -89,6 +89,19 @@ return [
 
     // System & Files
     'permission.view-all' => 'عرض جميع الصلاحيات',
+    'file.download'       => 'تحميل الملفات',
+    'file.delete'         => 'حذف الملفات',
+     // company events
+    'company_event.view' => 'عرض فعاليات الشركة',
+    'company_event.manage' => 'إدارة فعاليات الشركة',
+    // policies
+    'policy.view' => 'عرض سياسات الشركة',
+    'policy.manage' => 'إدارة سياسات الشركة',
+    'policy.version_create' => 'إنشاء إصدارات السياسات',
+    'policy.version_activate' => 'تفعيل إصدارات السياسات',
+    'policy.active_view' => 'عرض السياسات النشطة',
+    'policy.audit_view' => 'عرض سجل تغييرات السياسات',
+
     'file.download' => 'تحميل الملفات',
     'file.delete' => 'حذف الملفات',
 
