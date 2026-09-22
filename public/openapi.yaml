@@ -6427,6 +6427,7 @@ paths:
                 password:
                   type: string
                   format: password
+                  minLength: 8
                   example: Password123!
                 password_confirmation:
                   type: string
@@ -6598,17 +6599,9 @@ paths:
                       - "Use AI HR Policy Assistant"
                     created_at: "2026-09-22 10:50:23"
         '422':
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
+          $ref: '#/components/responses/422RegistrationValidationError'
         '429':
-          description: Too Many Requests (Throttle limit exceeded)
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
+          $ref: '#/components/responses/429TooManyRequests'
   /api/forget-password:
     post:
       summary: Forget password request to send OTP via email (This route is allowed for all roles)
@@ -6661,18 +6654,11 @@ paths:
                     message: OTP sent successfully.
                     data:
                         email: john@example.com
-        "422":
-          description: Validation error or Email not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "429":
-          description: Too Many Requests
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
+        '422':
+          $ref: '#/components/responses/422RegistrationValidationError'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+
   /api/forgot-password/verify-otp:
     post:
       summary: Verify OTP code (This route is allowed for all roles)
@@ -6733,18 +6719,10 @@ paths:
                     data:
                         email: john@example.com
                         reset_token: 9f8e7d6c5b4a3...
-        "422":
-          description: Invalid or expired OTP / Validation error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "429":
-          description: Too Many Requests
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
+        '422':
+          $ref: '#/components/responses/422OtpValidationError'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
   /api/forgot-password/reset:
     post:
       summary: Reset user password (This route is allowed for all roles)
@@ -6776,6 +6754,7 @@ paths:
                 password:
                   type: string
                   format: password
+                  minLength: 8
                   example: NewPassword123!
                 password_confirmation:
                   type: string
@@ -6803,18 +6782,10 @@ paths:
                     success: true
                     message: password reset successfully.
                     data: null
-        "422":
-          description: Invalid or expired reset token / Validation error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "429":
-          description: Too Many Requests
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
+        '422':
+          $ref: '#/components/responses/422ResetTokenValidationError'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
   /api/forgot-password/resend-otp:
     post:
       summary: Resend OTP code (This route is allowed for all roles)
@@ -6867,18 +6838,10 @@ paths:
                     message: OTP resnd successfully
                     data:
                         email: john@example.com
-        "422":
-          description: Email not found or validation error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "429":
-          description: Too Many Requests
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
+        '422':
+          $ref: '#/components/responses/422ResendOtpValidationError'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
 
 
   /api/ai/career-coach:
@@ -7678,6 +7641,139 @@ components:
             success: false
             message: "AI service is currently unavailable."
             errors: null
+    422RegistrationValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: "Validation error."
+              errors:
+                type: object
+                nullable: true
+                example:
+                  email:
+                    - "The email has already been taken."
+          example:
+            success: false
+            message: "Validation error."
+            errors:
+              email:
+                - "The email has already been taken."
+
+    429TooManyRequests:
+      description: Too Many Requests (Throttle limit exceeded)
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: "Too many login attempts. Please try again in 46 seconds."
+              errors:
+                type: string
+                nullable: true
+                example: null
+          example:
+            success: false
+            message: "Too many login attempts. Please try again in 46 seconds."
+            errors: null
+
+    422OtpValidationError:
+      description: OTP Validation error (Invalid or expired OTP)
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: "Validation error."
+              errors:
+                type: object
+                properties:
+                  otp:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                      - "Invalid or expired OTP."
+          example:
+            success: false
+            message: "Validation error."
+            errors:
+              otp:
+                - "Invalid or expired OTP."
+
+    422ResetTokenValidationError:
+      description: Reset Token Validation error (Invalid or expired reset token)
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: "Validation error."
+              errors:
+                type: object
+                properties:
+                  reset_token:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                      - "Invalid or expired reset token."
+          example:
+            success: false
+            message: "Validation error."
+            errors:
+              reset_token:
+                - "Invalid or expired reset token."
+    422ResendOtpValidationError:
+      description: Resend OTP Validation error (Email not found)
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: "Validation error."
+              errors:
+                type: object
+                properties:
+                  email:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                      - "Email not found."
+          example:
+            success: false
+            message: "Validation error."
+            errors:
+              email:
+                - "Email not found."
   schemas:
     EvaluationPeriod:
       type: object
