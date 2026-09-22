@@ -6392,6 +6392,15 @@ paths:
             type: string
             default: application/json
           example: application/json
+        - in: query
+          name: lang
+          required: false
+          description: Language for response translation (e.g. ar, en)
+          schema:
+            type: string
+            enum: [ar, en]
+            default: en
+          example: en
       requestBody:
         required: true
         content:
@@ -6424,7 +6433,7 @@ paths:
                   format: password
                   example: Password123!
       responses:
-        "201":
+        '201':
           description: User registered successfully.
           content:
             application/json:
@@ -6448,30 +6457,153 @@ paths:
                         example: bearer
                       expires_in:
                         type: string
-                        example: 1 hours
+                        example: 24 hours
                       user:
                         type: object
                         properties:
                           id:
                             type: integer
-                            example: 1
+                            example: 14
                           name:
                             type: string
-                            example: "John Doe"
+                            example: Menna
                           email:
                             type: string
                             format: email
-                            example: "john@example.com"
+                            example: mennabaligh@gmail.com
+                          phone:
+                            type: string
+                            nullable: true
+                            example: null
+                          status:
+                            type: string
+                            example: Active
+                          address:
+                            type: string
+                            nullable: true
+                            example: null
+                          avatar_url:
+                            type: string
+                            nullable: true
+                            example: null
                           role:
                             type: string
-                            example: "Owner"
-        "422":
+                            example: Owner
+                          role_label:
+                            type: string
+                            example: System Owner
+                          locale:
+                            type: string
+                            example: en
+                          permissions:
+                            type: array
+                            items:
+                              type: string
+                          created_at:
+                            type: string
+                            example: "2026-09-22 10:50:23"
+              example:
+                success: true
+                message: User registered successfully.
+                data:
+                  access_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2F1dGgvcmVnaXN0ZXIiLCJpYXQiOjE3OTAwNjM0MjMsImV4cCI6MTc5MDE0OTgyMywibmJmIjoxNzkwMDYzNDIzLCJqdGkiOiJwZ1FrZjQxbUxoWkhXNXBsIiwic3ViIjoiMTQiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3Iiwicm9sZSI6Ik93bmVyIn0.hMOfMgoUIH1r6paG087NNzPj5RIIR5FzycX-ckrNA64"
+                  token_type: "bearer"
+                  expires_in: "24 hours"
+                  user:
+                    id: 14
+                    name: "Menna"
+                    email: "mennabaligh@gmail.com"
+                    phone: null
+                    status: "Active"
+                    address: null
+                    avatar_url: null
+                    role: "Owner"
+                    role_label: "System Owner"
+                    locale: "en"
+                    permissions:
+                      - "Create Employee"
+                      - "Edit HR Fields"
+                      - "Change Account Status"
+                      - "View All Employees"
+                      - "View Profile"
+                      - "Update Profile"
+                      - "View Departments"
+                      - "Create Department"
+                      - "Edit Department"
+                      - "Change Department Status"
+                      - "View Team Employees"
+                      - "View Team Attendance"
+                      - "View Team Goals"
+                      - "Create Task"
+                      - "Update Task"
+                      - "Assign Task"
+                      - "Update Task Progress"
+                      - "Update Task Status"
+                      - "Create Submission"
+                      - "Attach File to Submission"
+                      - "View Submission Queue"
+                      - "View Submission"
+                      - "Approve Submission"
+                      - "Reject Submission"
+                      - "Request Changes on Submission"
+                      - "Resubmit Submission"
+                      - "Create Company Location"
+                      - "Update Company Location"
+                      - "Deactivate Location"
+                      - "Activate Location"
+                      - "View Active Locations"
+                      - "Check-in / Check-out"
+                      - "View Personal Attendance History"
+                      - "View Daily Attendance"
+                      - "View Attendance Exceptions"
+                      - "View Attendance Summary"
+                      - "Export Attendance Reports"
+                      - "View Own Goals"
+                      - "Create Goal"
+                      - "Update Goal"
+                      - "Update Goal Progress"
+                      - "Complete Goal"
+                      - "Company Goals Overview"
+                      - "Manage Evaluation Setup"
+                      - "Create Evaluation"
+                      - "Update Evaluation"
+                      - "Complete Evaluation"
+                      - "View Manager Evaluations"
+                      - "View Personal Evaluation"
+                      - "Company Performance"
+                      - "Team Performance"
+                      - "Personal Performance Dashboard"
+                      - "View Leave Types"
+                      - "Manage Leave Types"
+                      - "View Leave Balances"
+                      - "View Own Leave Requests"
+                      - "Create Leave Request"
+                      - "Cancel Leave Request"
+                      - "Manager Approve Leave"
+                      - "HR Approve Leave"
+                      - "Reject Leave Request"
+                      - "View Leave History"
+                      - "Team Leave Queue"
+                      - "HR Leave Queue"
+                      - "View Leave Calendar"
+                      - "View All Permissions"
+                      - "Download Files"
+                      - "Delete Files"
+                      - "Use AI Career Coach"
+                      - "View AI Performance Insight"
+                      - "Generate AI Evaluation Draft"
+                      - "Analyze AI Skill-Gap & Development"
+                      - "View AI Employee Attention Signal"
+                      - "View AI Team Insight Summary"
+                      - "Use AI HR Policy Assistant"
+                    created_at: "2026-09-22 10:50:23"
+        '422':
           description: Validation error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "429":
+        '429':
           description: Too Many Requests (Throttle limit exceeded)
           content:
             application/json:
