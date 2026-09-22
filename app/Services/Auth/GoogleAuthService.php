@@ -22,9 +22,9 @@ class GoogleAuthService
 
         $user = User::where('email', $googleUser->getEmail())->first();
 
-        if ($user && $user->employee && $user->employee->status === 'inactive') {
+        if ($user && !$user->hasRole('Owner')) {
             throw ValidationException::withMessages([
-                'email' => 'Your account is inactive. Please activate your account first.',
+                'email' => 'You are not authorized to log in with Google.',
             ]);
         }
 

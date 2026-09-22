@@ -372,7 +372,7 @@ paths:
 
   /api/auth/google/redirect:
     get:
-      summary: Google Login Redirect
+      summary: Google Login (Only For Role Owner)
       operationId: googleRedirect
       tags:
         - Authentication
@@ -406,198 +406,7 @@ paths:
                 message: Google redirect URL generated successfully
                 data:
                   url: https://accounts.google.com/o/oauth2/v2/auth?client_id=123456789.apps.googleusercontent.com&redirect_uri=http%3A%2F%2Flocalhost%3A8000%2Fapi%2Fauth%2Fgoogle%2Fcallback&response_type=code&scope=openid+profile+email
-  /api/auth/google/callback:
-    get:
-      summary: Google Login Callback
-      operationId: googleCallback
-      tags:
-        - Authentication
-      parameters:
-        - in: header
-          name: Accept
-          required: true
-          schema:
-            type: string
-            default: application/json
-          example: application/json
-        - in: query
-          name: code
-          required: false
-          description: Authorization code provided by Google OAuth.
-          schema:
-            type: string
-        - in: query
-          name: state
-          required: false
-          description: State parameter for CSRF mitigation.
-          schema:
-            type: string
-      responses:
-        "200":
-          description: Logged in with Google successfully.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: Logged in with Google successfully
-                  data:
-                    type: object
-                    properties:
-                      access_token:
-                        type: string
-                      token_type:
-                        type: string
-                        example: bearer
-                      expires_in:
-                        type: string
-                        example: 24 hours
-                      user:
-                        type: object
-                        properties:
-                          id:
-                            type: integer
-                            example: 49
-                          employee_id:
-                            type: integer
-                            nullable: true
-                            example: 37
-                          name:
-                            type: string
-                            example: noni
-                          email:
-                            type: string
-                            format: email
-                            example: noni@gmail.com
-                          phone:
-                            type: string
-                            nullable: true
-                            example: null
-                          avatar_url:
-                            type: string
-                            nullable: true
-                            example: null
-                          role:
-                            type: string
-                            example: Employee
-                          locale:
-                            type: string
-                            example: en
-                          permissions:
-                            type: array
-                            items:
-                              type: string
-                            example:
-                              - edit self profile
-                              - department.view
-                              - employee.view-profile
-                              - employee.update-profile
-                              - task.update-progress
-                              - task.update-status
-                              - submission.create
-                              - submission.attach-file
-                              - submission.view
-                              - submission.resubmit
-                              - location.view-active
-                              - attendance.checkin-checkout
-                              - attendance.view-history
-                              - goal.view-own
-                              - goal.create
-                              - goal.update
-                              - goal.update-progress
-                              - goal.complete
-                              - evaluation.view-employee
-                              - employee.performance.dashboard
-                              - leave-type.view
-                              - leave-balance.view
-                              - leave-request.create
-                              - leave-request.view-own
-                              - leave-request.cancel
-                              - leave.view-history
-                              - leave.calendar-view
-                              - file.download
-                              - file.delete
-                          created_at:
-                            type: string
-                            example: 2026-09-17 17:23:59
-              example:
-                success: true
-                message: Logged in with Google successfully
-                data:
-                  access_token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3ODk4MDU4NTQsImV4cCI6MTc4OTg5MjI1NCwibmJmIjoxNzg5ODA1ODU0LCJqdGkiOiJXdFI0VGNhRWlhV1NibWxuIiwic3ViIjoiNDkiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3Iiwicm9sZSI6IkVtcGxveWVlIn0.2BRyaQT1IDhq5urGMLg1fZGWuECfdKDZUMcLAD0XehA
-                  token_type: bearer
-                  expires_in: 24 hours
-                  user:
-                    id: 49
-                    employee_id: 37
-                    name: noni
-                    email: noni@gmail.com
-                    phone: null
-                    avatar_url: null
-                    role: Employee
-                    locale: en
-                    permissions:
-                      - edit self profile
-                      - department.view
-                      - employee.view-profile
-                      - employee.update-profile
-                      - task.update-progress
-                      - task.update-status
-                      - submission.create
-                      - submission.attach-file
-                      - submission.view
-                      - submission.resubmit
-                      - location.view-active
-                      - attendance.checkin-checkout
-                      - attendance.view-history
-                      - goal.view-own
-                      - goal.create
-                      - goal.update
-                      - goal.update-progress
-                      - goal.complete
-                      - evaluation.view-employee
-                      - employee.performance.dashboard
-                      - leave-type.view
-                      - leave-balance.view
-                      - leave-request.create
-                      - leave-request.view-own
-                      - leave-request.cancel
-                      - leave.view-history
-                      - leave.calendar-view
-                      - file.download
-                      - file.delete
-                    created_at: 2026-09-17 17:23:59
-        "422":
-          description: Validation or process error.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Google authentication failed
-                  errors:
-                    type: object
-                    nullable: true
-                    additionalProperties:
-                      type: array
-                      items:
-                        type: string
-              example:
-                success: false
-                message: Google authentication failed
-                errors:
-                  email:
-                    - Google authentication failed
+
   /api/permissions:
     get:
       summary: Retrieve all permissions (This route is allowed for roles Owner, HR)
@@ -6571,7 +6380,7 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
   /api/register:
     post:
-      summary: Register a new user (Owner role)
+      summary: Register a new user (Only For Role Owner)
       operationId: registerUser
       tags:
         - Authentication
@@ -6670,7 +6479,7 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
   /api/forget-password:
     post:
-      summary: Forget password request to send OTP via email
+      summary: Forget password request to send OTP via email (This route is allowed for all roles)
       operationId: forgotPassword
       tags:
         - Authentication
@@ -6734,7 +6543,7 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
   /api/forgot-password/verify-otp:
     post:
-      summary: Verify OTP code
+      summary: Verify OTP code (This route is allowed for all roles)
       operationId: verifyForgotPasswordOtp
       tags:
         - Authentication
@@ -6806,7 +6615,7 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
   /api/forgot-password/reset:
     post:
-      summary: Reset user password
+      summary: Reset user password (This route is allowed for all roles)
       operationId: resetPassword
       tags:
         - Authentication
@@ -6876,7 +6685,7 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
   /api/forgot-password/resend-otp:
     post:
-      summary: Resend OTP code
+      summary: Resend OTP code (This route is allowed for all roles)
       operationId: resendOtp
       tags:
         - Authentication
