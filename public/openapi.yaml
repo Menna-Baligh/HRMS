@@ -5,7 +5,7 @@ info:
 servers:
   - url: http://127.0.0.1:8000
     description: Local Development Server
-  - url: https://api.yourdomain.com
+  - url: https://hr-system.iptvdemo.serv5group.com
     description: Production Server (Staging/Live)
 tags:
   - name: Authentication

@@ -30,7 +30,7 @@ class EmployeeService
                 }
             }
 
-            $locationId =  CompanyLocation::latest('id')->value('id');
+            $locationId = CompanyLocation::latest('id')->value('id');
 
             $user = User::create([
                 'name' => $data['name'],
