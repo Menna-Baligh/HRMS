@@ -3460,7 +3460,7 @@ paths:
                     - The latitude must be between -90 and 90.
   /api/attendance/check-in:
     post:
-      summary: Perform check-in for the authenticated employee 📱
+      summary: Perform check-in for the authenticated employee(All Roles) 📱
       operationId: checkIn
       tags:
         - Attendance
@@ -3516,7 +3516,7 @@ paths:
                       id:
                         type: integer
                         example: 10
-                      employee_id:
+                      user_id:
                         type: integer
                         example: 1
                       date:
@@ -3546,7 +3546,7 @@ paths:
                 message: Checked in successfully.
                 data:
                   id: 10
-                  employee_id: 1
+                  user_id: 1
                   date: 2026-09-12
                   check_in: 09:05 AM
                   check_out: null
@@ -3648,8 +3648,9 @@ paths:
                     errors: null
   /api/attendance/check-out:
     post:
-      summary: Perform check-out for the authenticated employee 📱
-      operationId: checkOut
+      summary: Perform check-out for the authenticated employee(All Roles) 📱
+      description: Allows employee to check-out for the day without requiring location coordinates or radius validation.
+      operationId: checkOutAttendance
       tags:
         - Attendance
       security:
@@ -3662,30 +3663,8 @@ paths:
             type: string
             default: application/json
           example: application/json
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - latitude
-                - longitude
-              properties:
-                latitude:
-                  type: number
-                  format: float
-                  minimum: -90
-                  maximum: 90
-                  example: 30.0444
-                longitude:
-                  type: number
-                  format: float
-                  minimum: -180
-                  maximum: 180
-                  example: 31.2357
       responses:
-        "200":
+        '200':
           description: Checked out successfully.
           content:
             application/json:
@@ -3697,141 +3676,27 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Checked out successfully.
+                    example: "Checked out successfully."
                   data:
-                    type: object
-                    properties:
-                      id:
-                        type: integer
-                        example: 10
-                      employee_id:
-                        type: integer
-                        example: 1
-                      date:
-                        type: string
-                        format: date
-                        example: 2026-09-12
-                      check_in:
-                        type: string
-                        nullable: true
-                        example: 09:05 AM
-                      check_out:
-                        type: string
-                        nullable: true
-                        example: 05:00 PM
-                      status:
-                        type: string
-                        example: Present
-                      worked_seconds:
-                        type: integer
-                        example: 28400
-                      is_exception:
-                        type: boolean
-                        example: false
-              example:
-                success: true
-                message: Checked out successfully.
-                data:
-                  id: 10
-                  employee_id: 1
-                  date: 2026-09-12
-                  check_in: 09:05 AM
-                  check_out: 05:00 PM
-                  status: Present
-                  worked_seconds: 28400
-                  is_exception: false
-        "400":
-          description: Bad request (Unhandled exception)
+                    $ref: '#/components/schemas/AttendanceResource'
+        '422':
+          description: Validation error or no active check-in session.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Bad request error message
-                  errors:
-                    nullable: true
-        "401":
-          description: Unauthenticated
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthenticated
-                  errors:
-                    type: string
-                    nullable: true
-                    example: null
-              example:
-                success: false
-                message: Unauthenticated
-                errors: null
-        "404":
-          description: Employee profile not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Employee profile not found.
-                  errors:
-                    type: string
-                    nullable: true
-                    example: null
-              example:
-                success: false
-                message: Employee profile not found.
-                errors: null
-        "422":
-          description: Process error (e.g. no open check-in, already checked out, outside
-            radius) or validation error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                  errors:
-                    type: string
-                    nullable: true
-                    example: null
+                $ref: '#/components/schemas/ErrorResponse'
               examples:
-                noOpenCheckin:
-                  summary: No Open Check-in
+                noCheckIn:
+                  summary: No Active Check-In
                   value:
                     success: false
-                    message: No active check-in record found for today.
+                    message: "No active check-in record found for today."
                     errors: null
                 alreadyCheckedOut:
                   summary: Already Checked Out
                   value:
                     success: false
-                    message: You have already checked out today.
-                    errors: null
-                outsideRadius:
-                  summary: Outside Radius
-                  value:
-                    success: false
-                    message: You are outside the allowed company location radius.
+                    message: "You have already checked out today."
                     errors: null
   /api/attendance/history:
     get:
@@ -4453,18 +4318,6 @@ paths:
                             type: string
                             nullable: true
                             example: 03:34 PM
-                          check_out_location:
-                            type: object
-                            nullable: true
-                            properties:
-                              latitude:
-                                type: number
-                                format: float
-                                example: 30.0444196
-                              longitude:
-                                type: number
-                                format: float
-                                example: 31.2357116
                           status:
                             type: string
                             example: Late
@@ -4499,9 +4352,7 @@ paths:
                       latitude: 30.0444196
                       longitude: 31.2357116
                     check_out: 03:34 PM
-                    check_out_location:
-                      latitude: 30.0444196
-                      longitude: 31.2357116
+                    
                     status: Late
                     worked_seconds: 15
                     worked_hours_formatted: 0.0h

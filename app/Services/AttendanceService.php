@@ -67,7 +67,7 @@ class AttendanceService
         ]);
     }
 
-    public function checkOut(User $user, float $lat, float $lng): Attendance
+    public function checkOut(User $user): Attendance
     {
         $today = now()->toDateString();
 
@@ -83,24 +83,11 @@ class AttendanceService
             throw new Exception('ALREADY_CHECKED_OUT');
         }
 
-        $location = $attendance->companyLocation;
-        if ($location) {
-            $isInside = $this->geofenceService->isWithinRadius(
-                $lat, $lng, $location->latitude, $location->longitude, $location->radius
-            );
-
-            if (! $isInside) {
-                throw new Exception('OUTSIDE_RADIUS');
-            }
-        }
-
         $now = now();
         $workedSeconds = (int) abs($now->diffInSeconds($attendance->check_in));
 
         $attendance->update([
             'check_out' => $now,
-            'check_out_lat' => $lat,
-            'check_out_lng' => $lng,
             'worked_seconds' => $workedSeconds,
         ]);
 
