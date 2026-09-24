@@ -25,7 +25,7 @@ class ManagerEmployeeAttendanceDetailResource extends JsonResource
                 'name' => $user->name,
                 'job_title' => $user->job_title,
                 'email' => $user->email,
-                'location_name' => $user->companyLocation?->name,
+                'company_name' => $user->companyLocation?->name,
             ],
             'attendance' => [
                 'id' => $attendance?->id,

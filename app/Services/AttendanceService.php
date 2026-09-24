@@ -156,8 +156,9 @@ class AttendanceService
 
     public function getManagerTeamTodayData(User $manager, ?string $date = null, ?string $statusFilter = null, ?string $search = null, int $perPage = 15): array
     {
-        $targetDate = $date ? Carbon::parse($date) : now();
+        $targetDate = $date ? Carbon::parse($date)->startOfDay() : now()->startOfDay();
         $formattedDate = $targetDate->toDateString();
+        $todayDate = now()->startOfDay();
 
         $subordinateIds = User::where('manager_id', $manager->id)
             ->where('status', 'active')
@@ -171,7 +172,11 @@ class AttendanceService
         $presentCount = $todayAttendances->where('status', 'Present')->count();
         $lateCount = $todayAttendances->where('status', 'Late')->count();
         $checkedInCount = $todayAttendances->whereNotNull('check_in')->count();
-        $absentCount = max(0, $totalTeamCount - $checkedInCount);
+
+        $absentCount = $targetDate->gt($todayDate) 
+            ? 0 
+            : max(0, $totalTeamCount - $checkedInCount);
+
         $onShiftCount = $todayAttendances->whereNotNull('check_in')->whereNull('check_out')->count();
 
         $totalSecondsWorked = $todayAttendances->sum('worked_seconds');
@@ -188,6 +193,8 @@ class AttendanceService
         $weeklyChart = [];
         for ($day = $startOfWeek->copy(); $day->lte($endOfWeek); $day->addDay()) {
             $dayDate = $day->toDateString();
+            $isFutureDay = $day->gt($todayDate); 
+
             $dayAtts = $weeklyAttendances->where('date', $dayDate);
 
             $weeklyChart[] = [
@@ -195,7 +202,9 @@ class AttendanceService
                 'date' => $dayDate,
                 'present' => $dayAtts->where('status', 'Present')->count(),
                 'late' => $dayAtts->where('status', 'Late')->count(),
-                'absent' => max(0, $totalTeamCount - $dayAtts->whereNotNull('check_in')->count()),
+                'absent' => $isFutureDay 
+                    ? 0 
+                    : max(0, $totalTeamCount - $dayAtts->whereNotNull('check_in')->count()),
             ];
         }
 

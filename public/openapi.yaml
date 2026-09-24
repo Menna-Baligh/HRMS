@@ -2949,9 +2949,10 @@ paths:
                   errors:
                     nullable: true
                     example: null
-  /api/managers/employees:
+  /api/manager/employees:
     get:
-      summary: Retrieve employees managed by the authenticated manager
+      summary: "Retrieve employees managed by the authenticated manager (Allowed For Manager)"
+      description: "Retrieve a paginated list of employees managed by the currently authenticated manager with optional filters."
       operationId: getManagerEmployees
       tags:
         - Managers
@@ -2971,6 +2972,7 @@ paths:
           schema:
             type: string
           description: Search by name, email, employee ID, job title, or phone
+          example: Noran
         - in: query
           name: status
           required: false
@@ -2979,11 +2981,13 @@ paths:
             enum:
               - active
               - inactive
+          example: active
         - in: query
           name: department_id
           required: false
           schema:
             type: integer
+          example: 2
         - in: query
           name: employment_type
           required: false
@@ -2993,20 +2997,30 @@ paths:
               - Full-time
               - Part-time
               - Contract
+          example: Part-time
         - in: query
           name: role
           required: false
           schema:
             type: string
+          example: Employee
         - in: query
           name: per_page
           required: false
           schema:
             type: integer
             default: 15
+          example: 15
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: integer
+            default: 1
+          example: 1
       responses:
         "200":
-          description: Manager employees retrieved successfully.
+          description: Manager team employees retrieved successfully.
           content:
             application/json:
               schema:
@@ -3017,13 +3031,10 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Manager employees retrieved successfully.
+                    example: Manager team employees retrieved successfully.
                   data:
                     type: object
                     properties:
-                      current_page:
-                        type: integer
-                        example: 1
                       data:
                         type: array
                         items:
@@ -3031,102 +3042,215 @@ paths:
                           properties:
                             id:
                               type: integer
-                              example: 1
+                              example: 6
                             name:
                               type: string
-                              example: John Doe
+                              example: Noran Baligh
                             email:
                               type: string
-                              example: john@example.com
+                              format: email
+                              example: noran@gmail.com
                             phone:
                               type: string
                               nullable: true
-                              example: "+1234567890"
-                            avatar:
+                              example: "01019018137"
+                            employee_code:
                               type: string
                               nullable: true
-                              example: null
+                              example: EMP-2026-24271
+                            job_title:
+                              type: string
+                              nullable: true
+                              example: Frontend Developer
+                            employment_type:
+                              type: string
+                              nullable: true
+                              example: Part-time
+                            start_date:
+                              type: string
+                              format: date
+                              nullable: true
+                              example: "2026-09-01"
+                            status:
+                              type: string
+                              nullable: true
+                              example: Active
+                            address:
+                              type: string
+                              nullable: true
+                              example: Mansoura
+                            avatar_url:
+                              type: string
+                              nullable: true
+                              example: "https://hr-system.iptvdemo.serv5group.com/api/files/1/download"
                             role:
                               type: string
                               example: Employee
+                            role_label:
+                              type: string
+                              nullable: true
+                              example: Employee
+                            locale:
+                              type: string
+                              example: en
+                            department:
+                              type: object
+                              nullable: true
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 2
+                                name:
+                                  type: string
+                                  example: New Department
+                            company_location:
+                              type: object
+                              nullable: true
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 1
+                                name:
+                                  type: string
+                                  example: WorkWise HQ
+                            manager:
+                              type: object
+                              nullable: true
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 8
+                                name:
+                                  type: string
+                                  example: Mostafa Mohamed
                             permissions:
                               type: array
                               items:
                                 type: string
                               example:
-                                - employee.view
-                      first_page_url:
-                        type: string
-                      from:
-                        type: integer
-                        nullable: true
-                      last_page:
-                        type: integer
-                      last_page_url:
-                        type: string
+                                - View Profile
+                                - Update Profile
+                            created_at:
+                              type: string
+                              example: "2026-09-22 20:24:09"
                       links:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            url:
-                              type: string
-                              nullable: true
-                            label:
-                              type: string
-                            active:
-                              type: boolean
-                      next_page_url:
-                        type: string
-                        nullable: true
-                      path:
-                        type: string
-                      per_page:
-                        type: integer
-                        example: 15
-                      prev_page_url:
-                        type: string
-                        nullable: true
-                      to:
-                        type: integer
-                        nullable: true
-                      total:
-                        type: integer
-                        example: 1
+                        type: object
+                        properties:
+                          first:
+                            type: string
+                            nullable: true
+                            example: "https://hr-system.iptvdemo.serv5group.com/api/manager/employees?page=1"
+                          last:
+                            type: string
+                            nullable: true
+                            example: "https://hr-system.iptvdemo.serv5group.com/api/manager/employees?page=1"
+                          prev:
+                            type: string
+                            nullable: true
+                            example: null
+                          next:
+                            type: string
+                            nullable: true
+                            example: null
+                      meta:
+                        type: object
+                        properties:
+                          current_page:
+                            type: integer
+                            example: 1
+                          from:
+                            type: integer
+                            nullable: true
+                            example: 1
+                          last_page:
+                            type: integer
+                            example: 1
+                          links:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                url:
+                                  type: string
+                                  nullable: true
+                                label:
+                                  type: string
+                                page:
+                                  type: integer
+                                  nullable: true
+                                active:
+                                  type: boolean
+                          path:
+                            type: string
+                            example: "https://hr-system.iptvdemo.serv5group.com/api/manager/employees"
+                          per_page:
+                            type: integer
+                            example: 15
+                          to:
+                            type: integer
+                            nullable: true
+                            example: 1
+                          total:
+                            type: integer
+                            example: 1
               example:
                 success: true
-                message: Manager employees retrieved successfully.
+                message: Manager team employees retrieved successfully.
                 data:
-                  current_page: 1
                   data:
-                    - id: 1
-                      name: John Doe
-                      email: john@example.com
-                      phone: "+1234567890"
-                      avatar: null
+                    - id: 6
+                      name: Noran Baligh
+                      email: noran@gmail.com
+                      phone: "01019018137"
+                      employee_code: EMP-2026-24271
+                      job_title: Frontend Developer
+                      employment_type: Part-time
+                      start_date: "2026-09-01"
+                      status: Active
+                      address: Mansoura
+                      avatar_url: "https://hr-system.iptvdemo.serv5group.com/api/files/1/download"
                       role: Employee
+                      role_label: Employee
+                      locale: en
+                      department:
+                        id: 2
+                        name: New Department
+                      company_location:
+                        id: 1
+                        name: WorkWise HQ
+                      manager:
+                        id: 8
+                        name: Mostafa Mohamed
                       permissions:
-                        - employee.view
-                  first_page_url: http://localhost:8000/api/managers/employees?page=1
-                  from: 1
-                  last_page: 1
-                  last_page_url: http://localhost:8000/api/managers/employees?page=1
+                        - View Profile
+                        - Update Profile
+                      created_at: "2026-09-22 20:24:09"
                   links:
-                    - url: null
-                      label: "&laquo; Previous"
-                      active: false
-                    - url: http://localhost:8000/api/managers/employees?page=1
-                      label: "1"
-                      active: true
-                    - url: null
-                      label: Next &raquo;
-                      active: false
-                  next_page_url: null
-                  path: http://localhost:8000/api/managers/employees
-                  per_page: 15
-                  prev_page_url: null
-                  to: 1
-                  total: 1
+                    first: "https://hr-system.iptvdemo.serv5group.com/api/manager/employees?page=1"
+                    last: "https://hr-system.iptvdemo.serv5group.com/api/manager/employees?page=1"
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    from: 1
+                    last_page: 1
+                    links:
+                      - url: null
+                        label: "&laquo; Previous"
+                        page: null
+                        active: false
+                      - url: "https://hr-system.iptvdemo.serv5group.com/api/manager/employees?page=1"
+                        label: "1"
+                        page: 1
+                        active: true
+                      - url: null
+                        label: "Next &raquo;"
+                        page: null
+                        active: false
+                    path: "https://hr-system.iptvdemo.serv5group.com/api/manager/employees"
+                    per_page: 15
+                    to: 1
+                    total: 1
         "401":
           description: Unauthenticated
           content:
@@ -3139,18 +3263,12 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: Unauthenticated
+                    example: Unauthenticated.
                   errors:
-                    type: string
                     nullable: true
                     example: null
-              example:
-                success: false
-                message: Unauthenticated
-                errors: null
         "403":
-          description: Forbidden - User lacks manager.view-employees permission or is not
-            registered as an employee
+          description: Forbidden - User lacks permissions or is not a manager
           content:
             application/json:
               schema:
@@ -3161,24 +3279,26 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: You are not registered as an employee.
+                    example: User does not have the right permissions.
                   errors:
-                    type: string
                     nullable: true
                     example: null
-              examples:
-                notRegisteredAsEmployee:
-                  summary: Not Registered as Employee
-                  value:
-                    success: false
-                    message: You are not registered as an employee.
-                    errors: null
-                permissionDenied:
-                  summary: Permission Denied
-                  value:
-                    success: false
-                    message: User does not have the right permissions.
-                    errors: null
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Failed to retrieve team employees.
+                  errors:
+                    nullable: true
+                    example: null
   /api/attendance/today:
     get:
       summary: Retrieve today's attendance status and location check for the
@@ -3925,8 +4045,7 @@ paths:
                 errors: null
   /api/manager/attendance/today:
     get:
-      summary: Retrieve today's team attendance summary, weekly chart, and team
-        members attendance list
+      summary: Retrieve today's team attendance summary, weekly chart, and team members attendance list (Manager)
       operationId: getManagerTeamAttendanceToday
       tags:
         - Managers
@@ -3947,7 +4066,7 @@ paths:
           schema:
             type: string
             format: date
-          example: 2026-09-12
+          example: 2026-09-24
         - in: query
           name: status
           required: false
@@ -3958,7 +4077,6 @@ paths:
               - Present
               - Late
               - Absent
-              - On Shift
           example: Present
         - in: query
           name: search
@@ -3967,7 +4085,7 @@ paths:
           schema:
             type: string
             maxLength: 100
-          example: John
+          example: Noran
         - in: query
           name: per_page
           required: false
@@ -3997,28 +4115,28 @@ paths:
                       selected_date:
                         type: string
                         format: date
-                        example: 2026-09-12
+                        example: "2026-09-24"
                       summary:
                         type: object
                         properties:
                           present:
                             type: integer
-                            example: 5
+                            example: 0
                           late:
                             type: integer
                             example: 1
                           absent:
                             type: integer
-                            example: 2
+                            example: 0
                           avg_hours:
                             type: string
-                            example: 7.5h
+                            example: "0.0h"
                           on_shift:
                             type: integer
-                            example: 4
+                            example: 0
                           total_team:
                             type: integer
-                            example: 8
+                            example: 1
                       weekly_chart:
                         type: array
                         items:
@@ -4030,249 +4148,215 @@ paths:
                             date:
                               type: string
                               format: date
-                              example: 2026-09-07
+                              example: "2026-09-21"
                             present:
                               type: integer
-                              example: 5
+                              example: 0
                             late:
                               type: integer
-                              example: 1
+                              example: 0
                             absent:
                               type: integer
-                              example: 2
+                              example: 0
                       team:
                         type: object
                         properties:
-                          current_page:
-                            type: integer
-                            example: 1
                           data:
                             type: array
                             items:
                               type: object
                               properties:
-                                employee_id:
+                                user_id:
                                   type: integer
-                                  example: 1
+                                  example: 6
                                 name:
                                   type: string
-                                  example: John Doe
+                                  example: Noran Baligh
                                 job_title:
                                   type: string
-                                  example: Software Engineer
-                                avatar:
+                                  example: Frontend Developer
+                                avatar_url:
                                   type: string
                                   nullable: true
-                                  example: null
+                                  example: "https://hr-system.iptvdemo.serv5group.com/api/files/1/download"
                                 attendance_id:
                                   type: integer
                                   nullable: true
-                                  example: 10
+                                  example: 2
                                 check_in:
                                   type: string
-                                  example: 09:00
+                                  example: "03:40 PM"
                                 check_out:
                                   type: string
-                                  example: 17:00
+                                  example: "03:40 PM"
                                 status:
                                   type: string
-                                  example: Present
+                                  example: Late
                                 worked_hours_formatted:
                                   type: string
-                                  example: 8.0h
+                                  example: "0.0h"
                                 worked_seconds:
                                   type: integer
-                                  example: 28800
+                                  example: 10
                                 is_exception:
                                   type: boolean
                                   example: false
-                          first_page_url:
-                            type: string
-                          from:
-                            type: integer
-                            nullable: true
-                          last_page:
-                            type: integer
-                          last_page_url:
-                            type: string
                           links:
-                            type: array
-                            items:
-                              type: object
-                              properties:
-                                url:
-                                  type: string
-                                  nullable: true
-                                label:
-                                  type: string
-                                active:
-                                  type: boolean
-                          next_page_url:
-                            type: string
-                            nullable: true
-                          path:
-                            type: string
-                          per_page:
-                            type: integer
-                            example: 15
-                          prev_page_url:
-                            type: string
-                            nullable: true
-                          to:
-                            type: integer
-                            nullable: true
-                          total:
-                            type: integer
-                            example: 1
+                            type: object
+                            properties:
+                              first:
+                                type: string
+                                nullable: true
+                              last:
+                                type: string
+                                nullable: true
+                              prev:
+                                type: string
+                                nullable: true
+                              next:
+                                type: string
+                                nullable: true
+                          meta:
+                            type: object
+                            properties:
+                              current_page:
+                                type: integer
+                                example: 1
+                              from:
+                                type: integer
+                                nullable: true
+                                example: 1
+                              last_page:
+                                type: integer
+                                example: 1
+                              links:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    url:
+                                      type: string
+                                      nullable: true
+                                    label:
+                                      type: string
+                                    active:
+                                      type: boolean
+                              path:
+                                type: string
+                              per_page:
+                                type: integer
+                                example: 15
+                              to:
+                                type: integer
+                                nullable: true
+                                example: 1
+                              total:
+                                type: integer
+                                example: 1
               example:
                 success: true
                 message: Manager team attendance retrieved successfully.
                 data:
-                  selected_date: 2026-09-12
+                  selected_date: "2026-09-24"
                   summary:
-                    present: 5
+                    present: 0
                     late: 1
-                    absent: 2
-                    avg_hours: 7.5h
-                    on_shift: 4
-                    total_team: 8
+                    absent: 0
+                    avg_hours: "0.0h"
+                    on_shift: 0
+                    total_team: 1
                   weekly_chart:
                     - day: Mon
-                      date: 2026-09-07
-                      present: 5
-                      late: 1
-                      absent: 2
-                    - day: Tue
-                      date: 2026-09-08
-                      present: 6
+                      date: "2026-09-21"
+                      present: 0
                       late: 0
-                      absent: 2
+                      absent: 0
+                    - day: Tue
+                      date: "2026-09-22"
+                      present: 0
+                      late: 0
+                      absent: 0
+                    - day: Wed
+                      date: "2026-09-23"
+                      present: 0
+                      late: 0
+                      absent: 0
+                    - day: Thu
+                      date: "2026-09-24"
+                      present: 0
+                      late: 1
+                      absent: 0
+                    - day: Fri
+                      date: "2026-09-25"
+                      present: 0
+                      late: 0
+                      absent: 0
+                    - day: Sat
+                      date: "2026-09-26"
+                      present: 0
+                      late: 0
+                      absent: 0
+                    - day: Sun
+                      date: "2026-09-27"
+                      present: 0
+                      late: 0
+                      absent: 0
                   team:
-                    current_page: 1
                     data:
-                      - employee_id: 1
-                        name: John Doe
-                        job_title: Software Engineer
-                        avatar: null
-                        attendance_id: 10
-                        check_in: 09:00
-                        check_out: 17:00
-                        status: Present
-                        worked_hours_formatted: 8.0h
-                        worked_seconds: 28800
+                      - user_id: 6
+                        name: "Noran Baligh"
+                        job_title: "Frontend Developer"
+                        avatar_url: "https://hr-system.iptvdemo.serv5group.com/api/files/1/download"
+                        attendance_id: 2
+                        check_in: "03:40 PM"
+                        check_out: "03:40 PM"
+                        status: "Late"
+                        worked_hours_formatted: "0.0h"
+                        worked_seconds: 10
                         is_exception: false
-                    first_page_url: http://localhost:8000/api/manager/attendance/today?page=1
-                    from: 1
-                    last_page: 1
-                    last_page_url: http://localhost:8000/api/manager/attendance/today?page=1
                     links:
-                      - url: null
-                        label: "&laquo; Previous"
-                        active: false
-                      - url: http://localhost:8000/api/manager/attendance/today?page=1
-                        label: "1"
-                        active: true
-                      - url: null
-                        label: Next &raquo;
-                        active: false
-                    next_page_url: null
-                    path: http://localhost:8000/api/manager/attendance/today
-                    per_page: 15
-                    prev_page_url: null
-                    to: 1
-                    total: 1
+                      first: "https://hr-system.iptvdemo.serv5group.com/api/manager/attendance/today?page=1"
+                      last: "https://hr-system.iptvdemo.serv5group.com/api/manager/attendance/today?page=1"
+                      prev: null
+                      next: null
+                    meta:
+                      current_page: 1
+                      from: 1
+                      last_page: 1
+                      links:
+                        - url: null
+                          label: "&laquo; Previous"
+                          active: false
+                        - url: "https://hr-system.iptvdemo.serv5group.com/api/manager/attendance/today?page=1"
+                          label: "1"
+                          active: true
+                        - url: null
+                          label: "Next &raquo;"
+                          active: false
+                      path: "https://hr-system.iptvdemo.serv5group.com/api/manager/attendance/today"
+                      per_page: 15
+                      to: 1
+                      total: 1
         "401":
-          description: Unauthenticated
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthenticated
-                  errors:
-                    type: string
-                    nullable: true
-                    example: null
-              example:
-                success: false
-                message: Unauthenticated
-                errors: null
+          $ref: '#/components/responses/401Unauthorized'
         "403":
           description: Forbidden - User does not have Manager, Owner, or HR role
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: User does not have the right roles.
-                  errors:
-                    type: string
-                    nullable: true
-                    example: null
-              example:
-                success: false
-                message: User does not have the right roles.
-                errors: null
+                $ref: '#/components/schemas/ErrorResponse'
         "404":
           description: Manager profile not found
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Manager profile not found.
-                  errors:
-                    type: string
-                    nullable: true
-                    example: null
-              example:
-                success: false
-                message: Manager profile not found.
-                errors: null
+                $ref: '#/components/schemas/ErrorResponse'
         "422":
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Validation error
-                  errors:
-                    type: object
-                    additionalProperties:
-                      type: array
-                      items:
-                        type: string
-              example:
-                success: false
-                message: Validation error
-                errors:
-                  date:
-                    - The date does not match the format Y-m-d.
+          $ref: '#/components/responses/422ValidationError'
   /api/manager/attendance/{employeeId}:
     get:
-      summary: Retrieve attendance details for a specific employee managed by the
-        authenticated manager
+      summary: "Retrieve attendance details for a specific employee managed by the authenticated manager (Manager)"
+      description: "Retrieves attendance details and records for a specific employee under the authenticated manager's team for a given date."
       operationId: getManagerEmployeeAttendanceDetail
       tags:
         - Managers
@@ -4292,7 +4376,7 @@ paths:
           schema:
             type: integer
           description: ID of the employee
-          example: 1
+          example: 6
         - in: query
           name: date
           required: false
@@ -4300,7 +4384,7 @@ paths:
           schema:
             type: string
             format: date
-          example: 2026-09-12
+          example: "2026-09-24"
       responses:
         "200":
           description: Employee attendance details retrieved successfully.
@@ -4318,41 +4402,41 @@ paths:
                   data:
                     type: object
                     properties:
-                      employee:
+                      user:
                         type: object
                         properties:
                           id:
                             type: integer
-                            example: 1
+                            example: 6
                           name:
                             type: string
-                            example: John Doe
+                            example: Noran Baligh
                           job_title:
                             type: string
-                            example: Software Engineer
+                            example: Frontend Developer
                           email:
                             type: string
                             format: email
-                            example: john@example.com
-                          location_name:
+                            example: noran@gmail.com
+                          company_name:
                             type: string
                             nullable: true
-                            example: Headquarters
+                            example: WorkWise HQ
                       attendance:
                         type: object
                         properties:
                           id:
                             type: integer
                             nullable: true
-                            example: 10
+                            example: 1
                           date:
                             type: string
                             format: date
-                            example: 2026-09-12
+                            example: "2026-09-24"
                           check_in:
                             type: string
                             nullable: true
-                            example: 09:05 AM
+                            example: 03:33 PM
                           check_in_location:
                             type: object
                             nullable: true
@@ -4360,15 +4444,15 @@ paths:
                               latitude:
                                 type: number
                                 format: float
-                                example: 30.0444
+                                example: 30.0444196
                               longitude:
                                 type: number
                                 format: float
-                                example: 31.2357
+                                example: 31.2357116
                           check_out:
                             type: string
                             nullable: true
-                            example: 05:00 PM
+                            example: 03:34 PM
                           check_out_location:
                             type: object
                             nullable: true
@@ -4376,20 +4460,20 @@ paths:
                               latitude:
                                 type: number
                                 format: float
-                                example: 30.0444
+                                example: 30.0444196
                               longitude:
                                 type: number
                                 format: float
-                                example: 31.2357
+                                example: 31.2357116
                           status:
                             type: string
-                            example: Present
+                            example: Late
                           worked_seconds:
                             type: integer
-                            example: 28500
+                            example: 15
                           worked_hours_formatted:
                             type: string
-                            example: 7.9h
+                            example: 0.0h
                           is_exception:
                             type: boolean
                             example: false
@@ -4401,26 +4485,26 @@ paths:
                 success: true
                 message: Employee attendance details retrieved successfully.
                 data:
-                  employee:
-                    id: 1
-                    name: John Doe
-                    job_title: Software Engineer
-                    email: john@example.com
-                    location_name: Headquarters
+                  user:
+                    id: 6
+                    name: Noran Baligh
+                    job_title: Frontend Developer
+                    email: noran@gmail.com
+                    company_name: WorkWise HQ
                   attendance:
-                    id: 10
-                    date: 2026-09-12
-                    check_in: 09:05 AM
+                    id: 1
+                    date: "2026-09-24"
+                    check_in: 03:33 PM
                     check_in_location:
-                      latitude: 30.0444
-                      longitude: 31.2357
-                    check_out: 05:00 PM
+                      latitude: 30.0444196
+                      longitude: 31.2357116
+                    check_out: 03:34 PM
                     check_out_location:
-                      latitude: 30.0444
-                      longitude: 31.2357
-                    status: Present
-                    worked_seconds: 28500
-                    worked_hours_formatted: 7.9h
+                      latitude: 30.0444196
+                      longitude: 31.2357116
+                    status: Late
+                    worked_seconds: 15
+                    worked_hours_formatted: 0.0h
                     is_exception: false
                     exception_reason: null
         "401":
@@ -4435,17 +4519,12 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: Unauthenticated
+                    example: Unauthenticated.
                   errors:
-                    type: string
                     nullable: true
                     example: null
-              example:
-                success: false
-                message: Unauthenticated
-                errors: null
         "403":
-          description: Forbidden - Not assigned to team or invalid role
+          description: Forbidden - Employee not found or not assigned to your team
           content:
             application/json:
               schema:
@@ -4458,22 +4537,8 @@ paths:
                     type: string
                     example: Employee not found or not assigned to your team.
                   errors:
-                    type: string
                     nullable: true
                     example: null
-              examples:
-                notAssignedToTeam:
-                  summary: Employee Not Assigned to Team
-                  value:
-                    success: false
-                    message: Employee not found or not assigned to your team.
-                    errors: null
-                invalidRole:
-                  summary: Invalid Role
-                  value:
-                    success: false
-                    message: User does not have the right roles.
-                    errors: null
         "404":
           description: Manager profile not found
           content:
@@ -4488,13 +4553,8 @@ paths:
                     type: string
                     example: Manager profile not found.
                   errors:
-                    type: string
                     nullable: true
                     example: null
-              example:
-                success: false
-                message: Manager profile not found.
-                errors: null
         "422":
           description: Validation error
           content:
@@ -4520,6 +4580,22 @@ paths:
                 errors:
                   date:
                     - The date does not match the format Y-m-d.
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Something went wrong.
+                  errors:
+                    nullable: true
+                    example: null
   /api/hr/attendance/daily:
     get:
       summary: Retrieve daily company attendance overview and employee list
