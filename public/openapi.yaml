@@ -542,7 +542,8 @@ paths:
                 errors: null
   /api/employees:
     get:
-      summary: List all employees
+      summary: "List all employees (This Route Allowed For Owner / HR Only)"
+      description: "Retrieve a paginated list of employees with optional filters for search, status, department, manager, employment type, and role."
       operationId: getAllEmployees
       tags:
         - Employees
@@ -559,27 +560,31 @@ paths:
         - in: query
           name: search
           required: false
+          description: Search by name, email, employee ID, job title, or phone
           schema:
             type: string
-          description: Search by name, email, employee ID, job title, or phone
+          example: John
         - in: query
           name: status
           required: false
           schema:
             type: string
             enum:
-              - active
-              - inactive
+              - Active
+              - Inactive
+          example: Active
         - in: query
           name: department_id
           required: false
           schema:
             type: integer
+          example: 1
         - in: query
           name: manager_id
           required: false
           schema:
             type: integer
+          example: 3
         - in: query
           name: employment_type
           required: false
@@ -589,17 +594,27 @@ paths:
               - Full-time
               - Part-time
               - Contract
+          example: Full-time
         - in: query
           name: role
           required: false
           schema:
             type: string
+          example: Employee
         - in: query
           name: per_page
           required: false
           schema:
             type: integer
             default: 15
+          example: 15
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: integer
+            default: 1
+          example: 1
       responses:
         "200":
           description: Employees retrieved successfully
@@ -613,7 +628,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Employees retrieved successfully
+                    example: Employees retrieved successfully.
                   data:
                     type: object
                     properties:
@@ -627,39 +642,110 @@ paths:
                           properties:
                             id:
                               type: integer
-                              example: 1
+                              example: 25
                             name:
                               type: string
-                              example: John Doe
+                              example: Tala
                             email:
                               type: string
-                              example: john@example.com
+                              format: email
+                              example: talabaligh@gmail.com
                             phone:
                               type: string
                               nullable: true
-                              example: "+1234567890"
-                            avatar:
+                              example: "+201114356906"
+                            employee_code:
+                              type: string
+                              nullable: true
+                              example: EMP-2026-87711
+                            job_title:
+                              type: string
+                              nullable: true
+                              example: Flutter Developer
+                            employment_type:
+                              type: string
+                              nullable: true
+                              example: Full-time
+                            start_date:
+                              type: string
+                              format: date
+                              nullable: true
+                              example: "2026-09-01"
+                            status:
+                              type: string
+                              nullable: true
+                              example: Inactive
+                            address:
+                              type: string
+                              nullable: true
+                              example: null
+                            avatar_url:
                               type: string
                               nullable: true
                               example: null
                             role:
                               type: string
                               example: Employee
+                            role_label:
+                              type: string
+                              nullable: true
+                              example: Employee
+                            locale:
+                              type: string
+                              example: en
+                            department:
+                              type: object
+                              nullable: true
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 1
+                                name:
+                                  type: string
+                                  example: Software Engineering
+                            company_location:
+                              type: object
+                              nullable: true
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 1
+                                name:
+                                  type: string
+                                  example: WorkWise HQ
+                            manager:
+                              type: object
+                              nullable: true
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 3
+                                name:
+                                  type: string
+                                  example: Manona
                             permissions:
                               type: array
                               items:
                                 type: string
                               example:
-                                - employee.view-all
+                                - View Profile
+                                - Update Profile
+                            created_at:
+                              type: string
+                              example: "2026-09-24 13:44:09"
                       first_page_url:
                         type: string
+                        example: "https://hr-system.iptvdemo.serv5group.com/api/employees?page=1"
                       from:
                         type: integer
                         nullable: true
+                        example: 1
                       last_page:
                         type: integer
+                        example: 2
                       last_page_url:
                         type: string
+                        example: "https://hr-system.iptvdemo.serv5group.com/api/employees?page=2"
                       links:
                         type: array
                         items:
@@ -675,24 +761,59 @@ paths:
                       next_page_url:
                         type: string
                         nullable: true
+                        example: "https://hr-system.iptvdemo.serv5group.com/api/employees?page=2"
                       path:
                         type: string
+                        example: "https://hr-system.iptvdemo.serv5group.com/api/employees"
                       per_page:
                         type: integer
                         example: 15
                       prev_page_url:
                         type: string
                         nullable: true
+                        example: null
                       to:
                         type: integer
                         nullable: true
+                        example: 15
                       total:
                         type: integer
-                        example: 1
+                        example: 22
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  errors:
+                    nullable: true
+                    example: null
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Failed to retrieve employees.
+                  errors:
+                    nullable: true
+                    example: null
     post:
-      summary: Create a new employee (Allowed for Owner and HR roles)
-      description: Creates a new employee account and sends an invitation email.
-        Department is required for Employee and Manager roles, optional for HR.
+      summary: "Create a new employee (Allowed for Owner and HR roles)"
+      description: "Creates a new employee account and sends an invitation email. Department is required for Employee and Manager roles, optional for HR. Send `lang=ar` or `lang=en` as a query parameter."
       operationId: storeEmployee
       tags:
         - Employees
@@ -787,6 +908,11 @@ paths:
                   type: string
                   nullable: true
                   example: Cairo, Egypt
+                locale:
+                  type: string
+                  enum: [ar, en]
+                  nullable: true
+                  example: en
       responses:
         "201":
           description: Employee created successfully
@@ -820,19 +946,24 @@ paths:
                         example: "+201234567890"
                       employee_code:
                         type: string
+                        nullable: true
                         example: EMP-2026-84920
                       job_title:
                         type: string
+                        nullable: true
                         example: Software Engineer
                       employment_type:
                         type: string
+                        nullable: true
                         example: Full-time
                       start_date:
                         type: string
                         format: date
+                        nullable: true
                         example: 2026-09-22
                       status:
                         type: string
+                        nullable: true
                         example: Inactive
                       address:
                         type: string
@@ -847,6 +978,7 @@ paths:
                         example: Employee
                       role_label:
                         type: string
+                        nullable: true
                         example: Employee
                       locale:
                         type: string
@@ -870,7 +1002,7 @@ paths:
                             example: 1
                           name:
                             type: string
-                            example: Headquarter
+                            example: WorkWise HQ
                       manager:
                         type: object
                         nullable: true
@@ -914,7 +1046,7 @@ paths:
                     name: Engineering
                   company_location:
                     id: 1
-                    name: Headquarter
+                    name: WorkWise HQ
                   manager:
                     id: 2
                     name: John Manager
@@ -923,24 +1055,79 @@ paths:
                     - Update Task Progress
                   created_at: 2026-09-22 12:15:00
         "401":
-          $ref: "#/components/responses/401Unauthorized"
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  errors:
+                    nullable: true
+                    example: null
         "403":
           description: Forbidden (User is not Owner or HR)
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Only the Owner can create HR accounts.
+                  errors:
+                    nullable: true
+                    example: null
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Validation error
+                  errors:
+                    type: object
+                    nullable: true
               example:
                 success: false
-                message: You do not have the required permissions to perform this action.
-                errors: null
-        "422":
-          $ref: "#/components/responses/422StoreValidationError"
+                message: Validation error
+                errors:
+                  email:
+                    - "The email has already been taken."
         "500":
-          $ref: "#/components/responses/500ServerError"
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Failed to create employee.
+                  errors:
+                    nullable: true
+                    example: null
   /api/employees/profile:
     patch:
-      summary: Update authenticated user's profile 📱
+      summary: "Update authenticated user's profile (This route is allowed for all roles) 📱"
+      description: "Updates the profile details of the currently authenticated user. Supports multipart/form-data for updating the avatar image. Send `lang=ar` or `lang=en` as a query parameter."
       operationId: updateProfile
       tags:
         - Employees
@@ -954,7 +1141,17 @@ paths:
             type: string
             default: application/json
           example: application/json
+        - in: query
+          name: lang
+          required: false
+          description: Language for response translation (e.g. ar, en)
+          schema:
+            type: string
+            enum: [ar, en]
+            default: en
+          example: en
       requestBody:
+        required: true
         content:
           multipart/form-data:
             schema:
@@ -964,17 +1161,22 @@ paths:
                   type: string
                   maxLength: 255
                   nullable: true
-                  example: Jane Doe
+                  example: Noran Baligh
                 phone:
                   type: string
                   maxLength: 20
                   nullable: true
-                  example: "+1234567890"
+                  example: "01019018137"
                 address:
                   type: string
                   maxLength: 500
                   nullable: true
-                  example: 456 Oak St
+                  example: Mansoura
+                locale:
+                  type: string
+                  enum: [ar, en]
+                  nullable: true
+                  example: en
                 avatar:
                   type: string
                   format: binary
@@ -993,66 +1195,136 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Profile updated successfully
+                    example: Profile updated successfully.
                   data:
                     type: object
                     properties:
                       id:
                         type: integer
-                        example: 1
-                      employee_id:
-                        type: string
-                        example: EMP-2026-00001
+                        example: 6
                       name:
                         type: string
-                        example: Jane Doe
+                        example: Noran Baligh
                       email:
                         type: string
-                        example: jane@example.com
-                      role:
-                        type: string
-                        example: Employee
-                      avatar:
-                        type: string
-                        nullable: true
-                        example: avatars/sample.jpg
-                      job_title:
-                        type: string
-                        example: Software Engineer
-                      employment_type:
-                        type: string
-                        example: Full-time
-                      status:
-                        type: string
-                        example: active
-                      start_date:
-                        type: string
-                        format: date
-                        example: 2026-01-15
+                        format: email
+                        example: noran@gmail.com
                       phone:
                         type: string
                         nullable: true
-                        example: "+1234567890"
+                        example: "01019018137"
+                      employee_code:
+                        type: string
+                        nullable: true
+                        example: EMP-2026-24271
+                      job_title:
+                        type: string
+                        nullable: true
+                        example: Frontend Developer
+                      employment_type:
+                        type: string
+                        nullable: true
+                        example: Part-time
+                      start_date:
+                        type: string
+                        format: date
+                        nullable: true
+                        example: 2026-09-01
+                      status:
+                        type: string
+                        nullable: true
+                        example: Active
                       address:
                         type: string
                         nullable: true
-                        example: 456 Oak St
-                      department:
+                        example: Mansoura
+                      avatar_url:
                         type: string
                         nullable: true
-                        example: Engineering
+                        example: https://hr-system.iptvdemo.serv5group.com/api/files/1/download
+                      role:
+                        type: string
+                        example: Employee
+                      role_label:
+                        type: string
+                        nullable: true
+                        example: Employee
+                      locale:
+                        type: string
+                        example: en
+                      department:
+                        type: object
+                        nullable: true
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          name:
+                            type: string
+                            example: Software Engineering
+                      company_location:
+                        type: object
+                        nullable: true
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          name:
+                            type: string
+                            example: WorkWise HQ
                       manager:
                         type: object
                         nullable: true
-                      created_at:
-                        type: string
-                        example: 2026-09-10 21:30:00
+                        properties:
+                          id:
+                            type: integer
+                            example: 3
+                          name:
+                            type: string
+                            example: Manona
                       permissions:
                         type: array
                         items:
                           type: string
-        "404":
-          description: Employee profile not found for this user
+                        example:
+                          - View Profile
+                          - Update Profile
+                      created_at:
+                        type: string
+                        example: 2026-09-22 20:24:09
+              example:
+                success: true
+                message: Profile updated successfully.
+                data:
+                  id: 6
+                  name: Noran Baligh
+                  email: noran@gmail.com
+                  phone: "01019018137"
+                  employee_code: EMP-2026-24271
+                  job_title: Frontend Developer
+                  employment_type: Part-time
+                  start_date: 2026-09-01
+                  status: Active
+                  address: Mansoura
+                  avatar_url: https://hr-system.iptvdemo.serv5group.com/api/files/1/download
+                  role: Employee
+                  role_label: Employee
+                  locale: en
+                  department:
+                    id: 1
+                    name: Software Engineering
+                  company_location:
+                    id: 1
+                    name: WorkWise HQ
+                  manager:
+                    id: 3
+                    name: Manona
+                  permissions:
+                    - View Profile
+                    - Update Profile
+                  created_at: 2026-09-22 20:24:09
+        "422":
+          description: Validation error
           content:
             application/json:
               schema:
@@ -1063,9 +1335,32 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: Employee profile not found for this user.
+                    example: Validation error
+                  errors:
+                    type: object
+                    nullable: true
+              example:
+                success: false
+                message: Validation error
+                errors:
+                  phone:
+                    - "The phone has already been taken."
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated
                   errors:
                     nullable: true
+                    example: null
         "500":
           description: Failed to update profile
           content:
@@ -1078,9 +1373,10 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: Failed to update profile
+                    example: Failed to update profile.
                   errors:
                     nullable: true
+                    example: null
   /api/employees/{id}:
     get:
       summary: "Retrieve employee details (This route is allowed for all roles) 📱"
@@ -1370,7 +1666,8 @@ paths:
                     example: null
   /api/employees/{id}/hr-fields:
     patch:
-      summary: Update HR fields of an employee
+      summary: "Update HR fields of an employee (Allowed For Owner/HR Only)"
+      description: "Updates specific HR-related fields for an employee such as job title, employment type, status, department, and manager."
       operationId: updateEmployeeHrFields
       tags:
         - Employees
@@ -1390,7 +1687,9 @@ paths:
           schema:
             type: integer
           description: Employee ID
+          example: 25
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -1399,7 +1698,7 @@ paths:
                 job_title:
                   type: string
                   maxLength: 255
-                  example: Senior Software Engineer
+                  example: Frontend
                 employment_type:
                   type: string
                   enum:
@@ -1417,10 +1716,6 @@ paths:
                   type: integer
                   nullable: true
                   example: 1
-                manager_id:
-                  type: integer
-                  nullable: true
-                  example: 2
       responses:
         "200":
           description: Employee HR fields updated successfully
@@ -1434,61 +1729,119 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Employee HR fields updated successfully
+                    example: Employee HR fields updated successfully.
                   data:
                     type: object
                     properties:
                       id:
                         type: integer
-                        example: 1
-                      employee_id:
-                        type: string
-                        example: EMP-2026-00001
+                        example: 25
                       name:
                         type: string
-                        example: Jane Doe
+                        example: Tala
                       email:
                         type: string
-                        example: jane@example.com
-                      role:
-                        type: string
-                        example: Employee
-                      avatar:
-                        type: string
-                        nullable: true
-                      job_title:
-                        type: string
-                        example: Senior Software Engineer
-                      employment_type:
-                        type: string
-                        example: Full-time
-                      status:
-                        type: string
-                        example: active
-                      start_date:
-                        type: string
-                        format: date
-                        example: 2026-01-15
+                        format: email
+                        example: talabaligh@gmail.com
                       phone:
                         type: string
                         nullable: true
+                        example: null
+                      employee_code:
+                        type: string
+                        nullable: true
+                        example: EMP-2026-87711
+                      job_title:
+                        type: string
+                        nullable: true
+                        example: Frontend
+                      employment_type:
+                        type: string
+                        nullable: true
+                        example: Full-time
+                      start_date:
+                        type: string
+                        format: date
+                        nullable: true
+                        example: "2026-09-01"
+                      status:
+                        type: string
+                        nullable: true
+                        example: Inactive
                       address:
                         type: string
                         nullable: true
-                      department:
+                        example: null
+                      avatar_url:
                         type: string
                         nullable: true
-                        example: Engineering
+                        example: null
+                      role:
+                        type: string
+                        example: Employee
+                      role_label:
+                        type: string
+                        nullable: true
+                        example: Employee
+                      locale:
+                        type: string
+                        example: en
+                      department:
+                        type: object
+                        nullable: true
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          name:
+                            type: string
+                            example: Software Engineering
+                      company_location:
+                        type: object
+                        nullable: true
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          name:
+                            type: string
+                            example: WorkWise HQ
                       manager:
                         type: object
                         nullable: true
-                      created_at:
-                        type: string
-                        example: 2026-09-10 21:30:00
+                        properties:
+                          id:
+                            type: integer
+                            example: 3
+                          name:
+                            type: string
+                            example: Manona
                       permissions:
                         type: array
                         items:
                           type: string
+                        example:
+                          - View Profile
+                          - Update Profile
+                      created_at:
+                        type: string
+                        example: "2026-09-24 13:44:09"
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  errors:
+                    nullable: true
+                    example: null
         "403":
           description: Forbidden - Not authorized to update HR fields
           content:
@@ -1504,6 +1857,7 @@ paths:
                     example: You are not authorized to update HR fields.
                   errors:
                     nullable: true
+                    example: null
         "404":
           description: Employee not found
           content:
@@ -1519,11 +1873,27 @@ paths:
                     example: Employee not found.
                   errors:
                     nullable: true
+                    example: null
         "500":
-          description: Failed to update HR fields
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Failed to update HR fields.
+                  errors:
+                    nullable: true
+                    example: null
   /api/employees/{id}/change-account-status:
     patch:
-      summary: Toggle employee account active/inactive status
+      summary: "Toggle employee account active/inactive status (Allowed For Owner/HR Only)"
+      description: "Changes the status of an employee account between active and inactive. Users cannot change the status of their own account."
       operationId: changeAccountStatus
       tags:
         - Employees
@@ -1543,6 +1913,7 @@ paths:
           schema:
             type: integer
           description: Employee ID
+          example: 25
       responses:
         "200":
           description: Account status changed successfully
@@ -1562,54 +1933,97 @@ paths:
                     properties:
                       id:
                         type: integer
-                        example: 1
-                      employee_id:
-                        type: string
-                        example: EMP-2026-00001
+                        example: 25
                       name:
                         type: string
-                        example: Jane Doe
+                        example: Tala
                       email:
                         type: string
-                        example: jane@example.com
-                      role:
-                        type: string
-                        example: Employee
-                      avatar:
-                        type: string
-                        nullable: true
-                      job_title:
-                        type: string
-                        example: Software Engineer
-                      employment_type:
-                        type: string
-                        example: Full-time
-                      status:
-                        type: string
-                        example: active
-                      start_date:
-                        type: string
-                        format: date
-                        example: 2026-01-15
+                        format: email
+                        example: talabaligh@gmail.com
                       phone:
                         type: string
                         nullable: true
+                        example: null
+                      employee_code:
+                        type: string
+                        nullable: true
+                        example: EMP-2026-87711
+                      job_title:
+                        type: string
+                        nullable: true
+                        example: Flutter Developer
+                      employment_type:
+                        type: string
+                        nullable: true
+                        example: Full-time
+                      start_date:
+                        type: string
+                        format: date
+                        nullable: true
+                        example: "2026-09-01"
+                      status:
+                        type: string
+                        nullable: true
+                        example: Active
                       address:
                         type: string
                         nullable: true
-                      department:
+                        example: null
+                      avatar_url:
                         type: string
                         nullable: true
+                        example: null
+                      role:
+                        type: string
+                        example: Employee
+                      role_label:
+                        type: string
+                        nullable: true
+                        example: Employee
+                      locale:
+                        type: string
+                        example: en
+                      department:
+                        type: object
+                        nullable: true
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          name:
+                            type: string
+                            example: Software Engineering
+                      company_location:
+                        type: object
+                        nullable: true
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          name:
+                            type: string
+                            example: WorkWise HQ
                       manager:
                         type: object
                         nullable: true
-                      created_at:
-                        type: string
-                        example: 2026-09-10 21:30:00
+                        properties:
+                          id:
+                            type: integer
+                            example: 3
+                          name:
+                            type: string
+                            example: Manona
                       permissions:
                         type: array
                         items:
                           type: string
+                        example:
+                          - View Profile
+                          - Update Profile
+                      created_at:
+                        type: string
+                        example: "2026-09-24 13:44:09"
               examples:
                 activated:
                   summary: Account Activated
@@ -1617,44 +2031,98 @@ paths:
                     success: true
                     message: Employee account has been activated successfully.
                     data:
-                      id: 1
-                      employee_id: EMP-2026-00001
-                      name: Jane Doe
-                      email: jane@example.com
-                      role: Employee
-                      avatar: null
-                      job_title: Software Engineer
-                      employment_type: Full-time
-                      status: active
-                      start_date: 2026-01-15
+                      id: 25
+                      name: Tala
+                      email: talabaligh@gmail.com
                       phone: null
+                      employee_code: EMP-2026-87711
+                      job_title: Flutter Developer
+                      employment_type: Full-time
+                      start_date: "2026-09-01"
+                      status: Active
                       address: null
-                      department: null
-                      manager: null
-                      created_at: 2026-09-10 21:30:00
-                      permissions: []
+                      avatar_url: null
+                      role: Employee
+                      role_label: Employee
+                      locale: en
+                      department:
+                        id: 1
+                        name: Software Engineering
+                      company_location:
+                        id: 1
+                        name: WorkWise HQ
+                      manager:
+                        id: 3
+                        name: Manona
+                      permissions:
+                        - View Profile
+                        - Update Profile
+                      created_at: "2026-09-24 13:44:09"
                 deactivated:
                   summary: Account Deactivated
                   value:
                     success: true
                     message: Employee account has been deactivated successfully.
                     data:
-                      id: 1
-                      employee_id: EMP-2026-00001
-                      name: Jane Doe
-                      email: jane@example.com
-                      role: Employee
-                      avatar: null
-                      job_title: Software Engineer
-                      employment_type: Full-time
-                      status: inactive
-                      start_date: 2026-01-15
+                      id: 25
+                      name: Tala
+                      email: talabaligh@gmail.com
                       phone: null
+                      employee_code: EMP-2026-87711
+                      job_title: Flutter Developer
+                      employment_type: Full-time
+                      start_date: "2026-09-01"
+                      status: Inactive
                       address: null
-                      department: null
-                      manager: null
-                      created_at: 2026-09-10 21:30:00
-                      permissions: []
+                      avatar_url: null
+                      role: Employee
+                      role_label: Employee
+                      locale: en
+                      department:
+                        id: 1
+                        name: Software Engineering
+                      company_location:
+                        id: 1
+                        name: WorkWise HQ
+                      manager:
+                        id: 3
+                        name: Manona
+                      permissions:
+                        - View Profile
+                        - Update Profile
+                      created_at: "2026-09-24 13:44:09"
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  errors:
+                    nullable: true
+                    example: null
+        "404":
+          description: Employee not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Employee not found.
+                  errors:
+                    nullable: true
+                    example: null
         "422":
           description: Validation error (e.g. changing own account status)
           content:
@@ -1683,6 +2151,22 @@ paths:
                 errors:
                   employee:
                     - You cannot change the status of your own account.
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Failed to change employee account status.
+                  errors:
+                    nullable: true
+                    example: null
   /api/departments:
     get:
       summary: List departments
