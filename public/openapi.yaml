@@ -19,7 +19,7 @@ tags:
 paths:
   /api/auth/login:
     post:
-      summary: Login (This route is allowed for all roles)
+      summary: Login (This route is allowed for all roles) 📱
       operationId: login
       tags:
         - Authentication
@@ -303,7 +303,7 @@ paths:
                     example: null
   /api/auth/logout:
     post:
-      summary: Logout (This route is allowed for all roles)
+      summary: Logout (This route is allowed for all roles) 📱
       operationId: logout
       tags:
         - Authentication
@@ -940,7 +940,7 @@ paths:
           $ref: "#/components/responses/500ServerError"
   /api/employees/profile:
     patch:
-      summary: Update authenticated user's profile
+      summary: Update authenticated user's profile 📱
       operationId: updateProfile
       tags:
         - Employees
@@ -1083,7 +1083,7 @@ paths:
                     nullable: true
   /api/employees/{id}:
     get:
-      summary: Retrieve employee details
+      summary: Retrieve employee details 📱
       operationId: getEmployeeById
       tags:
         - Employees
@@ -2508,7 +2508,7 @@ paths:
   /api/attendance/today:
     get:
       summary: Retrieve today's attendance status and location check for the
-        authenticated employee
+        authenticated employee 📱
       operationId: getTodayAttendance
       tags:
         - Attendance
@@ -2666,7 +2666,7 @@ paths:
                     - The latitude must be between -90 and 90.
   /api/attendance/check-in:
     post:
-      summary: Perform check-in for the authenticated employee
+      summary: Perform check-in for the authenticated employee 📱
       operationId: checkIn
       tags:
         - Attendance
@@ -2854,7 +2854,7 @@ paths:
                     errors: null
   /api/attendance/check-out:
     post:
-      summary: Perform check-out for the authenticated employee
+      summary: Perform check-out for the authenticated employee 📱
       operationId: checkOut
       tags:
         - Attendance
@@ -3041,7 +3041,7 @@ paths:
                     errors: null
   /api/attendance/history:
     get:
-      summary: Retrieve paginated attendance history for the authenticated employee
+      summary: Retrieve paginated attendance history for the authenticated employee 📱
       operationId: getAttendanceHistory
       tags:
         - Attendance
@@ -5310,7 +5310,7 @@ paths:
                           $ref: "#/components/schemas/Evaluation"
   /api/employee/evaluations:
     get:
-      summary: Employee Evaluation History
+      summary: Employee Evaluation History 📱
       operationId: employeeEvaluationsHistory
       tags:
         - Evaluation
@@ -5349,7 +5349,7 @@ paths:
     get:
       tags:
         - Performance
-      summary: Get employee performance dashboard
+      summary: Get employee performance dashboard 📱
       description: Retrieves detailed performance metrics, 6-month historical trends,
         at-a-glance KPIs, and period comparisons for the authenticated employee
         profile.
@@ -5572,7 +5572,7 @@ paths:
     get:
       tags:
         - Goals
-      summary: Get Employee Goals
+      summary: Get Employee Goals 📱
       description: Retrieves a paginated list of goals assigned to the authenticated
         employee.
       parameters:
@@ -5606,7 +5606,7 @@ paths:
     post:
       tags:
         - Goals
-      summary: Create Goal
+      summary: Create Goal 📱
       description: Creates a new goal for the authenticated employee.
       requestBody:
         required: true
@@ -5659,7 +5659,7 @@ paths:
     get:
       tags:
         - Goals
-      summary: Get Goal Details
+      summary: Get Goal Details 📱
       description: Retrieves details of a specific goal owned by the authenticated employee.
       parameters:
         - name: id
@@ -5691,7 +5691,7 @@ paths:
     put:
       tags:
         - Goals
-      summary: Update Goal Details
+      summary: Update Goal Details 📱
       description: Updates editable fields of a goal. Cannot update completed or
         cancelled goals.
       parameters:
@@ -5748,7 +5748,7 @@ paths:
     patch:
       tags:
         - Goals
-      summary: Update Goal Progress
+      summary: Update Goal Progress 📱
       description: Logs progress for a goal and automatically marks it as completed if
         current_value reaches target_value.
       parameters:
@@ -5800,7 +5800,7 @@ paths:
     patch:
       tags:
         - Goals
-      summary: Mark Goal as Completed
+      summary: Mark Goal as Completed 📱
       description: Explicitly marks a goal as completed and sets current_value equal
         to target_value.
       parameters:
@@ -5918,7 +5918,7 @@ paths:
           description: Failed to retrieve company goals overview.
   /api/notifications:
     get:
-      summary: Retrieve paginated list of user notifications
+      summary: Retrieve paginated list of user notifications 📱
       operationId: getNotifications
       tags:
         - Notifications
@@ -6002,7 +6002,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
     delete:
-      summary: Clear all notifications for the authenticated user
+      summary: Clear all notifications for the authenticated user 📱
       operationId: clearAllNotifications
       tags:
         - Notifications
@@ -6041,7 +6041,7 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
   /api/notifications/unread-count:
     get:
-      summary: Get count of unread notifications for the authenticated user
+      summary: Get count of unread notifications for the authenticated user 📱
       operationId: getUnreadNotificationsCount
       tags:
         - Notifications
@@ -6088,7 +6088,7 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
   /api/notifications/{id}/read:
     patch:
-      summary: Mark a specific notification as read
+      summary: Mark a specific notification as read 📱
       operationId: markNotificationAsRead
       tags:
         - Notifications
@@ -6144,7 +6144,7 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
   /api/notifications/read-all:
     patch:
-      summary: Mark all unread notifications as read for the authenticated user
+      summary: Mark all unread notifications as read for the authenticated user 📱
       operationId: markAllNotificationsAsRead
       tags:
         - Notifications
@@ -6183,7 +6183,7 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
   /api/notifications/fcm-token:
     post:
-      summary: Update Firebase Cloud Messaging (FCM) token for push notifications
+      summary: Update Firebase Cloud Messaging (FCM) token for push notifications 📱
       operationId: updateFcmToken
       tags:
         - Notifications
@@ -6240,7 +6240,7 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
   /api/broadcasting/auth:
     post:
-      summary: Authorize user for Reverb/Laravel broadcasting channels
+      summary: Authorize user for Reverb/Laravel broadcasting channels 📱
       operationId: broadcastingAuth
       tags:
         - Broadcasting
@@ -6645,7 +6645,7 @@ paths:
   /api/auth/forget-password:
     post:
       summary: Forget password request to send OTP via email (This route is allowed
-        for all roles)
+        for all roles) 📱
       operationId: forgotPassword
       tags:
         - Authentication
@@ -6701,7 +6701,7 @@ paths:
           $ref: "#/components/responses/429TooManyRequests"
   /api/auth/forgot-password/verify-otp:
     post:
-      summary: Verify OTP code (This route is allowed for all roles)
+      summary: Verify OTP code (This route is allowed for all roles) 📱
       operationId: verifyForgotPasswordOtp
       tags:
         - Authentication
@@ -6765,7 +6765,7 @@ paths:
           $ref: "#/components/responses/429TooManyRequests"
   /api/auth/forgot-password/reset:
     post:
-      summary: Reset user password (This route is allowed for all roles)
+      summary: Reset user password (This route is allowed for all roles)📱
       operationId: resetPassword
       tags:
         - Authentication
@@ -6828,7 +6828,7 @@ paths:
           $ref: "#/components/responses/429TooManyRequests"
   /api/auth/forgot-password/resend-otp:
     post:
-      summary: Resend OTP code (This route is allowed for all roles)
+      summary: Resend OTP code (This route is allowed for all roles) 📱
       operationId: resendOtp
       tags:
         - Authentication
@@ -6884,7 +6884,7 @@ paths:
           $ref: "#/components/responses/429TooManyRequests"
   /api/ai/career-coach:
     post:
-      summary: AI Career Coach Guidance (For All Roles)
+      summary: AI Career Coach Guidance (For All Roles) 📱
       description: Generates personalized career development guidance based on
         approved employee data.
       operationId: getCareerCoachGuidance
@@ -7003,7 +7003,7 @@ paths:
           $ref: "#/components/responses/500ServerError"
   /api/ai/performance-insight:
     post:
-      summary: AI Performance Insight (For All Roles)
+      summary: AI Performance Insight (For All Roles)📱
       description: Explains approved performance metrics and trends for an employee.
       operationId: getPerformanceInsight
       tags:
@@ -7208,7 +7208,7 @@ paths:
           $ref: "#/components/responses/500ServerError"
   /api/ai/skill-gap:
     post:
-      summary: AI Skill-Gap Analysis (For All Roles)
+      summary: AI Skill-Gap Analysis (For All Roles) 📱
       description: Identifies evidence-backed skill gaps and recommends target
         development actions.
       operationId: getSkillGapAnalysis
@@ -7523,7 +7523,7 @@ paths:
           $ref: "#/components/responses/500ServerError"
   /api/ai/policy-assistant:
     post:
-      summary: AI HR Policy Assistant (For All Roles)
+      summary: AI HR Policy Assistant (For All Roles) 📱
       description: Answers employee policy questions grounded in company policies and
         employee facts.
       operationId: askPolicyQuestion
