@@ -84,7 +84,18 @@ class EmployeeService
 
     public function getEmployeeById(int $id): User
     {
-        return User::with(['department', 'companyLocation', 'manager', 'files', 'roles'])->findOrFail($id);
+        $user = User::with(['department', 'companyLocation', 'manager', 'files', 'roles'])->findOrFail($id);
+
+        if (empty($user->department_id) && ! empty($user->manager_id)) {
+            $managedDepartmentId = Department::where('manager_id', $user->manager_id)->value('id');
+
+            if ($managedDepartmentId) {
+                $user->update(['department_id' => $managedDepartmentId]);
+                $user->load('department');
+            }
+        }
+
+        return $user;
     }
 
     public function updateHrFields(User $user, array $data): User

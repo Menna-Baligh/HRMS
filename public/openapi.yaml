@@ -1083,7 +1083,8 @@ paths:
                     nullable: true
   /api/employees/{id}:
     get:
-      summary: Retrieve employee details 📱
+      summary: "Retrieve employee details (This route is allowed for all roles) 📱"
+      description: "Returns the detailed profile of a specific employee based on their ID. Send `lang=ar` or `lang=en` as a query parameter to translate statuses and roles."
       operationId: getEmployeeById
       tags:
         - Employees
@@ -1097,6 +1098,15 @@ paths:
             type: string
             default: application/json
           example: application/json
+        - in: query
+          name: lang
+          required: false
+          description: Language for response translation (e.g. ar, en)
+          schema:
+            type: string
+            enum: [ar, en]
+            default: en
+          example: en
         - in: path
           name: id
           required: true
@@ -1116,73 +1126,200 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Employee details retrieved successfully
+                    example: Profile updated successfully.
                   data:
                     type: object
                     properties:
                       id:
                         type: integer
-                        example: 1
-                      employee_id:
-                        type: string
-                        example: EMP-2026-00001
+                        example: 6
                       name:
                         type: string
-                        example: Jane Doe
+                        example: Noran Baligh
                       email:
                         type: string
-                        example: jane@example.com
-                      role:
-                        type: string
-                        example: Employee
-                      avatar:
-                        type: string
-                        nullable: true
-                      job_title:
-                        type: string
-                        example: Software Engineer
-                      employment_type:
-                        type: string
-                        example: Full-time
-                      status:
-                        type: string
-                        example: active
-                      start_date:
-                        type: string
-                        format: date
-                        example: 2026-01-15
+                        format: email
+                        example: noran@gmail.com
                       phone:
                         type: string
                         nullable: true
-                        example: "+1234567890"
+                        example: "01019018137"
+                      employee_code:
+                        type: string
+                        nullable: true
+                        example: EMP-2026-24271
+                      job_title:
+                        type: string
+                        nullable: true
+                        example: Frontend Developer
+                      employment_type:
+                        type: string
+                        nullable: true
+                        example: Part-time
+                      start_date:
+                        type: string
+                        format: date
+                        nullable: true
+                        example: 2026-09-01
+                      status:
+                        type: string
+                        nullable: true
+                        example: Active
                       address:
                         type: string
                         nullable: true
-                        example: 123 Main St
-                      department:
+                        example: Mansoura
+                      avatar_url:
                         type: string
                         nullable: true
-                        example: Engineering
+                        example: https://hr-system.iptvdemo.serv5group.com/api/files/1/download
+                      role:
+                        type: string
+                        example: Employee
+                      role_label:
+                        type: string
+                        nullable: true
+                        example: Employee
+                      locale:
+                        type: string
+                        example: en
+                      department:
+                        type: object
+                        nullable: true
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          name:
+                            type: string
+                            example: Software Engineering
+                      company_location:
+                        type: object
+                        nullable: true
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          name:
+                            type: string
+                            example: WorkWise HQ
                       manager:
                         type: object
                         nullable: true
                         properties:
                           id:
                             type: integer
-                            example: 2
-                          employee_id:
-                            type: string
-                            example: EMP-2026-00002
+                            example: 3
                           name:
                             type: string
-                            example: John Manager
-                      created_at:
-                        type: string
-                        example: 2026-09-10 21:30:00
+                            example: Manona
                       permissions:
                         type: array
                         items:
                           type: string
+                        example:
+                          - View Profile
+                          - Update Profile
+                          - View Departments
+                          - Update Task Progress
+                          - Update Task Status
+                          - Create Submission
+                          - Attach File to Submission
+                          - View Submission
+                          - Resubmit Submission
+                          - View Active Locations
+                          - Check-in / Check-out
+                          - View Personal Attendance History
+                          - View Own Goals
+                          - Create Goal
+                          - Update Goal
+                          - Update Goal Progress
+                          - Complete Goal
+                          - View Personal Evaluation
+                          - Personal Performance Dashboard
+                          - View Leave Types
+                          - View Leave Balances
+                          - View Own Leave Requests
+                          - Create Leave Request
+                          - Cancel Leave Request
+                          - View Leave History
+                          - View Leave Calendar
+                          - View company events
+                          - View company policies
+                          - View active policies
+                          - Download Files
+                          - Delete Files
+                          - Use AI Career Coach
+                          - View AI Performance Insight
+                          - Analyze AI Skill-Gap & Development
+                          - Use AI HR Policy Assistant
+                      created_at:
+                        type: string
+                        example: 2026-09-22 20:24:09
+              example:
+                success: true
+                message: Profile updated successfully.
+                data:
+                  id: 6
+                  name: Noran Baligh
+                  email: noran@gmail.com
+                  phone: "01019018137"
+                  employee_code: EMP-2026-24271
+                  job_title: Frontend Developer
+                  employment_type: Part-time
+                  start_date: 2026-09-01
+                  status: Active
+                  address: Mansoura
+                  avatar_url: https://hr-system.iptvdemo.serv5group.com/api/files/1/download
+                  role: Employee
+                  role_label: Employee
+                  locale: en
+                  department:
+                    id: 1
+                    name: Software Engineering
+                  company_location:
+                    id: 1
+                    name: WorkWise HQ
+                  manager:
+                    id: 3
+                    name: Manona
+                  permissions:
+                    - View Profile
+                    - Update Profile
+                    - View Departments
+                    - Update Task Progress
+                    - Update Task Status
+                    - Create Submission
+                    - Attach File to Submission
+                    - View Submission
+                    - Resubmit Submission
+                    - View Active Locations
+                    - Check-in / Check-out
+                    - View Personal Attendance History
+                    - View Own Goals
+                    - Create Goal
+                    - Update Goal
+                    - Update Goal Progress
+                    - Complete Goal
+                    - View Personal Evaluation
+                    - Personal Performance Dashboard
+                    - View Leave Types
+                    - View Leave Balances
+                    - View Own Leave Requests
+                    - Create Leave Request
+                    - Cancel Leave Request
+                    - View Leave History
+                    - View Leave Calendar
+                    - View company events
+                    - View company policies
+                    - View active policies
+                    - Download Files
+                    - Delete Files
+                    - Use AI Career Coach
+                    - View AI Performance Insight
+                    - Analyze AI Skill-Gap & Development
+                    - Use AI HR Policy Assistant
+                  created_at: 2026-09-22 20:24:09
         "403":
           description: Forbidden - Not authorized to view profile
           content:
@@ -1198,6 +1335,7 @@ paths:
                     example: You are not authorized to view this employee profile.
                   errors:
                     nullable: true
+                    example: null
         "404":
           description: Employee not found
           content:
@@ -1213,8 +1351,23 @@ paths:
                     example: Employee not found.
                   errors:
                     nullable: true
+                    example: null
         "500":
           description: Failed to retrieve employee details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Failed to retrieve employee details.
+                  errors:
+                    nullable: true
+                    example: null
   /api/employees/{id}/hr-fields:
     patch:
       summary: Update HR fields of an employee
@@ -6294,7 +6447,7 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
   /api/files/{file}/download:
     get:
-      summary: Download a specific file securely via permissions or policy
+      summary: Download a specific file securely via permissions or policy 📱
       operationId: downloadFile
       tags:
         - Files
@@ -6349,7 +6502,7 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
   /api/files/{file}:
     delete:
-      summary: Delete a specific file from storage and database
+      summary: Delete a specific file from storage and database 📱
       operationId: deleteFile
       tags:
         - Files
