@@ -5601,7 +5601,7 @@ paths:
                     example: null
   /api/evaluation-periods:
     get:
-      summary: List Evaluation Periods
+      summary: List Evaluation Periods (HR / Owner / Manager)
       operationId: listEvaluationPeriods
       tags:
         - Evaluation
@@ -5647,7 +5647,7 @@ paths:
                       meta:
                         type: object
     post:
-      summary: Store Evaluation Period
+      summary: Store Evaluation Period (HR / Owner / Manager)
       operationId: storeEvaluationPeriod
       tags:
         - Evaluation
@@ -5701,7 +5701,7 @@ paths:
                     $ref: "#/components/schemas/EvaluationPeriod"
   /api/evaluation-periods/{id}/toggle-status:
     patch:
-      summary: Toggle Evaluation Period Status
+      summary: Toggle Evaluation Period Status (HR / Owner / Manager)
       operationId: toggleEvaluationPeriodStatus
       tags:
         - Evaluation
@@ -5739,7 +5739,7 @@ paths:
                     $ref: "#/components/schemas/EvaluationPeriod"
   /api/evaluation-categories:
     get:
-      summary: List Evaluation Categories
+      summary: List Evaluation Categories (HR / Owner / Manager)
       operationId: listEvaluationCategories
       tags:
         - Evaluation
@@ -5781,7 +5781,7 @@ paths:
                         items:
                           $ref: "#/components/schemas/EvaluationCategory"
     post:
-      summary: Store Evaluation Category
+      summary: Store Evaluation Category (HR / Owner / Manager)
       operationId: storeEvaluationCategory
       tags:
         - Evaluation
@@ -5833,7 +5833,7 @@ paths:
                     $ref: "#/components/schemas/EvaluationCategory"
   /api/hr/evaluations:
     get:
-      summary: HR Company Evaluations Overview
+      summary: (HR/Owner) Company Evaluations Overview
       operationId: hrEvaluationsOverview
       tags:
         - Evaluation
@@ -5900,7 +5900,7 @@ paths:
                           $ref: "#/components/schemas/Evaluation"
   /api/evaluations:
     post:
-      summary: Create Evaluation Draft
+      summary: Create Evaluation Draft (HR / Owner / Manager)
       operationId: storeEvaluationDraft
       tags:
         - Evaluation
@@ -5921,10 +5921,10 @@ paths:
             schema:
               type: object
               required:
-                - employee_id
+                - user_id
                 - period_id
               properties:
-                employee_id:
+                user_id:
                   type: integer
                   example: 5
                 period_id:
@@ -5972,7 +5972,7 @@ paths:
                     $ref: "#/components/schemas/Evaluation"
   /api/evaluations/{id}:
     put:
-      summary: Update Evaluation Draft
+      summary: Update Evaluation Draft (HR / Owner / Manager)
       operationId: updateEvaluationDraft
       tags:
         - Evaluation
@@ -6037,7 +6037,7 @@ paths:
                     $ref: "#/components/schemas/Evaluation"
   /api/evaluations/{id}/complete:
     patch:
-      summary: Complete Evaluation
+      summary: Complete Evaluation (HR / Owner / Manager)
       operationId: completeEvaluation
       tags:
         - Evaluation
@@ -6075,7 +6075,7 @@ paths:
                     $ref: "#/components/schemas/Evaluation"
   /api/manager/evaluations:
     get:
-      summary: Manager Team Evaluations
+      summary: (Manager) Team Evaluations
       operationId: managerTeamEvaluations
       tags:
         - Evaluation
@@ -6124,7 +6124,7 @@ paths:
                           $ref: "#/components/schemas/Evaluation"
   /api/employee/evaluations:
     get:
-      summary: Employee Evaluation History 📱
+      summary: (Employee) Evaluation History 📱
       operationId: employeeEvaluationsHistory
       tags:
         - Evaluation
@@ -6163,7 +6163,7 @@ paths:
     get:
       tags:
         - Performance
-      summary: Get employee performance dashboard 📱
+      summary: Get (employee) performance dashboard 📱
       description: Retrieves detailed performance metrics, 6-month historical trends,
         at-a-glance KPIs, and period comparisons for the authenticated employee
         profile.
@@ -6236,7 +6236,7 @@ paths:
     get:
       tags:
         - Performance
-      summary: Get manager team performance dashboard
+      summary: Get (manager) team performance dashboard
       description: Retrieves aggregated performance summaries, 6-month trend charts,
         and paginated team member metrics for employees directly managed by the
         authenticated manager.
@@ -6315,7 +6315,7 @@ paths:
     get:
       tags:
         - Performance
-      summary: Get HR company performance dashboard
+      summary: Get (HR/Owner) company performance dashboard
       description: Retrieves company-wide performance metrics, department-level
         aggregations, historical trends, and high/low performer counts across
         the organization.
@@ -8787,7 +8787,7 @@ components:
         id:
           type: integer
           example: 10
-        employee_id:
+        user_id:
           type: integer
           example: 5
         employee_name:
@@ -9084,8 +9084,8 @@ components:
       type: object
       properties:
         employee_id:
-          type: integer
-          example: 10
+          type: string
+          example: "EMP-2026-24271"
         user_id:
           type: integer
           example: 15
@@ -9345,25 +9345,7 @@ components:
         id:
           type: integer
           example: 1
-        employee_id:
-          type: integer
-          example: 12
-        employee:
-          type: object
-          nullable: true
-          properties:
-            id:
-              type: integer
-              example: 12
-            name:
-              type: string
-              example: John Doe
-            job_title:
-              type: string
-              example: Backend Developer
-            department:
-              type: string
-              example: Engineering
+        
         title:
           type: string
           example: Implement Redis Caching
@@ -9387,10 +9369,7 @@ components:
         status:
           type: string
           example: active
-        histories:
-          type: array
-          items:
-            $ref: "#/components/schemas/GoalProgressHistory"
+        
         created_at:
           type: string
           format: date-time
