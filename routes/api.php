@@ -183,6 +183,7 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
     });
 
     Route::prefix('departments')->group(function () {
+        Route::get('/managers-dropdown', [DepartmentController::class,'GetManagersDropdown'])->middleware('permission:'.PermissionEnum::VIEW_MANAGERS_DROPDOWN->value);
         Route::get('/', [DepartmentController::class, 'index'])->middleware('permission:'.PermissionEnum::DEPARTMENT_VIEW->value);
         Route::post('/', [DepartmentController::class, 'store'])->middleware('permission:'.PermissionEnum::DEPARTMENT_CREATE->value);
         Route::patch('/{id}', [DepartmentController::class, 'update'])->middleware('permission:'.PermissionEnum::DEPARTMENT_EDIT->value);

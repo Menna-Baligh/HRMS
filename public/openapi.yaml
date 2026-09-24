@@ -2169,7 +2169,8 @@ paths:
                     example: null
   /api/departments:
     get:
-      summary: List departments
+      summary: "List departments (Allowed For All Roles)"
+      description: "Retrieve a paginated list of departments with optional filters for search and status."
       operationId: listDepartments
       tags:
         - Departments
@@ -2189,6 +2190,7 @@ paths:
           schema:
             type: string
           description: Search by department name or description
+          example: Engineering
         - in: query
           name: status
           required: false
@@ -2197,12 +2199,21 @@ paths:
             enum:
               - active
               - inactive
+          example: active
         - in: query
           name: per_page
           required: false
           schema:
             type: integer
             default: 15
+          example: 15
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: integer
+            default: 1
+          example: 1
       responses:
         "200":
           description: Departments retrieved successfully
@@ -2216,13 +2227,10 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Departments retrieved successfully
+                    example: Departments retrieved successfully.
                   data:
                     type: object
                     properties:
-                      current_page:
-                        type: integer
-                        example: 1
                       data:
                         type: array
                         items:
@@ -2233,111 +2241,94 @@ paths:
                               example: 1
                             name:
                               type: string
-                              example: Engineering
+                              example: Software Engineering
                             description:
                               type: string
                               nullable: true
-                              example: Software Development Department
+                              example: Core product development, architecture, and quality assurance.
                             status:
                               type: string
-                              example: active
+                              example: Active
                             manager:
                               type: object
                               nullable: true
                               properties:
                                 id:
                                   type: integer
-                                  example: 2
+                                  example: 3
                                 name:
                                   type: string
-                                  example: John Doe
+                                  example: Manona
                                 email:
                                   type: string
-                                  example: john@example.com
-                                job_title:
-                                  type: string
-                                  example: Engineering Manager
+                                  format: email
+                                  example: mennabaligh06@gmail.com
                             employees_count:
                               type: integer
-                              example: 12
+                              example: 1
                             created_at:
                               type: string
-                              example: 2026-01-15 10:00:00
-                      first_page_url:
-                        type: string
-                      from:
-                        type: integer
-                        nullable: true
-                      last_page:
-                        type: integer
-                      last_page_url:
-                        type: string
+                              example: "2026-09-24 13:43:46"
                       links:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            url:
-                              type: string
-                              nullable: true
-                            label:
-                              type: string
-                            active:
-                              type: boolean
-                      next_page_url:
-                        type: string
-                        nullable: true
-                      path:
-                        type: string
-                      per_page:
-                        type: integer
-                        example: 15
-                      prev_page_url:
-                        type: string
-                        nullable: true
-                      to:
-                        type: integer
-                        nullable: true
-                      total:
-                        type: integer
-                        example: 1
-              example:
-                success: true
-                message: Departments retrieved successfully
-                data:
-                  current_page: 1
-                  data:
-                    - id: 1
-                      name: Engineering
-                      description: Software Development Department
-                      status: active
-                      manager:
-                        id: 2
-                        name: John Doe
-                        email: john@example.com
-                        job_title: Engineering Manager
-                      employees_count: 12
-                      created_at: 2026-01-15 10:00:00
-                  first_page_url: http://localhost:8000/api/departments?page=1
-                  from: 1
-                  last_page: 1
-                  last_page_url: http://localhost:8000/api/departments?page=1
-                  links:
-                    - url: null
-                      label: "&laquo; Previous"
-                      active: false
-                    - url: http://localhost:8000/api/departments?page=1
-                      label: "1"
-                      active: true
-                    - url: null
-                      label: Next &raquo;
-                      active: false
-                  next_page_url: null
-                  path: http://localhost:8000/api/departments
-                  per_page: 15
-                  prev_page_url: null
-                  to: 1
-                  total: 1
+                        type: object
+                        properties:
+                          first:
+                            type: string
+                            nullable: true
+                            example: "https://hr-system.iptvdemo.serv5group.com/api/departments?page=1"
+                          last:
+                            type: string
+                            nullable: true
+                            example: "https://hr-system.iptvdemo.serv5group.com/api/departments?page=1"
+                          prev:
+                            type: string
+                            nullable: true
+                            example: null
+                          next:
+                            type: string
+                            nullable: true
+                            example: null
+                      meta:
+                        type: object
+                        properties:
+                          current_page:
+                            type: integer
+                            example: 1
+                          from:
+                            type: integer
+                            nullable: true
+                            example: 1
+                          last_page:
+                            type: integer
+                            example: 1
+                          links:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                url:
+                                  type: string
+                                  nullable: true
+                                label:
+                                  type: string
+                                page:
+                                  type: integer
+                                  nullable: true
+                                active:
+                                  type: boolean
+                          path:
+                            type: string
+                            example: "https://hr-system.iptvdemo.serv5group.com/api/departments"
+                          per_page:
+                            type: integer
+                            example: 15
+                          to:
+                            type: integer
+                            nullable: true
+                            example: 1
+                          total:
+                            type: integer
+                            example: 1
         "401":
           description: Unauthenticated
           content:
@@ -2350,17 +2341,12 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: Unauthenticated
+                    example: Unauthenticated.
                   errors:
-                    type: string
                     nullable: true
                     example: null
-              example:
-                success: false
-                message: Unauthenticated
-                errors: null
         "403":
-          description: Forbidden - User lacks department.view permission
+          description: Forbidden - User lacks permission
           content:
             application/json:
               schema:
@@ -2373,15 +2359,27 @@ paths:
                     type: string
                     example: User does not have the right permissions.
                   errors:
-                    type: string
                     nullable: true
                     example: null
-              example:
-                success: false
-                message: User does not have the right permissions.
-                errors: null
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Failed to process department request.
+                  errors:
+                    nullable: true
+                    example: null
     post:
-      summary: Create a new department
+      summary: "Create a new department (Owner/HR Only)"
+      description: "Creates a new department. Allowed only for users with Owner or HR roles."
       operationId: storeDepartment
       tags:
         - Departments
@@ -2430,7 +2428,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Department created successfully
+                    example: Department created successfully.
                   data:
                     type: object
                     properties:
@@ -2446,7 +2444,7 @@ paths:
                         example: Responsible for hiring, training, and employee welfare.
                       status:
                         type: string
-                        example: active
+                        example: Active
                       manager:
                         type: object
                         nullable: true
@@ -2459,31 +2457,32 @@ paths:
                             example: Sarah Smith
                           email:
                             type: string
+                            format: email
                             example: sarah@example.com
                           job_title:
                             type: string
+                            nullable: true
                             example: HR Manager
-                      employees_count:
-                        type: integer
-                        example: 0
-                      created_at:
-                        type: string
-                        example: 2026-09-10 21:35:00
+                          employees_count:
+                            type: integer
+                            example: 5
+                          created_at:
+                            type: string
+                            example: "2026-09-10 21:35:00"
               example:
                 success: true
-                message: Department created successfully
+                message: Department created successfully.
                 data:
                   id: 2
                   name: Human Resources
                   description: Responsible for hiring, training, and employee welfare.
-                  status: active
+                  status: Active
                   manager:
                     id: 5
                     name: Sarah Smith
                     email: sarah@example.com
-                    job_title: HR Manager
-                  employees_count: 0
-                  created_at: 2026-09-10 21:35:00
+                  employees_count: 5
+                  created_at: "2026-09-10 21:35:00"
         "401":
           description: Unauthenticated
           content:
@@ -2496,17 +2495,12 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: Unauthenticated
+                    example: Unauthenticated.
                   errors:
-                    type: string
                     nullable: true
                     example: null
-              example:
-                success: false
-                message: Unauthenticated
-                errors: null
         "403":
-          description: Forbidden - User lacks department.create permission
+          description: Forbidden - Only Owner or HR can create departments / User lacks permission
           content:
             application/json:
               schema:
@@ -2519,13 +2513,8 @@ paths:
                     type: string
                     example: User does not have the right permissions.
                   errors:
-                    type: string
                     nullable: true
                     example: null
-              example:
-                success: false
-                message: User does not have the right permissions.
-                errors: null
         "422":
           description: Validation error
           content:
@@ -2554,17 +2543,35 @@ paths:
                     errors:
                       name:
                         - The name has already been taken.
-                invalidManager:
-                  summary: Selected Manager Does Not Exist
+                invalidManagerRole:
+                  summary: Selected Manager Must Have Manager/HR/Owner Role
                   value:
                     success: false
                     message: Validation error
                     errors:
                       manager_id:
-                        - The selected manager id is invalid.
+                        - The selected user must have a Manager, HR, or Owner role.
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Failed to process department request.
+                  errors:
+                    nullable: true
+                    example: null
+  
   /api/departments/{id}:
     patch:
-      summary: Update department details
+      summary: "Update department details (Allowed For Owner/HR Only)"
+      description: "Updates the details of an existing department such as its name, description, and manager."
       operationId: updateDepartment
       tags:
         - Departments
@@ -2584,6 +2591,7 @@ paths:
           schema:
             type: integer
           description: Department ID
+          example: 1
       requestBody:
         required: true
         content:
@@ -2596,12 +2604,12 @@ paths:
                 name:
                   type: string
                   maxLength: 255
-                  example: Engineering & Operations
+                  example: People & Culture
                 description:
                   type: string
                   maxLength: 1000
                   nullable: true
-                  example: Handles soft dev and infrastructure.
+                  example: Updated department name with expanded focus on employee well-being.
                 manager_id:
                   type: integer
                   nullable: true
@@ -2619,7 +2627,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Department updated successfully
+                    example: Department updated successfully.
                   data:
                     type: object
                     properties:
@@ -2628,14 +2636,14 @@ paths:
                         example: 1
                       name:
                         type: string
-                        example: Engineering & Operations
+                        example: People & Culture
                       description:
                         type: string
                         nullable: true
-                        example: Handles soft dev and infrastructure.
+                        example: Updated department name with expanded focus on employee well-being.
                       status:
                         type: string
-                        example: active
+                        example: Active
                       manager:
                         type: object
                         nullable: true
@@ -2645,34 +2653,31 @@ paths:
                             example: 3
                           name:
                             type: string
-                            example: Alex Johnson
+                            example: Manona
                           email:
                             type: string
-                            example: alex@example.com
-                          job_title:
-                            type: string
-                            example: VP of Engineering
+                            format: email
+                            example: mennabaligh06@gmail.com
                       employees_count:
                         type: integer
-                        example: 12
+                        example: 0
                       created_at:
                         type: string
-                        example: 2026-01-15 10:00:00
+                        example: "2026-09-24 13:24:56"
               example:
                 success: true
-                message: Department updated successfully
+                message: Department updated successfully.
                 data:
                   id: 1
-                  name: Engineering & Operations
-                  description: Handles soft dev and infrastructure.
-                  status: active
+                  name: People & Culture
+                  description: Updated department name with expanded focus on employee well-being.
+                  status: Active
                   manager:
                     id: 3
-                    name: Alex Johnson
-                    email: alex@example.com
-                    job_title: VP of Engineering
-                  employees_count: 12
-                  created_at: 2026-01-15 10:00:00
+                    name: Manona
+                    email: mennabaligh06@gmail.com
+                  employees_count: 0
+                  created_at: "2026-09-24 13:24:56"
         "401":
           description: Unauthenticated
           content:
@@ -2685,15 +2690,10 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: Unauthenticated
+                    example: Unauthenticated.
                   errors:
-                    type: string
                     nullable: true
                     example: null
-              example:
-                success: false
-                message: Unauthenticated
-                errors: null
         "403":
           description: Forbidden - User lacks department.edit permission
           content:
@@ -2708,13 +2708,8 @@ paths:
                     type: string
                     example: User does not have the right permissions.
                   errors:
-                    type: string
                     nullable: true
                     example: null
-              example:
-                success: false
-                message: User does not have the right permissions.
-                errors: null
         "404":
           description: Department not found
           content:
@@ -2727,15 +2722,10 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: Department not found
+                    example: Department not found.
                   errors:
-                    type: string
                     nullable: true
                     example: null
-              example:
-                success: false
-                message: Department not found
-                errors: null
         "422":
           description: Validation error
           content:
@@ -2755,15 +2745,43 @@ paths:
                       type: array
                       items:
                         type: string
-              example:
-                success: false
-                message: Validation error
-                errors:
-                  name:
-                    - The name has already been taken.
+              examples:
+                duplicateName:
+                  summary: Department Name Already Exists
+                  value:
+                    success: false
+                    message: Validation error
+                    errors:
+                      name:
+                        - The name has already been taken.
+                invalidManagerRole:
+                  summary: Selected Manager Must Have Manager/HR/Owner Role
+                  value:
+                    success: false
+                    message: Validation error
+                    errors:
+                      manager_id:
+                        - The selected user must have a Manager, HR, or Owner role.
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Failed to process department request.
+                  errors:
+                    nullable: true
+                    example: null
   /api/departments/{id}/change-status:
     patch:
-      summary: Toggle department active/inactive status
+      summary: "Toggle department active/inactive status (Allowed For Owner/HR Only)"
+      description: "Toggles the status of a department between active and inactive while keeping employee records intact."
       operationId: changeDepartmentStatus
       tags:
         - Departments
@@ -2783,6 +2801,7 @@ paths:
           schema:
             type: integer
           description: Department ID
+          example: 1
       responses:
         "200":
           description: Department status changed successfully
@@ -2805,23 +2824,34 @@ paths:
                         example: 1
                       name:
                         type: string
-                        example: Engineering
+                        example: Software Engineering
                       description:
                         type: string
                         nullable: true
-                        example: Software Development Department
+                        example: Core product development, architecture, and quality assurance.
                       status:
                         type: string
-                        example: active
+                        example: Active
                       manager:
                         type: object
                         nullable: true
+                        properties:
+                          id:
+                            type: integer
+                            example: 3
+                          name:
+                            type: string
+                            example: Manona
+                          email:
+                            type: string
+                            format: email
+                            example: mennabaligh06@gmail.com
                       employees_count:
                         type: integer
-                        example: 12
+                        example: 1
                       created_at:
                         type: string
-                        example: 2026-01-15 10:00:00
+                        example: "2026-09-24 13:43:46"
               examples:
                 activated:
                   summary: Department Activated
@@ -2830,12 +2860,15 @@ paths:
                     message: Activated department successfully with keeping employee records.
                     data:
                       id: 1
-                      name: Engineering
-                      description: Software Development Department
-                      status: active
-                      manager: null
-                      employees_count: 12
-                      created_at: 2026-01-15 10:00:00
+                      name: Software Engineering
+                      description: Core product development, architecture, and quality assurance.
+                      status: Active
+                      manager:
+                        id: 3
+                        name: Manona
+                        email: mennabaligh06@gmail.com
+                      employees_count: 1
+                      created_at: "2026-09-24 13:43:46"
                 deactivated:
                   summary: Department Deactivated
                   value:
@@ -2843,12 +2876,15 @@ paths:
                     message: Deactivated department successfully with keeping employee records.
                     data:
                       id: 1
-                      name: Engineering
-                      description: Software Development Department
-                      status: inactive
-                      manager: null
-                      employees_count: 12
-                      created_at: 2026-01-15 10:00:00
+                      name: Software Engineering
+                      description: Core product development, architecture, and quality assurance.
+                      status: Inactive
+                      manager:
+                        id: 3
+                        name: Manona
+                        email: mennabaligh06@gmail.com
+                      employees_count: 1
+                      created_at: "2026-09-24 13:43:46"
         "401":
           description: Unauthenticated
           content:
@@ -2861,15 +2897,10 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: Unauthenticated
+                    example: Unauthenticated.
                   errors:
-                    type: string
                     nullable: true
                     example: null
-              example:
-                success: false
-                message: Unauthenticated
-                errors: null
         "403":
           description: Forbidden - User lacks department.change-status permission
           content:
@@ -2884,13 +2915,8 @@ paths:
                     type: string
                     example: User does not have the right permissions.
                   errors:
-                    type: string
                     nullable: true
                     example: null
-              example:
-                success: false
-                message: User does not have the right permissions.
-                errors: null
         "404":
           description: Department not found
           content:
@@ -2903,15 +2929,26 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: Department not found
+                    example: Department not found.
                   errors:
-                    type: string
                     nullable: true
                     example: null
-              example:
-                success: false
-                message: Department not found
-                errors: null
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Failed to process department request.
+                  errors:
+                    nullable: true
+                    example: null
   /api/managers/employees:
     get:
       summary: Retrieve employees managed by the authenticated manager
