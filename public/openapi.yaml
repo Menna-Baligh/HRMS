@@ -3649,8 +3649,8 @@ paths:
                     errors: null
   /api/attendance/check-out:
     post:
-      summary: Perform check-out for the authenticated employee(All Roles) 📱
-      description: Allows employee to check-out for the day without requiring location coordinates or radius validation.
+      summary: "Perform check-out for the authenticated employee (All Roles) 📱"
+      description: "Allows employee to check-out for the day without requiring location coordinates or radius validation."
       operationId: checkOutAttendance
       tags:
         - Attendance
@@ -3665,7 +3665,7 @@ paths:
             default: application/json
           example: application/json
       responses:
-        '200':
+        "200":
           description: Checked out successfully.
           content:
             application/json:
@@ -3679,13 +3679,79 @@ paths:
                     type: string
                     example: "Checked out successfully."
                   data:
-                    $ref: '#/components/schemas/AttendanceResource'
-        '422':
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 3
+                      user_id:
+                        type: integer
+                        example: 6
+                      date:
+                        type: string
+                        format: date
+                        example: "2026-09-24"
+                      check_in:
+                        type: string
+                        example: "06:52 PM"
+                      check_out:
+                        type: string
+                        example: "06:52 PM"
+                      status:
+                        type: string
+                        example: "Late"
+                      worked_seconds:
+                        type: integer
+                        example: 5
+                      is_exception:
+                        type: boolean
+                        example: true
+              example:
+                success: true
+                message: "Checked out successfully."
+                data:
+                  id: 3
+                  user_id: 6
+                  date: "2026-09-24"
+                  check_in: "06:52 PM"
+                  check_out: "06:52 PM"
+                  status: "Late"
+                  worked_seconds: 5
+                  is_exception: true
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated
+                  errors:
+                    type: string
+                    nullable: true
+                    example: null
+        "422":
           description: Validation error or no active check-in session.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "No active check-in record found for today."
+                  errors:
+                    type: string
+                    nullable: true
+                    example: null
               examples:
                 noCheckIn:
                   summary: No Active Check-In
