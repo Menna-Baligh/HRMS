@@ -169,8 +169,16 @@ class AttendanceController extends Controller
             $request->filled('per_page') ? (int) $request->per_page : 15
         );
 
+        $responseData = AttendanceHistoryResource::collection($paginatedHistory)->response()->getData(true);
+
+        $formattedData = [
+            'history' => $responseData['data'],
+            'links'   => $responseData['links'],
+            'meta'    => $responseData['meta'],
+        ];
+
         return ResponseHelper::success(
-            data: AttendanceHistoryResource::collection($paginatedHistory)->response()->getData(true),
+            data: $formattedData,
             message: __('attendance.history_retrieved')
         );
     }
