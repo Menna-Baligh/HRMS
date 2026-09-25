@@ -7309,14 +7309,7 @@ paths:
             enum:
               - ar
               - en
-        - in: header
-          name: Accept-Language
-          required: false
-          schema:
-            type: string
-            enum:
-              - ar
-              - en
+
       responses:
         "200":
           description: All notifications cleared successfully.
@@ -9458,12 +9451,7 @@ components:
             errors:
               department_id:
                 - The department field is required.
-          "500":
-            description: Internal Server Error
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/ErrorResponse"
+
   schemas:
     EvaluationPeriod:
       type: object
