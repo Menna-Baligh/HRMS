@@ -2,6 +2,7 @@ openapi: 3.0.3
 info:
   title: HR API Documentation
   version: 1.0.0
+  description: Backend API
 servers:
 - url: http://127.0.0.1:8000
   description: Local Development Server
@@ -6516,6 +6517,7 @@ paths:
       - Goals
       summary: Get Employee Goals 📱
       description: Retrieves a paginated list of goals assigned to the authenticated employee.
+      operationId: GetEmployeeGoals.
       parameters:
       - name: status
         in: query
@@ -6557,6 +6559,7 @@ paths:
       - Goals
       summary: Create Goal 📱
       description: Creates a new goal for the authenticated employee.
+      operationId: CreateGoal.
       requestBody:
         required: true
         content:
@@ -6619,6 +6622,7 @@ paths:
       - Goals
       summary: Get Goal Details 📱
       description: Retrieves details of a specific goal owned by the authenticated employee.
+      operationId: GetGoalDetails.
       parameters:
       - name: id
         in: path
@@ -6659,6 +6663,7 @@ paths:
       - Goals
       summary: Update Goal Details 📱
       description: Updates editable fields of a goal. Cannot update completed or cancelled goals.
+      operationId: UpdateGoalDetails.
       parameters:
       - name: id
         in: path
@@ -6722,6 +6727,7 @@ paths:
       tags:
       - Goals
       summary: Update Goal Progress 📱
+      operationId: UpdateGoalProgress.
       description: Logs progress for a goal and automatically marks it as completed if current_value reaches target_value.
       parameters:
       - name: id
@@ -6781,6 +6787,7 @@ paths:
       tags:
       - Goals
       summary: Mark Goal as Completed 📱
+      operationId: MarkGoalAsCompleted.
       description: Explicitly marks a goal as completed and sets current_value equal to target_value.
       parameters:
       - name: id
@@ -6824,6 +6831,7 @@ paths:
       tags:
       - Goals
       summary: Get Team Goals (Manager)
+      operationId: GetTeamGoals.
       description: Retrieves a paginated list of goals for team members reporting to the authenticated manager.
       parameters:
       - name: status
@@ -6871,6 +6879,7 @@ paths:
       tags:
       - Goals
       summary: Get Company Goals Overview (HR)
+      operationId: GetCompanyGoalsOverview.
       description: Retrieves a paginated overview of all employee goals across departments for HR administrative review.
       parameters:
       - name: status
