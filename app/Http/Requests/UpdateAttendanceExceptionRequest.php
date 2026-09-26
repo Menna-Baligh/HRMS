@@ -18,6 +18,7 @@ class UpdateAttendanceExceptionRequest extends FormRequest
             'admin_note' => ['nullable', 'string', 'max:500'],
         ];
     }
+
     public function messages(): array
     {
         return [

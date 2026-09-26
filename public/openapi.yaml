@@ -8947,6 +8947,187 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /api/hr/attendance/exceptions/{id}:
+    patch:
+      summary: Review and update attendance exception status (Approve / Reject)
+      description: |
+        Allows (HR or Owner) to review an attendance exception record and either approve or reject it, with an optional administrative note.
+      operationId: updateAttendanceExceptionStatus
+      tags:
+        - Attendance
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the attendance record
+          example: 5
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - approved
+                    - rejected
+                  description: Decision status for the exception
+                  example: approved
+                admin_note:
+                  type: string
+                  nullable: true
+                  maxLength: 500
+                  description: Optional administrative reason or note
+                  example: Approved due to authorized remote work.
+      responses:
+        "200":
+          description: Attendance exception status updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Attendance exception status updated successfully.
+                  data:
+                    type: object
+                    properties:
+                      attendance_id:
+                        type: integer
+                        example: 5
+                      date:
+                        type: string
+                        format: date
+                        example: "2026-09-26"
+                      user:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 6
+                          name:
+                            type: string
+                            example: Noran Baligh
+                          employee_code:
+                            type: string
+                            example: EMP-2026-24271
+                          job_title:
+                            type: string
+                            example: Frontend Developer
+                          department:
+                            type: string
+                            nullable: true
+                            example: New Department
+                      check_in:
+                        type: string
+                        nullable: true
+                        example: "03:02 PM"
+                      check_out:
+                        type: string
+                        nullable: true
+                        example: null
+                      status:
+                        type: string
+                        example: Late
+                      exception:
+                        type: object
+                        nullable: true
+                        properties:
+                          is_exception:
+                            type: boolean
+                            example: true
+                          reason:
+                            type: string
+                            nullable: true
+                            example: Check-in recorded outside company geofence radius.
+                          status:
+                            type: string
+                            enum:
+                              - pending
+                              - approved
+                              - rejected
+                            example: pending
+                          admin_note:
+                            type: string
+                            nullable: true
+                            example: null
+                      company_name:
+                        type: string
+                        example: WorkWise HQ
+              example:
+                success: true
+                message: Attendance exception status updated successfully.
+                data:
+                  attendance_id: 5
+                  date: "2026-09-26"
+                  user:
+                    id: 6
+                    name: Noran Baligh
+                    employee_code: EMP-2026-24271
+                    job_title: Frontend Developer
+                    department: New Department
+                  check_in: "03:02 PM"
+                  check_out: null
+                  status: Late
+                  exception:
+                    is_exception: true
+                    reason: Check-in recorded outside company geofence radius.
+                    status: pending
+                    admin_note: null
+                  company_name: WorkWise HQ
+        "401":
+          $ref: '#/components/responses/401Unauthorized'
+        "403":
+          description: Forbidden - User does not have permission to manage attendance exceptions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: User does not have the right permissions.
+                errors: null
+        "404":
+          description: Attendance record not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Attendance exception record not found.
+                errors: null
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Decision status is required.
+                errors:
+                  status:
+                    - Decision status is required.
 components:
   securitySchemes:
     bearerAuth:
