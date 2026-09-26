@@ -101,8 +101,7 @@ return [
     'policy.version_activate' => 'Activate policy versions',
     'policy.active_view' => 'View active policies',
     'policy.audit_view' => 'View policy audit history',
-    'file.download' => 'Download Files',
-    'file.delete' => 'Delete Files',
+
 
     'ai.career_coach' => 'Use AI Career Coach',
     'ai.performance_insight' => 'View AI Performance Insight',
@@ -113,4 +112,6 @@ return [
     'ai.policy_assistant' => 'Use AI HR Policy Assistant',
 
     'department.view-managers-dropdown' => 'View Managers Dropdown',
+
+    'hr.attendance.manage-exceptions' => 'Manage and decide on attendance exceptions (Approve/Reject)',
 ];

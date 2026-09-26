@@ -88,7 +88,6 @@ class AttendanceController extends Controller
         } catch (\Exception $e) {
             $errorResponses = [
                 'DUPLICATE_CHECKIN' => [Response::HTTP_UNPROCESSABLE_ENTITY, __('attendance.errors.duplicate_checkin')],
-                'OUTSIDE_RADIUS' => [Response::HTTP_UNPROCESSABLE_ENTITY, __('attendance.errors.outside_radius')],
                 'LOCATION_NOT_CONFIGURED' => [Response::HTTP_UNPROCESSABLE_ENTITY, __('attendance.errors.location_not_configured')],
             ];
 

@@ -218,5 +218,10 @@ return [
     'longitude_numeric' => 'The longitude must be a valid number.',
     'longitude_between' => 'The longitude must be between -180 and 180.',
     'geofence_out_of_range' => 'The distance between your location and the company must be less than :radius meters.',
+    'attendance_exception' => [
+        'status_required' => 'Decision status is required.',
+        'status_in' => 'Status must be either approved or rejected.',
+        'admin_note_max' => 'Admin note must not exceed 500 characters.',
+    ],
 
 ];

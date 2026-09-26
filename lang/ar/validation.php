@@ -43,6 +43,7 @@ return [
         'evidence_goal_ids' => 'الأهداف المرتبطة',
         'evidence_goal_ids.*' => 'الهدف المرتبط',
         'department' => 'القسم',
+        'status' => 'الحالة',
     ],
 
     'custom' => [
@@ -55,4 +56,9 @@ return [
     'longitude_numeric' => 'يجب أن يكون خط الطول رقماً صحيحاً.',
     'longitude_between' => 'يجب أن يكون خط الطول بين -180 و 180.',
     'geofence_out_of_range' => 'المسافة بين موقعك ومقر الشركة يجب أن تكون أقل من :radius متر.',
+    'attendance_exception' => [
+        'status_required' => 'حالة القرار مطلوبة (مقبول أو مرفوض).',
+        'status_in' => 'يجب أن تكون الحالة إما مقبول (approved) أو مرفوض (rejected).',
+        'admin_note_max' => 'يجب ألا تتجاوز ملاحظات الإدارة 500 حرف.',
+    ],
 ];

@@ -233,6 +233,7 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
     Route::prefix('hr')->group(function () {
         Route::get('/attendance/daily', [HrAttendanceController::class, 'daily'])->middleware('permission:'.PermissionEnum::HR_ATTENDANCE_VIEW_DAILY->value);
         Route::get('/attendance/exceptions', [HrAttendanceController::class, 'exceptions'])->middleware('permission:'.PermissionEnum::HR_ATTENDANCE_VIEW_EXCEPTIONS->value);
+        Route::patch('/attendance/exceptions/{id}', [HrAttendanceController::class, 'updateExceptionStatus'])->middleware('permission:'.PermissionEnum::HR_ATTENDANCE_MANAGE_EXCEPTIONS->value);
         Route::get('/attendance/monthly-summary', [HrAttendanceController::class, 'monthlySummary'])->middleware('permission:'.PermissionEnum::HR_ATTENDANCE_VIEW_SUMMARY->value);
         Route::get('/attendance/export', [HrAttendanceController::class, 'export'])->middleware('permission:'.PermissionEnum::HR_ATTENDANCE_EXPORT->value);
         Route::get('/goals', [HrGoalController::class, 'index'])->middleware('permission:'.PermissionEnum::HR_GOALS_OVERVIEW->value);

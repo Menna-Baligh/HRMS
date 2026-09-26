@@ -5,4 +5,6 @@ return [
     'exceptions_retrieved' => 'Attendance exceptions retrieved successfully.',
     'monthly_summary_retrieved' => 'Monthly attendance summary retrieved successfully.',
     'failed_to_retrieve' => 'Failed to retrieve attendance reports.',
+    'exception_status_updated' => 'Attendance exception status updated successfully.',
+    'failed_to_update_exception' => 'Failed to update attendance exception status.',
 ];

@@ -102,8 +102,6 @@ return [
     'policy.active_view' => 'عرض السياسات النشطة',
     'policy.audit_view' => 'عرض سجل تغييرات السياسات',
 
-    'file.download' => 'تحميل الملفات',
-    'file.delete' => 'حذف الملفات',
 
     'ai.career_coach' => 'استخدام مستشار المسار الوظيفي الذكي (AI Career Coach)',
     'ai.performance_insight' => 'عرض تحليلات الأداء الذكية (AI Performance Insight)',
@@ -114,4 +112,6 @@ return [
     'ai.policy_assistant' => 'استخدام مساعد سياسات الشركة الذكي (AI HR Policy Assistant)',
 
     'department.view-managers-dropdown' => 'عرض قائمة المدراء للقوائم المنسدلة',
+
+    'hr.attendance.manage-exceptions' => 'إدارة واتخاذ القرار بشأن استثناءات الحضور (قبول/رفض)',
 ];

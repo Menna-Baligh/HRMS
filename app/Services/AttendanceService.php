@@ -33,16 +33,17 @@ class AttendanceService
             $lat, $lng, $location->latitude, $location->longitude, $location->radius
         );
 
-        if (! $isInside) {
-            throw new Exception('OUTSIDE_RADIUS');
-        }
-
         $gracePeriodEnd = Carbon::parse('09:15:00');
         $shiftEnd = Carbon::parse('17:00:00');
 
         $now = now();
         $isException = false;
-        $exceptionReason = null;
+        $exceptionReasons = [];
+
+        if (! $isInside) {
+            $isException = true;
+            $exceptionReasons[] = 'Check-in recorded outside company geofence radius.';
+        }
 
         if ($now->lte($gracePeriodEnd)) {
             $status = 'Present';
@@ -51,7 +52,7 @@ class AttendanceService
         } else {
             $status = 'Late';
             $isException = true;
-            $exceptionReason = 'Check-in recorded after official shift hours.';
+            $exceptionReasons[] = 'Check-in recorded after official shift hours.';
         }
 
         return Attendance::create([
@@ -63,7 +64,8 @@ class AttendanceService
             'check_in_lng' => $lng,
             'status' => $status,
             'is_exception' => $isException,
-            'exception_reason' => $exceptionReason,
+            'exception_reason' => ! empty($exceptionReasons) ? implode(' | ', $exceptionReasons) : null,
+            'exception_status' => $isException ? 'pending' : null,
         ]);
     }
 
@@ -160,8 +162,8 @@ class AttendanceService
         $lateCount = $todayAttendances->where('status', 'Late')->count();
         $checkedInCount = $todayAttendances->whereNotNull('check_in')->count();
 
-        $absentCount = $targetDate->gt($todayDate) 
-            ? 0 
+        $absentCount = $targetDate->gt($todayDate)
+            ? 0
             : max(0, $totalTeamCount - $checkedInCount);
 
         $onShiftCount = $todayAttendances->whereNotNull('check_in')->whereNull('check_out')->count();
@@ -180,7 +182,7 @@ class AttendanceService
         $weeklyChart = [];
         for ($day = $startOfWeek->copy(); $day->lte($endOfWeek); $day->addDay()) {
             $dayDate = $day->toDateString();
-            $isFutureDay = $day->gt($todayDate); 
+            $isFutureDay = $day->gt($todayDate);
 
             $dayAtts = $weeklyAttendances->where('date', $dayDate);
 
@@ -189,8 +191,8 @@ class AttendanceService
                 'date' => $dayDate,
                 'present' => $dayAtts->where('status', 'Present')->count(),
                 'late' => $dayAtts->where('status', 'Late')->count(),
-                'absent' => $isFutureDay 
-                    ? 0 
+                'absent' => $isFutureDay
+                    ? 0
                     : max(0, $totalTeamCount - $dayAtts->whereNotNull('check_in')->count()),
             ];
         }
@@ -430,5 +432,21 @@ class AttendanceService
                 'total_worked_seconds' => $totalWorkedSeconds,
             ];
         });
+    }
+    public function handleExceptionDecision(int $attendanceId, string $status, ?string $adminNote = null): Attendance
+    {
+        $attendance = Attendance::where('is_exception', true)->findOrFail($attendanceId);
+
+        if (! in_array($status, ['approved', 'rejected'])) {
+            throw new \InvalidArgumentException('Invalid decision status.');
+        }
+
+        $attendance->update([
+            'exception_status' => $status,
+            'status' => $status === 'rejected' ? 'Absent' : $attendance->status,
+            'admin_note' => $adminNote,
+        ]);
+
+        return $attendance;
     }
 }

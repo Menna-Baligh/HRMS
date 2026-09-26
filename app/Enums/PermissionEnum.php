@@ -62,6 +62,8 @@ enum PermissionEnum: string
     case ATTENDANCE_VIEW_HISTORY = 'attendance.view-history';
     case HR_ATTENDANCE_VIEW_DAILY = 'hr.attendance.view-daily';
     case HR_ATTENDANCE_VIEW_EXCEPTIONS = 'hr.attendance.view-exceptions';
+
+    case HR_ATTENDANCE_MANAGE_EXCEPTIONS = 'hr.attendance.manage-exceptions';
     case HR_ATTENDANCE_VIEW_SUMMARY = 'hr.attendance.view-summary';
     case HR_ATTENDANCE_EXPORT = 'hr.attendance.export';
 
@@ -171,7 +173,8 @@ enum PermissionEnum: string
             self::POLICY_VERSION_CREATE,
             self::POLICY_VERSION_ACTIVATE,
             self::POLICY_AUDIT_VIEW,
-            self::VIEW_MANAGERS_DROPDOWN => ['HR', 'Owner'],
+            self::VIEW_MANAGERS_DROPDOWN,
+            self::HR_ATTENDANCE_MANAGE_EXCEPTIONS => ['HR', 'Owner'],
 
             // Manager, HR & Owner
             self::MANAGER_VIEW_EMPLOYEES,
