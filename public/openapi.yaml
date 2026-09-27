@@ -7686,7 +7686,7 @@ paths:
                 message: "Failed to retrieve team goals."
   /api/hr/goals:
     get:
-      summary: Get Company Goals Overview (HR) 
+      summary: Get Company Goals Overview (HR)
       description: Retrieves a paginated overview of all employee goals across departments for HR administrative review.
       operationId: getCompanyGoalsOverview
       tags:
@@ -9971,29 +9971,40 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
   /api/hr/attendance/exceptions/{id}:
     patch:
-      summary: Review and update attendance exception status (Approve / Reject)
+      summary: Review and update attendance exception status (Approve / Reject) 
       description: |
         Allows (HR or Owner) to review an attendance exception record and either approve or reject it, with an optional administrative note.
       operationId: updateAttendanceExceptionStatus
       tags:
-      - Attendance
+        - Attendance
       security:
-      - bearerAuth: []
+        - bearerAuth: []
       parameters:
-      - in: header
-        name: Accept
-        required: true
-        schema:
-          type: string
-          default: application/json
-        example: application/json
-      - in: path
-        name: id
-        required: true
-        schema:
-          type: integer
-        description: The ID of the attendance record
-        example: 5
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          description: Language preference for response messages
+          schema:
+            type: string
+            enum:
+              - ar
+              - en
+            default: en
+          example: en
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the attendance record
+          example: 5
       requestBody:
         required: true
         content:
@@ -10001,13 +10012,13 @@ paths:
             schema:
               type: object
               required:
-              - status
+                - status
               properties:
                 status:
                   type: string
                   enum:
-                  - approved
-                  - rejected
+                    - approved
+                    - rejected
                   description: Decision status for the exception
                   example: approved
                 admin_note:
@@ -10015,7 +10026,10 @@ paths:
                   nullable: true
                   maxLength: 500
                   description: Optional administrative reason or note
-                  example: Approved due to authorized remote work.
+                  example: "Approved due to authorized remote work."
+            example:
+              status: "approved"
+              admin_note: "Approved due to authorized remote work."
       responses:
         "200":
           description: Attendance exception status updated successfully.
@@ -10029,7 +10043,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Attendance exception status updated successfully.
+                    example: "Attendance exception status updated successfully."
                   data:
                     type: object
                     properties:
@@ -10048,17 +10062,17 @@ paths:
                             example: 6
                           name:
                             type: string
-                            example: Noran Baligh
+                            example: "Noran Baligh"
                           employee_code:
                             type: string
-                            example: EMP-2026-24271
+                            example: "EMP-2026-24271"
                           job_title:
                             type: string
-                            example: Frontend Developer
+                            example: "Frontend Developer"
                           department:
                             type: string
                             nullable: true
-                            example: New Department
+                            example: "New Department"
                       check_in:
                         type: string
                         nullable: true
@@ -10066,10 +10080,10 @@ paths:
                       check_out:
                         type: string
                         nullable: true
-                        example:
+                        example: null
                       status:
                         type: string
-                        example: Late
+                        example: "Late"
                       exception:
                         type: object
                         nullable: true
@@ -10080,76 +10094,122 @@ paths:
                           reason:
                             type: string
                             nullable: true
-                            example: Check-in recorded outside company geofence radius.
+                            example: "Check-in recorded outside company geofence radius."
                           status:
                             type: string
                             enum:
-                            - pending
-                            - approved
-                            - rejected
-                            example: pending
+                              - pending
+                              - approved
+                              - rejected
+                            example: "approved"
                           admin_note:
                             type: string
                             nullable: true
-                            example:
+                            example: "Approved due to authorized remote work."
                       company_name:
                         type: string
-                        example: WorkWise HQ
+                        example: "WorkWise HQ"
               example:
                 success: true
-                message: Attendance exception status updated successfully.
+                message: "Attendance exception status updated successfully."
                 data:
                   attendance_id: 5
                   date: "2026-09-26"
                   user:
                     id: 6
-                    name: Noran Baligh
-                    employee_code: EMP-2026-24271
-                    job_title: Frontend Developer
-                    department: New Department
+                    name: "Noran Baligh"
+                    employee_code: "EMP-2026-24271"
+                    job_title: "Frontend Developer"
+                    department: "New Department"
                   check_in: "03:02 PM"
-                  check_out:
-                  status: Late
+                  check_out: null
+                  status: "Late"
                   exception:
                     is_exception: true
-                    reason: Check-in recorded outside company geofence radius.
-                    status: pending
-                    admin_note:
-                  company_name: WorkWise HQ
+                    reason: "Check-in recorded outside company geofence radius."
+                    status: "approved"
+                    admin_note: "Approved due to authorized remote work."
+                  company_name: "WorkWise HQ"
         "401":
-          $ref: '#/components/responses/401Unauthorized'
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Unauthenticated."
+              example:
+                success: false
+                message: "Unauthenticated."
         "403":
           description: Forbidden - User does not have permission to manage attendance exceptions
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "User does not have the right permissions."
               example:
                 success: false
-                message: User does not have the right permissions.
-                errors:
+                message: "User does not have the right permissions."
         "404":
           description: Attendance record not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Attendance exception record not found."
               example:
                 success: false
-                message: Attendance exception record not found.
-                errors:
+                message: "Attendance exception record not found."
         "422":
           description: Validation Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "The status field is required."
               example:
                 success: false
-                message: Decision status is required.
-                errors:
-                  status:
-                  - Decision status is required.
+                message: "The status field is required."
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Failed to update attendance exception status."
+              example:
+                success: false
+                message: "Failed to update attendance exception status."
 components:
   securitySchemes:
     bearerAuth:

@@ -23,7 +23,7 @@ class TodayAttendanceResource extends JsonResource
             'distance_meters' => $this['distance_meters'],
             'is_inside_radius' => $isInside,
             'can_check_in' => ! $hasCheckedIn && $isInside,
-            'can_check_out' => $hasCheckedIn && ! $hasCheckedOut && $isInside,
+            'can_check_out' => $hasCheckedIn && ! $hasCheckedOut ,
         ];
     }
 }
