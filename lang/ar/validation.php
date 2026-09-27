@@ -43,11 +43,26 @@ return [
         'evidence_goal_ids' => 'الأهداف المرتبطة',
         'evidence_goal_ids.*' => 'الهدف المرتبط',
         'department' => 'القسم',
+        'status' => 'الحالة',
+        'employee_id' => 'الموظف',
+        'title' => 'عنوان الهدف',
+        'target_value' => 'القيمة المستهدفة',
+        'target_date' => 'تاريخ الاستهداف',
     ],
 
     'custom' => [
         'manager_id' => [
             'invalid_role' => 'المستخدم المحدد يجب أن يمتلك دور مدير أو أعلى.',
         ],
+    ],
+    'latitude_numeric' => 'يجب أن يكون خط العرض رقماً صحيحاً.',
+    'latitude_between' => 'يجب أن يكون خط العرض بين -90 و 90.',
+    'longitude_numeric' => 'يجب أن يكون خط الطول رقماً صحيحاً.',
+    'longitude_between' => 'يجب أن يكون خط الطول بين -180 و 180.',
+    'geofence_out_of_range' => 'المسافة بين موقعك ومقر الشركة يجب أن تكون أقل من :radius متر.',
+    'attendance_exception' => [
+        'status_required' => 'حالة القرار مطلوبة (مقبول أو مرفوض).',
+        'status_in' => 'يجب أن تكون الحالة إما مقبول (approved) أو مرفوض (rejected).',
+        'admin_note_max' => 'يجب ألا تتجاوز ملاحظات الإدارة 500 حرف.',
     ],
 ];

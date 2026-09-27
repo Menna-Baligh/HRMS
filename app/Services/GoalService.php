@@ -5,39 +5,40 @@ namespace App\Services;
 use App\Enums\GoalStatus;
 use App\Jobs\SendNotificationJob;
 use App\Models\Goal;
-use App\Models\GoalProgressHistory;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class GoalService
 {
-    public function createGoal(User $user, array $data): Goal
+    public function createGoal(User $creator, array $data): Goal
     {
+
+        $targetUserId = $data['employee_id'];
+        $targetUser = User::findOrFail($targetUserId);
+
         $goal = Goal::create([
-            'user_id' => $user->id,
+            'user_id' => $targetUserId,
             'title' => $data['title'],
             'description' => $data['description'] ?? null,
-            'target_value' => $data['target_value'],
-            'current_value' => 0,
             'target_date' => $data['target_date'],
             'status' => GoalStatus::ACTIVE,
         ]);
 
-        if ($user->manager) {
+        if ($targetUser) {
             SendNotificationJob::dispatch(
-                user: $user->manager,
+                user: $targetUser,
                 type: 'goal_created',
                 titleKey: 'notifications.goal_created_title',
                 bodyKey: 'notifications.goal_created_body',
                 parameters: [
-                    'employee' => $user->name,
+                    'employee' => $targetUser->name,
                     'title' => $goal->title,
                 ],
                 metadata: ['goal_id' => $goal->id, 'screen' => 'goal_details']
             );
         }
 
-        return $goal;
+        return $goal->load(['user']);
     }
 
     public function updateGoal(Goal $goal, array $data): Goal
@@ -45,41 +46,12 @@ class GoalService
         $goal->update(array_filter([
             'title' => $data['title'] ?? $goal->title,
             'description' => array_key_exists('description', $data) ? $data['description'] : $goal->description,
-            'target_value' => $data['target_value'] ?? $goal->target_value,
             'target_date' => $data['target_date'] ?? $goal->target_date,
+            'employee_id' => $data['employee_id'] ?? $goal->employee_id,
+            'status' => $data['status'] ?? $goal->status,
         ], fn ($value) => ! is_null($value)));
 
-        return $goal->fresh(['histories.updater']);
-    }
-
-    public function updateProgress(Goal $goal, float $newValue, int $updatedByUserId, ?string $note = null): Goal
-    {
-        return DB::transaction(function () use ($goal, $newValue, $updatedByUserId, $note) {
-            $previousValue = $goal->current_value;
-
-            GoalProgressHistory::create([
-                'goal_id' => $goal->id,
-                'updated_by' => $updatedByUserId,
-                'previous_value' => $previousValue,
-                'new_value' => $newValue,
-                'note' => $note,
-            ]);
-
-            $goal->current_value = $newValue;
-            $wasCompletedBefore = $goal->status === GoalStatus::COMPLETED;
-
-            if ($goal->current_value >= $goal->target_value) {
-                $goal->status = GoalStatus::COMPLETED;
-            }
-
-            $goal->save();
-
-            if ($goal->status === GoalStatus::COMPLETED && ! $wasCompletedBefore) {
-                $this->notifyGoalCompletion($goal);
-            }
-
-            return $goal->fresh(['histories.updater']);
-        });
+        return $goal->load(['user']);
     }
 
     public function markAsCompleted(Goal $goal): Goal
@@ -88,14 +60,13 @@ class GoalService
             $wasCompletedBefore = $goal->status === GoalStatus::COMPLETED;
 
             $goal->status = GoalStatus::COMPLETED;
-            $goal->current_value = $goal->target_value;
             $goal->save();
 
             if (! $wasCompletedBefore) {
                 $this->notifyGoalCompletion($goal);
             }
 
-            return $goal->fresh(['histories.updater']);
+            return $goal->load('user');
         });
     }
 
@@ -144,6 +115,11 @@ class GoalService
         }
 
         return $query->latest()->paginate($perPage);
+    }
+
+    public function getGoalById(int $goalId): ?Goal
+    {
+        return Goal::with(['histories.updater'])->find($goalId);
     }
 
     public function getEmployeeGoalDetails(User $user, int $goalId): ?Goal

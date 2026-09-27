@@ -89,9 +89,9 @@ return [
 
     // System & Files
     'permission.view-all' => 'عرض جميع الصلاحيات',
-    'file.download'       => 'تحميل الملفات',
-    'file.delete'         => 'حذف الملفات',
-     // company events
+    'file.download' => 'تحميل الملفات',
+    'file.delete' => 'حذف الملفات',
+    // company events
     'company_event.view' => 'عرض فعاليات الشركة',
     'company_event.manage' => 'إدارة فعاليات الشركة',
     // policies
@@ -102,9 +102,6 @@ return [
     'policy.active_view' => 'عرض السياسات النشطة',
     'policy.audit_view' => 'عرض سجل تغييرات السياسات',
 
-    'file.download' => 'تحميل الملفات',
-    'file.delete' => 'حذف الملفات',
-
     'ai.career_coach' => 'استخدام مستشار المسار الوظيفي الذكي (AI Career Coach)',
     'ai.performance_insight' => 'عرض تحليلات الأداء الذكية (AI Performance Insight)',
     'ai.evaluation_draft' => 'توليد مسودة التقييم الذكية (AI Evaluation Draft)',
@@ -112,6 +109,8 @@ return [
     'ai.attention_signal' => 'عرض مؤشر تنبيه أداء الموظفين الذكي (AI Employee Attention Signal)',
     'ai.team_insight' => 'عرض ملخص تحليلات الفريق الذكي (AI Team Insight Summary)',
     'ai.policy_assistant' => 'استخدام مساعد سياسات الشركة الذكي (AI HR Policy Assistant)',
-    
+
     'department.view-managers-dropdown' => 'عرض قائمة المدراء للقوائم المنسدلة',
+
+    'hr.attendance.manage-exceptions' => 'إدارة واتخاذ القرار بشأن استثناءات الحضور (قبول/رفض)',
 ];

@@ -27,7 +27,11 @@ class DepartmentController extends Controller
             $paginatedData = DepartmentResource::collection($departments)->response()->getData(true);
 
             return ResponseHelper::success(
-                data: $paginatedData,
+                data: [
+                    'departments' => $paginatedData['data'],
+                    'links' => $paginatedData['links'],
+                    'meta' => $paginatedData['meta'],
+                ],
                 message: __('departments.retrieved_successfully')
             );
         } catch (Throwable $e) {
@@ -111,7 +115,8 @@ class DepartmentController extends Controller
             );
         }
     }
-    public function GetManagersDropdown() :JsonResponse
+
+    public function GetManagersDropdown(): JsonResponse
     {
         $managers = $this->departmentService->getManagersForDropdown();
 

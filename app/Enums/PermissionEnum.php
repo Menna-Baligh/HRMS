@@ -65,6 +65,8 @@ enum PermissionEnum: string
     case ATTENDANCE_VIEW_HISTORY = 'attendance.view-history';
     case HR_ATTENDANCE_VIEW_DAILY = 'hr.attendance.view-daily';
     case HR_ATTENDANCE_VIEW_EXCEPTIONS = 'hr.attendance.view-exceptions';
+
+    case HR_ATTENDANCE_MANAGE_EXCEPTIONS = 'hr.attendance.manage-exceptions';
     case HR_ATTENDANCE_VIEW_SUMMARY = 'hr.attendance.view-summary';
     case HR_ATTENDANCE_EXPORT = 'hr.attendance.export';
 
@@ -183,6 +185,8 @@ enum PermissionEnum: string
             self::POLICY_AUDIT_VIEW,
             self::HOLIDAY_MANAGE => ['HR', 'Owner'],
             self::VIEW_MANAGERS_DROPDOWN => ['HR', 'Owner'],
+            self::VIEW_MANAGERS_DROPDOWN,
+            self::HR_ATTENDANCE_MANAGE_EXCEPTIONS => ['HR', 'Owner'],
 
             // Manager, HR & Owner
             self::MANAGER_VIEW_EMPLOYEES,
@@ -207,6 +211,9 @@ enum PermissionEnum: string
             self::AI_ATTENTION_SIGNAL,
 
             self::AI_TEAM_INSIGHT => ['Manager', 'HR', 'Owner'],
+            self::AI_TEAM_INSIGHT,
+            self::GOAL_CREATE,
+            self::GOAL_UPDATE => ['Manager', 'HR', 'Owner'],
 
             // All Roles (Owner, HR, Manager, Employee)
             self::EMPLOYEE_VIEW_PROFILE,
@@ -224,11 +231,6 @@ enum PermissionEnum: string
             self::LOCATION_VIEW_ACTIVE,
             self::ATTENDANCE_CHECKIN_CHECKOUT,
             self::ATTENDANCE_VIEW_HISTORY,
-            self::GOAL_VIEW_OWN,
-            self::GOAL_CREATE,
-            self::GOAL_UPDATE,
-            self::GOAL_UPDATE_PROGRESS,
-            self::GOAL_COMPLETE,
             self::EVALUATION_VIEW_EMPLOYEE,
             self::EMPLOYEE_PERFORMANCE_DASHBOARD,
             self::LEAVE_BALANCE_VIEW,
@@ -242,13 +244,16 @@ enum PermissionEnum: string
             self::COMPANY_EVENT_VIEW,
             self::POLICY_VIEW,
             self::POLICY_ACTIVE_VIEW,
-            self::FILE_DELETE => ['Owner', 'HR', 'Manager', 'Employee'],
             self::FILE_DELETE,
             self::AI_CAREER_COACH,
             self::AI_PERFORMANCE_INSIGHT,
             self::AI_SKILL_GAP,
             self::HOLIDAY_VIEW => ['Owner', 'HR', 'Manager', 'Employee'],
             self::AI_POLICY_ASSISTANT => ['Owner', 'HR', 'Manager', 'Employee'],
+
+            // Employee Only
+            self::GOAL_VIEW_OWN,
+            self::GOAL_COMPLETE => ['Employee'],
 
             default => ['Owner', 'HR'],
         };

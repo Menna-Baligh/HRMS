@@ -68,7 +68,7 @@ Route::middleware('set.app.language')->prefix('auth')->group(function () {
     });
 });
 
-// holiday 
+// holiday
 Route::prefix('holidays')->middleware(['auth:api', 'set.app.language'])->group(function () {
 
         // All authenticated users with holiday.view permission can view holidays.
@@ -84,24 +84,23 @@ Route::prefix('holidays')->middleware(['auth:api', 'set.app.language'])->group(f
                 Route::delete('/{holiday}', [HolidayController::class, 'destroy']);
             });
     });
-
+});
 
 // company events
-    Route::prefix('company-events')->middleware(['auth:api', 'set.app.language'])->group(function () {
+Route::prefix('company-events')->middleware(['auth:api', 'set.app.language'])->group(function () {
 
-        // All authenticated users can view company events.
-        Route::get('/', [CompanyEventController::class, 'index'])->middleware('permission:company_event.view');
+    // All authenticated users can view company events.
+    Route::get('/', [CompanyEventController::class, 'index'])->middleware('permission:company_event.view');
 
-        // Only users with manage permission can create, update, or delete events.
-        Route::middleware('permission:company_event.manage')->group(function () {
-            Route::post('/', [CompanyEventController::class, 'store']);
+    // Only users with manage permission can create, update, or delete events.
+    Route::middleware('permission:company_event.manage')->group(function () {
+        Route::post('/', [CompanyEventController::class, 'store']);
 
-            Route::put('/{companyEvent}', [CompanyEventController::class,'update']);
+        Route::put('/{companyEvent}', [CompanyEventController::class, 'update']);
 
-            Route::delete('/{companyEvent}', [CompanyEventController::class,'destroy']);
-        });
+        Route::delete('/{companyEvent}', [CompanyEventController::class, 'destroy']);
     });
-
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -215,50 +214,9 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
 
         Route::get('/{policy}/active', [PolicyController::class, 'active'])->middleware('permission:policy.active_view');
 
-
-        Route::get('/{policy}/audits', [PolicyController::class, 'auditHistory'])->middleware('permission:policy.audit_view');        
+        Route::get('/{policy}/audits', [PolicyController::class, 'auditHistory'])->middleware('permission:policy.audit_view');
         Route::get('/', [PolicyController::class, 'index'])->middleware('permission:policy.view');
 
-
-    });
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Company Location Routes
-    |--------------------------------------------------------------------------
-    */
-
-    Route::middleware('auth:api', 'set.app.language')
-        ->prefix('locations')
-        ->group(function () {
-            // Create company location
-            Route::post('company/location', [CompanyLocationController::class, 'store']);
-            // Update company location
-            Route::put('company/location/{id}', [CompanyLocationController::class, 'update']);
-            // Deactivate company location
-            Route::patch('company/location/{id}/deactivate', [CompanyLocationController::class, 'deactivate']);
-            // Activate company location
-            Route::patch('company/location/{id}/activate', [CompanyLocationController::class, 'activate']);
-            // Get active company location
-            Route::get('company/location/active', [CompanyLocationController::class, 'activeLocation']
-            );
-        });
-    Route::prefix('employees')->group(function () {
-        Route::get('/', [EmployeeController::class, 'index'])->middleware('permission:'.PermissionEnum::EMPLOYEE_VIEW_ALL->value);
-        Route::post('/', [EmployeeController::class, 'store'])->middleware('permission:'.PermissionEnum::EMPLOYEE_CREATE->value);
-        Route::patch('/profile', [EmployeeController::class, 'updateProfile'])->middleware('permission:'.PermissionEnum::EMPLOYEE_UPDATE_PROFILE->value);
-        Route::get('/{id}', [EmployeeController::class, 'show'])->middleware('permission:'.PermissionEnum::EMPLOYEE_VIEW_PROFILE->value);
-        Route::patch('/{id}/hr-fields', [EmployeeController::class, 'updateHrFields'])->middleware('permission:'.PermissionEnum::EMPLOYEE_EDIT_HR_FIELDS->value);
-        Route::patch('/{id}/change-account-status', [EmployeeController::class, 'changeAccountStatus'])->middleware('permission:'.PermissionEnum::EMPLOYEE_CHANGE_ACCOUNT_STATUS->value);
-    });
-
-    Route::prefix('departments')->group(function () {
-        Route::get('/', [DepartmentController::class, 'index'])->middleware('permission:'.PermissionEnum::DEPARTMENT_VIEW->value);
-        Route::post('/', [DepartmentController::class, 'store'])->middleware('permission:'.PermissionEnum::DEPARTMENT_CREATE->value);
-        Route::patch('/{id}', [DepartmentController::class, 'update'])->middleware('permission:'.PermissionEnum::DEPARTMENT_EDIT->value);
-        Route::patch('/{id}/change-status', [DepartmentController::class, 'changeStatus'])->middleware('permission:'.PermissionEnum::DEPARTMENT_CHANGE_STATUS->value);
-        Route::get('/managers-dropdown', [DepartmentController::class,'GetManagersDropdown'])->middleware('permission:'.PermissionEnum::VIEW_MANAGERS_DROPDOWN->value);
     });
 
     Route::prefix('employees')->group(function () {
@@ -271,6 +229,7 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
     });
 
     Route::prefix('departments')->group(function () {
+        Route::get('/managers-dropdown', [DepartmentController::class, 'GetManagersDropdown'])->middleware('permission:'.PermissionEnum::VIEW_MANAGERS_DROPDOWN->value);
         Route::get('/', [DepartmentController::class, 'index'])->middleware('permission:'.PermissionEnum::DEPARTMENT_VIEW->value);
         Route::post('/', [DepartmentController::class, 'store'])->middleware('permission:'.PermissionEnum::DEPARTMENT_CREATE->value);
         Route::patch('/{id}', [DepartmentController::class, 'update'])->middleware('permission:'.PermissionEnum::DEPARTMENT_EDIT->value);
@@ -320,6 +279,7 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
     Route::prefix('hr')->group(function () {
         Route::get('/attendance/daily', [HrAttendanceController::class, 'daily'])->middleware('permission:'.PermissionEnum::HR_ATTENDANCE_VIEW_DAILY->value);
         Route::get('/attendance/exceptions', [HrAttendanceController::class, 'exceptions'])->middleware('permission:'.PermissionEnum::HR_ATTENDANCE_VIEW_EXCEPTIONS->value);
+        Route::patch('/attendance/exceptions/{id}', [HrAttendanceController::class, 'updateExceptionStatus'])->middleware('permission:'.PermissionEnum::HR_ATTENDANCE_MANAGE_EXCEPTIONS->value);
         Route::get('/attendance/monthly-summary', [HrAttendanceController::class, 'monthlySummary'])->middleware('permission:'.PermissionEnum::HR_ATTENDANCE_VIEW_SUMMARY->value);
         Route::get('/attendance/export', [HrAttendanceController::class, 'export'])->middleware('permission:'.PermissionEnum::HR_ATTENDANCE_EXPORT->value);
         Route::get('/goals', [HrGoalController::class, 'index'])->middleware('permission:'.PermissionEnum::HR_GOALS_OVERVIEW->value);
@@ -331,7 +291,6 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
         Route::post('/', [GoalController::class, 'store'])->middleware('permission:'.PermissionEnum::GOAL_CREATE->value);
         Route::get('/{id}', [GoalController::class, 'show'])->middleware('permission:'.PermissionEnum::GOAL_VIEW_OWN->value);
         Route::put('/{id}', [GoalController::class, 'update'])->middleware('permission:'.PermissionEnum::GOAL_UPDATE->value);
-        Route::patch('/{id}/progress', [GoalController::class, 'updateProgress'])->middleware('permission:'.PermissionEnum::GOAL_UPDATE_PROGRESS->value);
         Route::patch('/{id}/complete', [GoalController::class, 'complete'])->middleware('permission:'.PermissionEnum::GOAL_COMPLETE->value);
     });
 

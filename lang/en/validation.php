@@ -212,6 +212,20 @@ return [
         'job_title' => 'job title',
         'department_id' => 'department',
         'department' => 'department',
+        'employee_id' => 'employee',
+        'title' => 'goal title',
+        'target_value' => 'target value',
+        'target_date' => 'target date',
+    ],
+    'latitude_numeric' => 'The latitude must be a valid number.',
+    'latitude_between' => 'The latitude must be between -90 and 90.',
+    'longitude_numeric' => 'The longitude must be a valid number.',
+    'longitude_between' => 'The longitude must be between -180 and 180.',
+    'geofence_out_of_range' => 'The distance between your location and the company must be less than :radius meters.',
+    'attendance_exception' => [
+        'status_required' => 'Decision status is required.',
+        'status_in' => 'Status must be either approved or rejected.',
+        'admin_note_max' => 'Admin note must not exceed 500 characters.',
     ],
 
 ];
