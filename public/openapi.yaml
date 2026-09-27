@@ -7686,7 +7686,7 @@ paths:
                 message: "Failed to retrieve team goals."
   /api/hr/goals:
     get:
-      summary: Get Company Goals Overview (HR) 📱
+      summary: Get Company Goals Overview (HR) 
       description: Retrieves a paginated overview of all employee goals across departments for HR administrative review.
       operationId: getCompanyGoalsOverview
       tags:

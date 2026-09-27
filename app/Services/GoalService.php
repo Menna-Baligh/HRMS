@@ -54,8 +54,6 @@ class GoalService
         return $goal->load(['user']);
     }
 
-
-
     public function markAsCompleted(Goal $goal): Goal
     {
         return DB::transaction(function () use ($goal) {
@@ -118,7 +116,6 @@ class GoalService
 
         return $query->latest()->paginate($perPage);
     }
-
 
     public function getGoalById(int $goalId): ?Goal
     {

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CheckInRequest;
-use App\Http\Requests\CheckOutRequest;
 use App\Http\Requests\GetAttendanceHistoryRequest;
 use App\Http\Requests\GetTodayAttendanceRequest;
 use App\Http\Resources\AttendanceHistoryResource;
@@ -172,8 +171,8 @@ class AttendanceController extends Controller
 
         $formattedData = [
             'history' => $responseData['data'],
-            'links'   => $responseData['links'],
-            'meta'    => $responseData['meta'],
+            'links' => $responseData['links'],
+            'meta' => $responseData['meta'],
         ];
 
         return ResponseHelper::success(

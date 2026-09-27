@@ -102,7 +102,6 @@ return [
     'policy.active_view' => 'عرض السياسات النشطة',
     'policy.audit_view' => 'عرض سجل تغييرات السياسات',
 
-
     'ai.career_coach' => 'استخدام مستشار المسار الوظيفي الذكي (AI Career Coach)',
     'ai.performance_insight' => 'عرض تحليلات الأداء الذكية (AI Performance Insight)',
     'ai.evaluation_draft' => 'توليد مسودة التقييم الذكية (AI Evaluation Draft)',

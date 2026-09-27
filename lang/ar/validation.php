@@ -44,10 +44,10 @@ return [
         'evidence_goal_ids.*' => 'الهدف المرتبط',
         'department' => 'القسم',
         'status' => 'الحالة',
-        'employee_id'  => 'الموظف',
-        'title'        => 'عنوان الهدف',
+        'employee_id' => 'الموظف',
+        'title' => 'عنوان الهدف',
         'target_value' => 'القيمة المستهدفة',
-        'target_date'  => 'تاريخ الاستهداف',
+        'target_date' => 'تاريخ الاستهداف',
     ],
 
     'custom' => [

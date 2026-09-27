@@ -14,7 +14,6 @@ use App\Http\Resources\HrDailyAttendanceResource;
 use App\Http\Resources\HrMonthlySummaryResource;
 use App\Services\AttendanceService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -106,7 +105,6 @@ class HrAttendanceController extends Controller
             );
         }
     }
-
 
     public function monthlySummary(GetHrMonthlySummaryRequest $request): JsonResponse
     {

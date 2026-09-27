@@ -17,7 +17,6 @@ class GoalController extends Controller
 {
     public function __construct(private GoalService $goalService) {}
 
-
     public function index(Request $request): JsonResponse
     {
         try {
@@ -35,7 +34,7 @@ class GoalController extends Controller
                 data: [
                     'goals' => $paginatedData['data'],
                     'links' => $paginatedData['links'],
-                    'meta'  => $paginatedData['meta'],
+                    'meta' => $paginatedData['meta'],
                 ],
                 message: __('goal.retrieved')
             );
@@ -49,7 +48,6 @@ class GoalController extends Controller
             );
         }
     }
-
 
     public function show(Request $request, int $id): JsonResponse
     {
@@ -81,7 +79,6 @@ class GoalController extends Controller
         }
     }
 
-
     public function store(StoreGoalRequest $request): JsonResponse
     {
         try {
@@ -109,7 +106,6 @@ class GoalController extends Controller
         }
     }
 
-
     public function update(UpdateGoalRequest $request, int $id): JsonResponse
     {
         try {
@@ -124,8 +120,6 @@ class GoalController extends Controller
             if (! $goal) {
                 return ResponseHelper::error(null, __('goal.not_found'), 404);
             }
-
-
 
             $updatedGoal = $this->goalService->updateGoal($goal, $request->validated());
 
@@ -144,7 +138,6 @@ class GoalController extends Controller
         }
     }
 
-    
     public function complete(Request $request, int $id): JsonResponse
     {
         try {

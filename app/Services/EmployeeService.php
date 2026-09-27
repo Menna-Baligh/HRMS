@@ -121,8 +121,8 @@ class EmployeeService
                             ->where('id', '!=', $user->id)
                             ->where('role', 'Employee')
                             ->update(['manager_id' => $user->id]);
-                        
-                        $filteredData['manager_id'] = null; 
+
+                        $filteredData['manager_id'] = null;
                     }
                 } else {
                     $filteredData['manager_id'] = null;

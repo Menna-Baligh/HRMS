@@ -24,9 +24,9 @@ class StoreGoalRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'employee_id'  => __('validation.attributes.employee_id'),
-            'title'        => __('validation.attributes.title'),
-            'target_date'  => __('validation.attributes.target_date'),
+            'employee_id' => __('validation.attributes.employee_id'),
+            'title' => __('validation.attributes.title'),
+            'target_date' => __('validation.attributes.target_date'),
         ];
     }
 }

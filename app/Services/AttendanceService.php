@@ -433,6 +433,7 @@ class AttendanceService
             ];
         });
     }
+
     public function handleExceptionDecision(int $attendanceId, string $status, ?string $adminNote = null): Attendance
     {
         $attendance = Attendance::where('is_exception', true)->findOrFail($attendanceId);
