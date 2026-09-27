@@ -71,15 +71,18 @@ Route::middleware('set.app.language')->prefix('auth')->group(function () {
 // holiday 
 Route::prefix('holidays')->middleware(['auth:api', 'set.app.language'])->group(function () {
 
-        Route::get('/', [HolidayController::class, 'index']);
+        // All authenticated users with holiday.view permission can view holidays.
+        Route::get('/', [HolidayController::class, 'index'])->middleware('permission:' . PermissionEnum::HOLIDAY_VIEW->value);
 
-        Route::middleware('role:HR|Owner')->group(function () {
-            Route::post('/', [HolidayController::class, 'store']);
+        // Only users with holiday.manage permission can manage holidays.
+        Route::middleware('permission:' . PermissionEnum::HOLIDAY_MANAGE->value)->group(function () {
 
-            Route::put('/{holiday}', [HolidayController::class, 'update']);
+                Route::post('/', [HolidayController::class, 'store']);
 
-            Route::delete('/{holiday}', [HolidayController::class, 'destroy']);
-        });
+                Route::put('/{holiday}', [HolidayController::class, 'update']);
+
+                Route::delete('/{holiday}', [HolidayController::class, 'destroy']);
+            });
     });
 
 
@@ -105,9 +108,10 @@ Route::prefix('holidays')->middleware(['auth:api', 'set.app.language'])->group(f
 | calender Routes
 |--------------------------------------------------------------------------
 */
-Route::prefix('calender')->middleware(['auth:api', 'set.app.language'])->group(function () {
-        Route::get('/calendar', [CalendarController::class, 'index']);
-    });;
+Route::prefix('calendar')->middleware(['auth:api', 'set.app.language'])->group(function () {
+
+        Route::get('/', [CalendarController::class, 'index'])->middleware('permission:' . PermissionEnum::LEAVE_CALENDAR_VIEW->value);
+    });
 
 /*
 |--------------------------------------------------------------------------
@@ -149,7 +153,7 @@ Route::prefix('leaves')->middleware('auth:api', 'set.app.language')->group(funct
     // leave details
     Route::get('/leave-requests/{leaveRequest}', [LeaveRequestController::class, 'show']);
     // leave history
-    Route::get('/leave-requests', [LeaveRequestController::class, 'history']);
+    Route::get('/leave-requests', [LeaveRequestController::class, 'history'])->middleware('permission:' . PermissionEnum::LEAVE_VIEW_HISTORY->value);
 });
 
 /*
@@ -162,7 +166,7 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
 
     Route::prefix('tasks')->middleware('auth:api', 'set.app.language')->group(function () {
         // Task list
-        Route::get('/', [TaskController::class, 'index']);
+        Route::get('/', [TaskController::class, 'index'])->middleware('permission:' . PermissionEnum::TASK_VIEW_ALL->value);
         // Create task
         Route::post('/', [TaskController::class, 'store']);
         // Update task
@@ -174,9 +178,9 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
         // Update task status
         Route::patch('/{task}/status', [TaskController::class, 'updateStatus']);
         // Task details
-        Route::get('/{task}', [TaskController::class, 'show']);
+        Route::get('/{task}', [TaskController::class, 'show'])->middleware('permission:' . PermissionEnum::TASK_VIEW->value);
         // Task activity history
-        Route::get('/{task}/activities', [TaskController::class, 'activities']);
+        Route::get('/{task}/activities', [TaskController::class, 'activities'])->middleware('permission:' . PermissionEnum::TASK_ACTIVITIES_VIEW->value);
         // Submit a task
         Route::post('/{task}/submissions', [SubmissionController::class, 'store']);
         // Attach file to submission
@@ -218,11 +222,7 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
 
     });
 
-/*
-|--------------------------------------------------------------------------
-| Company Location Routes
-|--------------------------------------------------------------------------
-*/
+
     /*
     |--------------------------------------------------------------------------
     | Company Location Routes

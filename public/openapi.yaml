@@ -7691,6 +7691,5458 @@ paths:
                 success: false
                 message: "You do not have the required permissions to perform this action."
                 errors: null
+
+  /api/locations/company/location:
+    post:
+      summary: Create company location | allowed for HR, Owner
+      operationId: createCompanyLocation
+      tags:
+        - Company Locations
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+             - ar
+             - en
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompanyLocationRequest'
+            example:
+              name: Main Office
+              latitude: 30.0444
+              longitude: 31.2357
+              radius: 350
+              is_active: true
+
+      responses:
+        '201':
+          description: Company location created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyLocationResponse'
+              example:
+                success: true
+                message: Company location created successfully.
+                data:
+                  id: 1
+                  name: Main Office
+                  latitude: 30.0444
+                  longitude: 31.2357
+                  radius: 350
+                  is_active: true
+                  created_by: 1
+                  created_at: "2026-09-20T18:30:00.000000Z"
+                  updated_at: "2026-09-20T18:30:00.000000Z"
+
+        '401':
+            description: Unauthenticated.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  data: null
+
+        '500':
+            description: Internal server error.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+                example:
+                  success: false
+                  message: Something went wrong.
+                  data: null
+
+        '422':
+            description: Validation error or company location already exists.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ValidationErrorResponse'
+                example:
+                  success: false
+                  message: Validation error
+                  errors:
+                    location:
+                      - Company location already exists.   
+
+  /api/locations/company/location/{id}:
+    put:
+      summary: Update company location |allowed for HR, Owner
+      operationId: updateCompanyLocation
+      tags:
+        - Company Locations
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+            example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+             - ar
+             - en    
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Company location ID
+          example: 1
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCompanyLocationRequest'
+            example:
+              name: Main Office
+              radius: 500
+
+      responses:
+        '200':
+          description: Company location updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyLocationResponse'
+              example:
+                success: true
+                message: Company location updated successfully.
+                data:
+                  id: 1
+                  name: Main Office
+                  latitude: 30.0444
+                  longitude: 31.2357
+                  radius: 500
+                  is_active: true
+                  created_by: 1
+                  created_at: "2026-09-20T18:30:00.000000Z"
+                  updated_at: "2026-09-20T19:00:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '404':
+          description: Company location not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Company location not found.
+                data: null
+
+        '422':
+          description: Validation error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+              example:
+                success: false
+                message: The given data was invalid.
+                errors:
+                  name:
+                    - The name field is required.
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null   
+
+  /api/locations/company/location/{id}/deactivate:
+    patch:
+      summary: Deactivate company location |allowed for HR, Owner
+      operationId: deactivateCompanyLocation
+      tags:
+        - Company Locations
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+            example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+             - ar
+             - en     
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Company location ID
+          example: 1
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+      responses:
+        '200':
+          description: Company location deactivated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyLocationResponse'
+              example:
+                success: true
+                message: Company location deactivated successfully.
+                data:
+                  id: 1
+                  name: Main Office
+                  latitude: 30.0444
+                  longitude: 31.2357
+                  radius: 350
+                  is_active: false
+                  created_by: 1
+                  created_at: "2026-09-20T18:30:00.000000Z"
+                  updated_at: "2026-09-20T19:15:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '404':
+          description: Company location not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Company location not found.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null
+
+  /api/locations/company/location/{id}/activate:
+    patch:
+      summary: Activate company location |allowed for HR, Owner
+      operationId: activateCompanyLocation
+      tags:
+        - Company Locations
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+            example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+             - ar
+             - en    
+
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Company location ID
+          example: 1
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+      responses:
+        '200':
+          description: Company location activated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyLocationResponse'
+              example:
+                success: true
+                message: Company location activated successfully.
+                data:
+                  id: 1
+                  name: Main Office
+                  latitude: 30.0444
+                  longitude: 31.2357
+                  radius: 350
+                  is_active: true
+                  created_by: 1
+                  created_at: "2026-09-20T18:30:00.000000Z"
+                  updated_at: "2026-09-20T19:20:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '404':
+          description: Company location not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Company location not found.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null
+
+  /api/locations/company/location/active:
+    get:
+      summary: Get active company location | allowed for Owner, HR, Manager, Employee 📱
+      operationId: getActiveCompanyLocation
+      tags:
+        - Company Locations
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+            example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+             - ar
+             - en     
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+      responses:
+        '200':
+          description: Active company location retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyLocationResponse'
+              example:
+                success: true
+                message: Active company location retrieved successfully.
+                data:
+                  id: 1
+                  name: Main Office
+                  latitude: 30.0444
+                  longitude: 31.2357
+                  radius: 350
+                  is_active: true
+                  created_by: 1
+                  created_at: "2026-09-20T18:30:00.000000Z"
+                  updated_at: "2026-09-20T19:20:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '404':
+          description: No active company location found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: No active company location found.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null 
+
+  /api/tasks:
+    get:
+      summary: Get all tasks | allowed for Owner, HR, Manager, Employee 📱
+      operationId: getTasks
+      tags:
+        - Tasks
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+             - ar
+             - en     
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+        - in: query
+          name: status
+          required: false
+          schema:
+            type: string
+            enum: [Pending, In Progress, Completed, Closed]
+          example: In Progress
+
+        - in: query
+          name: priority
+          required: false
+          schema:
+            type: string
+            enum: [Low, Medium, High, Urgent]
+          example: High
+
+        - in: query
+          name: deadline_from
+          required: false
+          schema:
+            type: string
+            format: date
+          example: "2026-09-01"
+
+        - in: query
+          name: deadline_to
+          required: false
+          schema:
+            type: string
+            format: date
+          example: "2026-09-30"
+
+        - in: query
+          name: per_page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 15
+          example: 15
+
+      responses:
+        '200':
+          description: Tasks retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskListResponse'
+              example:
+                success: true
+                message: Tasks retrieved successfully.
+                data:
+                  current_page: 1
+                  data:
+                    - id: 1
+                      title: Complete API Documentation
+                      description: Complete the OpenAPI documentation.
+                      priority: High
+                      status: In Progress
+                      progress: 60
+                      created_by: 2
+                      deadline: "2026-09-30T18:00:00.000000Z"
+                      created_at: "2026-09-20T10:00:00.000000Z"
+                      updated_at: "2026-09-23T10:00:00.000000Z"
+                  first_page_url: "http://localhost/api/tasks?page=1"
+                  from: 1
+                  last_page: 1
+                  last_page_url: "http://localhost/api/tasks?page=1"
+                  next_page_url: null
+                  path: "http://localhost/api/tasks"
+                  per_page: 15
+                  prev_page_url: null
+                  to: 1
+                  total: 1
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '422':
+          description: Validation error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+              example:
+                success: false
+                message: Validation error.
+                errors:
+                  status:
+                    - The selected status is invalid.
+                  per_page:
+                    - The per page field must be between 1 and 100.
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null
+
+    post:
+      summary: Create a new task | allowed for Manager, HR, Owner
+      operationId: createTask
+      tags:
+        - Tasks
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskRequest'
+            example:
+              title: Complete API Documentation
+              description: Complete the OpenAPI documentation.
+              priority: High
+              deadline: "2026-09-30 18:00:00"
+
+      responses:
+        '201':
+          description: Task created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+              example:
+                success: true
+                message: Task created successfully.
+                data:
+                  id: 1
+                  title: Complete API Documentation
+                  description: Complete the OpenAPI documentation.
+                  priority: High
+                  status: Pending
+                  progress: 0
+                  created_by: 2
+                  deadline: "2026-09-30T18:00:00.000000Z"
+                  created_at: "2026-09-23T10:00:00.000000Z"
+                  updated_at: "2026-09-23T10:00:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '422':
+          description: Validation error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+              example:
+                success: false
+                message: Validation error.
+                errors:
+                  title:
+                    - The title field is required.
+                  priority:
+                    - The selected priority is invalid.
+                  deadline:
+                    - The deadline field is required.
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null            
+
+  /api/tasks/{task}:
+    put:
+      summary: Update a task | allowed for Manager, HR, Owner
+      operationId: updateTask
+      tags:
+        - Tasks
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+            example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+             - ar
+             - en     
+
+        - in: path
+          name: task
+          required: true
+          schema:
+            type: integer
+          example: 1
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaskRequest'
+            example:
+              title: Updated API Documentation
+              description: Updated description.
+              priority: Urgent
+              deadline: "2026-10-01 18:00:00"
+
+      responses:
+        '200':
+          description: Task updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+              example:
+                success: true
+                message: Task updated successfully.
+                data:
+                  id: 1
+                  title: Updated API Documentation
+                  description: Updated description.
+                  priority: Urgent
+                  status: Pending
+                  progress: 0
+                  created_by: 2
+                  deadline: "2026-10-01T18:00:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '404':
+          description: Task not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Task not found.
+                data: nul
+
+        '422':
+          description: Validation error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Validation error.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null        
+
+    get:
+      summary: Get task details | allowed for Owner, HR, Manager, Employee
+      operationId: getTaskDetails
+      tags:
+        - Tasks
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+
+        - in: path
+          name: task
+          required: true
+          schema:
+            type: integer
+          example: 1
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+      responses:
+        '200':
+          description: Task details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskDetailsResponse'
+              example:
+                success: true
+                message: Task details retrieved successfully.
+                data:
+                  id: 1
+                  title: Complete API Documentation
+                  description: Complete the OpenAPI documentation.
+                  priority: High
+                  status: In Progress
+                  progress: 60
+                  created_by: 2
+                  deadline: "2026-09-30T18:00:00.000000Z"
+                  created_at: "2026-09-20T10:00:00.000000Z"
+                  updated_at: "2026-09-23T10:00:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '403':
+          description: You are not authorized to view this task.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: You are not authorized to view this task.
+                data: null
+
+        '404':
+          description: Task not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Task not found.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null
+
+
+  /api/tasks/{task}/assign:
+    post:
+      summary: Assign a task to an employee | allowed for Manager, HR, Owner
+      operationId: assignTask
+      tags:
+        - Tasks
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+            example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+             - ar
+             - en     
+
+        - in: path
+          name: task
+          required: true
+          schema:
+            type: integer
+          example: 1
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignTaskRequest'
+            example:
+              user_id: 10
+
+      responses:
+        '201':
+          description: Task assigned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskAssignmentResponse'
+              example:
+                success: true
+                message: Task assigned successfully.
+                data:
+                  id: 1
+                  task_id: 1
+                  user_id: 10
+                  assigned_by: 2
+                  assigned_at: "2026-09-23T10:00:00.000000Z"
+                  created_at: "2026-09-23T10:00:00.000000Z"
+                  updated_at: "2026-09-23T10:00:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '404':
+          description: Task or user not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Task or user not found.
+                data: null
+
+        '422':
+          description: Validation error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Validation error.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null
+
+
+  /api/tasks/{task}/progress:
+    patch:
+      summary: Update task progress | allowed for Owner, HR, Manager, Employee 📱
+      operationId: updateTaskProgress
+      tags:
+        - Tasks
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+            example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+             - ar
+             - en     
+
+        - in: path
+          name: task
+          required: true
+          schema:
+            type: integer
+          example: 1
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaskProgressRequest'
+            example:
+              progress: 75
+
+      responses:
+        '200':
+          description: Task progress updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+              example:
+                success: true
+                message: Task progress updated successfully.
+                data:
+                  id: 1
+                  title: Complete API Documentation
+                  description: Complete the OpenAPI documentation.
+                  priority: High
+                  status: In Progress
+                  progress: 75
+                  created_by: 2
+                  deadline: "2026-09-30T18:00:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '403':
+          description: You are not authorized to update this task.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: You are not authorized to update this task.
+                data: null
+
+        '404':
+          description: Task not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Task not found.
+                data: null
+
+        '422':
+          description: Validation error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Validation error.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null        
+
+  /api/tasks/{task}/status:
+    patch:
+      summary: Update task status | allowed for Owner, HR, Manager, Employee 📱
+      operationId: updateTaskStatus
+      tags:
+        - Tasks
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+            example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+             - ar
+             - en     
+
+        - in: path
+          name: task
+          required: true
+          schema:
+            type: integer
+          example: 1
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaskStatusRequest'
+            example:
+              status: Completed
+
+      responses:
+        '200':
+          description: Task status updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+              example:
+                success: true
+                message: Task status updated successfully.
+                data:
+                  id: 1
+                  title: Complete API Documentation
+                  description: Complete the OpenAPI documentation.
+                  priority: High
+                  status: Completed
+                  progress: 100
+                  created_by: 2
+                  deadline: "2026-09-30T18:00:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '403':
+          description: You are not authorized to update this task.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: You are not authorized to update this task.
+                data: null
+
+        '404':
+          description: Task not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Task not found.
+                data: null
+
+
+        '422':
+          description: Invalid status transition.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Invalid status transition.
+                data: null  
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null         
+
+  /api/tasks/{task}/activities:
+    get:
+      summary: Get task activity history | allowed for Owner, HR, Manager, Employee
+      operationId: getTaskActivities
+      tags:
+        - Tasks
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en
+          example: ar
+
+        - in: path
+          name: task
+          required: true
+          description: Task ID
+          schema:
+            type: integer
+          example: 1
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum:
+              - en
+              - ar
+          example: en
+
+      responses:
+        '200':
+          description: Task activities retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskActivitiesResponse'
+              example:
+                success: true
+                message: Task activities retrieved successfully.
+                data:
+                  - id: 1
+                    task_id: 1
+                    user_id: 2
+                    action: created
+                    old_value: null
+                    new_value: null
+                    description: Task created successfully.
+                    created_at: "2026-09-23T10:00:00.000000Z"
+                    updated_at: "2026-09-23T10:00:00.000000Z"
+
+                  - id: 2
+                    task_id: 1
+                    user_id: 2
+                    action: assigned
+                    old_value: null
+                    new_value: "10"
+                    description: Task assigned successfully.
+                    created_at: "2026-09-23T10:05:00.000000Z"
+                    updated_at: "2026-09-23T10:05:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '403':
+          description: You are not authorized to view this task.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: You are not authorized to view this task.
+                data: null
+
+        '404':
+          description: Task not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Task not found.
+                data: null  
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null        
+
+  /api/tasks/{task}/submissions:
+    post:
+      summary: Submit a task |allowed for Owner, HR, Manager, Employee 📱
+      operationId: submitTask
+      tags:
+        - Submissions
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en   
+
+        - in: path
+          name: task
+          required: true
+          schema:
+            type: integer
+          example: 1
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StoreSubmissionRequest'
+
+      responses:
+        '201':
+          description: Submission created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionResponse'
+              example:
+                success: true
+                message: Submission created successfully.
+                data:
+                  id: 1
+                  task_id: 1
+                  user_id: 10
+                  note: "Completed the assigned task."
+                  status: Pending Review
+                  submitted_at: "2026-09-23T18:30:00.000000Z"
+                  created_at: "2026-09-23T18:30:00.000000Z"
+                  updated_at: "2026-09-23T18:30:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '422':
+          description: Validation error or task cannot be submitted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Validation error or task cannot be submitted.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null
+
+  /api/tasks/submissions/{submission}/attachments:
+    post:
+      summary: Attach file to task submission | allowed for Owner, HR, Manager, Employee 📱
+      operationId: attachSubmissionFile
+      tags:
+        - Submissions
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+          type: string
+          default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en    
+
+        - in: path
+          name: submission
+          required: true
+          schema:
+          type: integer
+          example: 1
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AttachSubmissionFileRequest'
+
+      responses:
+        '201':
+          description: File attached successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionAttachmentResponse'
+              example:
+                success: true
+                message: File attached successfully.
+                data:
+                  id: 1
+                  submission_id: 1
+                  uploaded_by: 10
+                  file_name: report.pdf
+                  file_path: submissions/1/report.pdf
+                  mime_type: application/pdf
+                  file_size: 245760
+                  created_at: "2026-09-23T18:35:00.000000Z"
+                  updated_at: "2026-09-23T18:35:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '403':
+          description: You are not the owner of this submission.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: You are not the owner of this submission.
+                data: null
+
+        '404':
+          description: Submission not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Submission not found.
+                data: null
+
+        '422':
+          description: Validation error or approved submission cannot be modified.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Validation error or approved submission cannot be modified.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null
+
+
+  /api/tasks/submissions/review:
+    get:
+      summary: Get submission review queue | allowed for Manager, HR, Owner
+      operationId: getSubmissionReviewQueue
+      tags:
+        - Submissions
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en   
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+      responses:
+        '200':
+          description: Submission review queue retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionListResponse'
+              example:
+                success: true
+                message: Submission review queue retrieved successfully.
+                data:
+                  current_page: 1
+                  data:
+                    - id: 1
+                      task_id: 1
+                      user_id: 10
+                      note: "Completed the assigned task."
+                      status: Pending Review
+                      submitted_at: "2026-09-23T18:30:00.000000Z"
+                      created_at: "2026-09-23T18:30:00.000000Z"
+                      updated_at: "2026-09-23T18:30:00.000000Z"
+                  per_page: 15
+                  total: 1
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '403':
+          description: You are not authorized to review submissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: You are not authorized to review submissions.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null        
+
+
+  /api/tasks/submissions/{submission}:
+    get:
+      summary: View a task submission | allowed for Owner, HR, Manager, Employee 📱
+      operationId: getSubmissionDetails
+      tags:
+        - Submissions
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en   
+
+        - in: path
+          name: submission
+          required: true
+          schema:
+            type: integer
+          example: 1
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+      responses:
+        '200':
+          description: Submission retrieved successfully.
+          content:
+           application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionDetailsResponse'
+              example:
+                success: true
+                message: Submission retrieved successfully.
+                data:
+                  id: 1
+                  task_id: 1
+                  user_id: 10
+                  note: "Completed the assigned task."
+                  status: Pending Review
+                  submitted_at: "2026-09-23T18:30:00.000000Z"
+                  created_at: "2026-09-23T18:30:00.000000Z"
+                  updated_at: "2026-09-23T18:30:00.000000Z"
+                  task:
+                    id: 1
+                    title: Complete API Documentation
+                  user:
+                    id: 10
+                    name: Ahmed Mohamed
+                  attachments: []
+                  reviews: []
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '403':
+          description: You are not authorized to view this submission.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: You are not authorized to view this submission.
+                data: null
+
+        '404':
+          description: Submission not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Submission not found.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null
+
+
+  /api/tasks/submissions/{submission}/approve:
+    patch:
+      summary: Approve a task submission | allowed for Manager, HR, Owner
+      operationId: approveSubmission
+      tags:
+        - Submissions
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en
+
+        - in: path
+          name: submission
+          required: true
+          schema:
+            type: integer
+          example: 1
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum:
+              - en
+              - ar
+          example: en
+
+      responses:
+        '200':
+          description: Submission approved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionResponse'
+              example:
+                success: true
+                message: Submission approved successfully.
+                data:
+                  id: 1
+                  task_id: 1
+                  user_id: 10
+                  note: "Completed the assigned task."
+                  status: Approved
+                  submitted_at: "2026-09-23T18:30:00.000000Z"
+                  created_at: "2026-09-23T18:30:00.000000Z"
+                  updated_at: "2026-09-23T19:00:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '403':
+          description: You are not authorized to review this submission.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: You are not authorized to review this submission.
+                data: null
+
+        '404':
+          description: Submission not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Submission not found.
+                data: null
+
+        '422':
+          description: Submission is not waiting for review.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Submission is not waiting for review.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null 
+
+
+  /api/tasks/submissions/{submission}/reject:
+    patch:
+      summary: Reject a task submission | allowed for Manager, HR, Owner
+      operationId: rejectSubmission
+      tags:
+        - Submissions
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en   
+
+        - in: path
+          name: submission
+          required: true
+          schema:
+            type: integer
+          example: 1
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RejectSubmissionRequest'
+            example:
+              feedback: "Please provide more details about the completed work."
+
+      responses:
+        '200':
+          description: Submission rejected successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionResponse'
+              example:
+                success: true
+                message: Submission rejected successfully.
+                data:
+                  id: 1
+                  task_id: 1
+                  user_id: 10
+                  note: "Completed the assigned task."
+                  status: Rejected
+                  submitted_at: "2026-09-23T18:30:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '403':
+          description: You are not authorized to review this submission.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: You are not authorized to review this submission.
+                data: null
+
+        '404':
+          description: Submission not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Submission not found.
+                data: null
+
+        '422':
+          description: Validation error or submission cannot be reviewed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Validation error or submission cannot be reviewed.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null        
+
+
+  /api/tasks/submissions/{submission}/request-changes:
+    patch:
+      summary: Request changes to a task submission | allowed for Manager, HR, Owner
+      operationId: requestSubmissionChanges
+      tags:
+       - Submissions
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en   
+
+        - in: path
+          name: submission
+          required: true
+          schema:
+            type: integer
+          example: 1
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestChangesRequest'
+            example:
+              feedback: "Please update the attached document and resubmit it."
+
+      responses:
+        '200':
+          description: Changes requested successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionResponse'
+              example:
+                success: true
+                message: Changes requested successfully.
+                data:
+                  id: 1
+                  task_id: 1
+                  user_id: 10
+                  note: "Completed the assigned task."
+                  status: Changes Requested
+                  submitted_at: "2026-09-23T18:30:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '403':
+          description: You are not authorized to review this submission.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: You are not authorized to review this submission.
+                data: null
+
+        '404':
+          description: Submission not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Submission not found.
+                data: null
+
+        '422':
+          description: Validation error or submission cannot be reviewed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Validation error or submission cannot be reviewed.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null        
+
+
+  /api/tasks/submissions/{submission}/resubmit:
+    post:
+      summary: Resubmit a task after requested changes | allowed for Owner, HR, Manager, Employee 📱
+      operationId: resubmitSubmission
+      tags:
+        - Submissions
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en   
+
+        - in: path
+          name: submission
+          required: true
+          schema:
+            type: integer
+          example: 1
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResubmitSubmissionRequest'
+            example:
+              note: "Updated the submission based on the requested changes."
+
+      responses:
+        '200':
+          description: Submission resubmitted successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionResponse'
+              example:
+                success: true
+                message: Submission resubmitted successfully.
+                data:
+                  id: 1
+                  task_id: 1
+                  user_id: 10
+                  note: "Updated the submission based on the requested changes."
+                  status: Pending Review
+                  submitted_at: "2026-09-23T20:00:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '403':
+          description: You are not the owner of this submission.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: You are not the owner of this submission.
+                data: null
+
+        '404':
+          description: Submission not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Submission not found.
+                data: null
+
+        '422':
+          description: Only submissions with requested changes can be resubmitted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Only submissions with requested changes can be resubmitted.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null
+
+  /leaves/leave-types:
+    post:
+      summary: Create a new leave type | allowed for Owner, HR, Manager, Employee
+      operationId: createLeaveType
+      tags:
+        - Leave Types
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en  
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum:
+              - en
+              - ar
+          example: en
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreLeaveTypeRequest'
+            example:
+              name: Annual Leave
+              description: Annual paid leave
+              default_days: 21
+              is_active: true
+              requires_balance: true
+              requires_attachment: false
+
+      responses:
+        '201':
+            description: Leave type created successfully.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/LeaveTypeResponse'
+                example:
+                  success: true
+                  message: Leave type created successfully.
+                  data:
+                    id: 1
+                    name: Annual Leave
+                    description: Annual paid leave
+                    default_days: 21
+                    is_active: true
+                    requires_balance: true
+                    requires_attachment: false
+                    created_at: "2026-09-20T18:30:00.000000Z"
+                    updated_at: "2026-09-20T18:30:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '422':
+          description: Validation error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Validation error.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null
+
+    get:
+      summary: Get all leave types | allowed for Owner, HR, Manager, Employee
+      operationId: getLeaveTypes
+      tags:
+        - Leave Types
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en   
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum:
+              - en
+              - ar
+          example: en
+
+      responses:
+        '200':
+          description: Leave types retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveTypesResponse'
+              example:
+                success: true
+                message: Leave types retrieved successfully.
+                data:
+                  - id: 1
+                    name: Annual Leave
+                    description: Annual paid leave
+                    default_days: 21
+                    is_active: true
+                    requires_balance: true
+                    requires_attachment: false
+                    created_at: "2026-09-20T18:30:00.000000Z"
+                    updated_at: "2026-09-20T18:30:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null
+
+  /leaves/leave-types/{leaveType}:
+    put:
+      summary: Update a leave type |allowed for Owner, HR, Manager, Employee
+      operationId: updateLeaveType
+      tags:
+        - Leave Types
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: path
+          name: leaveType
+          required: true
+          schema:
+            type: integer
+          example: 1
+
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en   
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLeaveTypeRequest'
+            example:
+              name: Annual Leave
+              default_days: 21
+              requires_attachment: false
+
+      responses:
+        '200':
+          description: Leave type updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveTypeResponse'
+              example:
+                success: true
+                message: Leave type updated successfully.
+                data:
+                  id: 1
+                  name: Annual Leave
+                  description: Annual paid leave.
+                  default_days: 21
+                  is_active: true
+                  requires_balance: true
+                  requires_attachment: false
+                  created_at: "2026-09-23T10:00:00.000000Z"
+                  updated_at: "2026-09-27T21:00:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '404':
+          description: Leave type not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Leave type not found.
+                data: null
+
+        '422':
+          description: Validation error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Validation error.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null
+
+
+  /leaves/leave-types/{leaveType}/activate:
+    patch:
+      summary: Activate a leave type | allowed Owner, HR
+      operationId: activateLeaveType
+      tags:
+        - Leave Types
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: path
+          name: leaveType
+          required: true
+          schema:
+            type: integer
+          example: 1
+
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en  
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+      responses:
+        '200':
+          description: Leave type activated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveTypeResponse'
+              example:
+                success: true
+                message: Leave type activated successfully.
+                data:
+                  id: 1
+                  name: Annual Leave
+                  description: Annual paid leave.
+                  default_days: 21
+                  is_active: true
+                  requires_balance: true
+                  requires_attachment: false
+                  created_at: "2026-09-23T10:00:00.000000Z"
+                  updated_at: "2026-09-27T21:00:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '404':
+          description: Leave type not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Leave type not found.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null
+
+  /leaves/leave-types/{leaveType}/deactivate:
+    patch:
+      summary: Deactivate a leave type | allowed for Owner, HR
+      operationId: deactivateLeaveType
+      tags:
+        - Leave Types
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: path
+          name: leaveType
+          required: true
+          schema:
+            type: integer
+          example: 1
+
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en  
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+      responses:
+        '200':
+          description: Leave type deactivated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveTypeResponse'
+              example:
+                success: true
+                message: Leave type deactivated successfully.
+                data:
+                  id: 1
+                  name: Annual Leave
+                  description: Annual paid leave.
+                  default_days: 21
+                  is_active: false
+                  requires_balance: true
+                  requires_attachment: false
+                  created_at: "2026-09-23T10:00:00.000000Z"
+                  updated_at: "2026-09-27T21:00:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '404':
+          description: Leave type not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Leave type not found.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null 
+
+  /leaves/leave-balances:
+    get:
+      summary: Get leave balances | allowed for Owner, HR, Manager, Employee 📱
+      operationId: getMyLeaveBalances
+      tags:
+        - Leave Balances
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en  
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+        - in: query
+          name: year
+          required: false
+          schema:
+            type: integer
+            minimum: 2000
+            maximum: 2100
+          example: 2026
+
+        - in: query
+          name: leave_type_id
+          required: false
+          schema:
+            type: integer
+          example: 1
+
+      responses:
+        '200':
+          description: Leave balances retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveBalancesResponse'
+              example:
+                success: true
+                message: Leave balances retrieved successfully.
+                data:
+                  - id: 1
+                    user_id: 5
+                    leave_type_id: 1
+                    year: 2026
+                    allocated_days: 21
+                    used_days: 3
+                    remaining_days: 18
+                    leave_type:
+                      id: 1
+                      name: Annual Leave
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '422':
+          description: Validation error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Validation error.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null   
+
+  /leaves/leave-requests:
+    post:
+      summary: Create a new leave request | allowed for Owner, HR, Manager, Employee 📱
+      operationId: createLeaveRequest
+      tags:
+        - Leave Requests
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en   
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum:
+              - en
+              - ar
+          example: en
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreLeaveRequest'
+            example:
+              leave_type_id: 1
+              start_date: "2026-10-01"
+              end_date: "2026-10-05"
+              reason: Family vacation
+
+      responses:
+        '201':
+          description: Leave request created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequestResponse'
+              example:
+                success: true
+                message: Leave request created successfully.
+                data:
+                  id: 1
+                  user_id: 5
+                  leave_type_id: 1
+                  start_date: "2026-10-01"
+                  end_date: "2026-10-05"
+                  days: 5
+                  reason: Family vacation
+                  status: Pending
+                  reviewed_by: null
+                  reviewed_at: null
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '422':
+          description: Validation error or insufficient leave balance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Validation error or insufficient leave balance.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null
+
+  get:
+    summary: Get leave request history | allowed for Owner, HR, Manager, Employee 📱
+    operationId: getLeaveRequestHistory
+    tags:
+      - Leave Requests
+
+    security:
+      - bearerAuth: []
+
+    parameters:
+      - in: header
+        name: Accept
+        required: true
+        schema:
+          type: string
+          default: application/json
+        example: application/json
+
+      - in: query
+        name: lang
+        required: false
+        schema:
+          type: string
+          enum:
+            - en
+            - ar
+        example: en
+
+      - in: query
+        name: status
+        required: false
+        schema:
+          type: string
+          enum:
+            - Pending
+            - Approved
+            - Rejected
+            - Cancelled
+        example: Approved
+
+      - in: query
+        name: leave_type_id
+        required: false
+        schema:
+          type: integer
+        example: 1
+
+      - in: query
+        name: year
+        required: false
+        schema:
+          type: integer
+        example: 2026
+
+    responses:
+      '200':
+        description: Leave requests retrieved successfully.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveRequestsResponse'
+
+      '401':
+        description: Unauthenticated.  
+
+  /leaves/leave-requests/{leaveRequest}:
+    get:
+      summary: Get leave request details
+      operationId: getLeaveRequestDetails
+      tags:
+        - Leave Requests
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: path
+          name: leaveRequest
+          required: true
+          schema:
+            type: integer
+          example: 1
+
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+      responses:
+        '200':
+          description: Leave request details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequestResponse'
+              example:
+                success: true
+                message: Leave request details retrieved successfully.
+                data:
+                  id: 1
+                  user_id: 10
+                  leave_type_id: 1
+                  start_date: "2026-09-28"
+                  end_date: "2026-09-30"
+                  days: 3
+                  reason: "Annual vacation."
+                  status: Pending
+                  created_at: "2026-09-27T10:00:00.000000Z"
+                  updated_at: "2026-09-27T10:00:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '404':
+          description: Leave request not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Leave request not found.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null  
+
+  /leaves/leave-requests/manager/pending:
+    get:
+      summary: Get pending leave requests for manager
+      operationId: getManagerPendingLeaveRequests
+      tags:
+        - Leave Requests
+      security:
+      - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en    
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+      responses:
+        '200':
+          description: Manager pending leave requests retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequestsResponse'
+              example:
+                success: true
+                message: Manager pending leave requests retrieved successfully.
+                data:
+                  - id: 1
+                    user_id: 10
+                    leave_type_id: 1
+                    start_date: "2026-09-28"
+                    end_date: "2026-09-30"
+                    days: 3
+                    reason: "Annual vacation."
+                    status: Pending
+                    created_at: "2026-09-27T10:00:00.000000Z"
+                    updated_at: "2026-09-27T10:00:00.000000Z"
+                  - id: 2
+                    user_id: 15
+                    leave_type_id: 2
+                    start_date: "2026-10-01"
+                    end_date: "2026-10-02"
+                    days: 2
+                    reason: "Personal leave."
+                    status: Pending
+                    created_at: "2026-09-27T11:00:00.000000Z"
+                    updated_at: "2026-09-27T11:00:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '403':
+          description: User is not a manager.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: User is not a manager.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null 
+
+  /leaves/leave-requests/hr/pending:
+    get:
+      summary: Get pending leave requests for HR
+      operationId: getHrPendingLeaveRequests
+      tags:
+        - Leave Requests
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en  
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+      responses:
+        '200':
+          description: HR pending leave requests retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequestsResponse'
+              example:
+                success: true
+                message: HR pending leave requests retrieved successfully.
+                data:
+                  - id: 1
+                    user_id: 10
+                    leave_type_id: 1
+                    start_date: "2026-09-28"
+                    end_date: "2026-09-30"
+                    days: 3
+                    reason: "Annual vacation."
+                    status: Pending
+                    created_at: "2026-09-27T10:00:00.000000Z"
+                    updated_at: "2026-09-27T10:00:00.000000Z"
+                  - id: 2
+                    user_id: 15
+                    leave_type_id: 2
+                    start_date: "2026-10-01"
+                    end_date: "2026-10-02"
+                    days: 2
+                    reason: "Personal leave."
+                    status: Pending
+                    created_at: "2026-09-27T11:00:00.000000Z"
+                    updated_at: "2026-09-27T11:00:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '403':
+          description: User is not authorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: User is not authorized.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null   
+
+  /leaves/leave-requests/{leaveRequest}/approve:
+    patch:
+      summary: Approve a leave request | allowed for Owner, HR, Manager
+      operationId: approveLeaveRequest
+      tags:
+        - Leave Requests
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: path
+          name: leaveRequest
+          required: true
+          schema:
+            type: integer
+          example: 1
+
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en   
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApproveLeaveRequest'
+
+      responses:
+        '200':
+          description: Leave request approved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequestResponse'
+              example:
+                success: true
+                message: Leave request approved successfully.
+                data:
+                  id: 1
+                  user_id: 10
+                  leave_type_id: 1
+                  start_date: "2026-09-28"
+                  end_date: "2026-09-30"
+                  days: 3
+                  reason: "Annual vacation."
+                  status: Approved
+                  created_at: "2026-09-27T10:00:00.000000Z"
+                  updated_at: "2026-09-27T11:00:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '404':
+          description: Leave request not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Leave request not found.
+                data: null
+
+        '422':
+          description: Leave request is not pending or insufficient balance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Leave request is not pending or insufficient balance.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null
+
+
+  /leaves/leave-requests/{leaveRequest}/reject:
+    patch:
+      summary: Reject a leave request |allowed for Owner, HR
+      operationId: rejectLeaveRequest
+      tags:
+        - Leave Requests
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: path
+          name: leaveRequest
+          required: true
+          schema:
+            type: integer
+          example: 1
+
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en  
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RejectLeaveRequest'
+            example:
+              rejection_reason: Leave period is not available.
+
+      responses:
+        '200':
+          description: Leave request rejected successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequestResponse'
+              example:
+                success: true
+                message: Leave request rejected successfully.
+                data:
+                  id: 1
+                  user_id: 10
+                  leave_type_id: 1
+                  start_date: "2026-09-28"
+                  end_date: "2026-09-30"
+                  days: 3
+                  reason: "Annual vacation."
+                  status: Rejected
+                  created_at: "2026-09-27T10:00:00.000000Z"
+                  updated_at: "2026-09-27T11:00:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '404':
+          description: Leave request not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Leave request not found.
+                data: null
+  
+        '422':
+          description: Validation error or leave request is not pending.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Validation error or leave request is not pending.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null
+
+  /leaves/leave-requests/{leaveRequest}/attachments:
+    post:
+      summary: Upload leave request attachment
+      operationId: uploadLeaveRequestAttachment
+      tags:
+        - Leave Requests
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: path
+          name: leaveRequest
+          required: true
+          schema:
+            type: integer
+          example: 1
+
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en    
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+
+      responses:
+        '201':
+          description: Attachment uploaded successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileResponse'
+              example:
+                success: true
+                message: Attachment uploaded successfully.
+                data:
+                  id: 1
+                  file_name: leave-request-attachment.pdf
+                  file_path: "uploads/leave-requests/1/leave-request-attachment.pdf"
+                  mime_type: application/pdf
+                  size: 245760
+                  created_at: "2026-09-27T12:00:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '403':
+          description: User is not authorized to upload attachment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: User is not authorized to upload attachment.
+                data: null
+
+        '404':
+          description: Leave request not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Leave request not found.
+                data: null
+
+        '422':
+          description: Validation error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Validation error.
+                data: null
+
+        '500':
+          description: Attachment upload failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Attachment upload failed.
+                data: null   
+
+  /leaves/leave-requests/{leaveRequest}/decisions:
+    get:
+      summary: Get leave decision history |allowed Owner, HR, Manager, Employee 📱
+      operationId: getLeaveDecisionHistory
+      tags:
+       - Leave Decisions
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: path
+          name: leaveRequest
+          required: true
+          schema:
+            type: integer
+          example: 1
+
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en    
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+
+      responses:
+        '200':
+          description: Leave decision history retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveDecisionsResponse'
+              example:
+                success: true
+                message: Leave decision history retrieved successfully.
+                data:
+                  - id: 1
+                    leave_request_id: 1
+                    decided_by: 5
+                    decision: Approved
+                    comment: "Leave request approved."
+                    created_at: "2026-09-27T11:00:00.000000Z"
+                    updated_at: "2026-09-27T11:00:00.000000Z"
+                  - id: 2
+                    leave_request_id: 1
+                    decided_by: 5
+                    decision: Rejected
+                    comment: "Insufficient balance."
+                    created_at: "2026-09-27T12:00:00.000000Z"
+                    updated_at: "2026-09-27T12:00:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '404':
+          description: Leave request not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Leave request not found.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null   
+
+  /policies:
+    post:
+      summary: Create a new policy |allowed for HR, Owner
+      operationId: createPolicy
+      tags:
+        - Policies
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+             - ar
+             - en
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum:
+              - en
+              - ar
+          example: en
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StorePolicyRequest'
+            example:
+              title: Employee Attendance Policy
+              description: Company attendance and working hours policy
+              content: Employees must follow the official working hours and attendance rules.
+
+      responses:
+        '201':
+          description: Policy created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyResponse'
+              example:
+                success: true
+                message: Policy created successfully.
+                data:
+                  id: 1
+                  title: Employee Attendance Policy
+                  description: Company attendance and working hours policy
+                  status: draft
+                  created_by: 1
+                  created_at: "2026-09-26T08:30:00.000000Z"
+                  updated_at: "2026-09-26T08:30:00.000000Z"
+                  versions:
+                    - id: 1
+                      policy_id: 1
+                      version: 1
+                      content: Employees must follow the official working hours and attendance rules.
+                      status: draft
+                      effective_date: null
+                      created_by: 1
+                      created_at: "2026-09-26T08:30:00.000000Z"
+                      updated_at: "2026-09-26T08:30:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+        '422':
+          description: Validation error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+              example:
+                success: false
+                message: The given data was invalid.
+                errors:
+                  title:
+                    - The title field is required.
+                  content:
+                    - The content field is required.
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null            
+
+    get:
+      summary: Get all policies | allowed for Owner, HR, Manager, Employee
+      operationId: getPolicies
+      tags:
+        - Policies
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+             - ar
+             - en
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum:
+              - en
+              - ar
+          example: en
+
+        - in: query
+          name: status
+          required: false
+          schema:
+            type: string
+            enum:
+              - draft
+              - active
+              - archived
+          example: active
+
+        - in: query
+          name: version_status
+          required: false
+          schema:
+            type: string
+            enum:
+              - draft
+              - active
+              - archived
+          example: active
+
+      responses:
+        '200':
+          description: Policies retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PoliciesResponse'
+              example:
+                success: true
+                message: Policies retrieved successfully.
+                data:
+                  - id: 1
+                    title: "Employee Attendance Policy"
+                    description: "Company policy regarding employee attendance."
+                    status: Active
+                    created_at: "2026-09-20T10:00:00.000000Z"
+                    updated_at: "2026-09-27T10:00:00.000000Z"
+                  - id: 2
+                    title: "Leave Policy"
+                    description: "Company rules and guidelines for employee leave."
+                    status: Active
+                    created_at: "2026-09-21T10:00:00.000000Z"
+                    updated_at: "2026-09-27T11:00:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '422':
+          description: Validation error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+              example:
+                success: false
+                message: The given data was invalid.
+                errors:
+                  status:
+                    - The selected status is invalid.
+                  version_status:
+                    - The selected version status is invalid.
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null   
+
+  /policies/{policy}/versions:
+    post:
+      summary: Create a new policy version | allowed for HR, Owner
+      operationId: createPolicyVersion
+      tags:
+        - Policies
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: path
+          name: policy
+          required: true
+          description: Policy ID
+          schema:
+            type: integer
+          example: 1
+
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+             - ar
+             - en
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum:
+              - en
+              - ar
+          example: en
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StorePolicyVersionRequest'
+            example:
+              content: Updated employee attendance and working hours policy.
+
+      responses:
+        '201':
+          description: Policy version created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyVersionResponse'
+              example:
+                success: true
+                message: Policy version created successfully.
+                data:
+                  id: 2
+                  policy_id: 1
+                  version: 2
+                  content: Updated employee attendance and working hours policy.
+                  status: draft
+                  effective_date: null
+                  created_by: 1
+                  created_at: "2026-09-26T09:00:00.000000Z"
+                  updated_at: "2026-09-26T09:00:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '404':
+          description: Policy not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Policy not found.
+                data: null
+
+        '422':
+          description: Validation error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+              example:
+                success: false
+                message: The given data was invalid.
+                errors:
+                  content:
+                    - The content field is required.
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null
+
+  /policies/{policy}/versions/{version}/activate:
+    post:
+      summary: Activate a policy version | allowed for HR, Owner
+      operationId: activatePolicyVersion
+      tags:
+        - Policies
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: path
+          name: policy
+          required: true
+          description: Policy ID
+          schema:
+            type: integer
+          example: 1
+
+        - in: path
+          name: version
+          required: true
+          description: Policy version ID
+          schema:
+            type: integer
+          example: 2
+
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+             - ar
+             - en
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum:
+              - en
+              - ar
+          example: en
+
+      responses:
+        '200':
+          description: Policy version activated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyVersionResponse'
+              example:
+                success: true
+                message: Policy version activated successfully.
+                data:
+                  id: 2
+                  policy_id: 1
+                  version: 2
+                  content: Updated employee attendance and working hours policy.
+                  status: active
+                  effective_date: "2026-09-26"
+                  created_by: 1
+                  created_at: "2026-09-26T09:00:00.000000Z"
+                  updated_at: "2026-09-26T09:30:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '404':
+          description: Policy or policy version not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Policy or policy version not found.
+                data: null
+
+        '422':
+          description: The policy version does not belong to this policy.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: The policy version does not belong to this policy.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null 
+
+  /policies/{policy}/audits:
+    get:
+      summary: Get policy audit history | allowed for HR, Owner
+      operationId: getPolicyAuditHistory
+      tags:
+        - Policies
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: path
+          name: policy
+          required: true
+          description: Policy ID
+          schema:
+            type: integer
+          example: 1
+
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+             - ar
+             - en  
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum:
+              - en
+              - ar
+          example: en
+
+      responses:
+        '200':
+          description: Policy audit history retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyAuditsResponse'
+              example:
+                success: true
+                message: Policy audit history retrieved successfully.
+                data:
+                  - id: 1
+                    policy_id: 1
+                    policy_version_id: 2
+                    performed_by: 1
+                    action: version_activated
+                    old_status: draft
+                    new_status: active
+                    description: Policy version 2 was activated.
+                    created_at: "2026-09-26T09:30:00.000000Z"
+                    updated_at: "2026-09-26T09:30:00.000000Z"
+                    policy_version:
+                      id: 2
+                      policy_id: 1
+                      version: 2
+                      content: Updated employee attendance and working hours policy.
+                      status: active
+                      effective_date: "2026-09-26"
+                    performer:
+                      id: 1
+                      name: Admin User
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '404':
+          description: Policy not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Policy not found.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null   
+
+  /holidays:
+    get:
+      summary:  Get all holidays | allowed for Owner, HR, Manager, Employee 📱
+      operationId: getHolidays
+      tags:
+        - Holidays
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+             - ar
+             - en   
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum:
+              - en
+              - ar
+          example: en
+
+      responses:
+        '200':
+          description: Holidays retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HolidaysResponse'
+              example:
+                success: true
+                message: Holidays retrieved successfully.
+                data:
+                  - id: 1
+                    name: Eid Al-Fitr
+                    start_date: "2026-03-20"
+                    end_date: "2026-03-22"
+                    description: Eid Al-Fitr holiday
+                    is_active: true
+                    created_at: "2026-09-26T08:00:00.000000Z"
+                    updated_at: "2026-09-26T08:00:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null
+
+    post:
+      summary: Create a new holiday | allowed for HR, Owner
+      operationId: createHoliday
+      tags:
+        - Holidays
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en   
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum:
+              - en
+              - ar
+          example: en
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreHolidayRequest'
+            example:
+              name: Eid Al-Fitr
+              start_date: "2026-03-20"
+              end_date: "2026-03-22"
+              description: Eid Al-Fitr holiday
+              is_active: true
+
+      responses:
+        '201':
+          description: Holiday created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HolidayResponse'
+              example:
+                success: true
+                message: Holiday created successfully.
+                data:
+                  id: 1
+                  name: Eid Al-Fitr
+                  start_date: "2026-03-20"
+                  end_date: "2026-03-22"
+                  description: Eid Al-Fitr holiday
+                  is_active: true
+                  created_at: "2026-09-26T08:00:00.000000Z"
+                  updated_at: "2026-09-26T08:00:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '403':
+          description: Unauthorized. Only HR or Owner can create holidays.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthorized. Only HR or Owner can create holidays.
+                data: null
+
+        '422':
+          description: Validation error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Validation error.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null
+
+  /holidays/{holiday}:
+    put:
+      summary: Update an existing holiday | allowed for HR, Owner
+      operationId: updateHoliday
+      tags:
+        - Holidays
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: path
+          name: holiday
+          required: true
+          description: Holiday ID
+          schema:
+            type: integer
+          example: 1
+
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+             - ar
+             - en   
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum:
+              - en
+              - ar
+          example: en
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateHolidayRequest'
+            example:
+              name: Updated Eid Al-Fitr
+              start_date: "2026-03-20"
+              end_date: "2026-03-23"
+              description: Updated Eid Al-Fitr holiday
+              is_active: true
+
+      responses:
+        '200':
+          description: Holiday updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HolidayResponse'
+              example:
+                success: true
+                message: Holiday updated successfully.
+                data:
+                  id: 1
+                  name: Updated Eid Al-Fitr
+                  start_date: "2026-03-20"
+                  end_date: "2026-03-23"
+                  description: Updated Eid Al-Fitr holiday
+                  is_active: true
+                  created_at: "2026-09-26T08:00:00.000000Z"
+                  updated_at: "2026-09-26T09:00:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '403':
+          description: Unauthorized. Only HR or Owner can update holidays.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthorized. Only HR or Owner can update holidays.
+                data: null
+
+        '404':
+          description: Holiday not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Holiday not found.
+                data: null
+
+        '422':
+          description: Validation error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Validation error.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null
+
+    delete:
+      summary: Delete a holiday | allowed for HR, Owner
+      operationId: deleteHoliday
+      tags:
+        - Holidays
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: path
+          name: holiday
+          required: true
+          description: Holiday ID
+          schema:
+            type: integer
+          example: 1
+
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en   
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum:
+              - en
+              - ar
+          example: en
+
+      responses:
+        '200':
+          description: Holiday deleted successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+              example:
+                success: true
+                message: Holiday deleted successfully.
+                data: null
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '403':
+          description: Unauthorized. Only HR or Owner can delete holidays.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthorized. Only HR or Owner can delete holidays.
+                data: null
+
+        '404':
+          description: Holiday not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Holiday not found.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null 
+
+  /company-events:
+
+    # =========================================================
+    # GET ALL COMPANY EVENTS
+    # =========================================================
+
+    get:
+      summary: Get all company events |allowed for Owner, HR, Manager, Employee 📱
+      operationId: getCompanyEvents
+      tags:
+        - Company Events
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+             - ar
+             - en  
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum:
+              - en
+              - ar
+          example: en
+
+      responses:
+        '200':
+          description: Company events retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyEventsResponse'
+              example:
+                success: true
+                message: Company events retrieved successfully.
+                data:
+                  - id: 1
+                    name: Company Annual Meeting
+                    start_date: "2026-10-15"
+                    end_date: "2026-10-15"
+                    description: Annual company meeting
+                    is_active: true
+                    created_by: 1
+                    created_at: "2026-09-26T08:00:00.000000Z"
+                    updated_at: "2026-09-26T08:00:00.000000Z"
+                    creator:
+                      id: 1
+                      name: Admin User
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '403':
+          description: Forbidden. The user does not have permission to view company events.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Forbidden. The user does not have permission to view company events.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null
+
+
+    # =========================================================
+    # CREATE COMPANY EVENT
+    # =========================================================
+
+    post:
+      summary: Create a new company event |allowed for HR, Owner
+      operationId: createCompanyEvent
+      tags:
+        - Company Events
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+             - ar
+             - en  
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum:
+              - en
+              - ar
+          example: en
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreCompanyEventRequest'
+            example:
+              name: Company Annual Meeting
+              start_date: "2026-10-15"
+              end_date: "2026-10-15"
+              description: Annual company meeting
+              is_active: true
+
+      responses:
+        '201':
+          description: Company event created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyEventResponse'
+              example:
+                success: true
+                message: Company event created successfully.
+                data:
+                  id: 1
+                  name: Company Annual Meeting
+                  start_date: "2026-10-15"
+                  end_date: "2026-10-15"
+                  description: Annual company meeting
+                  is_active: true
+                  created_by: 1
+                  created_at: "2026-09-26T08:00:00.000000Z"
+                  updated_at: "2026-09-26T08:00:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '403':
+          description: Forbidden. The user does not have permission to manage company events.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Forbidden. The user does not have permission to manage company events.
+                data: null
+
+        '422':
+          description: Validation error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Validation error.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null
+
+  /company-events/{companyEvent}:
+
+    # =========================================================
+    # UPDATE COMPANY EVENT
+    # =========================================================
+
+    put:
+      summary: Update a company event |allowed for HR, Owner
+      operationId: updateCompanyEvent
+      tags:
+        - Company Events
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: path
+          name: companyEvent
+          required: true
+          description: Company event ID
+          schema:
+            type: integer
+          example: 1
+
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+             - ar
+             - en   
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum:
+              - en
+              - ar
+          example: en
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCompanyEventRequest'
+            example:
+              name: Updated Company Annual Meeting
+              start_date: "2026-10-16"
+              end_date: "2026-10-16"
+              description: Updated annual company meeting
+              is_active: true
+
+      responses:
+        '200':
+          description: Company event updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyEventResponse'
+              example:
+                success: true
+                message: Company event updated successfully.
+                data:
+                  id: 1
+                  name: Updated Company Annual Meeting
+                  start_date: "2026-10-16"
+                  end_date: "2026-10-16"
+                  description: Updated annual company meeting
+                  is_active: true
+                  created_by: 1
+                  created_at: "2026-09-26T08:00:00.000000Z"
+                  updated_at: "2026-09-26T09:00:00.000000Z"
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '403':
+          description: Forbidden. The user does not have permission to manage company events.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Forbidden. The user does not have permission to manage company events.
+                data: null
+
+        '404':
+          description: Company event not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Company event not found.
+                data: null
+
+        '422':
+          description: Validation error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Validation error.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null
+
+
+    # =========================================================
+    # DELETE COMPANY EVENT
+    # =========================================================
+
+    delete:
+      summary: Delete a company event |allowed for HR, Owner
+      operationId: deleteCompanyEvent
+      tags:
+        - Company Events
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: path
+          name: companyEvent
+          required: true
+          description: Company event ID
+          schema:
+            type: integer
+          example: 1
+
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+             - ar
+             - en   
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum:
+              - en
+              - ar
+          example: en
+
+      responses:
+        '200':
+          description: Company event deleted successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+              example:
+                success: true
+                message: Company event deleted successfully.
+                data: null
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '403':
+          description: Forbidden. The user does not have permission to manage company events.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Forbidden. The user does not have permission to manage company events.
+                data: null
+
+        '404':
+          description: Company event not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Company event not found.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null     
+  /calendar:
+    get:
+      summary: Get calendar events | allowed for Owner, HR, Manager, Employee 📱
+      operationId: getCalendarEvents
+      tags:
+        - Calendar
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en
+
+        - in: query
+          name: lang
+          required: false
+          schema:
+            type: string
+            enum:
+              - en
+              - ar
+          example: en
+
+        - in: query
+          name: from
+          required: true
+          description: Start date of the calendar period.
+          schema:
+            type: string
+            format: date
+          example: "2026-09-01"
+
+        - in: query
+          name: to
+          required: true
+          description: End date of the calendar period. Must be greater than or equal to from.
+          schema:
+            type: string
+            format: date
+          example: "2026-09-30"
+
+      responses:
+        '200':
+          description: Calendar events retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarResponse'
+              example:
+                success: true
+                message: Calendar events retrieved successfully.
+                data:
+                  - date: "2026-09-05"
+                    type: leave
+                    reference: 1
+                  - date: "2026-09-10"
+                    type: task_deadline
+                    reference: 15
+                  - date: "2026-09-15"
+                    type: holiday
+                    reference: 2
+                  - date: "2026-09-20"
+                    type: company_event
+                    reference: 3
+
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '422':
+          description: Validation error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Validation error.
+                data: null
+
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null            
+                                     
 components:
   securitySchemes:
     bearerAuth:
@@ -8687,3 +14139,1493 @@ components:
         created_at:
           type: string
           example: 2026-09-17 21:00:00
+    CompanyLocation:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Main Office
+        latitude:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+          example: 30.0444
+        longitude:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+          example: 31.2357
+        radius:
+          type: number
+          format: double
+          description: Attendance geofence radius in meters.
+          example: 350
+        is_active:
+          type: boolean
+          example: true
+        created_by:
+          type: integer
+          nullable: true
+          example: 1
+        created_at:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2026-09-20T18:30:00.000000Z"
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2026-09-20T19:20:00.000000Z"
+
+    CompanyLocationRequest:
+      type: object
+      required:
+        - name
+        - latitude
+        - longitude
+        - radius
+      properties:
+        name:
+          type: string
+          example: Main Office
+        latitude:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+          example: 30.0444
+        longitude:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+          example: 31.2357
+        radius:
+          type: number
+          format: double
+          exclusiveMinimum: 0
+          description: Attendance geofence radius in meters.
+          example: 350
+        is_active:
+          type: boolean
+          default: true
+          example: true
+
+    UpdateCompanyLocationRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Main Office
+        latitude:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+          example: 30.0444
+        longitude:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+          example: 31.2357
+        radius:
+          type: number
+          format: double
+          exclusiveMinimum: 0
+          description: Attendance geofence radius in meters.
+          example: 500
+        is_active:
+          type: boolean
+          example: true
+
+    CompanyLocationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Company location retrieved successfully.
+        data:
+          $ref: '#/components/schemas/CompanyLocation'
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Validation error
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string    
+    Task:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: Complete API Documentation
+        description:
+          type: string
+          nullable: true
+          example: Complete the OpenAPI documentation.
+        priority:
+          type: string
+          enum: [Low, Medium, High, Urgent]
+          example: High
+        status:
+          type: string
+          enum: [Pending, In Progress, Completed, Closed]
+          example: In Progress
+        progress:
+          type: integer
+          minimum: 0
+          maximum: 100
+          example: 60
+        created_by:
+          type: integer
+          example: 2
+        deadline:
+          type: string
+          format: date-time
+          example: "2026-09-30T18:00:00.000000Z"
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-09-20T10:00:00.000000Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2026-09-23T10:00:00.000000Z"
+
+    CreateTaskRequest:
+      type: object
+      required:
+        - title
+        - priority
+        - deadline
+      properties:
+        title:
+          type: string
+          minLength: 3
+          maxLength: 255
+          example: Complete API Documentation
+        description:
+          type: string
+          nullable: true
+          example: Complete the OpenAPI documentation.
+        priority:
+          type: string
+          enum: [Low, Medium, High, Urgent]
+          example: High
+        deadline:
+          type: string
+          format: date-time
+          example: "2026-09-30 18:00:00"
+
+    UpdateTaskRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 3
+          maxLength: 255
+          example: Updated API Documentation
+        description:
+          type: string
+          nullable: true
+          example: Updated description.
+        priority:
+          type: string
+          enum: [Low, Medium, High, Urgent]
+          example: Urgent
+        deadline:
+          type: string
+          format: date-time
+          example: "2026-10-01 18:00:00"
+
+    AssignTaskRequest:
+      type: object
+      required:
+        - user_id
+      properties:
+        user_id:
+          type: integer
+          description: Employee user ID.
+          example: 10
+
+    UpdateTaskProgressRequest:
+      type: object
+      required:
+        - progress
+      properties:
+        progress:
+          type: integer
+          minimum: 0
+          maximum: 100
+          example: 75
+
+    UpdateTaskStatusRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [Pending, In Progress, Completed, Closed]
+          example: Completed
+
+    TaskAssignment:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        task_id:
+          type: integer
+          example: 1
+        user_id:
+          type: integer
+          example: 10
+        assigned_by:
+          type: integer
+          example: 2
+        assigned_at:
+          type: string
+          format: date-time
+          example: "2026-09-23T10:00:00.000000Z"
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-09-23T10:00:00.000000Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2026-09-23T10:00:00.000000Z"
+
+    TaskActivity:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        task_id:
+          type: integer
+          example: 1
+        user_id:
+          type: integer
+          example: 2
+        action:
+          type: string
+          enum:
+            - created
+            - updated
+            - assigned
+            - unassigned
+            - status_changed
+            - progress_updated
+          example: progress_updated
+        old_value:
+          type: string
+          nullable: true
+          example: "50"
+        new_value:
+          type: string
+          nullable: true
+          example: "75"
+        description:
+          type: string
+          nullable: true
+          example: Progress updated successfully.
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-09-23T10:00:00.000000Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2026-09-23T10:00:00.000000Z"
+
+    TaskResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Task retrieved successfully.
+        data:
+          $ref: '#/components/schemas/Task'
+
+    TaskAssignmentResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Task assigned successfully.
+        data:
+          $ref: '#/components/schemas/TaskAssignment'
+
+    TaskDetailsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Task details retrieved successfully.
+        data:
+          $ref: '#/components/schemas/Task'
+
+    TaskActivitiesResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Task activities retrieved successfully.
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskActivity'
+
+    TaskListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Tasks retrieved successfully.
+        data:
+          type: object
+          properties:
+            current_page:
+              type: integer
+              example: 1
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Task'
+            first_page_url:
+              type: string
+              nullable: true
+            from:
+              type: integer
+              nullable: true
+              example: 1
+            last_page:
+              type: integer
+              example: 1
+            last_page_url:
+              type: string
+              nullable: true
+            next_page_url:
+              type: string
+              nullable: true
+            path:
+              type: string
+            per_page:
+              type: integer
+              example: 15
+            prev_page_url:
+              type: string
+              nullable: true
+            to:
+              type: integer
+              nullable: true
+              example: 1
+            total:
+              type: integer
+              example: 1      
+    SubmissionResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+
+        message:
+          type: string
+          example: Submission retrieved successfully.
+
+        data:
+          $ref: '#/components/schemas/Submission'   
+    SubmissionAttachmentResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+
+        message:
+          type: string
+          example: File attached successfully.
+
+        data:
+          $ref: '#/components/schemas/SubmissionAttachment'
+    SubmissionDetails:
+      allOf:
+        - $ref: '#/components/schemas/Submission'
+        - type: object
+          properties:
+            task:
+              $ref: '#/components/schemas/Task'
+
+            user:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  example: 10
+                name:
+                  type: string
+                  example: Ahmed Mohamed
+                email:
+                  type: string
+                  format: email
+                  example: ahmed@example.com
+
+            attachments:
+              type: array
+              items:
+                $ref: '#/components/schemas/SubmissionAttachment'
+
+            reviews:
+              type: array
+              items:
+                $ref: '#/components/schemas/SubmissionReview' 
+    SubmissionDetailsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+
+        message:
+          type: string
+          example: Submission retrieved successfully.
+
+        data:
+          $ref: '#/components/schemas/SubmissionDetails'
+    SubmissionListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+
+        message:
+          type: string
+          example: Submission review queue retrieved successfully.
+
+        data:
+          type: object
+          properties:
+            current_page:
+              type: integer
+              example: 1
+
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Submission'
+
+            per_page:
+              type: integer
+              example: 15
+
+            total:
+              type: integer
+              example: 1
+
+            last_page:
+              type: integer
+              example: 1  
+    StoreLeaveTypeRequest:
+  type: object
+  required:
+    - name
+    - default_days
+  properties:
+    name:
+      type: string
+      example: Annual Leave
+    description:
+      type: string
+      nullable: true
+      example: Annual paid leave
+    default_days:
+      type: number
+      format: float
+      minimum: 0
+      example: 21
+    is_active:
+      type: boolean
+      example: true
+    requires_balance:
+      type: boolean
+      example: true
+    requires_attachment:
+      type: boolean
+      example: false
+
+
+UpdateLeaveTypeRequest:
+  type: object
+  properties:
+    name:
+      type: string
+      example: Annual Leave
+    description:
+      type: string
+      nullable: true
+    default_days:
+      type: number
+      format: float
+      minimum: 0
+      example: 21
+    is_active:
+      type: boolean
+    requires_balance:
+      type: boolean
+    requires_attachment:
+      type: boolean
+
+
+LeaveType:
+  type: object
+  properties:
+    id:
+      type: integer
+      example: 1
+    name:
+      type: string
+      example: Annual Leave
+    description:
+      type: string
+      nullable: true
+    default_days:
+      type: number
+      format: float
+      example: 21
+    is_active:
+      type: boolean
+      example: true
+    requires_balance:
+      type: boolean
+      example: true
+    requires_attachment:
+      type: boolean
+      example: false
+    created_at:
+      type: string
+      format: date-time
+    updated_at:
+      type: string
+      format: date-time
+
+
+LeaveTypeResponse:
+  type: object
+  properties:
+    success:
+      type: boolean
+      example: true
+    message:
+      type: string
+      example: Leave type retrieved successfully.
+    data:
+      $ref: '#/components/schemas/LeaveType'
+
+
+LeaveTypesResponse:
+  type: object
+  properties:
+    success:
+      type: boolean
+      example: true
+    message:
+      type: string
+      example: Leave types retrieved successfully.
+    data:
+      type: array
+      items:
+        $ref: '#/components/schemas/LeaveType'
+
+
+StoreLeaveRequest:
+  type: object
+  required:
+    - leave_type_id
+    - start_date
+    - end_date
+  properties:
+    leave_type_id:
+      type: integer
+      example: 1
+    start_date:
+      type: string
+      format: date
+      example: "2026-10-01"
+    end_date:
+      type: string
+      format: date
+      example: "2026-10-05"
+    reason:
+      type: string
+      nullable: true
+      example: Family vacation
+
+
+ApproveLeaveRequest:
+  type: object
+  properties:
+    note:
+      type: string
+      nullable: true
+      maxLength: 500
+      example: Approved.
+
+
+RejectLeaveRequest:
+  type: object
+  required:
+    - rejection_reason
+  properties:
+    rejection_reason:
+      type: string
+      minLength: 3
+      maxLength: 2000
+      example: Leave period is not available.
+
+
+LeaveBalance:
+  type: object
+  properties:
+    id:
+      type: integer
+      example: 1
+    user_id:
+      type: integer
+      example: 5
+    leave_type_id:
+      type: integer
+      example: 1
+    year:
+      type: integer
+      example: 2026
+    allocated_days:
+      type: number
+      format: float
+      example: 21
+    used_days:
+      type: number
+      format: float
+      example: 3
+    remaining_days:
+      type: number
+      format: float
+      example: 18
+    leave_type:
+      $ref: '#/components/schemas/LeaveType'
+
+
+LeaveBalancesResponse:
+  type: object
+  properties:
+    success:
+      type: boolean
+      example: true
+    message:
+      type: string
+      example: Leave balances retrieved successfully.
+    data:
+      type: array
+      items:
+        $ref: '#/components/schemas/LeaveBalance'
+
+
+LeaveRequest:
+  type: object
+  properties:
+    id:
+      type: integer
+      example: 1
+    user_id:
+      type: integer
+      example: 5
+    leave_type_id:
+      type: integer
+      example: 1
+    start_date:
+      type: string
+      format: date
+      example: "2026-10-01"
+    end_date:
+      type: string
+      format: date
+      example: "2026-10-05"
+    days:
+      type: number
+      format: float
+      example: 5
+    reason:
+      type: string
+      nullable: true
+      example: Family vacation
+    status:
+      type: string
+      enum:
+        - Pending
+        - Approved
+        - Rejected
+        - Cancelled
+      example: Pending
+    rejection_reason:
+      type: string
+      nullable: true
+    reviewed_by:
+      type: integer
+      nullable: true
+      example: 2
+    reviewed_at:
+      type: string
+      format: date-time
+      nullable: true
+    user:
+      type: object
+    leave_type:
+      $ref: '#/components/schemas/LeaveType'
+
+
+LeaveRequestResponse:
+  type: object
+  properties:
+    success:
+      type: boolean
+      example: true
+    message:
+      type: string
+      example: Leave request retrieved successfully.
+    data:
+      $ref: '#/components/schemas/LeaveRequest'
+
+
+LeaveRequestsResponse:
+  type: object
+  properties:
+    success:
+      type: boolean
+      example: true
+    message:
+      type: string
+      example: Leave requests retrieved successfully.
+    data:
+      type: array
+      items:
+        $ref: '#/components/schemas/LeaveRequest'
+
+
+LeaveDecision:
+  type: object
+  properties:
+    id:
+      type: integer
+      example: 1
+    leave_request_id:
+      type: integer
+      example: 1
+    reviewer_id:
+      type: integer
+      example: 2
+    previous_status:
+      type: string
+      example: Pending
+    decision:
+      type: string
+      example: Approved
+    reason:
+      type: string
+      nullable: true
+    decided_at:
+      type: string
+      format: date-time
+    reviewer:
+      type: object
+
+
+LeaveDecisionsResponse:
+  type: object
+  properties:
+    success:
+      type: boolean
+      example: true
+    message:
+      type: string
+      example: Leave decision history retrieved successfully.
+    data:
+      type: array
+      items:
+        $ref: '#/components/schemas/LeaveDecision'
+
+
+FileResponse:
+  type: object
+  properties:
+    success:
+      type: boolean
+      example: true
+    message:
+      type: string
+      example: Attachment uploaded successfully.
+    data:
+      type: object   
+
+    StorePolicyRequest:
+      type: object
+      required:
+        - title
+        - content
+      properties:
+        title:
+          type: string
+          maxLength: 255
+          example: Employee Attendance Policy
+
+        description:
+          type: string
+          nullable: true
+          example: Company attendance and working hours policy
+
+        content:
+          type: string
+          example: Employees must follow the official working hours and attendance rules.
+
+    StorePolicyVersionRequest:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          type: string
+          example: Updated employee attendance and working hours policy.
+
+
+    PolicyVersion:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 2
+
+        policy_id:
+          type: integer
+          example: 1
+
+        version:
+          type: integer
+          example: 2
+
+        content:
+          type: string
+          example: Updated employee attendance and working hours policy.
+
+        status:
+          type: string
+          enum:
+            - draft
+            - active
+            - archived
+          example: draft
+
+        effective_date:
+          type: string
+          format: date
+          nullable: true
+          example: "2026-09-26"
+
+        created_by:
+          type: integer
+          example: 1
+
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-09-26T09:00:00.000000Z"
+
+        updated_at:
+          type: string
+          format: date-time
+          example: "2026-09-26T09:00:00.000000Z"
+
+
+    Policy:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+
+        title:
+          type: string
+          example: Employee Attendance Policy
+
+        description:
+          type: string
+          nullable: true
+          example: Company attendance and working hours policy
+
+        status:
+          type: string
+          enum:
+            - draft
+            - active
+            - archived
+          example: draft
+
+        created_by:
+          type: integer
+          example: 1
+
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-09-26T08:30:00.000000Z"
+
+        updated_at:
+          type: string
+          format: date-time
+          example: "2026-09-26T08:30:00.000000Z"
+
+        versions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyVersion'
+
+
+    PolicyResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+
+        message:
+          type: string
+          example: Policy created successfully.
+
+        data:
+          $ref: '#/components/schemas/Policy'
+
+
+    PoliciesResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+
+        message:
+          type: string
+          example: Policies retrieved successfully.
+
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Policy'
+
+
+    PolicyVersionResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+
+        message:
+          type: string
+          example: Policy version created successfully.
+
+        data:
+          $ref: '#/components/schemas/PolicyVersion'
+
+
+    PolicyAudit:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+
+        policy_id:
+          type: integer
+          example: 1
+
+        policy_version_id:
+          type: integer
+          nullable: true
+          example: 2
+
+        performed_by:
+          type: integer
+          example: 1
+
+        action:
+          type: string
+          example: version_activated
+
+        old_status:
+          type: string
+          nullable: true
+          example: draft
+
+        new_status:
+          type: string
+          nullable: true
+          example: active
+
+        description:
+          type: string
+          nullable: true
+          example: Policy version 2 was activated.
+
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-09-26T09:30:00.000000Z"
+
+        updated_at:
+          type: string
+          format: date-time
+          example: "2026-09-26T09:30:00.000000Z"
+
+        policy_version:
+          $ref: '#/components/schemas/PolicyVersion'
+
+        performer:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            name:
+              type: string
+              example: Admin User
+
+
+    PolicyAuditsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+
+        message:
+          type: string
+          example: Policy audit history retrieved successfully.
+
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyAudit'  
+
+    Holiday:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+
+        name:
+          type: string
+          example: Eid Al-Fitr
+
+        start_date:
+          type: string
+          format: date
+          example: "2026-03-20"
+
+        end_date:
+          type: string
+          format: date
+          example: "2026-03-22"
+
+        description:
+          type: string
+          nullable: true
+          example: Eid Al-Fitr holiday
+
+        is_active:
+          type: boolean
+          example: true
+
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-09-26T08:00:00.000000Z"
+
+        updated_at:
+          type: string
+          format: date-time
+          example: "2026-09-26T08:00:00.000000Z"
+
+
+    StoreHolidayRequest:
+      type: object
+      required:
+        - name
+        - start_date
+        - end_date
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          example: Eid Al-Fitr
+
+        start_date:
+          type: string
+          format: date
+          example: "2026-03-20"
+
+        end_date:
+          type: string
+          format: date
+          example: "2026-03-22"
+
+        description:
+          type: string
+          nullable: true
+          example: Eid Al-Fitr holiday
+
+        is_active:
+          type: boolean
+          default: true
+          example: true
+
+
+    UpdateHolidayRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          example: Updated Eid Al-Fitr
+
+        start_date:
+          type: string
+          format: date
+          example: "2026-03-20"
+
+        end_date:
+          type: string
+          format: date
+          example: "2026-03-23"
+
+        description:
+          type: string
+          nullable: true
+          example: Updated Eid Al-Fitr holiday
+
+        is_active:
+          type: boolean
+          example: true
+
+
+    HolidayResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+
+        message:
+          type: string
+          example: Holiday created successfully.
+
+        data:
+          $ref: '#/components/schemas/Holiday'
+
+
+    HolidaysResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+
+        message:
+          type: string
+          example: Holidays retrieved successfully.
+
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Holiday'
+
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+
+        message:
+          type: string
+          example: Holiday deleted successfully.
+
+        data:
+          nullable: true
+          example: null    
+
+    CompanyEvent:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+
+        name:
+          type: string
+          example: Company Annual Meeting
+
+        start_date:
+          type: string
+          format: date
+          example: "2026-10-15"
+
+        end_date:
+          type: string
+          format: date
+          example: "2026-10-15"
+
+        description:
+          type: string
+          nullable: true
+          example: Annual company meeting
+
+        is_active:
+          type: boolean
+          example: true
+
+        created_by:
+          type: integer
+          example: 1
+
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-09-26T08:00:00.000000Z"
+
+        updated_at:
+          type: string
+          format: date-time
+          example: "2026-09-26T08:00:00.000000Z"
+
+        creator:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            name:
+              type: string
+              example: Admin User
+
+
+    StoreCompanyEventRequest:
+      type: object
+      required:
+        - name
+        - start_date
+        - end_date
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          example: Company Annual Meeting
+
+        start_date:
+          type: string
+          format: date
+          example: "2026-10-15"
+
+        end_date:
+          type: string
+          format: date
+          example: "2026-10-15"
+
+        description:
+          type: string
+          nullable: true
+          example: Annual company meeting
+
+        is_active:
+          type: boolean
+          default: true
+          example: true
+
+
+    UpdateCompanyEventRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          example: Updated Company Annual Meeting
+
+        start_date:
+          type: string
+          format: date
+          example: "2026-10-16"
+
+        end_date:
+          type: string
+          format: date
+          example: "2026-10-16"
+
+        description:
+          type: string
+          nullable: true
+          example: Updated annual company meeting
+
+        is_active:
+          type: boolean
+          example: true
+
+
+    CompanyEventResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+
+        message:
+          type: string
+          example: Company event created successfully.
+
+        data:
+          $ref: '#/components/schemas/CompanyEvent'
+
+
+    CompanyEventsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+
+        message:
+          type: string
+          example: Company events retrieved successfully.
+
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CompanyEvent'       
+
+    CalendarEvent:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+          description: The date on which the event occurs.
+          example: "2026-09-15"
+
+        type:
+          type: string
+          description: Type of the calendar event.
+          enum:
+            - leave
+            - task_deadline
+            - holiday
+            - company_event
+          example: task_deadline
+
+        reference:
+          type: integer
+          description: ID of the related record.
+          example: 25
+
+    CalendarEventsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+
+        message:
+          type: string
+          example: Calendar events retrieved successfully.
+
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CalendarEvent'
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+
+        message:
+          type: string
+          example: Unauthenticated.
+
+        data:
+          nullable: true
+          example: null
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+
+        message:
+          type: string
+          example: The given data was invalid.
+
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          example:
+            from:
+              - The from field is required.
+            to:
+              - The to field must be a date after or equal to from.                      
+                                  
+                  
