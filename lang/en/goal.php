@@ -37,4 +37,18 @@ return [
         'completed' => 'Completed',
         'cancelled' => 'Cancelled',
     ],
+    'validation' => [
+        'title_required' => 'Goal title is required.',
+        'title_string' => 'Goal title must be a string.',
+        'title_max' => 'Goal title must not exceed 255 characters.',
+        'description_string' => 'Goal description must be a string.',
+        'target_date_required' => 'Target date is required.',
+        'target_date_date' => 'Target date must be a valid date.',
+        'target_date_after_or_equal' => 'Target date must be today or a future date.',
+        'employee_id_required' => 'Employee selection is required.',
+        'employee_id_integer' => 'Employee ID must be an integer.',
+        'employee_id_exists' => 'The selected employee does not exist.',
+        'status_required' => 'Goal status is required.',
+        'status_enum' => 'Selected goal status is invalid.',
+    ],
 ];

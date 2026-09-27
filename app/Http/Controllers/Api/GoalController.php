@@ -6,7 +6,6 @@ use App\Enums\GoalStatus;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreGoalRequest;
-use App\Http\Requests\UpdateGoalProgressRequest;
 use App\Http\Requests\UpdateGoalRequest;
 use App\Http\Resources\GoalResource;
 use App\Services\GoalService;
@@ -17,6 +16,7 @@ use Throwable;
 class GoalController extends Controller
 {
     public function __construct(private GoalService $goalService) {}
+
 
     public function index(Request $request): JsonResponse
     {
@@ -35,7 +35,7 @@ class GoalController extends Controller
                 data: [
                     'goals' => $paginatedData['data'],
                     'links' => $paginatedData['links'],
-                    'meta' => $paginatedData['meta'],
+                    'meta'  => $paginatedData['meta'],
                 ],
                 message: __('goal.retrieved')
             );
@@ -49,6 +49,7 @@ class GoalController extends Controller
             );
         }
     }
+
 
     public function show(Request $request, int $id): JsonResponse
     {
@@ -80,6 +81,7 @@ class GoalController extends Controller
         }
     }
 
+
     public function store(StoreGoalRequest $request): JsonResponse
     {
         try {
@@ -107,6 +109,7 @@ class GoalController extends Controller
         }
     }
 
+
     public function update(UpdateGoalRequest $request, int $id): JsonResponse
     {
         try {
@@ -116,15 +119,13 @@ class GoalController extends Controller
                 return ResponseHelper::error(null, __('goal.user_not_found'), 404);
             }
 
-            $goal = $this->goalService->getEmployeeGoalDetails($user, $id);
+            $goal = $this->goalService->getGoalById($id);
 
             if (! $goal) {
                 return ResponseHelper::error(null, __('goal.not_found'), 404);
             }
 
-            if ($goal->status === GoalStatus::COMPLETED || $goal->status === GoalStatus::CANCELLED) {
-                return ResponseHelper::error(null, __('goal.cannot_modify_closed'), 422);
-            }
+
 
             $updatedGoal = $this->goalService->updateGoal($goal, $request->validated());
 
@@ -143,47 +144,7 @@ class GoalController extends Controller
         }
     }
 
-    public function updateProgress(UpdateGoalProgressRequest $request, int $id): JsonResponse
-    {
-        try {
-            $user = $request->user();
-
-            if (! $user) {
-                return ResponseHelper::error(null, __('goal.user_not_found'), 404);
-            }
-
-            $goal = $this->goalService->getEmployeeGoalDetails($user, $id);
-
-            if (! $goal) {
-                return ResponseHelper::error(null, __('goal.not_found'), 404);
-            }
-
-            if ($goal->status === GoalStatus::CANCELLED) {
-                return ResponseHelper::error(null, __('goal.cannot_update_cancelled'), 422);
-            }
-
-            $updatedGoal = $this->goalService->updateProgress(
-                $goal,
-                (float) $request->validated('current_value'),
-                $user->id,
-                $request->validated('note')
-            );
-
-            return ResponseHelper::success(
-                new GoalResource($updatedGoal),
-                __('goal.progress_updated')
-            );
-        } catch (Throwable $e) {
-            report($e);
-
-            return ResponseHelper::error(
-                config('app.debug') ? $e->getMessage() : null,
-                __('goal.failed_progress'),
-                500
-            );
-        }
-    }
-
+    
     public function complete(Request $request, int $id): JsonResponse
     {
         try {

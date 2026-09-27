@@ -245,7 +245,6 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
         Route::post('/', [GoalController::class, 'store'])->middleware('permission:'.PermissionEnum::GOAL_CREATE->value);
         Route::get('/{id}', [GoalController::class, 'show'])->middleware('permission:'.PermissionEnum::GOAL_VIEW_OWN->value);
         Route::put('/{id}', [GoalController::class, 'update'])->middleware('permission:'.PermissionEnum::GOAL_UPDATE->value);
-        Route::patch('/{id}/progress', [GoalController::class, 'updateProgress'])->middleware('permission:'.PermissionEnum::GOAL_UPDATE_PROGRESS->value);
         Route::patch('/{id}/complete', [GoalController::class, 'complete'])->middleware('permission:'.PermissionEnum::GOAL_COMPLETE->value);
     });
 

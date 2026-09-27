@@ -6515,8 +6515,8 @@ paths:
     get:
       tags:
       - Goals
-      summary: Get Employee Goals 📱
-      description: Retrieves a paginated list of goals assigned to the authenticated employee.
+      summary: List Own Goals (Employee)
+      description: Returns a paginated list of goals belonging to the authenticated employee. Employees can only see their own goals.
       operationId: GetEmployeeGoals.
       parameters:
       - name: status
@@ -6555,11 +6555,33 @@ paths:
         "500":
           description: Failed to retrieve goals.
     post:
+      summary: Create a Goal for an Employee (Owner / HR / Manager)
+      description: Owner, HR, and Manager can create a goal for a specific employee. The goal is assigned to the employee identified by employee_id.
+      operationId: createGoal
       tags:
-      - Goals
-      summary: Create Goal 📱
-      description: Creates a new goal for the authenticated employee.
-      operationId: CreateGoal.
+        - Goals
+      security:
+        - bearerAuth: []
+      parameters:
+      - in: header
+        name: Accept
+        required: true
+        schema:
+          type: string
+          default: application/json
+        example: application/json
+      - in: header
+        name: Accept-Language
+        required: false
+        description: Language preference for response messages
+        schema:
+          type: string
+          enum:
+            - ar
+            - en
+          default: en
+        example: en
+
       requestBody:
         required: true
         content:
@@ -6567,24 +6589,31 @@ paths:
             schema:
               type: object
               required:
-              - title
-              - target_value
-              - target_date
+                - employee_id
+                - title
+                - target_date
               properties:
+                employee_id:
+                  type: integer
+                  description: The ID of the employee this goal belongs to.
+                  example: 6
                 title:
                   type: string
-                  example: Complete Laravel Refactoring
+                  maxLength: 255
+                  example: "responsive task 2"
                 description:
                   type: string
                   nullable: true
-                  example: Clean up legacy API documentation and controllers.
-                target_value:
-                  type: number
-                  example: 100
+                  example: "Finish This Course"
                 target_date:
                   type: string
                   format: date
-                  example: 2026-12-31
+                  example: "2026-10-30"
+            example:
+              employee_id: 6
+              title: "responsive task 2"
+              description: "Finish This Course"
+              target_date: "2026-10-30"
       responses:
         "201":
           description: Goal created successfully.
@@ -6598,30 +6627,123 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Goal created successfully.
+                    example: "Goal created successfully."
                   data:
-                    $ref: "#/components/schemas/Goal"
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 3
+                      user:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 6
+                          name:
+                            type: string
+                            example: "Noran Baligh"
+                      title:
+                        type: string
+                        example: "responsive task 2"
+                      description:
+                        type: string
+                        nullable: true
+                        example: "Finish This Course"
+                      target_date:
+                        type: string
+                        format: date
+                        example: "2026-10-30"
+                      status:
+                        type: string
+                        example: "Active"
+                      created_at:
+                        type: string
+                        example: "2026-09-27 13:22:53"
+              example:
+                success: true
+                message: "Goal created successfully."
+                data:
+                  id: 3
+                  user:
+                    id: 6
+                    name: "Noran Baligh"
+                  title: "responsive task 2"
+                  description: "Finish This Course"
+                  target_date: "2026-10-30"
+                  status: "Active"
+                  created_at: "2026-09-27 13:22:53"
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Unauthenticated."
+              example:
+                success: false
+                message: "Unauthenticated."
         "404":
           description: Employee profile not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Employee profile not found."
+              example:
+                success: false
+                message: "Employee profile not found."
         "422":
           description: Validation error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "The employee field is required. The goal title field is required. The target date field is required."
+              example:
+                success: false
+                message: "The employee field is required. The goal title field is required. The target date field is required."
         "500":
           description: Failed to create goal.
-      parameters:
-      - in: header
-        name: Accept-Language
-        required: false
-        schema:
-          type: string
-          enum:
-          - ar
-          - en
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Failed to create goal."
+              example:
+                success: false
+                message: "Failed to create goal."
+
   /api/goals/{id}:
     get:
       tags:
       - Goals
-      summary: Get Goal Details 📱
-      description: Retrieves details of a specific goal owned by the authenticated employee.
+      summary: View Own Goal Details (Employee)
+      description: Returns details of a specific goal. Employees can only access their own goals. Returns 404 if the goal does not belong to the authenticated employee.
       operationId: GetGoalDetails.
       parameters:
       - name: id
@@ -6661,8 +6783,8 @@ paths:
     put:
       tags:
       - Goals
-      summary: Update Goal Details 📱
-      description: Updates editable fields of a goal. Cannot update completed or cancelled goals.
+      summary: Update a Goal (Owner / HR / Manager)
+      description: Owner, HR, and Manager can update any goal regardless of which employee it belongs to. Returns 404 if the goal does not exist. Returns 422 if the goal is completed or cancelled.
       operationId: UpdateGoalDetails.
       parameters:
       - name: id
@@ -6722,73 +6844,13 @@ paths:
           description: Completed or cancelled goals cannot be modified.
         "500":
           description: Failed to update goal details.
-  /api/goals/{id}/progress:
-    patch:
-      tags:
-      - Goals
-      summary: Update Goal Progress 📱
-      operationId: UpdateGoalProgress.
-      description: Logs progress for a goal and automatically marks it as completed if current_value reaches target_value.
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-        example: 1
-      - in: header
-        name: Accept-Language
-        required: false
-        schema:
-          type: string
-          enum:
-          - ar
-          - en
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-              - current_value
-              properties:
-                current_value:
-                  type: number
-                  example: 75.5
-                note:
-                  type: string
-                  nullable: true
-                  example: Completed phase 1 implementation.
-      responses:
-        "200":
-          description: Goal progress updated successfully.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: Goal progress updated successfully.
-                  data:
-                    $ref: "#/components/schemas/Goal"
-        "404":
-          description: Goal not found or access denied.
-        "422":
-          description: Cannot update progress for a cancelled goal.
-        "500":
-          description: Failed to update goal progress.
   /api/goals/{id}/complete:
     patch:
       tags:
       - Goals
-      summary: Mark Goal as Completed 📱
+      summary: Mark Own Goal as Completed (Employee)
       operationId: MarkGoalAsCompleted.
-      description: Explicitly marks a goal as completed and sets current_value equal to target_value.
+      description: Employee can mark their own goal as completed. Ownership is enforced — employees cannot complete another employee's goal. Returns 404 if the goal does not belong to the authenticated employee.
       parameters:
       - name: id
         in: path
@@ -8954,24 +9016,24 @@ paths:
         Allows (HR or Owner) to review an attendance exception record and either approve or reject it, with an optional administrative note.
       operationId: updateAttendanceExceptionStatus
       tags:
-        - Attendance
+      - Attendance
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       parameters:
-        - in: header
-          name: Accept
-          required: true
-          schema:
-            type: string
-            default: application/json
-          example: application/json
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-          description: The ID of the attendance record
-          example: 5
+      - in: header
+        name: Accept
+        required: true
+        schema:
+          type: string
+          default: application/json
+        example: application/json
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+        description: The ID of the attendance record
+        example: 5
       requestBody:
         required: true
         content:
@@ -8979,13 +9041,13 @@ paths:
             schema:
               type: object
               required:
-                - status
+              - status
               properties:
                 status:
                   type: string
                   enum:
-                    - approved
-                    - rejected
+                  - approved
+                  - rejected
                   description: Decision status for the exception
                   example: approved
                 admin_note:
@@ -9044,7 +9106,7 @@ paths:
                       check_out:
                         type: string
                         nullable: true
-                        example: null
+                        example:
                       status:
                         type: string
                         example: Late
@@ -9062,14 +9124,14 @@ paths:
                           status:
                             type: string
                             enum:
-                              - pending
-                              - approved
-                              - rejected
+                            - pending
+                            - approved
+                            - rejected
                             example: pending
                           admin_note:
                             type: string
                             nullable: true
-                            example: null
+                            example:
                       company_name:
                         type: string
                         example: WorkWise HQ
@@ -9086,13 +9148,13 @@ paths:
                     job_title: Frontend Developer
                     department: New Department
                   check_in: "03:02 PM"
-                  check_out: null
+                  check_out:
                   status: Late
                   exception:
                     is_exception: true
                     reason: Check-in recorded outside company geofence radius.
                     status: pending
-                    admin_note: null
+                    admin_note:
                   company_name: WorkWise HQ
         "401":
           $ref: '#/components/responses/401Unauthorized'
@@ -9105,7 +9167,7 @@ paths:
               example:
                 success: false
                 message: User does not have the right permissions.
-                errors: null
+                errors:
         "404":
           description: Attendance record not found
           content:
@@ -9115,7 +9177,7 @@ paths:
               example:
                 success: false
                 message: Attendance exception record not found.
-                errors: null
+                errors:
         "422":
           description: Validation Error
           content:
@@ -9127,7 +9189,7 @@ paths:
                 message: Decision status is required.
                 errors:
                   status:
-                    - Decision status is required.
+                  - Decision status is required.
 components:
   securitySchemes:
     bearerAuth:

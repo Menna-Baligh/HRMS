@@ -197,7 +197,9 @@ enum PermissionEnum: string
             self::LEAVE_QUEUE_MANAGER,
             self::AI_EVALUATION_DRAFT,
             self::AI_ATTENTION_SIGNAL,
-            self::AI_TEAM_INSIGHT => ['Manager', 'HR', 'Owner'],
+            self::AI_TEAM_INSIGHT,
+            self::GOAL_CREATE,
+            self::GOAL_UPDATE => ['Manager', 'HR', 'Owner'],
 
             // All Roles (Owner, HR, Manager, Employee)
             self::EMPLOYEE_VIEW_PROFILE,
@@ -212,11 +214,6 @@ enum PermissionEnum: string
             self::LOCATION_VIEW_ACTIVE,
             self::ATTENDANCE_CHECKIN_CHECKOUT,
             self::ATTENDANCE_VIEW_HISTORY,
-            self::GOAL_VIEW_OWN,
-            self::GOAL_CREATE,
-            self::GOAL_UPDATE,
-            self::GOAL_UPDATE_PROGRESS,
-            self::GOAL_COMPLETE,
             self::EVALUATION_VIEW_EMPLOYEE,
             self::EMPLOYEE_PERFORMANCE_DASHBOARD,
             self::LEAVE_BALANCE_VIEW,
@@ -230,12 +227,15 @@ enum PermissionEnum: string
             self::COMPANY_EVENT_VIEW,
             self::POLICY_VIEW,
             self::POLICY_ACTIVE_VIEW,
-            self::FILE_DELETE => ['Owner', 'HR', 'Manager', 'Employee'],
             self::FILE_DELETE,
             self::AI_CAREER_COACH,
             self::AI_PERFORMANCE_INSIGHT,
             self::AI_SKILL_GAP,
             self::AI_POLICY_ASSISTANT => ['Owner', 'HR', 'Manager', 'Employee'],
+
+            // Employee Only
+            self::GOAL_VIEW_OWN,
+            self::GOAL_COMPLETE => ['Employee'],
 
             default => ['Owner', 'HR'],
         };
