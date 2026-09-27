@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Services\GeofenceService;
 use Illuminate\Foundation\Http\FormRequest;
 
 class GetTodayAttendanceRequest extends FormRequest
@@ -17,10 +16,10 @@ class GetTodayAttendanceRequest extends FormRequest
         return [
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => [
-                'nullable', 
-                'numeric', 
+                'nullable',
+                'numeric',
                 'between:-180,180',
-                
+
             ],
         ];
     }

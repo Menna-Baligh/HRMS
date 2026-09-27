@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateEmployeeHrFieldsRequest extends FormRequest
@@ -19,7 +18,7 @@ class UpdateEmployeeHrFieldsRequest extends FormRequest
             'employment_type' => ['sometimes', 'in:Full-time,Part-time,Contract'],
             'status' => ['sometimes', 'in:active,inactive'],
             'department_id' => ['nullable', 'exists:departments,id'],
-            
+
         ];
     }
 }

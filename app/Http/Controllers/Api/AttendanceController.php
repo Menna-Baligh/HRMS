@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CheckInRequest;
-use App\Http\Requests\CheckOutRequest;
 use App\Http\Requests\GetAttendanceHistoryRequest;
 use App\Http\Requests\GetTodayAttendanceRequest;
 use App\Http\Resources\AttendanceHistoryResource;
@@ -88,7 +87,6 @@ class AttendanceController extends Controller
         } catch (\Exception $e) {
             $errorResponses = [
                 'DUPLICATE_CHECKIN' => [Response::HTTP_UNPROCESSABLE_ENTITY, __('attendance.errors.duplicate_checkin')],
-                'OUTSIDE_RADIUS' => [Response::HTTP_UNPROCESSABLE_ENTITY, __('attendance.errors.outside_radius')],
                 'LOCATION_NOT_CONFIGURED' => [Response::HTTP_UNPROCESSABLE_ENTITY, __('attendance.errors.location_not_configured')],
             ];
 
@@ -173,8 +171,8 @@ class AttendanceController extends Controller
 
         $formattedData = [
             'history' => $responseData['data'],
-            'links'   => $responseData['links'],
-            'meta'    => $responseData['meta'],
+            'links' => $responseData['links'],
+            'meta' => $responseData['meta'],
         ];
 
         return ResponseHelper::success(

@@ -36,4 +36,18 @@ return [
         'completed' => 'مكتمل',
         'cancelled' => 'ملغى',
     ],
+    'validation' => [
+        'title_required' => 'عنوان الهدف مطلوب.',
+        'title_string' => 'يجب أن يكون عنوان الهدف نصاً.',
+        'title_max' => 'يجب ألا يتجاوز عنوان الهدف 255 حرفاً.',
+        'description_string' => 'يجب أن يكون وصف الهدف نصاً.',
+        'target_date_required' => 'تاريخ الاستهداف مطلوب.',
+        'target_date_date' => 'صيغة تاريخ الاستهداف غير صالحة.',
+        'target_date_after_or_equal' => 'يجب أن يكون تاريخ الاستهداف اليوم أو تاريخاً مستقبلياً.',
+        'employee_id_required' => 'حقل الموظف مطلوب.',
+        'employee_id_integer' => 'معرف الموظف يجب أن يكون رقماً صحيحاً.',
+        'employee_id_exists' => 'الموظف المحدّد غير موجود بالنظام.',
+        'status_required' => 'حالة الهدف مطلوبة.',
+        'status_enum' => 'حالة الهدف غير صالحة.',
+    ],
 ];

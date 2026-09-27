@@ -14,9 +14,9 @@ class StoreGoalRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'employee_id' => ['required', 'integer', 'exists:users,id'],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'target_value' => ['required', 'numeric', 'min:1'],
             'target_date' => ['required', 'date', 'after_or_equal:today'],
         ];
     }
@@ -24,10 +24,9 @@ class StoreGoalRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'title' => 'عنوان الهدف',
-            'description' => 'وصف الهدف',
-            'target_value' => 'القيمة المستهدفة',
-            'target_date' => 'تاريخ الاستهداف',
+            'employee_id' => __('validation.attributes.employee_id'),
+            'title' => __('validation.attributes.title'),
+            'target_date' => __('validation.attributes.target_date'),
         ];
     }
 }

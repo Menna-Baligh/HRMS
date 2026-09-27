@@ -2,7 +2,10 @@
 
 namespace App\Helpers;
 
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\MessageProvider;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Arr;
 
 class ResponseHelper
 {
@@ -19,19 +22,19 @@ class ResponseHelper
     {
         $resolvedMessage = $message;
 
-        if (!empty($errors)) {
-            if ($errors instanceof \Illuminate\Contracts\Support\MessageProvider) {
+        if (! empty($errors)) {
+            if ($errors instanceof MessageProvider) {
                 $errorMessages = $errors->getMessageBag()->all();
-            } elseif ($errors instanceof \Illuminate\Contracts\Support\Arrayable) {
-                $errorMessages = \Illuminate\Support\Arr::flatten($errors->toArray());
+            } elseif ($errors instanceof Arrayable) {
+                $errorMessages = Arr::flatten($errors->toArray());
             } elseif (is_array($errors)) {
-                $errorMessages = \Illuminate\Support\Arr::flatten($errors);
+                $errorMessages = Arr::flatten($errors);
             } else {
                 $errorMessages = [(string) $errors];
             }
 
             $errorMessages = array_filter(array_map('trim', $errorMessages));
-            if (!empty($errorMessages)) {
+            if (! empty($errorMessages)) {
                 $resolvedMessage = implode(' ', $errorMessages);
             }
         }

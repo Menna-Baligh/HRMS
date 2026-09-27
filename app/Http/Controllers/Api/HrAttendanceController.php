@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\GetHrDailyAttendanceRequest;
 use App\Http\Requests\GetHrExceptionsAttendanceRequest;
 use App\Http\Requests\GetHrMonthlySummaryRequest;
+use App\Http\Requests\UpdateAttendanceExceptionRequest;
 use App\Http\Resources\HrAttendanceExceptionResource;
 use App\Http\Resources\HrDailyAttendanceResource;
 use App\Http\Resources\HrMonthlySummaryResource;
@@ -75,6 +76,31 @@ class HrAttendanceController extends Controller
 
             return ResponseHelper::error(
                 message: __('hr.failed_to_retrieve'),
+                statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    public function updateExceptionStatus(UpdateAttendanceExceptionRequest $request, int $id): JsonResponse
+    {
+        $validated = $request->validated();
+
+        try {
+            $attendance = $this->attendanceService->handleExceptionDecision(
+                $id,
+                $validated['status'],
+                $validated['admin_note'] ?? null
+            );
+
+            return ResponseHelper::success(
+                data: new HrAttendanceExceptionResource($attendance),
+                message: __('hr.exception_status_updated')
+            );
+        } catch (Throwable $e) {
+            report($e);
+
+            return ResponseHelper::error(
+                message: __('hr.failed_to_update_exception'),
                 statusCode: Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
