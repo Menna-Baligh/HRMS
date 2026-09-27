@@ -6513,27 +6513,53 @@ paths:
           $ref: "#/components/responses/InternalServerError"
   /api/goals:
     get:
-      tags:
-      - Goals
-      summary: List Own Goals (Employee)
+      summary: List Own Goals (Employee) 📱
       description: Returns a paginated list of goals belonging to the authenticated employee. Employees can only see their own goals.
-      operationId: GetEmployeeGoals.
+      operationId: getEmployeeGoals
+      tags:
+        - Goals
+      security:
+        - bearerAuth: []
       parameters:
-      - name: status
-        in: query
-        required: false
-        description: Filter goals by status (e.g., active, completed, cancelled).
-        schema:
-          type: string
-          example: active
-      - in: header
-        name: Accept-Language
-        required: false
-        schema:
-          type: string
-          enum:
-          - ar
-          - en
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          description: Language preference for response messages
+          schema:
+            type: string
+            enum:
+              - ar
+              - en
+            default: en
+          example: en
+        - name: status
+          in: query
+          required: false
+          description: Filter goals by status (e.g., active, completed, cancelled).
+          schema:
+            type: string
+            example: active
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+          example: 1
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 15
+          example: 15
       responses:
         "200":
           description: Employee goals retrieved successfully.
@@ -6547,13 +6573,180 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Employee goals retrieved successfully.
+                    example: "Employee goals retrieved successfully."
                   data:
-                    $ref: "#/components/schemas/GoalPaginatedResponse"
+                    type: object
+                    properties:
+                      goals:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            title:
+                              type: string
+                              example: "responsive task"
+                            description:
+                              type: string
+                              nullable: true
+                              example: "Finish This Course"
+                            target_date:
+                              type: string
+                              format: date
+                              example: "2026-10-30"
+                            status:
+                              type: string
+                              example: "Active"
+                            created_at:
+                              type: string
+                              example: "2026-09-27 13:00:43"
+                      links:
+                        type: object
+                        properties:
+                          first:
+                            type: string
+                            nullable: true
+                            example: "https://hr-system.iptvdemo.serv5group.com/api/goals?page=1"
+                          last:
+                            type: string
+                            nullable: true
+                            example: "https://hr-system.iptvdemo.serv5group.com/api/goals?page=1"
+                          prev:
+                            type: string
+                            nullable: true
+                            example: null
+                          next:
+                            type: string
+                            nullable: true
+                            example: null
+                      meta:
+                        type: object
+                        properties:
+                          current_page:
+                            type: integer
+                            example: 1
+                          from:
+                            type: integer
+                            nullable: true
+                            example: 1
+                          last_page:
+                            type: integer
+                            example: 1
+                          links:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                url:
+                                  type: string
+                                  nullable: true
+                                label:
+                                  type: string
+                                page:
+                                  type: integer
+                                  nullable: true
+                                active:
+                                  type: boolean
+                          path:
+                            type: string
+                            example: "https://hr-system.iptvdemo.serv5group.com/api/goals"
+                          per_page:
+                            type: integer
+                            example: 15
+                          to:
+                            type: integer
+                            nullable: true
+                            example: 1
+                          total:
+                            type: integer
+                            example: 1
+              example:
+                success: true
+                message: "Employee goals retrieved successfully."
+                data:
+                  goals:
+                    - id: 1
+                      title: "responsive task"
+                      description: "Finish This Course"
+                      target_date: "2026-10-30"
+                      status: "Active"
+                      created_at: "2026-09-27 13:00:43"
+                  links:
+                    first: "https://hr-system.iptvdemo.serv5group.com/api/goals?page=1"
+                    last: "https://hr-system.iptvdemo.serv5group.com/api/goals?page=1"
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    from: 1
+                    last_page: 1
+                    links:
+                      - url: null
+                        label: "&laquo; Previous"
+                        page: null
+                        active: false
+                      - url: "https://hr-system.iptvdemo.serv5group.com/api/goals?page=1"
+                        label: "1"
+                        page: 1
+                        active: true
+                      - url: null
+                        label: "Next &raquo;"
+                        page: null
+                        active: false
+                    path: "https://hr-system.iptvdemo.serv5group.com/api/goals"
+                    per_page: 15
+                    to: 1
+                    total: 1
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Unauthenticated."
+              example:
+                success: false
+                message: "Unauthenticated."
         "404":
           description: Employee profile not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Employee profile not found."
+              example:
+                success: false
+                message: "Employee profile not found."
         "500":
           description: Failed to retrieve goals.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Failed to retrieve goals."
+              example:
+                success: false
+                message: "Failed to retrieve goals."
     post:
       summary: Create a Goal for an Employee (Owner / HR / Manager)
       description: Owner, HR, and Manager can create a goal for a specific employee. The goal is assigned to the employee identified by employee_id.
@@ -6740,26 +6933,39 @@ paths:
 
   /api/goals/{id}:
     get:
-      tags:
-      - Goals
-      summary: View Own Goal Details (Employee)
+      summary: View Own Goal Details (Employee) 📱
       description: Returns details of a specific goal. Employees can only access their own goals. Returns 404 if the goal does not belong to the authenticated employee.
-      operationId: GetGoalDetails.
+      operationId: getGoalDetails
+      tags:
+        - Goals
+      security:
+        - bearerAuth: []
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-        example: 1
-      - in: header
-        name: Accept-Language
-        required: false
-        schema:
-          type: string
-          enum:
-          - ar
-          - en
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          description: Language preference for response messages
+          schema:
+            type: string
+            enum:
+              - ar
+              - en
+            default: en
+          example: en
+        - name: id
+          in: path
+          required: true
+          description: The ID of the goal.
+          schema:
+            type: integer
+          example: 1
       responses:
         "200":
           description: Goal details retrieved successfully.
@@ -6773,34 +6979,122 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Goal details retrieved successfully.
+                    example: "Goal details retrieved successfully."
                   data:
-                    $ref: "#/components/schemas/Goal"
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      title:
+                        type: string
+                        example: "responsive task"
+                      description:
+                        type: string
+                        nullable: true
+                        example: "Finish This Course"
+                      target_date:
+                        type: string
+                        format: date
+                        example: "2026-10-30"
+                      status:
+                        type: string
+                        example: "Active"
+                      created_at:
+                        type: string
+                        example: "2026-09-27 13:00:43"
+              example:
+                success: true
+                message: "Goal details retrieved successfully."
+                data:
+                  id: 1
+                  title: "responsive task"
+                  description: "Finish This Course"
+                  target_date: "2026-10-30"
+                  status: "Active"
+                  created_at: "2026-09-27 13:00:43"
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Unauthenticated."
+              example:
+                success: false
+                message: "Unauthenticated."
         "404":
           description: Goal not found or access denied.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Goal not found or access denied."
+              example:
+                success: false
+                message: "Goal not found or access denied."
         "500":
           description: Failed to retrieve goal details.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Failed to retrieve goal details."
+              example:
+                success: false
+                message: "Failed to retrieve goal details."
     put:
-      tags:
-      - Goals
       summary: Update a Goal (Owner / HR / Manager)
-      description: Owner, HR, and Manager can update any goal regardless of which employee it belongs to. Returns 404 if the goal does not exist. Returns 422 if the goal is completed or cancelled.
-      operationId: UpdateGoalDetails.
+      description: Owner, HR, and Manager can update any goal regardless of which employee it belongs to. Returns 404 if the goal does not exist. Returns 422 if validation fails.
+      operationId: updateGoalDetails
+      tags:
+        - Goals
+      security:
+        - bearerAuth: []
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-        example: 1
-      - in: header
-        name: Accept-Language
-        required: false
-        schema:
-          type: string
-          enum:
-          - ar
-          - en
+        - name: id
+          in: path
+          required: true
+          description: The ID of the goal to update.
+          schema:
+            type: integer
+          example: 1
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          description: Language preference for response messages
+          schema:
+            type: string
+            enum:
+              - ar
+              - en
+            default: en
+          example: en
       requestBody:
         required: true
         content:
@@ -6810,18 +7104,32 @@ paths:
               properties:
                 title:
                   type: string
-                  example: Updated Goal Title
+                  maxLength: 255
+                  example: "Updated Goal Title"
                 description:
                   type: string
                   nullable: true
-                  example: Updated description details.
-                target_value:
-                  type: number
-                  example: 150
+                  example: "Updated description details."
                 target_date:
                   type: string
                   format: date
-                  example: 2026-12-31
+                  example: "2026-11-15"
+                employee_id:
+                  type: integer
+                  example: 6
+                status:
+                  type: string
+                  enum:
+                    - active
+                    - completed
+                    - cancelled
+                  example: "active"
+            example:
+              title: "Updated Goal Title"
+              description: "Updated description details."
+              target_date: "2026-11-15"
+              employee_id: 6
+              status: "active"
       responses:
         "200":
           description: Goal details updated successfully.
@@ -6835,37 +7143,151 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Goal details updated successfully.
+                    example: "Goal details updated successfully."
                   data:
-                    $ref: "#/components/schemas/Goal"
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      user:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 6
+                          name:
+                            type: string
+                            example: "Noran Baligh"
+                      title:
+                        type: string
+                        example: "Updated Goal Title"
+                      description:
+                        type: string
+                        nullable: true
+                        example: "Updated description details."
+                      target_date:
+                        type: string
+                        format: date
+                        example: "2026-11-15"
+                      status:
+                        type: string
+                        example: "Active"
+                      created_at:
+                        type: string
+                        example: "2026-09-27 13:00:43"
+              example:
+                success: true
+                message: "Goal details updated successfully."
+                data:
+                  id: 1
+                  user:
+                    id: 6
+                    name: "Noran Baligh"
+                  title: "Updated Goal Title"
+                  description: "Updated description details."
+                  target_date: "2026-11-15"
+                  status: "Active"
+                  created_at: "2026-09-27 13:00:43"
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Unauthenticated."
+              example:
+                success: false
+                message: "Unauthenticated."
         "404":
           description: Goal not found or access denied.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Goal not found or access denied."
+              example:
+                success: false
+                message: "Goal not found or access denied."
         "422":
-          description: Completed or cancelled goals cannot be modified.
+          description: Validation error or completed/cancelled goals cannot be modified.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Completed or cancelled goals cannot be modified."
+              example:
+                success: false
+                message: "Completed or cancelled goals cannot be modified."
         "500":
           description: Failed to update goal details.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Failed to update goal details."
+              example:
+                success: false
+                message: "Failed to update goal details."
   /api/goals/{id}/complete:
     patch:
+      summary: Mark Own Goal as Completed (Employee) 📱
+      description: Employee can mark their own goal as completed. Ownership is enforced — employees cannot complete another employee's goal. Returns 404 if the goal does not belong to the authenticated employee. Returns 422 if the goal is already marked as completed.
+      operationId: markGoalAsCompleted
       tags:
-      - Goals
-      summary: Mark Own Goal as Completed (Employee)
-      operationId: MarkGoalAsCompleted.
-      description: Employee can mark their own goal as completed. Ownership is enforced — employees cannot complete another employee's goal. Returns 404 if the goal does not belong to the authenticated employee.
+        - Goals
+      security:
+        - bearerAuth: []
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-        example: 1
-      - in: header
-        name: Accept-Language
-        required: false
-        schema:
-          type: string
-          enum:
-          - ar
-          - en
+        - name: id
+          in: path
+          required: true
+          description: The ID of the goal to mark as completed.
+          schema:
+            type: integer
+          example: 2
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          description: Language preference for response messages
+          schema:
+            type: string
+            enum:
+              - ar
+              - en
+            default: en
+          example: en
       responses:
         "200":
           description: Goal marked as completed successfully.
@@ -6879,43 +7301,172 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Goal marked as completed successfully.
+                    example: "Goal marked as completed successfully."
                   data:
-                    $ref: "#/components/schemas/Goal"
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 2
+                      user:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 6
+                          name:
+                            type: string
+                            example: "Noran Baligh"
+                      title:
+                        type: string
+                        example: "responsive task 2"
+                      description:
+                        type: string
+                        nullable: true
+                        example: "Finish This Course"
+                      target_date:
+                        type: string
+                        format: date
+                        example: "2026-10-30"
+                      status:
+                        type: string
+                        example: "Completed"
+                      created_at:
+                        type: string
+                        example: "2026-09-27 13:22:05"
+              example:
+                success: true
+                message: "Goal marked as completed successfully."
+                data:
+                  id: 2
+                  user:
+                    id: 6
+                    name: "Noran Baligh"
+                  title: "responsive task 2"
+                  description: "Finish This Course"
+                  target_date: "2026-10-30"
+                  status: "Completed"
+                  created_at: "2026-09-27 13:22:05"
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Unauthenticated."
+              example:
+                success: false
+                message: "Unauthenticated."
         "404":
           description: Goal not found or access denied.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Goal not found or access denied."
+              example:
+                success: false
+                message: "Goal not found or access denied."
         "422":
           description: Goal is already marked as completed.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Goal is already marked as completed."
+              example:
+                success: false
+                message: "Goal is already marked as completed."
         "500":
           description: Failed to mark goal as completed.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Failed to mark goal as completed."
+              example:
+                success: false
+                message: "Failed to mark goal as completed."
   /api/manager/team-goals:
     get:
-      tags:
-      - Goals
       summary: Get Team Goals (Manager)
-      operationId: GetTeamGoals.
       description: Retrieves a paginated list of goals for team members reporting to the authenticated manager.
+      operationId: getTeamGoals
+      tags:
+        - Goals
+      security:
+        - bearerAuth: []
       parameters:
-      - name: status
-        in: query
-        required: false
-        schema:
-          type: string
-        example: active
-      - name: employee_id
-        in: query
-        required: false
-        schema:
-          type: integer
-        example: 5
-      - in: header
-        name: Accept-Language
-        required: false
-        schema:
-          type: string
-          enum:
-          - ar
-          - en
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          description: Language preference for response messages
+          schema:
+            type: string
+            enum:
+              - ar
+              - en
+            default: en
+          example: en
+        - name: status
+          in: query
+          required: false
+          description: Filter goals by status (e.g., active, completed, cancelled).
+          schema:
+            type: string
+            example: active
+        - name: employee_id
+          in: query
+          required: false
+          description: Filter goals by a specific team member's ID.
+          schema:
+            type: integer
+          example: 6
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+          example: 1
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 15
+          example: 15
       responses:
         "200":
           description: Team goals retrieved successfully.
@@ -6929,47 +7480,273 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Team goals retrieved successfully.
+                    example: "Team goals retrieved successfully."
                   data:
-                    $ref: "#/components/schemas/GoalPaginatedResponse"
+                    type: object
+                    properties:
+                      goals:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 3
+                            user:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 6
+                                name:
+                                  type: string
+                                  example: "Noran Baligh"
+                            title:
+                              type: string
+                              example: "responsive task 2"
+                            description:
+                              type: string
+                              nullable: true
+                              example: "Finish This Course"
+                            target_date:
+                              type: string
+                              format: date
+                              example: "2026-10-30"
+                            status:
+                              type: string
+                              example: "Active"
+                            created_at:
+                              type: string
+                              example: "2026-09-27 13:22:53"
+                      links:
+                        type: object
+                        properties:
+                          first:
+                            type: string
+                            nullable: true
+                            example: "https://hr-system.iptvdemo.serv5group.com/api/manager/team-goals?page=1"
+                          last:
+                            type: string
+                            nullable: true
+                            example: "https://hr-system.iptvdemo.serv5group.com/api/manager/team-goals?page=1"
+                          prev:
+                            type: string
+                            nullable: true
+                            example: null
+                          next:
+                            type: string
+                            nullable: true
+                            example: null
+                      meta:
+                        type: object
+                        properties:
+                          current_page:
+                            type: integer
+                            example: 1
+                          from:
+                            type: integer
+                            nullable: true
+                            example: 1
+                          last_page:
+                            type: integer
+                            example: 1
+                          links:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                url:
+                                  type: string
+                                  nullable: true
+                                label:
+                                  type: string
+                                page:
+                                  type: integer
+                                  nullable: true
+                                active:
+                                  type: boolean
+                          path:
+                            type: string
+                            example: "https://hr-system.iptvdemo.serv5group.com/api/manager/team-goals"
+                          per_page:
+                            type: integer
+                            example: 15
+                          to:
+                            type: integer
+                            nullable: true
+                            example: 3
+                          total:
+                            type: integer
+                            example: 3
+              example:
+                success: true
+                message: "Team goals retrieved successfully."
+                data:
+                  goals:
+                    - id: 3
+                      user:
+                        id: 6
+                        name: "Noran Baligh"
+                      title: "responsive task 2"
+                      description: "Finish This Course"
+                      target_date: "2026-10-30"
+                      status: "Active"
+                      created_at: "2026-09-27 13:22:53"
+                    - id: 2
+                      user:
+                        id: 6
+                        name: "Noran Baligh"
+                      title: "responsive task 2"
+                      description: "Finish This Course"
+                      target_date: "2026-10-30"
+                      status: "Completed"
+                      created_at: "2026-09-27 13:22:05"
+                    - id: 1
+                      user:
+                        id: 6
+                        name: "Noran Baligh"
+                      title: "responsive task"
+                      description: "Finish This Course"
+                      target_date: "2026-11-15"
+                      status: "Completed"
+                      created_at: "2026-09-27 13:00:43"
+                  links:
+                    first: "https://hr-system.iptvdemo.serv5group.com/api/manager/team-goals?page=1"
+                    last: "https://hr-system.iptvdemo.serv5group.com/api/manager/team-goals?page=1"
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    from: 1
+                    last_page: 1
+                    links:
+                      - url: null
+                        label: "&laquo; Previous"
+                        page: null
+                        active: false
+                      - url: "https://hr-system.iptvdemo.serv5group.com/api/manager/team-goals?page=1"
+                        label: "1"
+                        page: 1
+                        active: true
+                      - url: null
+                        label: "Next &raquo;"
+                        page: null
+                        active: false
+                    path: "https://hr-system.iptvdemo.serv5group.com/api/manager/team-goals"
+                    per_page: 15
+                    to: 3
+                    total: 3
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Unauthenticated."
+              example:
+                success: false
+                message: "Unauthenticated."
         "404":
-          description: Employee profile not found.
+          description: Manager profile not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Manager profile not found."
+              example:
+                success: false
+                message: "Manager profile not found."
         "500":
           description: Failed to retrieve team goals.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Failed to retrieve team goals."
+              example:
+                success: false
+                message: "Failed to retrieve team goals."
   /api/hr/goals:
     get:
-      tags:
-      - Goals
-      summary: Get Company Goals Overview (HR)
-      operationId: GetCompanyGoalsOverview.
+      summary: Get Company Goals Overview (HR) 📱
       description: Retrieves a paginated overview of all employee goals across departments for HR administrative review.
+      operationId: getCompanyGoalsOverview
+      tags:
+        - Goals
+      security:
+        - bearerAuth: []
       parameters:
-      - name: status
-        in: query
-        required: false
-        schema:
-          type: string
-        example: completed
-      - name: department_id
-        in: query
-        required: false
-        schema:
-          type: integer
-        example: 2
-      - name: employee_id
-        in: query
-        required: false
-        schema:
-          type: integer
-        example: 10
-      - in: header
-        name: Accept-Language
-        required: false
-        schema:
-          type: string
-          enum:
-          - ar
-          - en
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          description: Language preference for response messages
+          schema:
+            type: string
+            enum:
+              - ar
+              - en
+            default: en
+          example: en
+        - name: status
+          in: query
+          required: false
+          description: Filter goals by status (e.g., active, completed, cancelled).
+          schema:
+            type: string
+            example: completed
+        - name: department_id
+          in: query
+          required: false
+          description: Filter goals by department ID.
+          schema:
+            type: integer
+          example: 2
+        - name: employee_id
+          in: query
+          required: false
+          description: Filter goals by employee ID.
+          schema:
+            type: integer
+          example: 10
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+          example: 1
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 15
+          example: 15
       responses:
         "200":
           description: Company goals overview retrieved successfully.
@@ -6983,11 +7760,194 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Company goals overview retrieved successfully.
+                    example: "Company goals overview retrieved successfully."
                   data:
-                    $ref: "#/components/schemas/GoalPaginatedResponse"
+                    type: object
+                    properties:
+                      goals:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 3
+                            user:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 6
+                                name:
+                                  type: string
+                                  example: "Noran Baligh"
+                            title:
+                              type: string
+                              example: "responsive task 2"
+                            description:
+                              type: string
+                              nullable: true
+                              example: "Finish This Course"
+                            target_date:
+                              type: string
+                              format: date
+                              example: "2026-10-30"
+                            status:
+                              type: string
+                              example: "Active"
+                            created_at:
+                              type: string
+                              example: "2026-09-27 13:22:53"
+                      links:
+                        type: object
+                        properties:
+                          first:
+                            type: string
+                            nullable: true
+                            example: "https://hr-system.iptvdemo.serv5group.com/api/hr/goals?page=1"
+                          last:
+                            type: string
+                            nullable: true
+                            example: "https://hr-system.iptvdemo.serv5group.com/api/hr/goals?page=1"
+                          prev:
+                            type: string
+                            nullable: true
+                            example: null
+                          next:
+                            type: string
+                            nullable: true
+                            example: null
+                      meta:
+                        type: object
+                        properties:
+                          current_page:
+                            type: integer
+                            example: 1
+                          from:
+                            type: integer
+                            nullable: true
+                            example: 1
+                          last_page:
+                            type: integer
+                            example: 1
+                          links:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                url:
+                                  type: string
+                                  nullable: true
+                                label:
+                                  type: string
+                                page:
+                                  type: integer
+                                  nullable: true
+                                active:
+                                  type: boolean
+                          path:
+                            type: string
+                            example: "https://hr-system.iptvdemo.serv5group.com/api/hr/goals"
+                          per_page:
+                            type: integer
+                            example: 15
+                          to:
+                            type: integer
+                            nullable: true
+                            example: 3
+                          total:
+                            type: integer
+                            example: 3
+              example:
+                success: true
+                message: "Company goals overview retrieved successfully."
+                data:
+                  goals:
+                    - id: 3
+                      user:
+                        id: 6
+                        name: "Noran Baligh"
+                      title: "responsive task 2"
+                      description: "Finish This Course"
+                      target_date: "2026-10-30"
+                      status: "Active"
+                      created_at: "2026-09-27 13:22:53"
+                    - id: 2
+                      user:
+                        id: 6
+                        name: "Noran Baligh"
+                      title: "responsive task 2"
+                      description: "Finish This Course"
+                      target_date: "2026-10-30"
+                      status: "Completed"
+                      created_at: "2026-09-27 13:22:05"
+                    - id: 1
+                      user:
+                        id: 6
+                        name: "Noran Baligh"
+                      title: "responsive task"
+                      description: "Finish This Course"
+                      target_date: "2026-11-15"
+                      status: "Completed"
+                      created_at: "2026-09-27 13:00:43"
+                  links:
+                    first: "https://hr-system.iptvdemo.serv5group.com/api/hr/goals?page=1"
+                    last: "https://hr-system.iptvdemo.serv5group.com/api/hr/goals?page=1"
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    from: 1
+                    last_page: 1
+                    links:
+                      - url: null
+                        label: "&laquo; Previous"
+                        page: null
+                        active: false
+                      - url: "https://hr-system.iptvdemo.serv5group.com/api/hr/goals?page=1"
+                        label: "1"
+                        page: 1
+                        active: true
+                      - url: null
+                        label: "Next &raquo;"
+                        page: null
+                        active: false
+                    path: "https://hr-system.iptvdemo.serv5group.com/api/hr/goals"
+                    per_page: 15
+                    to: 3
+                    total: 3
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Unauthenticated."
+              example:
+                success: false
+                message: "Unauthenticated."
         "500":
           description: Failed to retrieve company goals overview.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Failed to retrieve company goals overview."
+              example:
+                success: false
+                message: "Failed to retrieve company goals overview."
   /api/notifications:
     get:
       summary: Retrieve paginated list of user notifications 📱
