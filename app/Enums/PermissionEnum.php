@@ -37,6 +37,9 @@ enum PermissionEnum: string
     case TASK_ASSIGN = 'task.assign';
     case TASK_UPDATE_PROGRESS = 'task.update-progress';
     case TASK_UPDATE_STATUS = 'task.update-status';
+    case TASK_ACTIVITIES_VIEW = 'task.activities.view';
+    case TASK_VIEW = 'task.view';
+    case TASK_VIEW_ALL = 'task.view-all';
     case SUBMISSION_CREATE = 'submission.create';
     case SUBMISSION_ATTACH_FILE = 'submission.attach-file';
     case SUBMISSION_REVIEW_QUEUE = 'submission.review-queue';
@@ -114,7 +117,13 @@ enum PermissionEnum: string
     case COMPANY_EVENT_MANAGE = 'company_event.manage';
 
     // ==========================================
-    // 11. Company Policies
+    // 11. Holidays
+    // ==========================================
+    case HOLIDAY_VIEW = 'holiday.view';
+    case HOLIDAY_MANAGE = 'holiday.manage';
+
+    // ==========================================
+    // 12. Company Policies
     // ==========================================
     case POLICY_VIEW = 'policy.view';
     case POLICY_MANAGE = 'policy.manage';
@@ -124,13 +133,13 @@ enum PermissionEnum: string
     case POLICY_AUDIT_VIEW = 'policy.audit_view';
 
     // ==========================================
-    // 12. System, Files & Permissions
+    // 13. System, Files & Permissions
     // ==========================================
     case PERMISSION_VIEW_ALL = 'permission.view-all';
     case FILE_DOWNLOAD = 'file.download';
     case FILE_DELETE = 'file.delete';
 
-    // 11. AI Features
+    // 14. AI Features
     case AI_CAREER_COACH = 'ai.career_coach';
     case AI_PERFORMANCE_INSIGHT = 'ai.performance_insight';
     case AI_EVALUATION_DRAFT = 'ai.evaluation_draft';
@@ -139,7 +148,8 @@ enum PermissionEnum: string
     case AI_TEAM_INSIGHT = 'ai.team_insight';
     case AI_POLICY_ASSISTANT = 'ai.policy_assistant';
 
-    // 12. DropDown
+
+    // 15. DropDown
     case VIEW_MANAGERS_DROPDOWN = 'department.view-managers-dropdown';
 
     public function defaultRoles(): array
@@ -173,6 +183,8 @@ enum PermissionEnum: string
             self::POLICY_VERSION_CREATE,
             self::POLICY_VERSION_ACTIVATE,
             self::POLICY_AUDIT_VIEW,
+            self::HOLIDAY_MANAGE => ['HR', 'Owner'],
+            self::VIEW_MANAGERS_DROPDOWN => ['HR', 'Owner'],
             self::VIEW_MANAGERS_DROPDOWN,
             self::HR_ATTENDANCE_MANAGE_EXCEPTIONS => ['HR', 'Owner'],
 
@@ -197,6 +209,8 @@ enum PermissionEnum: string
             self::LEAVE_QUEUE_MANAGER,
             self::AI_EVALUATION_DRAFT,
             self::AI_ATTENTION_SIGNAL,
+
+            self::AI_TEAM_INSIGHT => ['Manager', 'HR', 'Owner'],
             self::AI_TEAM_INSIGHT,
             self::GOAL_CREATE,
             self::GOAL_UPDATE => ['Manager', 'HR', 'Owner'],
@@ -207,6 +221,9 @@ enum PermissionEnum: string
             self::DEPARTMENT_VIEW,
             self::TASK_UPDATE_PROGRESS,
             self::TASK_UPDATE_STATUS,
+            self::TASK_ACTIVITIES_VIEW,
+            self::TASK_VIEW_ALL,
+            self::TASK_VIEW,
             self::SUBMISSION_CREATE,
             self::SUBMISSION_ATTACH_FILE,
             self::SUBMISSION_VIEW,
@@ -231,6 +248,7 @@ enum PermissionEnum: string
             self::AI_CAREER_COACH,
             self::AI_PERFORMANCE_INSIGHT,
             self::AI_SKILL_GAP,
+            self::HOLIDAY_VIEW => ['Owner', 'HR', 'Manager', 'Employee'],
             self::AI_POLICY_ASSISTANT => ['Owner', 'HR', 'Manager', 'Employee'],
 
             // Employee Only
