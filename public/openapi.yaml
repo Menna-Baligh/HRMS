@@ -9987,88 +9987,228 @@ paths:
         - in: header
           name: Accept-Language
           required: false
+          description: Language preference for response messages
           schema:
             type: string
             enum:
-             - ar
-             - en
-        - in: query
-          name: lang
-          required: false
-          schema:
-            type: string
-            enum: [en, ar]
+              - ar
+              - en
+            default: en
           example: en
-
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the attendance record
+          example: 5
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CompanyLocationRequest'
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - approved
+                    - rejected
+                  description: Decision status for the exception
+                  example: approved
+                admin_note:
+                  type: string
+                  nullable: true
+                  maxLength: 500
+                  description: Optional administrative reason or note
+                  example: "Approved due to authorized remote work."
             example:
-              name: Main Office
-              latitude: 30.0444
-              longitude: 31.2357
-              radius: 350
-              is_active: true
-
+              status: "approved"
+              admin_note: "Approved due to authorized remote work."
       responses:
-        '201':
-          description: Company location created successfully.
+        "200":
+          description: Attendance exception status updated successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CompanyLocationResponse'
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Attendance exception status updated successfully."
+                  data:
+                    type: object
+                    properties:
+                      attendance_id:
+                        type: integer
+                        example: 5
+                      date:
+                        type: string
+                        format: date
+                        example: "2026-09-26"
+                      user:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 6
+                          name:
+                            type: string
+                            example: "Noran Baligh"
+                          employee_code:
+                            type: string
+                            example: "EMP-2026-24271"
+                          job_title:
+                            type: string
+                            example: "Frontend Developer"
+                          department:
+                            type: string
+                            nullable: true
+                            example: "New Department"
+                      check_in:
+                        type: string
+                        nullable: true
+                        example: "03:02 PM"
+                      check_out:
+                        type: string
+                        nullable: true
+                        example: null
+                      status:
+                        type: string
+                        example: "Late"
+                      exception:
+                        type: object
+                        nullable: true
+                        properties:
+                          is_exception:
+                            type: boolean
+                            example: true
+                          reason:
+                            type: string
+                            nullable: true
+                            example: "Check-in recorded outside company geofence radius."
+                          status:
+                            type: string
+                            enum:
+                              - pending
+                              - approved
+                              - rejected
+                            example: "approved"
+                          admin_note:
+                            type: string
+                            nullable: true
+                            example: "Approved due to authorized remote work."
+                      company_name:
+                        type: string
+                        example: "WorkWise HQ"
               example:
                 success: true
-                message: Company location created successfully.
+                message: "Attendance exception status updated successfully."
                 data:
-                  id: 1
-                  name: Main Office
-                  latitude: 30.0444
-                  longitude: 31.2357
-                  radius: 350
-                  is_active: true
-                  created_by: 1
-                  created_at: "2026-09-20T18:30:00.000000Z"
-                  updated_at: "2026-09-20T18:30:00.000000Z"
+                  attendance_id: 5
+                  date: "2026-09-26"
+                  user:
+                    id: 6
+                    name: "Noran Baligh"
+                    employee_code: "EMP-2026-24271"
+                    job_title: "Frontend Developer"
+                    department: "New Department"
+                  check_in: "03:02 PM"
+                  check_out: null
+                  status: "Late"
+                  exception:
+                    is_exception: true
+                    reason: "Check-in recorded outside company geofence radius."
+                    status: "approved"
+                    admin_note: "Approved due to authorized remote work."
+                  company_name: "WorkWise HQ"
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Unauthenticated."
+              example:
+                success: false
+                message: "Unauthenticated."
+        "403":
+          description: Forbidden - User does not have permission to manage attendance exceptions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "User does not have the right permissions."
+              example:
+                success: false
+                message: "User does not have the right permissions."
+        "404":
+          description: Attendance record not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Attendance exception record not found."
+              example:
+                success: false
+                message: "Attendance exception record not found."
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "The status field is required."
+              example:
+                success: false
+                message: "The status field is required."
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Failed to update attendance exception status."
+              example:
+                success: false
+                message: "Failed to update attendance exception status."
 
-        '401':
-            description: Unauthenticated.
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/ErrorResponse'
-                example:
-                  success: false
-                  message: Unauthenticated.
-                  data: null
-
-        '500':
-            description: Internal server error.
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/ErrorResponse'
-                example:
-                  success: false
-                  message: Something went wrong.
-                  data: null
-
-        '422':
-            description: Validation error or company location already exists.
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/ValidationErrorResponse'
-                example:
-                  success: false
-                  message: Validation error
-                  errors:
-                    location:
-                      - Company location already exists.
-
+# company locations
   /api/locations/company/location:
     post:
       summary: Create company location | allowed for HR, Owner
@@ -10081,12 +10221,15 @@ paths:
         - in: header
           name: Accept
           required: true
-          type: string
-          default: application/json
+          description: Accept header for content negotiation
+          schema:
+            type: string
+            default: application/json
           example: application/json
         - in: header
           name: Accept-Language
           required: false
+          description: Language preference
           schema:
             type: string
             enum:
@@ -10095,8 +10238,10 @@ paths:
         - in: query
           name: lang
           required: false
-          type: string
-          enum: [en , ar]
+          description: Language query parameter
+          schema:
+            type: string
+            enum: [en, ar]
           example: en
       requestBody:
         required: true
@@ -10132,42 +10277,43 @@ paths:
                   created_at: "2026-09-20T18:30:00.000000Z"
                   updated_at: "2026-09-20T18:30:00.000000Z"
         '401':
-            description: Unauthenticated.
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/ErrorResponse'
-                example:
-                  success: false
-                  message: Unauthenticated.
-                  data: null
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+
+        '422':
+          description: Validation error or company location already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+              example:
+                success: false
+                message: Validation error
+                errors:
+                  location:
+                    - Company location already exists.
 
         '500':
-            description: Internal server error.
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/ErrorResponse'
-                example:
-                  success: false
-                  message: Something went wrong.
-                  data: null
-        '422':
-            description: Validation error or company location already exists.
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/ValidationErrorResponse'
-                example:
-                  success: false
-                  message: Validation error
-                  errors:
-                    location:
-                      - Company location already exists.
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null
 
   /api/locations/company/location/{id}:
     put:
-      summary: Update company location |allowed for HR, Owner
+      summary: Update company location | allowed for HR, Owner
       operationId: updateCompanyLocation
       tags:
         - Company Locations
@@ -10177,13 +10323,15 @@ paths:
         - in: header
           name: Accept
           required: true
+          description: Accept header
           schema:
             type: string
             default: application/json
-            example: application/json
+          example: application/json
         - in: header
           name: Accept-Language
           required: false
+          description: Language preference
           schema:
             type: string
             enum:
@@ -10192,14 +10340,15 @@ paths:
         - in: path
           name: id
           required: true
+          description: Company location ID
           schema:
             type: integer
-          description: Company location ID
           example: 1
 
         - in: query
           name: lang
           required: false
+          description: Language query parameter
           schema:
             type: string
             enum: [en, ar]
@@ -10279,9 +10428,10 @@ paths:
                 success: false
                 message: Something went wrong.
                 data: null
+
   /api/locations/company/location/{id}/deactivate:
     patch:
-      summary: Deactivate company location |allowed for HR, Owner
+      summary: Deactivate company location | allowed for HR, Owner
       operationId: deactivateCompanyLocation
       tags:
         - Company Locations
@@ -10292,13 +10442,15 @@ paths:
         - in: header
           name: Accept
           required: true
+          description: Accept header
           schema:
             type: string
             default: application/json
-            example: application/json
+          example: application/json
         - in: header
           name: Accept-Language
           required: false
+          description: Language preference
           schema:
             type: string
             enum:
@@ -10307,14 +10459,15 @@ paths:
         - in: path
           name: id
           required: true
+          description: Company location ID
           schema:
             type: integer
-          description: Company location ID
           example: 1
 
         - in: query
           name: lang
           required: false
+          description: Language query parameter
           schema:
             type: string
             enum: [en, ar]
@@ -10373,9 +10526,10 @@ paths:
                 success: false
                 message: Something went wrong.
                 data: null
+
   /api/locations/company/location/{id}/activate:
     patch:
-      summary: Activate company location |allowed for HR, Owner
+      summary: Activate company location | allowed for HR, Owner
       operationId: activateCompanyLocation
       tags:
         - Company Locations
@@ -10386,13 +10540,15 @@ paths:
         - in: header
           name: Accept
           required: true
+          description: Accept header
           schema:
             type: string
             default: application/json
-            example: application/json
+          example: application/json
         - in: header
           name: Accept-Language
           required: false
+          description: Language preference
           schema:
             type: string
             enum:
@@ -10402,14 +10558,15 @@ paths:
         - in: path
           name: id
           required: true
+          description: Company location ID
           schema:
             type: integer
-          description: Company location ID
           example: 1
 
         - in: query
           name: lang
           required: false
+          description: Language query parameter
           schema:
             type: string
             enum: [en, ar]
@@ -10468,6 +10625,7 @@ paths:
                 success: false
                 message: Something went wrong.
                 data: null
+
   /api/locations/company/location/active:
     get:
       summary: Get active company location | allowed for Owner, HR, Manager, Employee 📱
@@ -10481,13 +10639,15 @@ paths:
         - in: header
           name: Accept
           required: true
+          description: Accept header
           schema:
             type: string
             default: application/json
-            example: application/json
+          example: application/json
         - in: header
           name: Accept-Language
           required: false
+          description: Language preference
           schema:
             type: string
             enum:
@@ -10497,6 +10657,7 @@ paths:
         - in: query
           name: lang
           required: false
+          description: Language query parameter
           schema:
             type: string
             enum: [en, ar]
@@ -10807,123 +10968,8 @@ paths:
                 success: false
                 message: Something went wrong.
                 data: null
+
   /api/tasks/{task}:
-    put:
-      summary: Update a task | allowed for Manager, HR, Owner
-      operationId: updateTask
-      tags:
-        - Tasks
-      security:
-        - bearerAuth: []
-
-      parameters:
-        - in: header
-          name: Accept
-          required: true
-          schema:
-            type: string
-            default: application/json
-            example: application/json
-        - in: header
-          name: Accept-Language
-          required: false
-          schema:
-            type: string
-            enum:
-              - ar
-              - en
-
-        - in: path
-          name: task
-          required: true
-          schema:
-            type: integer
-          example: 1
-
-        - in: query
-          name: lang
-          required: false
-          schema:
-            type: string
-            enum: [en, ar]
-          example: en
-
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateTaskRequest'
-            example:
-              title: Updated API Documentation
-              description: Updated description.
-              priority: Urgent
-              deadline: "2026-10-01 18:00:00"
-
-      responses:
-        '200':
-          description: Task updated successfully.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TaskResponse'
-              example:
-                success: true
-                message: Task updated successfully.
-                data:
-                  id: 1
-                  title: Updated API Documentation
-                  description: Updated description.
-                  priority: Urgent
-                  status: Pending
-                  progress: 0
-                  created_by: 2
-                  deadline: "2026-10-01T18:00:00.000000Z"
-
-        '401':
-          description: Unauthenticated.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              example:
-                success: false
-                message: Unauthenticated.
-                data: null
-
-        '404':
-          description: Task not found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              example:
-                success: false
-                message: Task not found.
-                data: nul
-
-        '422':
-          description: Validation error.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              example:
-                success: false
-                message: Validation error.
-                data: null
-
-        '500':
-          description: Internal server error.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              example:
-                success: false
-                message: Something went wrong.
-                data: null
-
     get:
       summary: Get task details | allowed for Owner, HR, Manager, Employee
       operationId: getTaskDetails
@@ -10931,31 +10977,39 @@ paths:
         - Tasks
       security:
         - bearerAuth: []
-
       parameters:
         - in: header
           name: Accept
           required: true
+          description: Accept header
           schema:
             type: string
             default: application/json
           example: application/json
-
+        - in: header
+          name: Accept-Language
+          required: false
+          description: Language preference
+          schema:
+            type: string
+            enum:
+              - ar
+              - en
         - in: path
           name: task
           required: true
+          description: Task ID
           schema:
             type: integer
           example: 1
-
         - in: query
           name: lang
           required: false
+          description: Language parameter
           schema:
             type: string
             enum: [en, ar]
           example: en
-
       responses:
         '200':
           description: Task details retrieved successfully.
@@ -10977,7 +11031,6 @@ paths:
                   deadline: "2026-09-30T18:00:00.000000Z"
                   created_at: "2026-09-20T10:00:00.000000Z"
                   updated_at: "2026-09-23T10:00:00.000000Z"
-
         '401':
           description: Unauthenticated.
           content:
@@ -10988,7 +11041,6 @@ paths:
                 success: false
                 message: Unauthenticated.
                 data: null
-
         '403':
           description: You are not authorized to view this task.
           content:
@@ -10999,7 +11051,6 @@ paths:
                 success: false
                 message: You are not authorized to view this task.
                 data: null
-
         '404':
           description: Task not found.
           content:
@@ -11010,7 +11061,6 @@ paths:
                 success: false
                 message: Task not found.
                 data: null
-
         '500':
           description: Internal server error.
           content:
@@ -11021,7 +11071,119 @@ paths:
                 success: false
                 message: Something went wrong.
                 data: null
-    /api/tasks/{task}/assign:
+
+    put:
+      summary: Update a task | allowed for Manager, HR, Owner
+      operationId: updateTask
+      tags:
+        - Tasks
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          description: Accept header
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          description: Language preference
+          schema:
+            type: string
+            enum:
+              - ar
+              - en
+        - in: path
+          name: task
+          required: true
+          description: Task ID
+          schema:
+            type: integer
+          example: 1
+        - in: query
+          name: lang
+          required: false
+          description: Language parameter
+          schema:
+            type: string
+            enum: [en, ar]
+          example: en
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaskRequest'
+            example:
+              title: Updated API Documentation
+              description: Updated description.
+              priority: Urgent
+              deadline: "2026-10-01 18:00:00"
+      responses:
+        '200':
+          description: Task updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+              example:
+                success: true
+                message: Task updated successfully.
+                data:
+                  id: 1
+                  title: Updated API Documentation
+                  description: Updated description.
+                  priority: Urgent
+                  status: Pending
+                  progress: 0
+                  created_by: 2
+                  deadline: "2026-10-01T18:00:00.000000Z"
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+        '404':
+          description: Task not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Task not found.
+                data: null
+        '422':
+          description: Validation error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Validation error.
+                data: null
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Something went wrong.
+                data: null
+
+  /api/tasks/{task}/assign:
     post:
       summary: Assign a task to an employee | allowed for Manager, HR, Owner
       operationId: assignTask
@@ -11029,39 +11191,39 @@ paths:
         - Tasks
       security:
         - bearerAuth: []
-
       parameters:
         - in: header
           name: Accept
           required: true
+          description: Accept header
           schema:
             type: string
             default: application/json
-            example: application/json
+          example: application/json
         - in: header
           name: Accept-Language
           required: false
+          description: Language preference
           schema:
             type: string
             enum:
               - ar
               - en
-
         - in: path
           name: task
           required: true
+          description: Task ID
           schema:
             type: integer
           example: 1
-
         - in: query
           name: lang
           required: false
+          description: Language parameter
           schema:
             type: string
             enum: [en, ar]
           example: en
-
       requestBody:
         required: true
         content:
@@ -11070,7 +11232,6 @@ paths:
               $ref: '#/components/schemas/AssignTaskRequest'
             example:
               user_id: 10
-
       responses:
         '201':
           description: Task assigned successfully.
@@ -11089,7 +11250,6 @@ paths:
                   assigned_at: "2026-09-23T10:00:00.000000Z"
                   created_at: "2026-09-23T10:00:00.000000Z"
                   updated_at: "2026-09-23T10:00:00.000000Z"
-
         '401':
           description: Unauthenticated.
           content:
@@ -11100,7 +11260,6 @@ paths:
                 success: false
                 message: Unauthenticated.
                 data: null
-
         '404':
           description: Task or user not found.
           content:
@@ -11111,7 +11270,6 @@ paths:
                 success: false
                 message: Task or user not found.
                 data: null
-
         '422':
           description: Validation error.
           content:
@@ -11122,7 +11280,6 @@ paths:
                 success: false
                 message: Validation error.
                 data: null
-
         '500':
           description: Internal server error.
           content:
@@ -11133,8 +11290,6 @@ paths:
                 success: false
                 message: Something went wrong.
                 data: null
-
-
   /api/tasks/{task}/progress:
     patch:
       summary: Update task progress | allowed for Owner, HR, Manager, Employee 📱
@@ -11622,13 +11777,15 @@ paths:
         - in: header
           name: Accept
           required: true
+          description: Accept header
           schema:
-          type: string
-          default: application/json
+            type: string
+            default: application/json
           example: application/json
         - in: header
           name: Accept-Language
           required: false
+          description: Language preference
           schema:
             type: string
             enum:
@@ -11638,13 +11795,15 @@ paths:
         - in: path
           name: submission
           required: true
+          description: Submission ID
           schema:
-          type: integer
+            type: integer
           example: 1
 
         - in: query
           name: lang
           required: false
+          description: Language parameter
           schema:
             type: string
             enum: [en, ar]
@@ -11732,8 +11891,6 @@ paths:
                 success: false
                 message: Something went wrong.
                 data: null
-
-
   /api/tasks/submissions/review:
     get:
       summary: Get submission review queue | allowed for Manager, HR, Owner
@@ -13398,7 +13555,7 @@ paths:
           name: Accept-Language
           required: false
           schema:
-            type: schemas
+            type: string
             enum:
               - ar
               - en
@@ -13809,7 +13966,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 
 # Holidays
-  /holidays:
+  /api/holidays:
     get:
       summary:  Get all holidays | allowed for Owner, HR, Manager, Employee 📱
       operationId: getHolidays
@@ -14001,7 +14158,7 @@ paths:
                 message: Something went wrong.
                 data: null
 
-  /holidays/{holiday}:
+  /api/holidays/{holiday}:
     put:
       summary: Update an existing holiday | allowed for HR, Owner
       operationId: updateHoliday
@@ -14235,7 +14392,7 @@ paths:
                 data: null
 
 # Company events & Calendar
-  /company-events:
+  /api/company-events:
 
     # =========================================================
     # GET ALL COMPANY EVENTS
@@ -14453,7 +14610,7 @@ paths:
                 message: Something went wrong.
                 data: null
 
-  /company-events/{companyEvent}:
+  /api/company-events/{companyEvent}:
 
     # =========================================================
     # UPDATE COMPANY EVENT
@@ -14696,7 +14853,7 @@ paths:
                 success: false
                 message: Something went wrong.
                 data: null
-  /calendar:
+  /api/calendar:
     get:
       summary: Get calendar events | allowed for Owner, HR, Manager, Employee 📱
       operationId: getCalendarEvents
@@ -15779,6 +15936,39 @@ components:
         created_at:
           type: string
           example: 2026-09-17 21:00:00
+    CompanyLocation:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Main Office
+        latitude:
+          type: number
+          format: double
+          example: 30.0444
+        longitude:
+          type: number
+          format: double
+          example: 31.2357
+        radius:
+          type: number
+          format: double
+          example: 350
+        is_active:
+          type: boolean
+          example: true
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-09-26T08:00:00.000000Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2026-09-26T08:00:00.000000Z"
+
     CompanyLocationRequest:
       type: object
       required:
@@ -15803,11 +15993,12 @@ components:
           maximum: 180
           example: 31.2357
         radius:
-          type: number
-          format: double
-          exclusiveMinimum: 0
-          description: Attendance geofence radius in meters.
-          example: 350
+            type: number
+            format: double
+            minimum: 0
+            exclusiveMinimum: true
+            description: Attendance geofence radius in meters.
+            example: 350
         is_active:
           type: boolean
           default: true
@@ -15844,11 +16035,12 @@ components:
           maximum: 180
           example: 31.2357
         radius:
-          type: number
-          format: double
-          exclusiveMinimum: 0
-          description: Attendance geofence radius in meters.
-          example: 500
+            type: number
+            format: double
+            minimum: 0
+            exclusiveMinimum: true
+            description: Attendance geofence radius in meters.
+            example: 500
         is_active:
           type: boolean
           example: true
@@ -16343,6 +16535,106 @@ components:
             last_page:
               type: integer
               example: 1
+
+    StoreSubmissionRequest:
+      type: object
+      required:
+        - note
+      properties:
+        note:
+          type: string
+          example: "Completed the assigned task."
+        files:
+          type: array
+          items:
+            type: string
+            format: binary
+          description: Optional files to attach to the submission.
+
+    AttachSubmissionFileRequest:
+      type: object
+      required:
+        - file
+      properties:
+        file:
+          type: string
+          format: binary
+          description: The file to attach to the submission.
+
+    RejectSubmissionRequest:
+      type: object
+      required:
+        - feedback
+      properties:
+        feedback:
+          type: string
+          example: "Please provide more details about the completed work."
+
+    RequestChangesRequest:
+      type: object
+      required:
+        - feedback
+      properties:
+        feedback:
+          type: string
+          example: "Please update the attached document and resubmit it."
+
+    ResubmitSubmissionRequest:
+      type: object
+      properties:
+        note:
+          type: string
+          nullable: true
+          example: "Updated the submission based on the requested changes."
+
+    FileResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "File uploaded successfully."
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            file_name:
+              type: string
+              example: "document.pdf"
+            file_path:
+              type: string
+              example: "uploads/document.pdf"
+            mime_type:
+              type: string
+              example: "application/pdf"
+            file_size:
+              type: integer
+              example: 245760
+            download_url:
+              type: string
+              example: "http://127.0.0.1:8000/api/files/1/download"
+            created_at:
+              type: string
+              format: date-time
+              example: "2026-09-23T10:00:00.000000Z"
+
+    CalendarResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Calendar events retrieved successfully."
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CalendarEvent'
 
     LeaveType:
       type: object
