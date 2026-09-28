@@ -3308,9 +3308,9 @@ paths:
                         type: string
                         nullable: true
                         example:
-                      worked_seconds:
-                        type: integer
-                        example: 7200
+                      worked_time:
+                        type: string
+                        example: "08:15:30"
                       distance_meters:
                         type: number
                         format: float
@@ -3332,7 +3332,7 @@ paths:
                   status: On shift
                   check_in_time: 09:05 AM
                   check_out_time:
-                  worked_seconds: 7200
+                  worked_time: "08:15:30"
                   distance_meters: 25.5
                   is_inside_radius: true
                   can_check_in: false
@@ -3475,8 +3475,8 @@ paths:
                       status:
                         type: string
                         example: Present
-                      worked_seconds:
-                        type: integer
+                      worked_time:
+                        type: string
                         nullable: true
                         example:
                       is_exception:
@@ -3492,7 +3492,7 @@ paths:
                   check_in: 09:05 AM
                   check_out:
                   status: Present
-                  worked_seconds:
+                  worked_time:
                   is_exception: false
         "400":
           description: Bad request (Unhandled exception)
@@ -3634,9 +3634,9 @@ paths:
                       status:
                         type: string
                         example: "Late"
-                      worked_seconds:
-                        type: integer
-                        example: 5
+                      worked_time:
+                        type: string
+                        example: "00:00:05"
                       is_exception:
                         type: boolean
                         example: true
@@ -3650,7 +3650,7 @@ paths:
                   check_in: "06:52 PM"
                   check_out: "06:52 PM"
                   status: "Late"
-                  worked_seconds: 5
+                  worked_time: "00:00:05"
                   is_exception: true
         "401":
           description: Unauthenticated
@@ -3786,12 +3786,10 @@ paths:
                             status:
                               type: string
                               example: Late
-                            worked_seconds:
-                              type: integer
-                              example: 5
-                            worked_hours_formatted:
+                            worked_time:
                               type: string
-                              example: 0h 0m
+                              example: "00:00:05"
+
                             is_exception:
                               type: boolean
                               example: true
@@ -3861,8 +3859,7 @@ paths:
                     check_in: 06:52 PM
                     check_out: 06:52 PM
                     status: Late
-                    worked_seconds: 5
-                    worked_hours_formatted: "0h 0m"
+                    worked_time: "00:00:05"
                     is_exception: true
                   - id: 1
                     date: 2026-09-01
@@ -3870,8 +3867,7 @@ paths:
                     check_in: 03:33 PM
                     check_out: 03:34 PM
                     status: Late
-                    worked_seconds: 15
-                    worked_hours_formatted: "0h 0m"
+                    worked_time: "00:00:01"
                     is_exception: false
                   links:
                     first: http://127.0.0.1:8000/api/attendance/history?page=1
