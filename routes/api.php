@@ -82,8 +82,7 @@ Route::prefix('holidays')->middleware(['auth:api', 'set.app.language'])->group(f
                 Route::put('/{holiday}', [HolidayController::class, 'update']);
 
                 Route::delete('/{holiday}', [HolidayController::class, 'destroy']);
-            });
-    });
+        });
 });
 
 // company events
