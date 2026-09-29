@@ -148,7 +148,6 @@ enum PermissionEnum: string
     case AI_TEAM_INSIGHT = 'ai.team_insight';
     case AI_POLICY_ASSISTANT = 'ai.policy_assistant';
 
-
     // 15. DropDown
     case VIEW_MANAGERS_DROPDOWN = 'department.view-managers-dropdown';
 
