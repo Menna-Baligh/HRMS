@@ -27,6 +27,14 @@ class LandingPageSeeder extends Seeder
                     'primary_button' => 'Get Started Free',
                     'secondary_button' => 'Explore Features',
                     'trust_text' => '10,000+ Trusted by modern organizations & forward-thinking teams',
+                    'ticker_tags' => [
+                        'GEOFENCING ATTENDANCE',
+                        'AI CAREER & TALENT INSIGHTS',
+                        'LIVE PAYROLL RECONCILIATION',
+                        'WORKFORCE SKILL-GAP ANALYTICS',
+                        'ENTERPRISE ROLE GOVERNANCE',
+                        'CENTRALIZED WORKFORCE PROFILE',
+                    ],
                 ],
             ]
         );

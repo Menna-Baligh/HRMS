@@ -8,6 +8,8 @@ servers:
   description: Local Development Server
 - url: https://hr-system.iptvdemo.serv5group.com
   description: Production Server (Staging/Live)
+- url: https://nontelepathically-pamphletary-cyndi.ngrok-free.dev
+  description: ngrok Server (only when i run it to u)
 tags:
 - name: Authentication
 - name: Permissions

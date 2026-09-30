@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\HrAttendanceController;
 use App\Http\Controllers\Api\HrEvaluationSetupController;
 use App\Http\Controllers\Api\HrGoalController;
 use App\Http\Controllers\Api\HrPerformanceController;
+use App\Http\Controllers\Api\LandingPageController;
 use App\Http\Controllers\Api\LeaveBalanceController;
 use App\Http\Controllers\Api\LeaveDecisionHistoryController;
 use App\Http\Controllers\Api\LeaveRequestController;
@@ -342,7 +343,6 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
     });
 
     Route::get('/permissions', [PermissionController::class, 'index'])->middleware('permission:'.PermissionEnum::PERMISSION_VIEW_ALL->value);
-
 });
 
 Route::middleware(['auth:api', 'set.app.language'])->post('/broadcasting/auth', function (Request $request) {
@@ -370,3 +370,5 @@ Route::prefix('ai')->middleware(['auth:api', 'set.app.language'])->group(functio
     Route::post('/policy-assistant', AIPolicyAssistantController::class)
         ->middleware('permission:'.PermissionEnum::AI_POLICY_ASSISTANT->value);
 });
+
+Route::get('/landing-page', [LandingPageController::class, 'index']);
