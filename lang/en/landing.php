@@ -20,4 +20,10 @@ return [
         'updated' => 'Landing role updated successfully.',
         'deleted' => 'Landing role deleted successfully.',
     ],
+    'plans' => [
+        'retrieved' => 'Landing plans retrieved successfully.',
+        'created' => 'Landing plan created successfully.',
+        'updated' => 'Landing plan updated successfully.',
+        'deleted' => 'Landing plan deleted successfully.',
+    ],
 ];

@@ -35,6 +35,7 @@ use App\Http\Controllers\Api\ManagerController;
 use App\Http\Controllers\Api\ManagerPerformanceController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\Owner\LandingFeatureController;
+use App\Http\Controllers\Api\Owner\LandingPlanController;
 use App\Http\Controllers\Api\Owner\LandingRoleController;
 use App\Http\Controllers\Api\Owner\LandingSectionController;
 use App\Http\Controllers\Api\PermissionController;
@@ -380,4 +381,5 @@ Route::prefix('owner/landing-page')->middleware(['auth:api', 'role:Owner', 'set.
     Route::put('/sections/{key}', [LandingSectionController::class, 'update']);
     Route::apiResource('features', LandingFeatureController::class);
     Route::apiResource('roles', LandingRoleController::class);
+    Route::apiResource('plans', LandingPlanController::class);
 });
