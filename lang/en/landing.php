@@ -14,4 +14,10 @@ return [
         'updated' => 'Landing feature updated successfully.',
         'deleted' => 'Landing feature deleted successfully.',
     ],
+    'roles' => [
+        'retrieved' => 'Landing roles retrieved successfully.',
+        'created' => 'Landing role created successfully.',
+        'updated' => 'Landing role updated successfully.',
+        'deleted' => 'Landing role deleted successfully.',
+    ],
 ];
