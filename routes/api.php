@@ -34,6 +34,7 @@ use App\Http\Controllers\Api\ManagerAttendanceController;
 use App\Http\Controllers\Api\ManagerController;
 use App\Http\Controllers\Api\ManagerPerformanceController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\Owner\LandingSectionController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\PolicyController;
 use App\Http\Controllers\Api\SubmissionController;
@@ -371,4 +372,8 @@ Route::prefix('ai')->middleware(['auth:api', 'set.app.language'])->group(functio
         ->middleware('permission:'.PermissionEnum::AI_POLICY_ASSISTANT->value);
 });
 
-Route::get('/landing-page', [LandingPageController::class, 'index']);
+Route::get('/landing-page', [LandingPageController::class, 'index'])->middleware('set.app.language');
+Route::prefix('owner/landing-page')->middleware(['auth:api', 'role:Owner', 'set.app.language'])->group(function () {
+    Route::get('/sections', [LandingSectionController::class, 'index']);
+    Route::put('/sections/{key}', [LandingSectionController::class, 'update']);
+});
