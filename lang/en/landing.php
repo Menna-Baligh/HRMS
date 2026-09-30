@@ -8,4 +8,10 @@ return [
         'content_required' => 'The content field is required.',
         'content_array' => 'The content must be an array/object.',
     ],
+    'features' => [
+        'retrieved' => 'Landing features retrieved successfully.',
+        'created' => 'Landing feature created successfully.',
+        'updated' => 'Landing feature updated successfully.',
+        'deleted' => 'Landing feature deleted successfully.',
+    ],
 ];
