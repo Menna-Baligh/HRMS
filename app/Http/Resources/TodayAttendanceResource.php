@@ -26,6 +26,7 @@ class TodayAttendanceResource extends JsonResource
             'can_check_out' => $hasCheckedIn && ! $hasCheckedOut,
         ];
     }
+
     private function formatWorkedTime(?int $seconds): string
     {
         if (! $seconds || $seconds <= 0) {
