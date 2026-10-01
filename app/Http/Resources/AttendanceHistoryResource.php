@@ -23,6 +23,7 @@ class AttendanceHistoryResource extends JsonResource
             'is_exception' => (bool) $this->is_exception,
         ];
     }
+
     private function formatWorkedTime(?int $seconds): string
     {
         if (! $seconds || $seconds <= 0) {

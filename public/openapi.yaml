@@ -8,6 +8,8 @@ servers:
   description: Local Development Server
 - url: https://hr-system.iptvdemo.serv5group.com
   description: Production Server (Staging/Live)
+- url: https://nontelepathically-pamphletary-cyndi.ngrok-free.dev
+  description: ngrok Server (only when i run it to u)
 tags:
 - name: Authentication
 - name: Permissions
@@ -14961,6 +14963,1474 @@ paths:
                 success: false
                 message: Something went wrong.
                 data: null
+
+# dynamic Landing Page
+  /api/landing-page:
+    get:
+      tags:
+        - Landing Page
+      summary: Get Public Landing Page Content
+      description: Retrieve all dynamic landing page sections, features, targeted roles, and pricing plans for public visitors. No authentication required.
+      operationId: getPublicLandingPage
+      parameters:
+        - in: header
+          name: Accept-Language
+          schema:
+            type: string
+            enum: [en, ar]
+            default: en
+          required: false
+          description: Preferred language for localization response messages.
+      responses:
+        '200':
+          description: Landing page data retrieved successfully.
+          content:
+            application/json:
+              example:
+                success: true
+                message: "Landing page data retrieved successfully."
+                data:
+                  hero:
+                    badge: "UNIFIED PEOPLE OPERATIONS PLATFORM"
+                    title: "Smarter HR Management. Empowered Teams."
+                    description: "WiseWork transforms traditional HR workflows into an intelligent, centralized system. Streamline employee directory, track attendance, manage leaves, evaluate performance, and uncover organizational talent seamlessly."
+                    primary_button: "Get Started Free"
+                    secondary_button: "Explore Features"
+                    trust_text: "10,000+ Trusted by modern organizations & forward-thinking teams"
+                    ticker_tags:
+                      - "GEOFENCING ATTENDANCE"
+                      - "AI CAREER & TALENT INSIGHTS"
+                      - "LIVE PAYROLL RECONCILIATION"
+                      - "WORKFORCE SKILL-GAP ANALYTICS"
+                      - "ENTERPRISE ROLE GOVERNANCE"
+                      - "CENTRALIZED WORKFORCE PROFILE"
+                  about:
+                    badge: "ABOUT WISEWORK"
+                    title: "Engineered for Modern People Operations"
+                    description: "We eliminate fragmented spreadsheets and chaotic manual workflows, bringing clarity, efficiency, and intelligence to your workforce."
+                    stats:
+                      - label: "Silos"
+                        value: "0"
+                        subtext: "Unified workforce records"
+                      - label: "Faster"
+                        value: "45%"
+                        subtext: "Daily approval workflows"
+                      - label: "Audit-Ready"
+                        value: "100%"
+                        subtext: "Compliance & policy tracking"
+                    highlights:
+                      - title: "The WiseWork Solution"
+                        description: "A single, unified workspace combining core HR administration with cutting-edge talent intelligence and intuitive self-service portals."
+                      - title: "The Challenge in Today's Workplace"
+                        description: "HR departments struggle with scattered employee data, disconnected attendance tools, delayed review cycles, and blind talent matching without actionable data."
+                      - title: "Real-Time Operational Clarity"
+                        description: "Everything from attendance punches to leave balances update live across all departments."
+                  ai_insights:
+                    badge: "SMARTER DECISIONS, POWERED BY DATA"
+                    title: "Turn HR data into smarter decisions."
+                    description: "Smart HR helps you see what is happening across your organization and understand what to do next."
+                    button_text: "Discover AI Insights"
+                  global_stats:
+                    - value: "99.8%"
+                      label: "System Reliability & Uptime"
+                    - value: "45%"
+                      label: "Faster Routine HR Operations"
+                    - value: "10,000+"
+                      label: "Active Employees Managed"
+                    - value: "100%"
+                      label: "Data Privacy & Security Compliance"
+                  cta:
+                    badge: "READY TO TRANSFORM YOUR WORKPLACE?"
+                    title: "Experience Smarter People Operations Today"
+                    description: "Join hundreds of forward-thinking companies streamlining their HR with WiseWork."
+                    button_text: "Start Free Trial"
+                    subnotes: "No credit card required • Instant setup • Cancel anytime"
+                  footer:
+                    brand_description: "Corporate, trustworthy, and operational workforce management system built for modern teams."
+                    columns:
+                      platform:
+                        - "Employee Directory"
+                        - "Attendance Tracking"
+                        - "Leave Management"
+                        - "Performance & Goals"
+                      resources:
+                        - "Documentation"
+                        - "Security & Compliance"
+                        - "Help Center"
+                      company:
+                        - "About WiseWork"
+                        - "Careers"
+                        - "Privacy Policy"
+                    contact:
+                      email: "support@wisework.io"
+                      phone: "+1 (800) 555-0199"
+                      address: "Enterprise Tower, Innovation District"
+                    copyright: "© 2026 WiseWork. All rights reserved."
+                    bottom_tagline: "Enterprise Grade People Operations Platform"
+                  features:
+                    - id: 7
+                      icon: "user-group"
+                      title: "Employee Directory & Profiles"
+                      description: "Centralized database for contracts, documents, departmental structure, and complete workforce profiles."
+                      order: 1
+                    - id: 8
+                      icon: "clock"
+                      title: "Smart Attendance & Shifts"
+                      description: "Real-time check-ins, automated shift assignments, overtime calculations, and instant presence tracking."
+                      order: 2
+                    - id: 9
+                      icon: "calendar"
+                      title: "Leave & Absence Management"
+                      description: "Customizable leave policies, multi-tier approval flows, automated balance calculations, and team calendars."
+                      order: 3
+                    - id: 10
+                      icon: "trending-up"
+                      title: "Performance & OKRs"
+                      description: "Quarterly reviews, KPI metrics, transparent 360° feedback, and objective goal achievement tracking."
+                      order: 4
+                    - id: 11
+                      icon: "chart-bar"
+                      title: "Analytics & Audit-Ready Reports"
+                      description: "Comprehensive executive reports on retention, attendance rates, payroll readiness, and productivity."
+                      order: 5
+                    - id: 12
+                      icon: "sparkles"
+                      title: "AI Insights & Recommendations"
+                      description: "Native data intelligence that identifies operational bottlenecks and highlights workforce trends."
+                      order: 6
+                  roles:
+                    - id: 4
+                      role_name: "HR LEADERS"
+                      title: "Complete Operational Control"
+                      description: "Automate repetitive workflows, maintain compliance, manage organizational hierarchies, and gain instant reporting with minimal manual effort."
+                      features:
+                        - "Automated onboarding & offboarding"
+                        - "Comprehensive policy enforcement"
+                        - "Instant bulk actions & CSV exports"
+                      order: 1
+                    - id: 5
+                      role_name: "EMPLOYEES"
+                      title: "Intuitive Self-Service Portal"
+                      description: "Give your employees seamless access to request leaves, track attendance, review personal goals, and manage profile information on any device."
+                      features:
+                        - "One-click leave requests"
+                        - "Transparent balance & history tracking"
+                        - "Goal progress visibility"
+                      order: 2
+                    - id: 6
+                      role_name: "MANAGERS & C-LEVEL"
+                      title: "Team Oversight & Agile Approvals"
+                      description: "Equip managers to review team attendance, approve leave requests in seconds, conduct structured evaluations, and foster team growth."
+                      features:
+                        - "Single-inbox approval center"
+                        - "Team attendance overview"
+                        - "Structured performance feedback"
+                      order: 3
+                  plans:
+                    - id: 4
+                      name: "STARTER"
+                      description: "Essential people operations for small teams and startups."
+                      price: "Custom"
+                      billing_period: "per employee / month"
+                      is_popular: false
+                      features:
+                        - "Up to 50 employees"
+                        - "Core Employee Directory"
+                        - "Attendance & Shifts"
+                        - "Standard Leave Management"
+                        - "Email Support"
+                      button_text: "Choose Plan"
+                      button_link: null
+                      order: 1
+                    - id: 5
+                      name: "PROFESSIONAL"
+                      description: "Complete workforce management with performance & AI insights."
+                      price: "Custom"
+                      billing_period: "per employee / month"
+                      is_popular: true
+                      features:
+                        - "Up to 500 employees"
+                        - "Everything in Starter"
+                        - "Performance Reviews & KPIs"
+                        - "SkillMatch AI Recommendations"
+                        - "Custom Approval Workflows"
+                        - "Advanced Reports & Export"
+                        - "Priority Support"
+                      button_text: "Choose Plan"
+                      button_link: null
+                      order: 2
+                    - id: 6
+                      name: "ENTERPRISE"
+                      description: "Maximum flexibility, dedicated infrastructure, and SLA guarantee."
+                      price: "Custom"
+                      billing_period: "tailored for your organization"
+                      is_popular: false
+                      features:
+                        - "Unlimited employees"
+                        - "Everything in Professional"
+                        - "Custom HRIS Integrations"
+                        - "Dedicated Account Manager"
+                        - "Custom Roles & Permissions"
+                        - "Single Sign-On (SSO / SAML)"
+                        - "99.9% Uptime SLA"
+                      button_text: "Contact Sales"
+                      button_link: null
+                      order: 3
+
+        '500':
+          description: Internal Server Error.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "Server Error. Something went wrong while fetching landing page data."
+  /api/owner/landing-page/sections:
+    get:
+      tags:
+        - Landing Page
+      summary: Get All Landing Page Sections (Owner)
+      description: Retrieve all raw landing page section records for administrative control.
+      operationId: getOwnerLandingSections
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept-Language
+          schema:
+            type: string
+            enum: [en, ar]
+            default: en
+          required: false
+          description: Preferred language for localized response messages.
+      responses:
+        '200':
+          description: Landing sections retrieved successfully.
+          content:
+            application/json:
+              example:
+                success: true
+                message: "Landing sections retrieved successfully."
+                data:
+                  - id: 7
+                    section_key: "hero"
+                    content:
+                      badge: "UNIFIED PEOPLE OPERATIONS PLATFORM"
+                      title: "Smarter HR Management. Empowered Teams."
+                      description: "WiseWork transforms traditional HR workflows into an intelligent, centralized system. Streamline employee directory, track attendance, manage leaves, evaluate performance, and uncover organizational talent seamlessly."
+                      primary_button: "Get Started Free"
+                      secondary_button: "Explore Features"
+                      trust_text: "10,000+ Trusted by modern organizations & forward-thinking teams"
+                      ticker_tags:
+                        - "GEOFENCING ATTENDANCE"
+                        - "AI CAREER & TALENT INSIGHTS"
+                        - "LIVE PAYROLL RECONCILIATION"
+                        - "WORKFORCE SKILL-GAP ANALYTICS"
+                        - "ENTERPRISE ROLE GOVERNANCE"
+                        - "CENTRALIZED WORKFORCE PROFILE"
+                    created_at: "2026-09-30T10:11:04.000000Z"
+                    updated_at: "2026-09-30T10:11:04.000000Z"
+                  - id: 8
+                    section_key: "about"
+                    content:
+                      badge: "ABOUT WISEWORK"
+                      title: "Engineered for Modern People Operations"
+                      description: "We eliminate fragmented spreadsheets and chaotic manual workflows, bringing clarity, efficiency, and intelligence to your workforce."
+                      stats:
+                        - label: "Silos"
+                          value: "0"
+                          subtext: "Unified workforce records"
+                        - label: "Faster"
+                          value: "45%"
+                          subtext: "Daily approval workflows"
+                        - label: "Audit-Ready"
+                          value: "100%"
+                          subtext: "Compliance & policy tracking"
+                      highlights:
+                        - title: "The WiseWork Solution"
+                          description: "A single, unified workspace combining core HR administration with cutting-edge talent intelligence and intuitive self-service portals."
+                        - title: "The Challenge in Today's Workplace"
+                          description: "HR departments struggle with scattered employee data, disconnected attendance tools, delayed review cycles, and blind talent matching without actionable data."
+                        - title: "Real-Time Operational Clarity"
+                          description: "Everything from attendance punches to leave balances update live across all departments."
+                    created_at: "2026-09-30T10:11:04.000000Z"
+                    updated_at: "2026-09-30T10:11:04.000000Z"
+                  - id: 9
+                    section_key: "ai_insights"
+                    content:
+                      badge: "SMARTER DECISIONS, POWERED BY DATA"
+                      title: "Turn HR data into smarter decisions."
+                      description: "Smart HR helps you see what is happening across your organization and understand what to do next."
+                      button_text: "Discover AI Insights"
+                    created_at: "2026-09-30T10:11:04.000000Z"
+                    updated_at: "2026-09-30T10:11:04.000000Z"
+                  - id: 10
+                    section_key: "global_stats"
+                    content:
+                      - value: "99.8%"
+                        label: "System Reliability & Uptime"
+                      - value: "45%"
+                        label: "Faster Routine HR Operations"
+                      - value: "10,000+"
+                        label: "Active Employees Managed"
+                      - value: "100%"
+                        label: "Data Privacy & Security Compliance"
+                    created_at: "2026-09-30T10:11:04.000000Z"
+                    updated_at: "2026-09-30T10:11:04.000000Z"
+                  - id: 11
+                    section_key: "cta"
+                    content:
+                      badge: "READY TO TRANSFORM YOUR WORKPLACE?"
+                      title: "Experience Smarter People Operations Today"
+                      description: "Join hundreds of forward-thinking companies streamlining their HR with WiseWork."
+                      button_text: "Start Free Trial"
+                      subnotes: "No credit card required • Instant setup • Cancel anytime"
+                    created_at: "2026-09-30T10:11:04.000000Z"
+                    updated_at: "2026-09-30T10:11:04.000000Z"
+                  - id: 12
+                    section_key: "footer"
+                    content:
+                      brand_description: "Corporate, trustworthy, and operational workforce management system built for modern teams."
+                      columns:
+                        platform:
+                          - "Employee Directory"
+                          - "Attendance Tracking"
+                          - "Leave Management"
+                          - "Performance & Goals"
+                        resources:
+                          - "Documentation"
+                          - "Security & Compliance"
+                          - "Help Center"
+                        company:
+                          - "About WiseWork"
+                          - "Careers"
+                          - "Privacy Policy"
+                      contact:
+                        email: "support@wisework.io"
+                        phone: "+1 (800) 555-0199"
+                        address: "Enterprise Tower, Innovation District"
+                      copyright: "© 2026 WiseWork. All rights reserved."
+                      bottom_tagline: "Enterprise Grade People Operations Platform"
+                    created_at: "2026-09-30T10:11:04.000000Z"
+                    updated_at: "2026-09-30T10:11:04.000000Z"
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "Unauthenticated."
+        '403':
+          description: Forbidden (User does not have Owner role).
+          content:
+            application/json:
+              example:
+                success: false
+                message: "User does not have the right roles."
+  /api/owner/landing-page/sections/{key}:
+    put:
+      tags:
+        - Landing Page
+      summary: Update Specific Landing Page Section (Owner)
+      description: Update content structure for a specific section using its unique section key.
+      operationId: updateOwnerLandingSection
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: key
+          required: true
+          schema:
+            type: string
+            enum: [hero, about, ai_insights, global_stats, cta, footer]
+          description: Unique identifier key of the section to update.
+        - in: header
+          name: Accept-Language
+          schema:
+            type: string
+            enum: [en, ar]
+            default: en
+          required: false
+          description: Preferred language for localized response messages.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - content
+              properties:
+                content:
+                  type: object
+                  description: Flexible JSON structure containing section key-value pairs or array of objects.
+                  additionalProperties: true
+                  example:
+                    badge: "UPDATED PLATFORM BADGE"
+                    title: "Smarter HR Management Updated"
+                    description: "New updated description for testing"
+                    primary_button: "Get Started Now"
+                    secondary_button: "Explore Features"
+                    trust_text: "10,000+ Trusted Teams"
+                    ticker_tags:
+                      - "GEOFENCING ATTENDANCE"
+                      - "AI CAREER & TALENT INSIGHTS"
+      responses:
+        '200':
+          description: Landing section updated successfully.
+          content:
+            application/json:
+              example:
+                success: true
+                message: "Landing section updated successfully."
+                data:
+                  id: 7
+                  section_key: "hero"
+                  content:
+                    badge: "UPDATED PLATFORM BADGE"
+                    title: "Smarter HR Management Updated"
+                    description: "New updated description for testing"
+                    primary_button: "Get Started Now"
+                    secondary_button: "Explore Features"
+                    trust_text: "10,000+ Trusted Teams"
+                    ticker_tags:
+                      - "GEOFENCING ATTENDANCE"
+                      - "AI CAREER & TALENT INSIGHTS"
+                  created_at: "2026-09-30T10:11:04.000000Z"
+                  updated_at: "2026-09-30T13:14:14.000000Z"
+        '400':
+          description: Validation Error.
+          content:
+            application/json:
+              examples:
+                missingContent:
+                  summary: Missing required field
+                  value:
+                    success: false
+                    message: "The content field is required."
+                invalidContentFormat:
+                  summary: Content is not an array/object
+                  value:
+                    success: false
+                    message: "The content must be an array/object."
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "Unauthenticated."
+        '403':
+          description: Forbidden (User does not have Owner role).
+          content:
+            application/json:
+              example:
+                success: false
+                message: "User does not have the right roles."
+        '404':
+          description: Section key not found.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "The requested resource was not found."
+  /api/owner/landing-page/features:
+    get:
+      tags:
+        - Landing Page
+      summary: Get All Landing Features (Owner)
+      description: Retrieve a list of all landing page features ordered by their display priority.
+      operationId: getOwnerLandingFeatures
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept-Language
+          schema:
+            type: string
+            enum: [en, ar]
+            default: en
+          required: false
+          description: Preferred language for localized response messages.
+      responses:
+        '200':
+          description: Landing features retrieved successfully.
+          content:
+            application/json:
+              example:
+                success: true
+                message: "Landing features retrieved successfully."
+                data:
+                  - id: 7
+                    icon: "user-group"
+                    title: "Employee Directory & Profiles"
+                    description: "Centralized database for contracts, documents, departmental structure, and complete workforce profiles."
+                    order: 1
+                  - id: 8
+                    icon: "clock"
+                    title: "Smart Attendance & Shifts"
+                    description: "Real-time check-ins, automated shift assignments, overtime calculations, and instant presence tracking."
+                    order: 2
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "Unauthenticated."
+        '403':
+          description: Forbidden (User does not have Owner role).
+          content:
+            application/json:
+              example:
+                success: false
+                message: "User does not have the right roles."
+
+    post:
+      tags:
+        - Landing Page
+      summary: Create Landing Feature (Owner)
+      description: Add a new feature card to the landing page.
+      operationId: createOwnerLandingFeature
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept-Language
+          schema:
+            type: string
+            enum: [en, ar]
+            default: en
+          required: false
+          description: Preferred language for localized response messages.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - icon
+                - title
+                - description
+              properties:
+                icon:
+                  type: string
+                  maxLength: 255
+                  example: "shield-check"
+                title:
+                  type: string
+                  maxLength: 255
+                  example: "Advanced Security & Compliance"
+                description:
+                  type: string
+                  example: "Role-based access control and end-to-end data encryption for your enterprise."
+                order:
+                  type: integer
+                  minimum: 0
+                  nullable: true
+                  example: 7
+                is_active:
+                  type: boolean
+                  nullable: true
+                  example: true
+      responses:
+        '201':
+          description: Landing feature created successfully.
+          content:
+            application/json:
+              example:
+                success: true
+                message: "Landing feature created successfully."
+                data:
+                  id: 13
+                  icon: "shield-check"
+                  title: "Advanced Security & Compliance"
+                  description: "Role-based access control and end-to-end data encryption for your enterprise."
+                  order: 7
+        '400':
+          description: Validation Error.
+          content:
+            application/json:
+              examples:
+                missingRequiredFields:
+                  summary: Missing required parameters
+                  value:
+                    success: false
+                    message: "The icon field is required. The title field is required. The description field is required."
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "Unauthenticated."
+        '403':
+          description: Forbidden (User does not have Owner role).
+          content:
+            application/json:
+              example:
+                success: false
+                message: "User does not have the right roles."
+  /api/owner/landing-page/features/{id}:
+    put:
+      tags:
+        - Landing Page
+      summary: Update Landing Feature (Owner)
+      description: Update an existing landing page feature by ID.
+      operationId: updateOwnerLandingFeature
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the landing feature to update.
+        - in: header
+          name: Accept-Language
+          schema:
+            type: string
+            enum: [en, ar]
+            default: en
+          required: false
+          description: Preferred language for localized response messages.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                icon:
+                  type: string
+                  maxLength: 255
+                  example: "shield-check"
+                title:
+                  type: string
+                  maxLength: 255
+                  example: "Enterprise Security & Global Compliance"
+                description:
+                  type: string
+                  example: "Updated description for enterprise security features."
+                order:
+                  type: integer
+                  minimum: 0
+                  nullable: true
+                  example: 1
+                is_active:
+                  type: boolean
+                  nullable: true
+                  example: true
+      responses:
+        '200':
+          description: Landing feature updated successfully.
+          content:
+            application/json:
+              example:
+                success: true
+                message: "Landing feature updated successfully."
+                data:
+                  id: 7
+                  icon: "shield-check"
+                  title: "Enterprise Security & Global Compliance"
+                  description: "Updated description for enterprise security features."
+                  order: 1
+        '400':
+          description: Validation Error.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "The title field must be a string."
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "Unauthenticated."
+        '403':
+          description: Forbidden (User does not have Owner role).
+          content:
+            application/json:
+              example:
+                success: false
+                message: "User does not have the right roles."
+        '404':
+          description: Resource Not Found.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "The requested resource was not found."
+
+    delete:
+      tags:
+        - Landing Page
+      summary: Delete Landing Feature (Owner)
+      description: Permanently remove a landing feature card by ID.
+      operationId: deleteOwnerLandingFeature
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the landing feature to delete.
+        - in: header
+          name: Accept-Language
+          schema:
+            type: string
+            enum: [en, ar]
+            default: en
+          required: false
+          description: Preferred language for localized response messages.
+      responses:
+        '200':
+          description: Landing feature deleted successfully.
+          content:
+            application/json:
+              example:
+                success: true
+                message: "Landing feature deleted successfully."
+                data: null
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "Unauthenticated."
+        '403':
+          description: Forbidden (User does not have Owner role).
+          content:
+            application/json:
+              example:
+                success: false
+                message: "User does not have the right roles."
+        '404':
+          description: Resource Not Found.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "The requested resource was not found."
+  /api/owner/landing-page/roles:
+    get:
+      tags:
+        - Landing Page
+      summary: Get All Landing Roles (Owner)
+      description: Retrieve all targeted role cards for owner management, ordered by display priority.
+      operationId: getOwnerLandingRoles
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept-Language
+          schema:
+            type: string
+            enum: [en, ar]
+            default: en
+          required: false
+          description: Preferred language for localized response messages.
+      responses:
+        '200':
+          description: Landing roles retrieved successfully.
+          content:
+            application/json:
+              example:
+                success: true
+                message: "Landing roles retrieved successfully."
+                data:
+                  - id: 4
+                    role_name: "HR LEADERS"
+                    title: "Complete Operational Control"
+                    description: "Automate repetitive workflows, maintain compliance, manage organizational hierarchies, and gain instant reporting with minimal manual effort."
+                    features:
+                      - "Automated onboarding & offboarding"
+                      - "Comprehensive policy enforcement"
+                      - "Instant bulk actions & CSV exports"
+                    order: 1
+                  - id: 5
+                    role_name: "EMPLOYEES"
+                    title: "Intuitive Self-Service Portal"
+                    description: "Give your employees seamless access to request leaves, track attendance, review personal goals, and manage profile information on any device."
+                    features:
+                      - "One-click leave requests"
+                      - "Transparent balance & history tracking"
+                      - "Goal progress visibility"
+                    order: 2
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "Unauthenticated."
+        '403':
+          description: Forbidden (User does not have Owner role).
+          content:
+            application/json:
+              example:
+                success: false
+                message: "User does not have the right roles."
+
+    post:
+      tags:
+        - Landing Page
+      summary: Create Landing Role (Owner)
+      description: Create a new target role card on the landing page.
+      operationId: createOwnerLandingRole
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept-Language
+          schema:
+            type: string
+            enum: [en, ar]
+            default: en
+          required: false
+          description: Preferred language for localized response messages.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - role_name
+                - title
+                - description
+                - features
+              properties:
+                role_name:
+                  type: string
+                  maxLength: 255
+                  example: "FINANCE & PAYROLL"
+                title:
+                  type: string
+                  maxLength: 255
+                  example: "Automated Payroll & Expense Control"
+                description:
+                  type: string
+                  example: "Streamline salary processing, tax compliance, and expense approvals effortlessly."
+                features:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: string
+                  example:
+                    - "Automated tax & insurance deductions"
+                    - "Instant salary slip generation"
+                    - "Multi-currency expense tracking"
+                order:
+                  type: integer
+                  minimum: 0
+                  nullable: true
+                  example: 4
+                is_active:
+                  type: boolean
+                  nullable: true
+                  example: true
+      responses:
+        '201':
+          description: Landing role created successfully.
+          content:
+            application/json:
+              example:
+                success: true
+                message: "Landing role created successfully."
+                data:
+                  id: 7
+                  role_name: "FINANCE & PAYROLL"
+                  title: "Automated Payroll & Expense Control"
+                  description: "Streamline salary processing, tax compliance, and expense approvals effortlessly."
+                  features:
+                    - "Automated tax & insurance deductions"
+                    - "Instant salary slip generation"
+                    - "Multi-currency expense tracking"
+                  order: 4
+        '400':
+          description: Validation Error.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "The role name field is required. The features field is required."
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "Unauthenticated."
+        '403':
+          description: Forbidden (User does not have Owner role).
+          content:
+            application/json:
+              example:
+                success: false
+                message: "User does not have the right roles."
+
+  /api/owner/landing-page/roles/{id}:
+    put:
+      tags:
+        - Landing Page
+      summary: Update Landing Role (Owner)
+      description: Update an existing landing page role card by ID.
+      operationId: updateOwnerLandingRole
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the landing role to update.
+        - in: header
+          name: Accept-Language
+          schema:
+            type: string
+            enum: [en, ar]
+            default: en
+          required: false
+          description: Preferred language for localized response messages.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role_name:
+                  type: string
+                  maxLength: 255
+                  example: "HR LEADERS"
+                title:
+                  type: string
+                  maxLength: 255
+                  example: "Complete Operational Control Updated"
+                description:
+                  type: string
+                  example: "Updated description for HR leaders role card."
+                features:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: string
+                  example:
+                    - "Automated onboarding & offboarding"
+                    - "Comprehensive policy enforcement"
+                    - "Instant bulk actions & CSV exports"
+                    - "Custom role permissions"
+                order:
+                  type: integer
+                  minimum: 0
+                  nullable: true
+                  example: 1
+                is_active:
+                  type: boolean
+                  nullable: true
+                  example: true
+      responses:
+        '200':
+          description: Landing role updated successfully.
+          content:
+            application/json:
+              example:
+                success: true
+                message: "Landing role updated successfully."
+                data:
+                  id: 4
+                  role_name: "HR LEADERS"
+                  title: "Complete Operational Control Updated"
+                  description: "Updated description for HR leaders role card."
+                  features:
+                    - "Automated onboarding & offboarding"
+                    - "Comprehensive policy enforcement"
+                    - "Instant bulk actions & CSV exports"
+                    - "Custom role permissions"
+                  order: 1
+        '400':
+          description: Validation Error.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "The features must be an array."
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "Unauthenticated."
+        '403':
+          description: Forbidden (User does not have Owner role).
+          content:
+            application/json:
+              example:
+                success: false
+                message: "User does not have the right roles."
+        '404':
+          description: Resource Not Found.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "The requested resource was not found."
+
+    delete:
+      tags:
+        - Landing Page
+      summary: Delete Landing Role (Owner)
+      description: Remove a target role card by ID.
+      operationId: deleteOwnerLandingRole
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the landing role to delete.
+        - in: header
+          name: Accept-Language
+          schema:
+            type: string
+            enum: [en, ar]
+            default: en
+          required: false
+          description: Preferred language for localized response messages.
+      responses:
+        '200':
+          description: Landing role deleted successfully.
+          content:
+            application/json:
+              example:
+                success: true
+                message: "Landing role deleted successfully."
+                data: null
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "Unauthenticated."
+        '403':
+          description: Forbidden (User does not have Owner role).
+          content:
+            application/json:
+              example:
+                success: false
+                message: "User does not have the right roles."
+        '404':
+          description: Resource Not Found.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "The requested resource was not found."
+
+  # ==========================================
+  # 2. LANDING PLANS ENDPOINTS
+  # ==========================================
+  /api/owner/landing-page/plans:
+    get:
+      tags:
+        - Landing Page
+      summary: Get All Landing Plans (Owner)
+      description: Retrieve all pricing plans and subscription packages ordered by display order.
+      operationId: getOwnerLandingPlans
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept-Language
+          schema:
+            type: string
+            enum: [en, ar]
+            default: en
+          required: false
+          description: Preferred language for localized response messages.
+      responses:
+        '200':
+          description: Landing plans retrieved successfully.
+          content:
+            application/json:
+              example:
+                success: true
+                message: "Landing plans retrieved successfully."
+                data:
+                  - id: 4
+                    name: "STARTER"
+                    description: "Essential people operations for small teams and startups."
+                    price: "Custom"
+                    billing_period: "per employee / month"
+                    is_popular: false
+                    features:
+                      - "Up to 50 employees"
+                      - "Core Employee Directory"
+                      - "Attendance & Shifts"
+                      - "Standard Leave Management"
+                      - "Email Support"
+                    button_text: "Choose Plan"
+                    button_link: null
+                    order: 1
+                  - id: 5
+                    name: "PROFESSIONAL"
+                    description: "Complete workforce management with performance & AI insights."
+                    price: "Custom"
+                    billing_period: "per employee / month"
+                    is_popular: true
+                    features:
+                      - "Up to 500 employees"
+                      - "Everything in Starter"
+                      - "Performance Reviews & KPIs"
+                      - "SkillMatch AI Recommendations"
+                      - "Custom Approval Workflows"
+                      - "Advanced Reports & Export"
+                      - "Priority Support"
+                    button_text: "Choose Plan"
+                    button_link: null
+                    order: 2
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "Unauthenticated."
+        '403':
+          description: Forbidden (User does not have Owner role).
+          content:
+            application/json:
+              example:
+                success: false
+                message: "User does not have the right roles."
+
+    post:
+      tags:
+        - Landing Page
+      summary: Create Landing Plan (Owner)
+      description: Add a new pricing plan or package to the landing page.
+      operationId: createOwnerLandingPlan
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept-Language
+          schema:
+            type: string
+            enum: [en, ar]
+            default: en
+          required: false
+          description: Preferred language for localized response messages.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - price
+                - features
+              properties:
+                name:
+                  type: string
+                  maxLength: 255
+                  example: "ULTIMATE"
+                description:
+                  type: string
+                  nullable: true
+                  example: "Tailored solution for global enterprises with dedicated support."
+                price:
+                  type: string
+                  maxLength: 255
+                  example: "Custom"
+                billing_period:
+                  type: string
+                  maxLength: 255
+                  nullable: true
+                  example: "billed annually"
+                is_popular:
+                  type: boolean
+                  nullable: true
+                  example: false
+                features:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: string
+                  example:
+                    - "Unlimited employees & departments"
+                    - "Dedicated account manager & 24/7 support"
+                    - "Custom API integrations"
+                    - "On-premise deployment option"
+                button_text:
+                  type: string
+                  maxLength: 255
+                  nullable: true
+                  example: "Contact Sales"
+                button_link:
+                  type: string
+                  maxLength: 255
+                  nullable: true
+                  example: "/contact-sales"
+                order:
+                  type: integer
+                  minimum: 0
+                  nullable: true
+                  example: 4
+                is_active:
+                  type: boolean
+                  nullable: true
+                  example: true
+      responses:
+        '201':
+          description: Landing plan created successfully.
+          content:
+            application/json:
+              example:
+                success: true
+                message: "Landing plan created successfully."
+                data:
+                  id: 7
+                  name: "ULTIMATE"
+                  description: "Tailored solution for global enterprises with dedicated support."
+                  price: "Custom"
+                  billing_period: "billed annually"
+                  is_popular: false
+                  features:
+                    - "Unlimited employees & departments"
+                    - "Dedicated account manager & 24/7 support"
+                    - "Custom API integrations"
+                    - "On-premise deployment option"
+                  button_text: "Contact Sales"
+                  button_link: "/contact-sales"
+                  order: 4
+        '400':
+          description: Validation Error.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "The name field is required. The price field is required."
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "Unauthenticated."
+        '403':
+          description: Forbidden (User does not have Owner role).
+          content:
+            application/json:
+              example:
+                success: false
+                message: "User does not have the right roles."
+
+  /api/owner/landing-page/plans/{id}:
+    put:
+      tags:
+        - Landing Page
+      summary: Update Landing Plan (Owner)
+      description: Update an existing pricing plan package by ID.
+      operationId: updateOwnerLandingPlan
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the landing plan to update.
+        - in: header
+          name: Accept-Language
+          schema:
+            type: string
+            enum: [en, ar]
+            default: en
+          required: false
+          description: Preferred language for localized response messages.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  maxLength: 255
+                  example: "PROFESSIONAL PLUS"
+                description:
+                  type: string
+                  nullable: true
+                  example: "Complete workforce management with performance & AI insights."
+                price:
+                  type: string
+                  maxLength: 255
+                  example: "$12"
+                billing_period:
+                  type: string
+                  maxLength: 255
+                  nullable: true
+                  example: "per employee / month"
+                is_popular:
+                  type: boolean
+                  nullable: true
+                  example: true
+                features:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: string
+                  example:
+                    - "Up to 500 employees"
+                    - "Everything in Starter"
+                    - "Performance Reviews & KPIs"
+                    - "SkillMatch AI Recommendations"
+                    - "Custom Approval Workflows"
+                    - "Advanced Reports & Export"
+                    - "Priority Support 24/7"
+                button_text:
+                  type: string
+                  maxLength: 255
+                  nullable: true
+                  example: "Upgrade Now"
+                button_link:
+                  type: string
+                  maxLength: 255
+                  nullable: true
+                  example: null
+                order:
+                  type: integer
+                  minimum: 0
+                  nullable: true
+                  example: 2
+                is_active:
+                  type: boolean
+                  nullable: true
+                  example: true
+      responses:
+        '200':
+          description: Landing plan updated successfully.
+          content:
+            application/json:
+              example:
+                success: true
+                message: "Landing plan updated successfully."
+                data:
+                  id: 5
+                  name: "PROFESSIONAL PLUS"
+                  description: "Complete workforce management with performance & AI insights."
+                  price: "$12"
+                  billing_period: "per employee / month"
+                  is_popular: true
+                  features:
+                    - "Up to 500 employees"
+                    - "Everything in Starter"
+                    - "Performance Reviews & KPIs"
+                    - "SkillMatch AI Recommendations"
+                    - "Custom Approval Workflows"
+                    - "Advanced Reports & Export"
+                    - "Priority Support 24/7"
+                  button_text: "Upgrade Now"
+                  button_link: null
+                  order: 2
+        '400':
+          description: Validation Error.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "The price field must be a string."
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "Unauthenticated."
+        '403':
+          description: Forbidden (User does not have Owner role).
+          content:
+            application/json:
+              example:
+                success: false
+                message: "User does not have the right roles."
+        '404':
+          description: Resource Not Found.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "The requested resource was not found."
+
+    delete:
+      tags:
+        - Landing Page
+      summary: Delete Landing Plan (Owner)
+      description: Delete a pricing plan card by ID.
+      operationId: deleteOwnerLandingPlan
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the landing plan to delete.
+        - in: header
+          name: Accept-Language
+          schema:
+            type: string
+            enum: [en, ar]
+            default: en
+          required: false
+          description: Preferred language for localized response messages.
+      responses:
+        '200':
+          description: Landing plan deleted successfully.
+          content:
+            application/json:
+              example:
+                success: true
+                message: "Landing plan deleted successfully."
+                data: null
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "Unauthenticated."
+        '403':
+          description: Forbidden (User does not have Owner role).
+          content:
+            application/json:
+              example:
+                success: false
+                message: "User does not have the right roles."
+        '404':
+          description: Resource Not Found.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "The requested resource was not found."
 
 
 components:

@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\HrAttendanceController;
 use App\Http\Controllers\Api\HrEvaluationSetupController;
 use App\Http\Controllers\Api\HrGoalController;
 use App\Http\Controllers\Api\HrPerformanceController;
+use App\Http\Controllers\Api\LandingPageController;
 use App\Http\Controllers\Api\LeaveBalanceController;
 use App\Http\Controllers\Api\LeaveDecisionHistoryController;
 use App\Http\Controllers\Api\LeaveRequestController;
@@ -33,6 +34,10 @@ use App\Http\Controllers\Api\ManagerAttendanceController;
 use App\Http\Controllers\Api\ManagerController;
 use App\Http\Controllers\Api\ManagerPerformanceController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\Owner\LandingFeatureController;
+use App\Http\Controllers\Api\Owner\LandingPlanController;
+use App\Http\Controllers\Api\Owner\LandingRoleController;
+use App\Http\Controllers\Api\Owner\LandingSectionController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\PolicyController;
 use App\Http\Controllers\Api\SubmissionController;
@@ -342,7 +347,6 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
     });
 
     Route::get('/permissions', [PermissionController::class, 'index'])->middleware('permission:'.PermissionEnum::PERMISSION_VIEW_ALL->value);
-
 });
 
 Route::middleware(['auth:api', 'set.app.language'])->post('/broadcasting/auth', function (Request $request) {
@@ -369,4 +373,13 @@ Route::prefix('ai')->middleware(['auth:api', 'set.app.language'])->group(functio
 
     Route::post('/policy-assistant', AIPolicyAssistantController::class)
         ->middleware('permission:'.PermissionEnum::AI_POLICY_ASSISTANT->value);
+});
+
+Route::get('/landing-page', [LandingPageController::class, 'index'])->middleware('set.app.language');
+Route::prefix('owner/landing-page')->middleware(['auth:api', 'role:Owner', 'set.app.language'])->group(function () {
+    Route::get('/sections', [LandingSectionController::class, 'index']);
+    Route::put('/sections/{key}', [LandingSectionController::class, 'update']);
+    Route::apiResource('features', LandingFeatureController::class);
+    Route::apiResource('roles', LandingRoleController::class);
+    Route::apiResource('plans', LandingPlanController::class);
 });
