@@ -54,8 +54,8 @@ class FinancialTestingSeeder extends Seeder
         SalaryAdvance::create([
             'user_id' => $employeeId,
             'requested_amount' => 6000.00,
-            "repayment_months"=> 6,
-            "monthly_deduction"=> 1000.00,
+            'repayment_months' => 6,
+            'monthly_deduction' => 1000.00,
             'reason' => 'Emergency personal expense',
             'status' => 'approved',
         ]);

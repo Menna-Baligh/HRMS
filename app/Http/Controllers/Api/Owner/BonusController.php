@@ -80,6 +80,4 @@ class BonusController extends Controller
             statusCode: Response::HTTP_CREATED
         );
     }
-
-
 }

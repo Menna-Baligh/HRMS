@@ -20,6 +20,7 @@ class StoreSalaryAdvanceRequest extends FormRequest
             'reason' => ['required', 'string', 'max:255'],
         ];
     }
+
     public function messages(): array
     {
         return [

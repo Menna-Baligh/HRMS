@@ -278,6 +278,7 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(PolicyVersion::class, 'created_by');
     }
+
     public function salaryAdvances(): HasMany
     {
         return $this->hasMany(SalaryAdvance::class);

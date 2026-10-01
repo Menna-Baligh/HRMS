@@ -17,6 +17,7 @@ class UpdateSalaryAdvanceStatusRequest extends FormRequest
             'status' => ['required', 'in:approved,rejected'],
         ];
     }
+
     public function messages(): array
     {
         return [

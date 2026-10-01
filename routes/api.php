@@ -40,6 +40,7 @@ use App\Http\Controllers\Api\Owner\LandingFeatureController;
 use App\Http\Controllers\Api\Owner\LandingPlanController;
 use App\Http\Controllers\Api\Owner\LandingRoleController;
 use App\Http\Controllers\Api\Owner\LandingSectionController;
+use App\Http\Controllers\Api\Owner\PayrollController;
 use App\Http\Controllers\Api\Owner\SalaryAdvanceController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\PolicyController;
@@ -49,7 +50,6 @@ use App\Http\Controllers\CompanyLocations\CompanyLocationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\Owner\PayrollController;
 
 /*
 |--------------------------------------------------------------------------

@@ -55,7 +55,7 @@ class DeductionController extends Controller
                 ],
                 [
                     'deduction_id' => $deduction->id,
-                    'screen' => 'deduction_details', 
+                    'screen' => 'deduction_details',
                     'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
                 ]
             );

@@ -84,8 +84,8 @@ return [
             'body' => 'A deduction of $:amount has been recorded on your account. Reason: :reason.',
         ],
         'bonus_issued' => [
-        'title' => 'New Incentive Issued',
-        'body' => 'A new incentive (:type) of $:amount has been assigned to you for :month.',
+            'title' => 'New Incentive Issued',
+            'body' => 'A new incentive (:type) of $:amount has been assigned to you for :month.',
         ],
         'bonus_status_updated' => [
             'title' => 'Incentive Status :status',
@@ -102,12 +102,12 @@ return [
         'status_updated' => 'Incentive status updated successfully.',
     ],
     'payroll' => [
-    'retrieved' => 'Payroll calculations retrieved successfully.',
-    'finalized' => 'Payroll for :month has been finalized successfully.',
-    'payslip_retrieved' => 'Payslip retrieved successfully.',
-    'already_finalized' => 'Payroll for this month has already been finalized.',
-    'finalized_status' => 'Payroll for this month is finalized.',
-    'draft_status' => 'Payroll for this month is still in draft (pending approval).',
-    'already_finalized_all' => 'All employees payrolls for this month are already finalized.',
+        'retrieved' => 'Payroll calculations retrieved successfully.',
+        'finalized' => 'Payroll for :month has been finalized successfully.',
+        'payslip_retrieved' => 'Payslip retrieved successfully.',
+        'already_finalized' => 'Payroll for this month has already been finalized.',
+        'finalized_status' => 'Payroll for this month is finalized.',
+        'draft_status' => 'Payroll for this month is still in draft (pending approval).',
+        'already_finalized_all' => 'All employees payrolls for this month are already finalized.',
     ],
 ];

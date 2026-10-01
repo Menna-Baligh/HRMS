@@ -58,7 +58,7 @@ class SalaryAdvanceController extends Controller
                     'amount' => $advance->requested_amount,
                 ],
                 [
-                    'advance_id' => $advance->id ,
+                    'advance_id' => $advance->id,
                     'screen' => 'salary_advance_details',
                     'click_action' => 'FRONTEND_NOTIFICATION_CLICK',
                 ]

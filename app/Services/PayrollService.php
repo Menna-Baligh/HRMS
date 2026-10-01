@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\DB;
 
 class PayrollService
 {
-
     public function calculateCompanyPayroll(string $monthYear, int $perPage = 10): LengthAwarePaginator
     {
         $isFinalized = Payroll::where('month_year', $monthYear)->exists();
@@ -39,8 +38,6 @@ class PayrollService
 
         return $employees;
     }
-
-
 
     public function finalizeCompanyPayroll(string $monthYear): array
     {
@@ -96,14 +93,12 @@ class PayrollService
         });
     }
 
-
     public function getEmployeeSalaryHistory(User $user, int $perPage = 10): LengthAwarePaginator
     {
         return Payroll::where('user_id', $user->id)
             ->latest('month_year')
             ->paginate($perPage);
     }
-
 
     private function calculateEmployeePayrollData(User $employee, string $monthYear): object
     {

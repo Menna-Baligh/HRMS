@@ -6,13 +6,12 @@ use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Owner\FinalizePayrollRequest;
 use App\Http\Resources\PayrollResource;
-use App\Http\Resources\PayslipResource;
 use App\Models\Payroll;
 use App\Services\PayrollService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class PayrollController extends Controller
 {
@@ -32,8 +31,8 @@ class PayrollController extends Controller
         return ResponseHelper::success(
             data: array_merge($paginatedData, [
                 'is_month_finalized' => $isFinalized,
-                'status_message' => $isFinalized 
-                    ? __('financial.payroll.finalized_status') 
+                'status_message' => $isFinalized
+                    ? __('financial.payroll.finalized_status')
                     : __('financial.payroll.draft_status'),
             ]),
             message: __('financial.payroll.retrieved')
@@ -65,7 +64,7 @@ class PayrollController extends Controller
         $payroll->load(['user.department', 'user.roles']);
 
         $pdf = Pdf::loadView('pdf.payslip', [
-            'payroll' => $payroll
+            'payroll' => $payroll,
         ]);
 
         $fileName = "payslip_{$payroll->user?->name}_{$payroll->month_year}.pdf";

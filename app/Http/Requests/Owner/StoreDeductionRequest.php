@@ -21,6 +21,7 @@ class StoreDeductionRequest extends FormRequest
             'type' => ['nullable', 'in:manual,delay'],
         ];
     }
+
     public function messages(): array
     {
         return [

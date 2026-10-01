@@ -279,7 +279,6 @@ enum PermissionEnum: string
             self::GOAL_VIEW_OWN,
             self::GOAL_COMPLETE => ['Employee'],
 
-
             default => ['Owner', 'HR'],
         };
     }
