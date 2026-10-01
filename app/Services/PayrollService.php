@@ -8,37 +8,60 @@ use App\Models\Deduction;
 use App\Models\Payroll;
 use App\Models\SalaryAdvance;
 use App\Models\User;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
 class PayrollService
 {
-    
-    public function calculateCompanyPayroll(string $monthYear): array
+
+    public function calculateCompanyPayroll(string $monthYear, int $perPage = 10): LengthAwarePaginator
     {
-        $existingPayrolls = Payroll::with('user')->where('month_year', $monthYear)->get();
+        $isFinalized = Payroll::where('month_year', $monthYear)->exists();
 
-        if ($existingPayrolls->isNotEmpty()) {
-            return $existingPayrolls->all();
+        if ($isFinalized) {
+            return Payroll::with('user')
+                ->where('month_year', $monthYear)
+                ->whereDoesntHave('user.roles', function ($q) {
+                    $q->whereIn('name', ['Owner', 'HR']);
+                })
+                ->paginate($perPage);
         }
 
-        $users = User::all();
-        $calculatedPayrolls = [];
+        $employeesQuery = User::whereDoesntHave('roles', function ($q) {
+            $q->whereIn('name', ['Owner', 'HR']);
+        });
 
-        foreach ($users as $employee) {
-            $calculatedPayrolls[] = $this->calculateEmployeePayrollData($employee, $monthYear);
-        }
+        $employees = $employeesQuery->paginate($perPage);
 
-        return $calculatedPayrolls;
+        $employees->getCollection()->transform(function ($employee) use ($monthYear) {
+            return $this->calculateEmployeePayrollData($employee, $monthYear);
+        });
+
+        return $employees;
     }
 
-    
+
+
     public function finalizeCompanyPayroll(string $monthYear): array
     {
         return DB::transaction(function () use ($monthYear) {
-            $users = User::all();
-            $finalizedPayrolls = [];
+            $alreadyFinalizedUserIds = Payroll::where('month_year', $monthYear)
+                ->pluck('user_id')
+                ->toArray();
 
-            foreach ($users as $employee) {
+            $pendingEmployees = User::whereNotIn('id', $alreadyFinalizedUserIds)
+                ->whereDoesntHave('roles', function ($q) {
+                    $q->whereIn('name', ['Owner', 'HR']);
+                })
+                ->get();
+
+            if ($pendingEmployees->isEmpty()) {
+                return [];
+            }
+
+            $newlyFinalizedPayrolls = [];
+
+            foreach ($pendingEmployees as $employee) {
                 $payrollData = $this->calculateEmployeePayrollData($employee, $monthYear);
 
                 $payroll = Payroll::create([
@@ -66,54 +89,37 @@ class PayrollService
                     ['payroll_id' => $payroll->id, 'screen' => 'payslip_details', 'click_action' => 'FLUTTER_NOTIFICATION_CLICK']
                 );
 
-                $finalizedPayrolls[] = $payroll->load('user');
+                $newlyFinalizedPayrolls[] = $payroll->load('user');
             }
 
-            return $finalizedPayrolls;
+            return $newlyFinalizedPayrolls;
         });
     }
 
-    
-    public function getEmployeeSalaryHistory(User $user): array
+
+    public function getEmployeeSalaryHistory(User $user, int $perPage = 10): LengthAwarePaginator
     {
-        $currentMonth = now()->format('Y-m');
-
-        $finalizedPayrolls = Payroll::where('user_id', $user->id)
+        return Payroll::where('user_id', $user->id)
             ->latest('month_year')
-            ->get();
-
-        $history = [];
-
-        $currentMonthFinalized = $finalizedPayrolls->where('month_year', $currentMonth)->first();
-
-        if (! $currentMonthFinalized) {
-            $currentEstimated = $this->calculateEmployeePayrollData($user, $currentMonth);
-            $history[] = $currentEstimated;
-        }
-
-        foreach ($finalizedPayrolls as $payroll) {
-            $history[] = $payroll;
-        }
-
-        return $history;
+            ->paginate($perPage);
     }
 
 
     private function calculateEmployeePayrollData(User $employee, string $monthYear): object
     {
-        $basicSalary = $employee->salary ?? 0.00;
+        $basicSalary = (float) ($employee->salary ?? 0.00);
 
-        $totalBonuses = Bonus::where('user_id', $employee->id)
+        $totalBonuses = (float) Bonus::where('user_id', $employee->id)
             ->where('status', 'approved')
             ->where('target_month', $monthYear)
             ->sum('amount');
 
-        $totalDeductions = Deduction::where('user_id', $employee->id)
+        $totalDeductions = (float) Deduction::where('user_id', $employee->id)
             ->where('status', 'queued')
             ->whereRaw("DATE_FORMAT(date, '%Y-%m') = ?", [$monthYear])
             ->sum('amount');
 
-        $loanInstallment = SalaryAdvance::where('user_id', $employee->id)
+        $loanInstallment = (float) SalaryAdvance::where('user_id', $employee->id)
             ->where('status', 'approved')
             ->sum('monthly_deduction');
 
@@ -124,16 +130,17 @@ class PayrollService
             ->first();
 
         return (object) [
-            'id' => $existingPayroll?->id,
+            'id' => $existingPayroll?->id ?? null,
             'user_id' => $employee->id,
             'user' => $employee,
             'month_year' => $monthYear,
-            'basic_salary' => (float) $basicSalary,
-            'total_bonuses' => (float) $totalBonuses,
-            'total_deductions' => (float) $totalDeductions,
-            'loan_installment' => (float) $loanInstallment,
-            'net_salary' => (float) $netSalary,
-            'status' => $existingPayroll ? 'finalized' : 'pending_approval',
+            'basic_salary' => $basicSalary,
+            'total_bonuses' => $totalBonuses,
+            'total_deductions' => $totalDeductions,
+            'loan_installment' => $loanInstallment,
+            'net_salary' => $netSalary,
+            'status' => $existingPayroll ? 'finalized' : 'draft',
+            'is_finalized' => (bool) $existingPayroll,
         ];
     }
 }

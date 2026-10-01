@@ -102,10 +102,12 @@ return [
         'status_updated' => 'Incentive status updated successfully.',
     ],
     'payroll' => [
-        'retrieved' => 'Payroll calculations retrieved successfully.',
-        'finalized' => 'Payroll for :month has been finalized successfully.',
-        'payslip_retrieved' => 'Payslip retrieved successfully.',
-        'already_finalized' => 'Payroll for this month has already been finalized.',
+    'retrieved' => 'Payroll calculations retrieved successfully.',
+    'finalized' => 'Payroll for :month has been finalized successfully.',
+    'payslip_retrieved' => 'Payslip retrieved successfully.',
+    'already_finalized' => 'Payroll for this month has already been finalized.',
+    'finalized_status' => 'Payroll for this month is finalized.',
+    'draft_status' => 'Payroll for this month is still in draft (pending approval).',
+    'already_finalized_all' => 'All employees payrolls for this month are already finalized.',
     ],
-
 ];

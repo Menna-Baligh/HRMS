@@ -9,17 +9,20 @@ class PayrollResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $isFinalized = (bool) ($this->is_finalized ?? ($this->status === 'finalized'));
+
         return [
-            'id' => $this->id ?? null,
+            'id' => $this->when($isFinalized, $this->id),
             'user_id' => $this->user_id,
-            'employee_name' => $this->user?->name,
+            'employee_name' => $this->user?->name ?? $this->employee_name ?? 'N/A',
             'month_year' => $this->month_year,
-            'basic_salary' => (float) $this->basic_salary,
-            'total_bonuses' => (float) $this->total_bonuses,
-            'total_deductions' => (float) $this->total_deductions,
-            'loan_installment' => (float) $this->loan_installment,
-            'net_salary' => (float) $this->net_salary,
+            'basic_salary' => (float) ($this->basic_salary ?? 0),
+            'total_bonuses' => (float) ($this->total_bonuses ?? 0),
+            'total_deductions' => (float) ($this->total_deductions ?? 0),
+            'loan_installment' => (float) ($this->loan_installment ?? 0),
+            'net_salary' => (float) ($this->net_salary ?? 0),
             'status' => $this->status ?? 'draft',
+            'is_finalized' => $isFinalized,
         ];
     }
 }

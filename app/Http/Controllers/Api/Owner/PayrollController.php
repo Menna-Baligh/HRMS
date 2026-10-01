@@ -17,32 +17,40 @@ class PayrollController extends Controller
 {
     public function __construct(protected PayrollService $payrollService) {}
 
-    
     public function index(Request $request): JsonResponse
     {
         $monthYear = $request->input('month_year', now()->format('Y-m'));
+        $perPage = (int) $request->input('per_page', 10);
 
-        $payrolls = $this->payrollService->calculateCompanyPayroll($monthYear);
+        $payrollsPaginator = $this->payrollService->calculateCompanyPayroll($monthYear, $perPage);
+
+        $isFinalized = Payroll::where('month_year', $monthYear)->exists();
+
+        $paginatedData = PayrollResource::collection($payrollsPaginator)->response()->getData(true);
 
         return ResponseHelper::success(
-            data: PayrollResource::collection($payrolls),
+            data: array_merge($paginatedData, [
+                'is_month_finalized' => $isFinalized,
+                'status_message' => $isFinalized 
+                    ? __('financial.payroll.finalized_status') 
+                    : __('financial.payroll.draft_status'),
+            ]),
             message: __('financial.payroll.retrieved')
         );
     }
-
 
     public function finalize(FinalizePayrollRequest $request): JsonResponse
     {
         $monthYear = $request->validated('month_year');
 
-        if (Payroll::where('month_year', $monthYear)->exists()) {
-            return ResponseHelper::error(
-                message: __('financial.payroll.already_finalized'),
-                statusCode: Response::HTTP_UNPROCESSABLE_ENTITY
+        $finalizedPayrolls = $this->payrollService->finalizeCompanyPayroll($monthYear);
+
+        if (empty($finalizedPayrolls)) {
+            return ResponseHelper::success(
+                data: [],
+                message: __('financial.payroll.already_finalized_all')
             );
         }
-
-        $finalizedPayrolls = $this->payrollService->finalizeCompanyPayroll($monthYear);
 
         return ResponseHelper::success(
             data: PayrollResource::collection($finalizedPayrolls),
@@ -50,7 +58,6 @@ class PayrollController extends Controller
             statusCode: Response::HTTP_CREATED
         );
     }
-
 
     public function payslip(Payroll $payroll): JsonResponse
     {
@@ -60,13 +67,14 @@ class PayrollController extends Controller
         );
     }
 
-
-    public function mySalaries(): JsonResponse
+    public function mySalaries(Request $request): JsonResponse
     {
-        $salariesHistory = $this->payrollService->getEmployeeSalaryHistory(auth()->user());
+        $perPage = (int) $request->input('per_page', 10);
+
+        $salariesPaginator = $this->payrollService->getEmployeeSalaryHistory(auth()->user(), $perPage);
 
         return ResponseHelper::success(
-            data: PayrollResource::collection($salariesHistory),
+            data: PayrollResource::collection($salariesPaginator)->response()->getData(true),
             message: __('financial.payroll.retrieved')
         );
     }

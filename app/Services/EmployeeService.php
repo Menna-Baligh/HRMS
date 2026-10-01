@@ -47,6 +47,7 @@ class EmployeeService
                 'company_location_id' => $locationId,
                 'manager_id' => $managerId,
                 'address' => $data['address'] ?? null,
+                'salary' => $data['salary'] ?? 0.00,
             ]);
 
             $user->assignRole($data['role']);
