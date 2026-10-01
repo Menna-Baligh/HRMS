@@ -151,6 +151,24 @@ enum PermissionEnum: string
     // 15. DropDown
     case VIEW_MANAGERS_DROPDOWN = 'department.view-managers-dropdown';
 
+    // Advances Permissions
+    case VIEW_ADVANCES = 'view advances';
+    case CREATE_ADVANCE = 'create advance';
+    case MANAGE_ADVANCE_STATUS = 'manage advance status';
+
+    // Deductions Permissions
+    case VIEW_DEDUCTIONS = 'view deductions';
+    case CREATE_DEDUCTION = 'create deduction';
+
+    // Bonuses Permissions
+    case VIEW_BONUSES = 'view bonuses';
+    case CREATE_BONUS = 'create bonus';
+    case MANAGE_BONUS_STATUS = 'manage bonus status';
+
+    // Payroll Permissions
+    case VIEW_PAYROLL = 'view payroll';
+    case RUN_PAYROLL = 'run payroll';
+
     public function defaultRoles(): array
     {
         return match ($this) {
@@ -182,10 +200,18 @@ enum PermissionEnum: string
             self::POLICY_VERSION_CREATE,
             self::POLICY_VERSION_ACTIVATE,
             self::POLICY_AUDIT_VIEW,
-            self::HOLIDAY_MANAGE => ['HR', 'Owner'],
-            self::VIEW_MANAGERS_DROPDOWN => ['HR', 'Owner'],
-            self::VIEW_MANAGERS_DROPDOWN,
-            self::HR_ATTENDANCE_MANAGE_EXCEPTIONS => ['HR', 'Owner'],
+            self::HOLIDAY_MANAGE ,
+            self::VIEW_MANAGERS_DROPDOWN ,
+            self::HR_ATTENDANCE_MANAGE_EXCEPTIONS,
+            self::VIEW_ADVANCES,
+            self::MANAGE_ADVANCE_STATUS,
+            self::VIEW_DEDUCTIONS,
+            self::CREATE_DEDUCTION,
+            self::VIEW_BONUSES,
+            self::CREATE_BONUS,
+            self::MANAGE_BONUS_STATUS,
+            self::RUN_PAYROLL,
+            self::VIEW_PAYROLL => ['HR', 'Owner'],
 
             // Manager, HR & Owner
             self::MANAGER_VIEW_EMPLOYEES,
@@ -208,8 +234,6 @@ enum PermissionEnum: string
             self::LEAVE_QUEUE_MANAGER,
             self::AI_EVALUATION_DRAFT,
             self::AI_ATTENTION_SIGNAL,
-
-            self::AI_TEAM_INSIGHT => ['Manager', 'HR', 'Owner'],
             self::AI_TEAM_INSIGHT,
             self::GOAL_CREATE,
             self::GOAL_UPDATE => ['Manager', 'HR', 'Owner'],
@@ -247,12 +271,14 @@ enum PermissionEnum: string
             self::AI_CAREER_COACH,
             self::AI_PERFORMANCE_INSIGHT,
             self::AI_SKILL_GAP,
-            self::HOLIDAY_VIEW => ['Owner', 'HR', 'Manager', 'Employee'],
-            self::AI_POLICY_ASSISTANT => ['Owner', 'HR', 'Manager', 'Employee'],
+            self::HOLIDAY_VIEW ,
+            self::AI_POLICY_ASSISTANT,
+            self::CREATE_ADVANCE => ['Owner', 'HR', 'Manager', 'Employee'],
 
             // Employee Only
             self::GOAL_VIEW_OWN,
             self::GOAL_COMPLETE => ['Employee'],
+
 
             default => ['Owner', 'HR'],
         };
