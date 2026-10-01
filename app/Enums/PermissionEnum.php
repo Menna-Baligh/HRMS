@@ -203,11 +203,8 @@ enum PermissionEnum: string
             self::HOLIDAY_MANAGE ,
             self::VIEW_MANAGERS_DROPDOWN ,
             self::HR_ATTENDANCE_MANAGE_EXCEPTIONS,
-            self::VIEW_ADVANCES,
             self::MANAGE_ADVANCE_STATUS,
-            self::VIEW_DEDUCTIONS,
             self::CREATE_DEDUCTION,
-            self::VIEW_BONUSES,
             self::CREATE_BONUS,
             self::MANAGE_BONUS_STATUS,
             self::RUN_PAYROLL,
@@ -273,7 +270,10 @@ enum PermissionEnum: string
             self::AI_SKILL_GAP,
             self::HOLIDAY_VIEW ,
             self::AI_POLICY_ASSISTANT,
-            self::CREATE_ADVANCE => ['Owner', 'HR', 'Manager', 'Employee'],
+            self::CREATE_ADVANCE,
+            self::VIEW_ADVANCES,
+            self::VIEW_DEDUCTIONS,
+            self::VIEW_BONUSES, => ['Owner', 'HR', 'Manager', 'Employee'],
 
             // Employee Only
             self::GOAL_VIEW_OWN,

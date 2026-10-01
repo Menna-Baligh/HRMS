@@ -19,10 +19,15 @@ class SalaryAdvanceController extends Controller
     public function index(Request $request): JsonResponse
     {
         $perPage = $request->input('per_page', 10);
+        $user = auth()->user();
 
-        $advances = SalaryAdvance::with('user')
-            ->latest()
-            ->paginate($perPage);
+        $query = SalaryAdvance::with('user')->latest();
+
+        if (! $user->hasAnyRole(['Owner', 'HR'])) {
+            $query->where('user_id', $user->id);
+        }
+
+        $advances = $query->paginate($perPage);
 
         return ResponseHelper::success(
             data: SalaryAdvanceResource::collection($advances)->response()->getData(true),

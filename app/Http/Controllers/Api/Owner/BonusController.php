@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\Owner;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Owner\StoreBonusRequest;
-use App\Http\Requests\Owner\UpdateBonusStatusRequest;
 use App\Http\Resources\BonusResource;
 use App\Jobs\SendNotificationJob;
 use App\Models\Bonus;
@@ -18,12 +17,21 @@ class BonusController extends Controller
     public function index(Request $request): JsonResponse
     {
         $perPage = $request->input('per_page', 10);
+        $user = auth()->user();
 
-        $bonuses = Bonus::with(['user.roles', 'approver'])
-            ->latest()
-            ->paginate($perPage);
+        $query = Bonus::with(['user.roles', 'approver'])->latest();
 
-        $totalPoolDistributed = Bonus::where('status', 'approved')->sum('amount');
+        if (! $user->hasAnyRole(['Owner', 'HR'])) {
+            $query->where('user_id', $user->id);
+        }
+
+        $bonuses = $query->paginate($perPage);
+
+        $statsQuery = Bonus::where('status', 'approved');
+        if (! $user->hasAnyRole(['Owner', 'HR'])) {
+            $statsQuery->where('user_id', $user->id);
+        }
+        $totalPoolDistributed = $statsQuery->sum('amount');
 
         $paginatedData = BonusResource::collection($bonuses)->response()->getData(true);
 

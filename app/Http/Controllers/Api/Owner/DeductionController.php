@@ -17,10 +17,15 @@ class DeductionController extends Controller
     public function index(Request $request): JsonResponse
     {
         $perPage = $request->input('per_page', 10);
+        $user = auth()->user();
 
-        $deductions = Deduction::with('user')
-            ->latest()
-            ->paginate($perPage);
+        $query = Deduction::with('user')->latest();
+
+        if (! $user->hasAnyRole(['Owner', 'HR'])) {
+            $query->where('user_id', $user->id);
+        }
+
+        $deductions = $query->paginate($perPage);
 
         return ResponseHelper::success(
             data: DeductionResource::collection($deductions)->response()->getData(true),
