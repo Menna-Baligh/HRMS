@@ -19,6 +19,7 @@ tags:
 - name: Notifications
 - name: Broadcasting
 - name: Files
+- name: Financials
 paths:
   /api/auth/login:
     post:
@@ -16433,6 +16434,560 @@ paths:
                 message: "The requested resource was not found."
 
 
+
+  /api/financial/advances:
+    get:
+      tags:
+        - Financials
+      summary: List salary advance requests (All Roles) 📱
+      description: Retrieve a paginated list of salary advance requests. If the authenticated user has the `Owner` or `HR` role, all advance requests are returned. Regular employees only see their own advance requests. 
+      operationId: getFinancialAdvances
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum: [ar, en]
+            default: ar
+          description: Preferred language for response messages.
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: integer
+            default: 1
+          description: Pagination page number.
+        - in: query
+          name: per_page
+          required: false
+          schema:
+            type: integer
+            default: 10
+          description: Number of items per page.
+      responses:
+        '200':
+          description: Salary advance requests retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalaryAdvanceListResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+
+    post:
+      tags:
+        - Financials
+      summary: Request a salary advance (All Roles)📱
+      description: Submit a new salary advance request. Automatically calculates `monthly_deduction = requested_amount / repayment_months`, sets `status` to `pending`, and dispatches notification jobs to all Owner and HR administrators. Requires `create advance` permission.
+      operationId: createFinancialAdvance
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum: [ar, en]
+            default: ar
+          description: Preferred language for response messages.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreSalaryAdvanceRequest'
+      responses:
+        '201':
+          description: Salary advance request created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalaryAdvanceSingleResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+
+  /api/financial/advances/{advance}/status:
+    put:
+      tags:
+        - Financials
+      summary: Update salary advance request status (HR / Owner)
+      description: Update the status of a salary advance to `approved` or `rejected`. Requires `manage advance status` permission. Automatically dispatches a push notification to the requesting employee.
+      operationId: updateFinancialAdvanceStatus
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: advance
+          required: true
+          schema:
+            type: integer
+          description: Unique ID of the salary advance request.
+          example: 3
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum: [ar, en]
+            default: ar
+          description: Preferred language for response messages.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSalaryAdvanceStatusRequest'
+      responses:
+        '200':
+          description: Salary advance status updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalaryAdvanceSingleResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+
+  /api/financial/deductions:
+    get:
+      tags:
+        - Financials
+      summary: List deductions and penalties (All Roles) 📱
+      description: Retrieve a paginated list of financial deductions and penalties. Users with `Owner` or `HR` role can view all company records; regular employees can only view their own deductions. Requires `view deductions` permission.
+      operationId: getFinancialDeductions
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum: [ar, en]
+            default: ar
+          description: Preferred language for response messages.
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: integer
+            default: 1
+          description: Pagination page number.
+        - in: query
+          name: per_page
+          required: false
+          schema:
+            type: integer
+            default: 10
+          description: Number of items per page.
+      responses:
+        '200':
+          description: Deductions list retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeductionListResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+
+    post:
+      tags:
+        - Financials
+      summary: Record a deduction or penalty (Owner / HR)
+      description: Record a new deduction or penalty for an employee. Defaults `type` to `manual` and `status` to `queued` (pending execution in the next payroll calculation). Dispatches a push notification to the employee. Requires `create deduction` permission.
+      operationId: createFinancialDeduction
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum: [ar, en]
+            default: ar
+          description: Preferred language for response messages.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreDeductionRequest'
+      responses:
+        '201':
+          description: Deduction recorded successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeductionSingleResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+
+  /api/financial/bonuses:
+    get:
+      tags:
+        - Financials
+      summary: List bonuses and incentives (All Roles)📱
+      description: Retrieve a paginated list of bonuses and incentives along with aggregate statistics (`total_bonus_pool_distributed`). Owner and HR roles view all bonuses; regular employees only view their own. Requires `view bonuses` permission.
+      operationId: getFinancialBonuses
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum: [ar, en]
+            default: ar
+          description: Preferred language for response messages.
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: integer
+            default: 1
+          description: Pagination page number.
+        - in: query
+          name: per_page
+          required: false
+          schema:
+            type: integer
+            default: 10
+          description: Number of items per page.
+      responses:
+        '200':
+          description: Bonuses list retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BonusListResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+
+    post:
+      tags:
+        - Financials
+      summary: Issue a bonus or incentive (Owner / HR)
+      description: Award a financial bonus or incentive to an employee. Automatically sets `approved_by_user_id` to current authenticated user and `status` to `approved`. Dispatches a push notification to the recipient employee. Requires `create bonus` permission.
+      operationId: createFinancialBonus
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum: [ar, en]
+            default: ar
+          description: Preferred language for response messages.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreBonusRequest'
+      responses:
+        '201':
+          description: Bonus awarded successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BonusSingleResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+
+  /api/financial/payroll:
+    get:
+      tags:
+        - Financials
+      summary: Get company payroll  (Owner / HR)
+      description: Calculates or retrieves the entire company payroll  for a given month (`month_year`). Indicates whether the month is finalized (`is_month_finalized`) and returns localized status messages. Requires `view payroll` permission.
+      operationId: getFinancialPayroll
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum: [ar, en]
+            default: ar
+          description: Preferred language for response messages.
+        - in: query
+          name: month_year
+          required: false
+          schema:
+            type: string
+            pattern: '^\\d{4}-\\d{2}$'
+            example: "2026-09"
+          description: "Target month in YYYY-MM format. Defaults to current month."
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: integer
+            default: 1
+          description: Pagination page number.
+        - in: query
+          name: per_page
+          required: false
+          schema:
+            type: integer
+            default: 10
+          description: Number of items per page.
+      responses:
+        '200':
+          description: Payroll calculation retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayrollListResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+
+  /api/financial/payroll/finalize:
+    post:
+      tags:
+        - Financials
+      summary: Finalize and close monthly payroll (Owner / HR)
+      description: Finalizes and locks the company payroll for the specified month (`month_year`). Deducts approved advance installments and queued deductions, applies bonuses, creates permanent payroll records, and notifies all employees. Returns HTTP 201 with created payroll entries, or HTTP 200 with an empty list if already finalized. Requires `run payroll` permission.
+      operationId: finalizeFinancialPayroll
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum: [ar, en]
+            default: ar
+          description: Preferred language for response messages.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinalizePayrollRequest'
+      responses:
+        '201':
+          description: Payroll finalized successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinalizePayrollResponse'
+        '200':
+          description: Payroll already finalized for all employees.
+          content:
+            application/json:
+              example:
+                success: true
+                message: "All employees payrolls for this month are already finalized."
+                data: []
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+
+  /api/financial/payroll/{payroll}/payslip:
+    get:
+      tags:
+        - Financials
+      summary: Download employee payslip PDF (Owner / HR)
+      description: Generates and streams a branded PDF payslip document for a specific finalized payroll record (`{payroll}`). Includes salary breakdown, allowances, bonuses, deductions, and loan repayments. Requires `view payroll` permission.
+      operationId: downloadFinancialPayslip
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: payroll
+          required: true
+          schema:
+            type: integer
+          description: Unique ID of the finalized payroll record.
+          example: 12
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum: [ar, en]
+            default: ar
+          description: Preferred language for PDF localized labels.
+      responses:
+        '200':
+          description: Payslip PDF document download.
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+                example: 'attachment; filename="payslip_Ahmed Hassan_2026-09.pdf"'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+
+  /api/financial/my-salaries:
+    get:
+      tags:
+        - Financials
+      summary: Retrieve authenticated employee salary history (Employee)📱
+      description: Returns a paginated list of past finalized payroll records and payslips for the currently authenticated employee. No administrative permission required.
+      operationId: getFinancialMySalaries
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum: [ar, en]
+            default: ar
+          description: Preferred language for response messages.
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: integer
+            default: 1
+          description: Pagination page number.
+        - in: query
+          name: per_page
+          required: false
+          schema:
+            type: integer
+            default: 10
+          description: Number of items per page.
+      responses:
+        '200':
+          description: Salary history retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MySalariesListResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -16479,7 +17034,6 @@ components:
           example:
             success: false
             message: Unauthenticated. Please log in first.
-            errors: null
     403Forbidden:
       description: Forbidden - Unauthorized scope or user role
       content:
@@ -16489,7 +17043,6 @@ components:
           example:
             success: false
             message: You do not have the required permissions to perform this action.
-            errors: null
     422ValidationError:
       description: Validation error
       content:
@@ -16510,8 +17063,7 @@ components:
             $ref: "#/components/schemas/ErrorResponse"
           example:
             success: false
-            message: AI service is currently unavailable.
-            errors: null
+            message: service is currently unavailable.
     422RegistrationValidationError:
       description: Validation error
       content:
@@ -16667,6 +17219,17 @@ components:
             errors:
               department_id:
                 - The department field is required.
+    404NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            success: false
+            message: "The requested resource was not found."
+            errors: null
+
   schemas:
     EvaluationPeriod:
       type: object
@@ -18928,3 +19491,689 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CalendarEvent'
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Financials – Salary Advances
+  # ─────────────────────────────────────────────────────────────────────────────
+
+    SalaryAdvance:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 3
+        employee_name:
+          type: string
+          nullable: true
+          example: Ahmed Hassan
+        requested_amount:
+          type: number
+          format: float
+          example: 5000.00
+        repayment_months:
+          type: integer
+          example: 5
+        monthly_deduction:
+          type: number
+          format: float
+          example: 1000.00
+        reason:
+          type: string
+          example: Medical emergency expenses
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+          example: pending
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-09-25 10:30:00"
+
+    StoreSalaryAdvanceRequest:
+      type: object
+      required:
+        - user_id
+        - requested_amount
+        - repayment_months
+        - reason
+      properties:
+        user_id:
+          type: integer
+          description: The ID of the employee submitting the advance request. Must exist in the users table.
+          example: 7
+        requested_amount:
+          type: number
+          format: float
+          description: The total amount requested. Must be greater than 0.
+          example: 5000.00
+        repayment_months:
+          type: integer
+          description: Number of months over which the advance will be repaid. Minimum 1.
+          minimum: 1
+          example: 5
+        reason:
+          type: string
+          maxLength: 255
+          description: Justification for the advance request.
+          example: Medical emergency expenses
+
+    UpdateSalaryAdvanceStatusRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [approved, rejected]
+          description: The new status for the salary advance. Must be either 'approved' or 'rejected'.
+          example: approved
+
+    SalaryAdvanceListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Salary advances retrieved successfully.
+        data:
+          type: object
+          properties:
+            current_page:
+              type: integer
+              example: 1
+            first_page_url:
+              type: string
+              example: "https://hr-system.iptvdemo.serv5group.com/api/financial/advances?page=1"
+            from:
+              type: integer
+              nullable: true
+              example: 1
+            last_page:
+              type: integer
+              example: 2
+            last_page_url:
+              type: string
+              example: "https://hr-system.iptvdemo.serv5group.com/api/financial/advances?page=2"
+            links:
+              type: array
+              items:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    nullable: true
+                  label:
+                    type: string
+                  active:
+                    type: boolean
+            next_page_url:
+              type: string
+              nullable: true
+              example: "https://hr-system.iptvdemo.serv5group.com/api/financial/advances?page=2"
+            path:
+              type: string
+              example: "https://hr-system.iptvdemo.serv5group.com/api/financial/advances"
+            per_page:
+              type: integer
+              example: 10
+            prev_page_url:
+              type: string
+              nullable: true
+              example: null
+            to:
+              type: integer
+              nullable: true
+              example: 10
+            total:
+              type: integer
+              example: 14
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/SalaryAdvance'
+
+    SalaryAdvanceSingleResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Salary advance request submitted successfully.
+        data:
+          $ref: '#/components/schemas/SalaryAdvance'
+
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Financials – Deductions
+  # ─────────────────────────────────────────────────────────────────────────────
+
+    Deduction:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 8
+        employee_name:
+          type: string
+          nullable: true
+          example: Sara Ali
+        amount:
+          type: number
+          format: float
+          example: 350.00
+        reason:
+          type: string
+          example: Late arrival penalty
+        date:
+          type: string
+          format: date
+          example: "2026-09-10"
+        type:
+          type: string
+          enum: [manual, delay]
+          example: manual
+        status:
+          type: string
+          enum: [queued, deducted]
+          example: queued
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-09-10 08:00:00"
+
+    StoreDeductionRequest:
+      type: object
+      required:
+        - user_id
+        - amount
+        - reason
+        - date
+      properties:
+        user_id:
+          type: integer
+          description: The ID of the employee to deduct from. Must exist in users table.
+          example: 7
+        amount:
+          type: number
+          format: float
+          description: The deduction amount. Must be greater than 0.
+          example: 350.00
+        reason:
+          type: string
+          maxLength: 255
+          description: The reason for the deduction.
+          example: Late arrival penalty
+        date:
+          type: string
+          format: date
+          description: The date on which the deduction applies.
+          example: "2026-09-10"
+        type:
+          type: string
+          enum: [manual, delay]
+          nullable: true
+          description: The deduction type. Defaults to 'manual' if omitted.
+          example: manual
+
+    DeductionListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Deductions retrieved successfully.
+        data:
+          type: object
+          properties:
+            current_page:
+              type: integer
+              example: 1
+            first_page_url:
+              type: string
+              example: "https://hr-system.iptvdemo.serv5group.com/api/financial/deductions?page=1"
+            from:
+              type: integer
+              nullable: true
+              example: 1
+            last_page:
+              type: integer
+              example: 1
+            last_page_url:
+              type: string
+              example: "https://hr-system.iptvdemo.serv5group.com/api/financial/deductions?page=1"
+            links:
+              type: array
+              items:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    nullable: true
+                  label:
+                    type: string
+                  active:
+                    type: boolean
+            next_page_url:
+              type: string
+              nullable: true
+              example: null
+            path:
+              type: string
+              example: "https://hr-system.iptvdemo.serv5group.com/api/financial/deductions"
+            per_page:
+              type: integer
+              example: 10
+            prev_page_url:
+              type: string
+              nullable: true
+              example: null
+            to:
+              type: integer
+              nullable: true
+              example: 7
+            total:
+              type: integer
+              example: 7
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Deduction'
+
+    DeductionSingleResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Deduction recorded successfully.
+        data:
+          $ref: '#/components/schemas/Deduction'
+
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Financials – Bonuses
+  # ─────────────────────────────────────────────────────────────────────────────
+
+    Bonus:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 4
+        employee_name:
+          type: string
+          nullable: true
+          example: Omar Khaled
+        role:
+          type: string
+          example: Employee
+        incentive_type:
+          type: string
+          example: Performance Bonus
+        amount:
+          type: number
+          format: float
+          example: 2000.00
+        target_month:
+          type: string
+          example: "2026-09"
+        approved_by:
+          type: string
+          nullable: true
+          example: Menna Baligh
+        status:
+          type: string
+          enum: [approved]
+          example: approved
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-09-20 14:00:00"
+
+    StoreBonusRequest:
+      type: object
+      required:
+        - user_id
+        - incentive_type
+        - amount
+        - target_month
+      properties:
+        user_id:
+          type: integer
+          description: The ID of the employee receiving the bonus. Must exist in users table.
+          example: 7
+        incentive_type:
+          type: string
+          maxLength: 255
+          description: A label for the type of incentive (e.g. Performance Bonus, KPI Reward).
+          example: Performance Bonus
+        amount:
+          type: number
+          format: float
+          description: The bonus amount. Must be greater than 0.
+          example: 2000.00
+        target_month:
+          type: string
+          maxLength: 255
+          description: The month the bonus targets, formatted as YYYY-MM.
+          example: "2026-09"
+
+    BonusListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Rewards and bonuses retrieved successfully.
+        data:
+          type: object
+          properties:
+            current_page:
+              type: integer
+              example: 1
+            first_page_url:
+              type: string
+              example: "https://hr-system.iptvdemo.serv5group.com/api/financial/bonuses?page=1"
+            from:
+              type: integer
+              nullable: true
+              example: 1
+            last_page:
+              type: integer
+              example: 1
+            last_page_url:
+              type: string
+              example: "https://hr-system.iptvdemo.serv5group.com/api/financial/bonuses?page=1"
+            links:
+              type: array
+              items:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    nullable: true
+                  label:
+                    type: string
+                  active:
+                    type: boolean
+            next_page_url:
+              type: string
+              nullable: true
+              example: null
+            path:
+              type: string
+              example: "https://hr-system.iptvdemo.serv5group.com/api/financial/bonuses"
+            per_page:
+              type: integer
+              example: 10
+            prev_page_url:
+              type: string
+              nullable: true
+              example: null
+            to:
+              type: integer
+              nullable: true
+              example: 4
+            total:
+              type: integer
+              example: 4
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Bonus'
+            stats:
+              type: object
+              properties:
+                total_bonus_pool_distributed:
+                  type: number
+                  format: float
+                  description: Sum of all approved bonus amounts visible to the current user.
+                  example: 8500.00
+
+    BonusSingleResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Incentive issued successfully.
+        data:
+          $ref: '#/components/schemas/Bonus'
+
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Financials – Payroll
+  # ─────────────────────────────────────────────────────────────────────────────
+
+    PayrollEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: true
+          description: Only present when the payroll record is finalized (stored in DB).
+          example: 12
+        user_id:
+          type: integer
+          example: 7
+        employee_name:
+          type: string
+          example: Noran Baligh
+        month_year:
+          type: string
+          example: "2026-09"
+        basic_salary:
+          type: number
+          format: float
+          example: 10000.00
+        total_bonuses:
+          type: number
+          format: float
+          example: 2000.00
+        total_deductions:
+          type: number
+          format: float
+          example: 350.00
+        loan_installment:
+          type: number
+          format: float
+          example: 1000.00
+        net_salary:
+          type: number
+          format: float
+          example: 10650.00
+        status:
+          type: string
+          enum: [draft, finalized]
+          example: finalized
+        is_finalized:
+          type: boolean
+          example: true
+
+    PayrollListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Payroll calculations retrieved successfully.
+        data:
+          type: object
+          properties:
+            current_page:
+              type: integer
+              example: 1
+            first_page_url:
+              type: string
+              example: "https://hr-system.iptvdemo.serv5group.com/api/financial/payroll?page=1"
+            from:
+              type: integer
+              nullable: true
+              example: 1
+            last_page:
+              type: integer
+              example: 2
+            last_page_url:
+              type: string
+              example: "https://hr-system.iptvdemo.serv5group.com/api/financial/payroll?page=2"
+            links:
+              type: array
+              items:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    nullable: true
+                  label:
+                    type: string
+                  active:
+                    type: boolean
+            next_page_url:
+              type: string
+              nullable: true
+              example: "https://hr-system.iptvdemo.serv5group.com/api/financial/payroll?page=2"
+            path:
+              type: string
+              example: "https://hr-system.iptvdemo.serv5group.com/api/financial/payroll"
+            per_page:
+              type: integer
+              example: 10
+            prev_page_url:
+              type: string
+              nullable: true
+              example: null
+            to:
+              type: integer
+              nullable: true
+              example: 10
+            total:
+              type: integer
+              example: 18
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/PayrollEntry'
+            is_month_finalized:
+              type: boolean
+              description: Whether all payrolls for the queried month have been finalized and persisted.
+              example: false
+            status_message:
+              type: string
+              description: Human-readable message describing the finalization state of the month.
+              example: Payroll for this month is still in draft (pending approval).
+
+    FinalizePayrollRequest:
+      type: object
+      required:
+        - month_year
+      properties:
+        month_year:
+          type: string
+          pattern: '^\d{4}-\d{2}$'
+          description: The month to finalize payroll for, in YYYY-MM format.
+          example: "2026-09"
+
+    FinalizePayrollResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Payroll for 2026-09 has been finalized successfully.
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PayrollEntry'
+
+    PayslipResponse:
+      description: A PDF binary file is returned as application/pdf. The Content-Disposition header will contain the filename.
+      type: object
+      properties:
+        content-type:
+          type: string
+          example: application/pdf
+        filename:
+          type: string
+          example: payslip_Noran Baligh_2026-09.pdf
+
+    MySalariesListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Payroll calculations retrieved successfully.
+        data:
+          type: object
+          properties:
+            current_page:
+              type: integer
+              example: 1
+            first_page_url:
+              type: string
+              example: "https://hr-system.iptvdemo.serv5group.com/api/financial/my-salaries?page=1"
+            from:
+              type: integer
+              nullable: true
+              example: 1
+            last_page:
+              type: integer
+              example: 1
+            last_page_url:
+              type: string
+              example: "https://hr-system.iptvdemo.serv5group.com/api/financial/my-salaries?page=1"
+            links:
+              type: array
+              items:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    nullable: true
+                  label:
+                    type: string
+                  active:
+                    type: boolean
+            next_page_url:
+              type: string
+              nullable: true
+              example: null
+            path:
+              type: string
+              example: "https://hr-system.iptvdemo.serv5group.com/api/financial/my-salaries"
+            per_page:
+              type: integer
+              example: 10
+            prev_page_url:
+              type: string
+              nullable: true
+              example: null
+            to:
+              type: integer
+              nullable: true
+              example: 6
+            total:
+              type: integer
+              example: 6
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/PayrollEntry'
