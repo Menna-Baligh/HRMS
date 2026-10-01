@@ -58,4 +58,18 @@ return [
         'type' => 'deduction type',
         'status' => 'status',
     ],
+    'notifications' => [
+        'advance_requested' => [
+            'title' => 'New Salary Advance Request',
+            'body' => ':employee has submitted a salary advance request of $:amount.',
+        ],
+        'advance_status_updated' => [
+            'title' => 'Salary Advance Request :status',
+            'body' => 'Your salary advance request of $:amount has been :status.',
+        ],
+        'deduction_recorded' => [
+            'title' => 'New Deduction Recorded',
+            'body' => 'A deduction of $:amount has been recorded on your account. Reason: :reason.',
+        ],
+    ],
 ];

@@ -58,4 +58,18 @@ return [
         'type' => 'نوع الخصم',
         'status' => 'الحالة',
     ],
+    'notifications' => [
+        'advance_requested' => [
+            'title' => 'طلب سلفة جديد',
+            'body' => 'قام الموظف :employee بتقديم طلب سلفة بمبلغ :amount$.',
+        ],
+        'advance_status_updated' => [
+            'title' => 'تحديث حالة طلب السلفة',
+            'body' => 'تمت :status طلب السلفة الخاص بك بمبلغ :amount$.',
+        ],
+        'deduction_recorded' => [
+            'title' => 'تسجيل خصم جديد',
+            'body' => 'تم تسجيل خصم بقيمة :amount$ على حسابك. السبب: :reason.',
+        ],
+    ],
 ];
