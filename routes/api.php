@@ -49,6 +49,7 @@ use App\Http\Controllers\CompanyLocations\CompanyLocationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\Owner\PayrollController;
 
 /*
 |--------------------------------------------------------------------------
@@ -361,6 +362,12 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
 
         Route::get('/bonuses', [BonusController::class, 'index'])->middleware('permission:view bonuses');
         Route::post('/bonuses', [BonusController::class, 'store'])->middleware('permission:create bonus');
+
+        Route::get('/payroll', [PayrollController::class, 'index'])->middleware('permission:view payroll');
+        Route::post('/payroll/finalize', [PayrollController::class, 'finalize'])->middleware('permission:run payroll');
+        Route::get('/payroll/{payroll}/payslip', [PayrollController::class, 'payslip'])->middleware('permission:view payroll');
+
+        Route::get('/my-salaries', [PayrollController::class, 'mySalaries']);
     });
 });
 

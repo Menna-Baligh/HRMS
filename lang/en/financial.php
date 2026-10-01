@@ -54,6 +54,10 @@ return [
             'required' => 'The target month is required.',
             'string' => 'The target month format must be valid.',
         ],
+        'month_year' => [
+            'required' => 'The month and year field is required.',
+            'string' => 'The month and year format must be valid (e.g. 2026-09).',
+        ],
     ],
     'attributes' => [
         'user_id' => 'employee',
@@ -87,11 +91,21 @@ return [
             'title' => 'Incentive Status :status',
             'body' => 'Your incentive for :month of $:amount has been :status.',
         ],
+        'payroll_finalized' => [
+            'title' => 'Monthly Salary Processed 💰',
+            'body' => 'Your net salary of $:amount for :month has been finalized.',
+        ],
     ],
     'bonuses' => [
         'retrieved' => 'Rewards and bonuses retrieved successfully.',
         'created' => 'Incentive issued successfully.',
         'status_updated' => 'Incentive status updated successfully.',
+    ],
+    'payroll' => [
+        'retrieved' => 'Payroll calculations retrieved successfully.',
+        'finalized' => 'Payroll for :month has been finalized successfully.',
+        'payslip_retrieved' => 'Payslip retrieved successfully.',
+        'already_finalized' => 'Payroll for this month has already been finalized.',
     ],
 
 ];
