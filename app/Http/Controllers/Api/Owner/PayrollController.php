@@ -12,6 +12,7 @@ use App\Services\PayrollService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PayrollController extends Controller
 {
@@ -59,12 +60,17 @@ class PayrollController extends Controller
         );
     }
 
-    public function payslip(Payroll $payroll): JsonResponse
+    public function payslip(Payroll $payroll)
     {
-        return ResponseHelper::success(
-            data: new PayslipResource($payroll->load('user.roles')),
-            message: __('financial.payroll.payslip_retrieved')
-        );
+        $payroll->load(['user.department', 'user.roles']);
+
+        $pdf = Pdf::loadView('pdf.payslip', [
+            'payroll' => $payroll
+        ]);
+
+        $fileName = "payslip_{$payroll->user?->name}_{$payroll->month_year}.pdf";
+
+        return $pdf->download($fileName);
     }
 
     public function mySalaries(Request $request): JsonResponse
