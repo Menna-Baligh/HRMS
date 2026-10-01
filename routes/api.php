@@ -34,6 +34,7 @@ use App\Http\Controllers\Api\ManagerAttendanceController;
 use App\Http\Controllers\Api\ManagerController;
 use App\Http\Controllers\Api\ManagerPerformanceController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\Owner\BonusController;
 use App\Http\Controllers\Api\Owner\DeductionController;
 use App\Http\Controllers\Api\Owner\LandingFeatureController;
 use App\Http\Controllers\Api\Owner\LandingPlanController;
@@ -351,12 +352,15 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
     Route::get('/permissions', [PermissionController::class, 'index'])->middleware('permission:'.PermissionEnum::PERMISSION_VIEW_ALL->value);
 
     Route::prefix('/financial')->group(function () {
-            Route::get('/advances', [SalaryAdvanceController::class, 'index'])->middleware('permission:view advances');
-            Route::post('/advances', [SalaryAdvanceController::class, 'store'])->middleware('permission:create advance');
-            Route::put('/advances/{advance}/status', [SalaryAdvanceController::class, 'updateStatus'])->middleware('permission:manage advance status');
+        Route::get('/advances', [SalaryAdvanceController::class, 'index'])->middleware('permission:view advances');
+        Route::post('/advances', [SalaryAdvanceController::class, 'store'])->middleware('permission:create advance');
+        Route::put('/advances/{advance}/status', [SalaryAdvanceController::class, 'updateStatus'])->middleware('permission:manage advance status');
 
-            Route::get('/deductions', [DeductionController::class, 'index'])->middleware('permission:view deductions');
-            Route::post('/deductions', [DeductionController::class, 'store'])->middleware('permission:create deduction');
+        Route::get('/deductions', [DeductionController::class, 'index'])->middleware('permission:view deductions');
+        Route::post('/deductions', [DeductionController::class, 'store'])->middleware('permission:create deduction');
+
+        Route::get('/bonuses', [BonusController::class, 'index'])->middleware('permission:view bonuses');
+        Route::post('/bonuses', [BonusController::class, 'store'])->middleware('permission:create bonus');
     });
 });
 

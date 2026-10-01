@@ -46,6 +46,14 @@ return [
         'type' => [
             'in' => 'The deduction type must be either manual or delay.',
         ],
+        'incentive_type' => [
+            'required' => 'The incentive type field is required.',
+            'string' => 'The incentive type must be a valid string.',
+        ],
+        'target_month' => [
+            'required' => 'The target month is required.',
+            'string' => 'The target month format must be valid.',
+        ],
     ],
     'attributes' => [
         'user_id' => 'employee',
@@ -71,5 +79,19 @@ return [
             'title' => 'New Deduction Recorded',
             'body' => 'A deduction of $:amount has been recorded on your account. Reason: :reason.',
         ],
+        'bonus_issued' => [
+        'title' => 'New Incentive Issued',
+        'body' => 'A new incentive (:type) of $:amount has been assigned to you for :month.',
+        ],
+        'bonus_status_updated' => [
+            'title' => 'Incentive Status :status',
+            'body' => 'Your incentive for :month of $:amount has been :status.',
+        ],
     ],
+    'bonuses' => [
+        'retrieved' => 'Rewards and bonuses retrieved successfully.',
+        'created' => 'Incentive issued successfully.',
+        'status_updated' => 'Incentive status updated successfully.',
+    ],
+
 ];
