@@ -47,6 +47,7 @@ class User extends Authenticatable implements JWTSubject
         'company_location_id',
         'manager_id',
         'address',
+        'salary',
     ];
 
     /**
@@ -276,5 +277,25 @@ class User extends Authenticatable implements JWTSubject
     public function policyVersions(): HasMany
     {
         return $this->hasMany(PolicyVersion::class, 'created_by');
+    }
+
+    public function salaryAdvances(): HasMany
+    {
+        return $this->hasMany(SalaryAdvance::class);
+    }
+
+    public function deductions(): HasMany
+    {
+        return $this->hasMany(Deduction::class);
+    }
+
+    public function bonuses(): HasMany
+    {
+        return $this->hasMany(Bonus::class);
+    }
+
+    public function payrolls(): HasMany
+    {
+        return $this->hasMany(Payroll::class);
     }
 }

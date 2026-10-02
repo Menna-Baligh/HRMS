@@ -34,10 +34,14 @@ use App\Http\Controllers\Api\ManagerAttendanceController;
 use App\Http\Controllers\Api\ManagerController;
 use App\Http\Controllers\Api\ManagerPerformanceController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\Owner\BonusController;
+use App\Http\Controllers\Api\Owner\DeductionController;
 use App\Http\Controllers\Api\Owner\LandingFeatureController;
 use App\Http\Controllers\Api\Owner\LandingPlanController;
 use App\Http\Controllers\Api\Owner\LandingRoleController;
 use App\Http\Controllers\Api\Owner\LandingSectionController;
+use App\Http\Controllers\Api\Owner\PayrollController;
+use App\Http\Controllers\Api\Owner\SalaryAdvanceController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\PolicyController;
 use App\Http\Controllers\Api\SubmissionController;
@@ -347,6 +351,24 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
     });
 
     Route::get('/permissions', [PermissionController::class, 'index'])->middleware('permission:'.PermissionEnum::PERMISSION_VIEW_ALL->value);
+
+    Route::prefix('/financial')->group(function () {
+        Route::get('/advances', [SalaryAdvanceController::class, 'index'])->middleware('permission:view advances');
+        Route::post('/advances', [SalaryAdvanceController::class, 'store'])->middleware('permission:create advance');
+        Route::put('/advances/{advance}/status', [SalaryAdvanceController::class, 'updateStatus'])->middleware('permission:manage advance status');
+
+        Route::get('/deductions', [DeductionController::class, 'index'])->middleware('permission:view deductions');
+        Route::post('/deductions', [DeductionController::class, 'store'])->middleware('permission:create deduction');
+
+        Route::get('/bonuses', [BonusController::class, 'index'])->middleware('permission:view bonuses');
+        Route::post('/bonuses', [BonusController::class, 'store'])->middleware('permission:create bonus');
+
+        Route::get('/payroll', [PayrollController::class, 'index'])->middleware('permission:view payroll');
+        Route::post('/payroll/finalize', [PayrollController::class, 'finalize'])->middleware('permission:run payroll');
+        Route::get('/payroll/{payroll}/payslip', [PayrollController::class, 'payslip'])->middleware('permission:view payroll');
+
+        Route::get('/my-salaries', [PayrollController::class, 'mySalaries']);
+    });
 });
 
 Route::middleware(['auth:api', 'set.app.language'])->post('/broadcasting/auth', function (Request $request) {
