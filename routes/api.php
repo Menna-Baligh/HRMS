@@ -342,6 +342,7 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
         Route::patch('/{id}/read', [NotificationController::class, 'markAsRead']);
         Route::patch('/read-all', [NotificationController::class, 'markAllAsRead']);
         Route::delete('/clear-all', [NotificationController::class, 'clearAll']);
+        Route::delete('/{id}', [NotificationController::class, 'destroy']);
         Route::post('/fcm-token', [NotificationController::class, 'updateFcmToken']);
     });
 
