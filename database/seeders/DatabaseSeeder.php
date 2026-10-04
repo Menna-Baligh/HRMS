@@ -16,5 +16,8 @@ class DatabaseSeeder extends Seeder
         $this->call(TestInitialDataSeeder::class);
         $this->call(RolesAndPermissionsSeeder::class);
 
+        // ApiTestingSeeder is intentionally NOT called here automatically.
+        // Run it manually when needed:
+        //   php artisan db:seed --class=ApiTestingSeeder
     }
 }
