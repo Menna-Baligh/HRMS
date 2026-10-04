@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\GoalController;
 use App\Http\Controllers\Api\GoogleAuthController;
 use App\Http\Controllers\Api\HolidayController;
 use App\Http\Controllers\Api\HrAttendanceController;
+use App\Http\Controllers\Api\HrDashboardController;
 use App\Http\Controllers\Api\HrEvaluationSetupController;
 use App\Http\Controllers\Api\HrGoalController;
 use App\Http\Controllers\Api\HrPerformanceController;
@@ -291,6 +292,7 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
         Route::get('/attendance/export', [HrAttendanceController::class, 'export'])->middleware('permission:'.PermissionEnum::HR_ATTENDANCE_EXPORT->value);
         Route::get('/goals', [HrGoalController::class, 'index'])->middleware('permission:'.PermissionEnum::HR_GOALS_OVERVIEW->value);
         Route::get('/company-performance', [HrPerformanceController::class, 'companyDashboard'])->middleware('permission:'.PermissionEnum::HR_PERFORMANCE_COMPANY->value);
+        Route::get('/dashboard', HrDashboardController::class)->middleware('permission:'.PermissionEnum::HR_DASHBOARD_VIEW->value);
     });
 
     Route::prefix('goals')->group(function () {

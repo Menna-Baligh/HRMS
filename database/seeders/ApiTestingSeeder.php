@@ -23,9 +23,11 @@ use App\Models\Goal;
 use App\Models\Holiday;
 use App\Models\LeaveBalance;
 use App\Models\LeaveRequest;
+use App\Models\LeaveType;
 use App\Models\Policy;
 use App\Models\PolicyAudit;
 use App\Models\PolicyVersion;
+use App\Models\SalaryAdvance;
 use App\Models\Submission;
 use App\Models\Task;
 use App\Models\TaskActivity;
@@ -55,8 +57,8 @@ class ApiTestingSeeder extends Seeder
         // ---------------------------------------------------------------------------
         // Resolve existing users dynamically — never assume IDs
         // ---------------------------------------------------------------------------
-        $owner   = User::role('Owner')->where('status', 'active')->firstOrFail();
-        $hr      = User::role('HR')->where('status', 'active')->firstOrFail();
+        $owner = User::role('Owner')->where('status', 'active')->firstOrFail();
+        $hr = User::role('HR')->where('status', 'active')->firstOrFail();
         $manager = User::role('Manager')->where('status', 'active')->firstOrFail();
         $employee = User::role('Employee')
             ->where('status', 'active')
@@ -72,19 +74,19 @@ class ApiTestingSeeder extends Seeder
         Holiday::firstOrCreate(
             ['name' => '[TEST] National Day'],
             [
-                'start_date'  => Carbon::now()->addDays(10)->toDateString(),
-                'end_date'    => Carbon::now()->addDays(10)->toDateString(),
+                'start_date' => Carbon::now()->addDays(10)->toDateString(),
+                'end_date' => Carbon::now()->addDays(10)->toDateString(),
                 'description' => 'Test national public holiday.',
-                'is_active'   => true,
+                'is_active' => true,
             ]
         );
         Holiday::firstOrCreate(
             ['name' => '[TEST] Year-End Break'],
             [
-                'start_date'  => Carbon::now()->addDays(60)->toDateString(),
-                'end_date'    => Carbon::now()->addDays(62)->toDateString(),
+                'start_date' => Carbon::now()->addDays(60)->toDateString(),
+                'end_date' => Carbon::now()->addDays(62)->toDateString(),
                 'description' => 'Test year-end company closure.',
-                'is_active'   => true,
+                'is_active' => true,
             ]
         );
 
@@ -95,21 +97,21 @@ class ApiTestingSeeder extends Seeder
         CompanyEvent::firstOrCreate(
             ['name' => '[TEST] Company Offsite Meeting'],
             [
-                'start_date'  => Carbon::now()->addDays(5)->toDateString(),
-                'end_date'    => Carbon::now()->addDays(5)->toDateString(),
+                'start_date' => Carbon::now()->addDays(5)->toDateString(),
+                'end_date' => Carbon::now()->addDays(5)->toDateString(),
                 'description' => 'Test company-wide offsite meeting.',
-                'is_active'   => true,
-                'created_by'  => $owner->id,
+                'is_active' => true,
+                'created_by' => $owner->id,
             ]
         );
         CompanyEvent::firstOrCreate(
             ['name' => '[TEST] Q4 All-Hands'],
             [
-                'start_date'  => Carbon::now()->addDays(30)->toDateString(),
-                'end_date'    => Carbon::now()->addDays(30)->toDateString(),
+                'start_date' => Carbon::now()->addDays(30)->toDateString(),
+                'end_date' => Carbon::now()->addDays(30)->toDateString(),
                 'description' => 'Test Q4 all-hands event.',
-                'is_active'   => true,
-                'created_by'  => $owner->id,
+                'is_active' => true,
+                'created_by' => $owner->id,
             ]
         );
 
@@ -121,13 +123,13 @@ class ApiTestingSeeder extends Seeder
         $currentYear = (int) Carbon::now()->year;
 
         // Resolve leave types dynamically
-        $annualLeaveType  = \App\Models\LeaveType::where('name', 'Annual Leave')
+        $annualLeaveType = LeaveType::where('name', 'Annual Leave')
             ->where('is_active', true)
             ->first();
-        $sickLeaveType    = \App\Models\LeaveType::where('name', 'Sick Leave')
+        $sickLeaveType = LeaveType::where('name', 'Sick Leave')
             ->where('is_active', true)
             ->first();
-        $emergencyLeaveType = \App\Models\LeaveType::where('name', 'Emergency Leave')
+        $emergencyLeaveType = LeaveType::where('name', 'Emergency Leave')
             ->where('is_active', true)
             ->first();
 
@@ -166,15 +168,15 @@ class ApiTestingSeeder extends Seeder
             // Pending leave request — needed for manager queue, approve, reject
             $pendingLeave = LeaveRequest::firstOrCreate(
                 [
-                    'user_id'       => $employee->id,
+                    'user_id' => $employee->id,
                     'leave_type_id' => $annualLeaveType->id,
-                    'start_date'    => Carbon::now()->addDays(15)->toDateString(),
-                    'status'        => LeaveStatus::Pending->value,
+                    'start_date' => Carbon::now()->addDays(15)->toDateString(),
+                    'status' => LeaveStatus::Pending->value,
                 ],
                 [
-                    'end_date'  => Carbon::now()->addDays(16)->toDateString(),
-                    'days'      => 2,
-                    'reason'    => '[TEST] Annual leave request for API testing.',
+                    'end_date' => Carbon::now()->addDays(16)->toDateString(),
+                    'days' => 2,
+                    'reason' => '[TEST] Annual leave request for API testing.',
                 ]
             );
         }
@@ -187,12 +189,12 @@ class ApiTestingSeeder extends Seeder
         Goal::firstOrCreate(
             [
                 'user_id' => $manager->id,
-                'title'   => '[TEST] Q4 Team Performance Improvement',
+                'title' => '[TEST] Q4 Team Performance Improvement',
             ],
             [
                 'description' => 'Improve team code review coverage and delivery speed.',
                 'target_date' => Carbon::now()->addDays(90)->toDateString(),
-                'status'      => GoalStatus::ACTIVE->value,
+                'status' => GoalStatus::ACTIVE->value,
             ]
         );
 
@@ -200,12 +202,12 @@ class ApiTestingSeeder extends Seeder
         Goal::firstOrCreate(
             [
                 'user_id' => $employee->id,
-                'title'   => '[TEST] Complete API Integration',
+                'title' => '[TEST] Complete API Integration',
             ],
             [
                 'description' => 'Integrate the HRMS API with the mobile app.',
                 'target_date' => Carbon::now()->addDays(45)->toDateString(),
-                'status'      => GoalStatus::ACTIVE->value,
+                'status' => GoalStatus::ACTIVE->value,
             ]
         );
 
@@ -218,8 +220,8 @@ class ApiTestingSeeder extends Seeder
             ['name' => '[TEST] Q4 2026 Review'],
             [
                 'start_date' => Carbon::now()->startOfQuarter()->toDateString(),
-                'end_date'   => Carbon::now()->endOfQuarter()->toDateString(),
-                'status'     => EvaluationPeriodStatus::ACTIVE->value,
+                'end_date' => Carbon::now()->endOfQuarter()->toDateString(),
+                'status' => EvaluationPeriodStatus::ACTIVE->value,
             ]
         );
 
@@ -227,8 +229,8 @@ class ApiTestingSeeder extends Seeder
             ['name' => '[TEST] Q3 2026 Review'],
             [
                 'start_date' => Carbon::now()->subQuarter()->startOfQuarter()->toDateString(),
-                'end_date'   => Carbon::now()->subQuarter()->endOfQuarter()->toDateString(),
-                'status'     => EvaluationPeriodStatus::CLOSED->value,
+                'end_date' => Carbon::now()->subQuarter()->endOfQuarter()->toDateString(),
+                'status' => EvaluationPeriodStatus::CLOSED->value,
             ]
         );
 
@@ -259,13 +261,13 @@ class ApiTestingSeeder extends Seeder
 
         $draftEvaluation = Evaluation::firstOrCreate(
             [
-                'user_id'      => $employee->id,
+                'user_id' => $employee->id,
                 'evaluator_id' => $manager->id,
-                'period_id'    => $activePeriod->id,
+                'period_id' => $activePeriod->id,
             ],
             [
                 'feedback' => '[TEST] Initial draft evaluation for API testing.',
-                'status'   => EvaluationStatus::DRAFT->value,
+                'status' => EvaluationStatus::DRAFT->value,
             ]
         );
 
@@ -287,8 +289,8 @@ class ApiTestingSeeder extends Seeder
         EvaluationAuditLog::firstOrCreate(
             [
                 'evaluation_id' => $draftEvaluation->id,
-                'user_id'       => $manager->id,
-                'action'        => 'created_draft',
+                'user_id' => $manager->id,
+                'action' => 'created_draft',
             ],
             ['details' => ['note' => '[TEST] Draft created for API testing.']]
         );
@@ -303,32 +305,32 @@ class ApiTestingSeeder extends Seeder
             ['title' => '[TEST] Remote Work Policy'],
             [
                 'description' => 'Policy governing remote work arrangements.',
-                'status'      => PolicyStatus::Draft->value,
-                'created_by'  => $owner->id,
+                'status' => PolicyStatus::Draft->value,
+                'created_by' => $owner->id,
             ]
         );
 
         $draftPolicyVersion = PolicyVersion::firstOrCreate(
             ['policy_id' => $draftPolicy->id, 'version' => 1],
             [
-                'content'        => 'Employees may work remotely up to 3 days per week with manager approval.',
-                'status'         => PolicyVersionStatus::Draft->value,
+                'content' => 'Employees may work remotely up to 3 days per week with manager approval.',
+                'status' => PolicyVersionStatus::Draft->value,
                 'effective_date' => Carbon::now()->addDays(30)->toDateString(),
-                'created_by'     => $owner->id,
+                'created_by' => $owner->id,
             ]
         );
 
         PolicyAudit::firstOrCreate(
             [
-                'policy_id'         => $draftPolicy->id,
+                'policy_id' => $draftPolicy->id,
                 'policy_version_id' => $draftPolicyVersion->id,
-                'action'            => 'version_created',
+                'action' => 'version_created',
             ],
             [
                 'performed_by' => $owner->id,
-                'old_status'   => null,
-                'new_status'   => PolicyVersionStatus::Draft->value,
-                'description'  => '[TEST] Draft version created.',
+                'old_status' => null,
+                'new_status' => PolicyVersionStatus::Draft->value,
+                'description' => '[TEST] Draft version created.',
             ]
         );
 
@@ -337,32 +339,32 @@ class ApiTestingSeeder extends Seeder
             ['title' => '[TEST] Code of Conduct Policy'],
             [
                 'description' => 'Company-wide code of conduct and ethics policy.',
-                'status'      => PolicyStatus::Active->value,
-                'created_by'  => $owner->id,
+                'status' => PolicyStatus::Active->value,
+                'created_by' => $owner->id,
             ]
         );
 
         $activePolicyVersion = PolicyVersion::firstOrCreate(
             ['policy_id' => $activePolicy->id, 'version' => 1],
             [
-                'content'        => 'All employees must adhere to the highest standards of professional conduct.',
-                'status'         => PolicyVersionStatus::Active->value,
+                'content' => 'All employees must adhere to the highest standards of professional conduct.',
+                'status' => PolicyVersionStatus::Active->value,
                 'effective_date' => Carbon::now()->subDays(30)->toDateString(),
-                'created_by'     => $owner->id,
+                'created_by' => $owner->id,
             ]
         );
 
         PolicyAudit::firstOrCreate(
             [
-                'policy_id'         => $activePolicy->id,
+                'policy_id' => $activePolicy->id,
                 'policy_version_id' => $activePolicyVersion->id,
-                'action'            => 'version_activated',
+                'action' => 'version_activated',
             ],
             [
                 'performed_by' => $owner->id,
-                'old_status'   => PolicyVersionStatus::Draft->value,
-                'new_status'   => PolicyVersionStatus::Active->value,
-                'description'  => '[TEST] Version activated.',
+                'old_status' => PolicyVersionStatus::Draft->value,
+                'new_status' => PolicyVersionStatus::Active->value,
+                'description' => '[TEST] Version activated.',
             ]
         );
 
@@ -374,15 +376,15 @@ class ApiTestingSeeder extends Seeder
 
         $secondTask = Task::firstOrCreate(
             [
-                'title'      => '[TEST] Implement Leave Management API',
+                'title' => '[TEST] Implement Leave Management API',
                 'created_by' => $hr->id,
             ],
             [
                 'description' => '[TEST] Second task for API testing: leave management.',
-                'priority'    => TaskPriority::MEDIUM->value,
-                'status'      => TaskStatus::IN_PROGRESS->value,
-                'progress'    => 40,
-                'deadline'    => Carbon::now()->addDays(14)->toDateString(),
+                'priority' => TaskPriority::MEDIUM->value,
+                'status' => TaskStatus::IN_PROGRESS->value,
+                'progress' => 40,
+                'deadline' => Carbon::now()->addDays(14)->toDateString(),
             ]
         );
 
@@ -397,9 +399,9 @@ class ApiTestingSeeder extends Seeder
 
         TaskActivity::firstOrCreate(
             [
-                'task_id'     => $secondTask->id,
-                'user_id'     => $hr->id,
-                'action'      => 'created',
+                'task_id' => $secondTask->id,
+                'user_id' => $hr->id,
+                'action' => 'created',
                 'description' => 'Task created.',
             ]
         );
@@ -415,10 +417,10 @@ class ApiTestingSeeder extends Seeder
             [
                 'task_id' => $secondTask->id,
                 'user_id' => $employee->id,
-                'status'  => SubmissionStatus::PENDING_REVIEW->value,
+                'status' => SubmissionStatus::PENDING_REVIEW->value,
             ],
             [
-                'note'         => '[TEST] Completed leave management API implementation.',
+                'note' => '[TEST] Completed leave management API implementation.',
                 'submitted_at' => Carbon::now()->toDateTimeString(),
             ]
         );
@@ -429,15 +431,15 @@ class ApiTestingSeeder extends Seeder
         // ---------------------------------------------------------------------------
         $this->command->info('  [12] Seeding pending salary advance...');
 
-        \App\Models\SalaryAdvance::firstOrCreate(
+        SalaryAdvance::firstOrCreate(
             [
                 'user_id' => $employee->id,
-                'status'  => 'pending',
-                'reason'  => '[TEST] Pending advance for API status-update testing.',
+                'status' => 'pending',
+                'reason' => '[TEST] Pending advance for API status-update testing.',
             ],
             [
-                'requested_amount'  => 2000.00,
-                'repayment_months'  => 4,
+                'requested_amount' => 2000.00,
+                'repayment_months' => 4,
                 'monthly_deduction' => 500.00,
             ]
         );
@@ -450,14 +452,14 @@ class ApiTestingSeeder extends Seeder
 
         Bonus::firstOrCreate(
             [
-                'user_id'       => $employee->id,
+                'user_id' => $employee->id,
                 'incentive_type' => '[TEST] Annual Excellence Bonus',
-                'status'        => 'pending',
+                'status' => 'pending',
             ],
             [
-                'amount'               => 1500.00,
-                'target_month'         => Carbon::now()->format('Y-m'),
-                'approved_by_user_id'  => null,
+                'amount' => 1500.00,
+                'target_month' => Carbon::now()->format('Y-m'),
+                'approved_by_user_id' => null,
             ]
         );
 
@@ -469,13 +471,13 @@ class ApiTestingSeeder extends Seeder
         Deduction::firstOrCreate(
             [
                 'user_id' => $employee->id,
-                'reason'  => '[TEST] Unapproved absence deduction',
-                'status'  => 'queued',
+                'reason' => '[TEST] Unapproved absence deduction',
+                'status' => 'queued',
             ],
             [
                 'amount' => 150.00,
-                'date'   => Carbon::now()->toDateString(),
-                'type'   => 'manual',
+                'date' => Carbon::now()->toDateString(),
+                'type' => 'manual',
             ]
         );
 
