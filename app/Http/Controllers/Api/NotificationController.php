@@ -139,6 +139,36 @@ class NotificationController extends Controller
         }
     }
 
+    public function destroy(Request $request, string $id): JsonResponse
+    {
+        try {
+            $notification = Notification::find($id);
+
+            if (! $notification) {
+                return ResponseHelper::error(null, __('notifications.not_found'), 404);
+            }
+
+            if ($notification->user_id !== $request->user()->id) {
+                return ResponseHelper::error(null, __('notifications.unauthorized'), 403);
+            }
+
+            $notification->delete();
+
+            return ResponseHelper::success(
+                null,
+                __('notifications.deleted')
+            );
+        } catch (Throwable $e) {
+            report($e);
+
+            return ResponseHelper::error(
+                config('app.debug') ? $e->getMessage() : null,
+                __('notifications.failed'),
+                500
+            );
+        }
+    }
+
     public function updateFcmToken(UpdateFcmTokenRequest $request): JsonResponse
     {
         try {
