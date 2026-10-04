@@ -168,6 +168,8 @@ enum PermissionEnum: string
     // Payroll Permissions
     case VIEW_PAYROLL = 'view payroll';
     case RUN_PAYROLL = 'run payroll';
+    // Dashboard Permissions
+    case HR_DASHBOARD_VIEW = 'hr.dashboard.view';
 
     public function defaultRoles(): array
     {
@@ -208,7 +210,8 @@ enum PermissionEnum: string
             self::CREATE_BONUS,
             self::MANAGE_BONUS_STATUS,
             self::RUN_PAYROLL,
-            self::VIEW_PAYROLL => ['HR', 'Owner'],
+            self::VIEW_PAYROLL,
+            self::HR_DASHBOARD_VIEW => ['HR', 'Owner'],
 
             // Manager, HR & Owner
             self::MANAGER_VIEW_EMPLOYEES,
