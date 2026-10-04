@@ -17111,7 +17111,101 @@ paths:
               example:
                 success: false
                 message: "Failed to fetch dashboard data."
-  
+
+  /api/owner/dashboard:
+    get:
+      summary: Get (Owner) Dashboard Data
+      description: Retrieves high-level workspace metrics, system governance stats, recent audit log activities, and recently active workspace users for the Owner portal.
+      operationId: getOwnerDashboard
+      tags:
+        - Dashboards
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: App-Language
+          in: header
+          description: Preferred language for response messages (`ar` or `en`).
+          required: false
+          schema:
+            type: string
+            enum: [ar, en]
+            default: en
+            example: en
+      responses:
+        '200':
+          description: Owner Dashboard data retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OwnerDashboardSuccessResponse'
+              example:
+                success: true
+                message: "Owner Dashboard data retrieved successfully."
+                data:
+                  kpis:
+                    total_users:
+                      label: "Total Users"
+                      value: 14
+                      subtext: "Across all active roles"
+                    branch_locations:
+                      label: "Branch Locations"
+                      value: 1
+                    review_completion:
+                      label: "Review Completion"
+                      value: 0
+                      formatted: "0%"
+                    active_policies:
+                      label: "Active System Policies"
+                      value: 1
+                  recent_activities:
+                    - id: 1
+                      user_name: "Menna Baligh Hamdy"
+                      action: "[TEST] Draft version created."
+                      timestamp: "2 hours ago"
+                      severity: "Success"
+                    - id: 2
+                      user_name: "Menna Baligh Hamdy"
+                      action: "[TEST] Version activated."
+                      timestamp: "2 hours ago"
+                      severity: "Info"
+                  quick_view_users:
+                    - id: 33
+                      name: "Menna Elharefa"
+                      job_title: "Owner"
+                      status: "active"
+                    - id: 32
+                      name: "mera"
+                      job_title: "front"
+                      status: "active"
+                    - id: 31
+                      name: "test per"
+                      job_title: "Flutter Developer"
+                      status: "inactive"
+                    - id: 30
+                      name: "test per"
+                      job_title: "Flutter Developer"
+                      status: "inactive"
+        '401':
+          description: Unauthenticated / Invalid token.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "Unauthenticated."
+        '403':
+          description: Unauthorized / Missing `owner.dashboard.view` permission.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "User does not have the right permissions."
+        '500':
+          description: Internal Server Error.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "Failed to fetch dashboard data."
 components:
   securitySchemes:
     bearerAuth:
@@ -20408,3 +20502,79 @@ components:
                       type: integer
                     total:
                       type: integer
+    OwnerDashboardSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Owner Dashboard data retrieved successfully."
+        data:
+          type: object
+          properties:
+            kpis:
+              type: object
+              properties:
+                total_users:
+                  type: object
+                  properties:
+                    label:
+                      type: string
+                    value:
+                      type: integer
+                    subtext:
+                      type: string
+                branch_locations:
+                  type: object
+                  properties:
+                    label:
+                      type: string
+                    value:
+                      type: integer
+                review_completion:
+                  type: object
+                  properties:
+                    label:
+                      type: string
+                    value:
+                      type: integer
+                    formatted:
+                      type: string
+                active_policies:
+                  type: object
+                  properties:
+                    label:
+                      type: string
+                    value:
+                      type: integer
+            recent_activities:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  user_name:
+                    type: string
+                  action:
+                    type: string
+                  timestamp:
+                    type: string
+                  severity:
+                    type: string
+                    enum: [Success, Info, Warning]
+            quick_view_users:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  job_title:
+                    type: string
+                  status:
+                    type: string

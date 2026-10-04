@@ -15,4 +15,13 @@ return [
             'unexcused_absence_reason' => 'Unexcused absence recorded.',
         ],
     ],
+    'owner' => [
+        'fetched_successfully' => 'Owner Dashboard data retrieved successfully.',
+        'total_users' => 'Total Users',
+        'across_all_roles' => 'Across all active roles',
+        'branch_locations' => 'Branch Locations',
+        'review_completion' => 'Review Completion',
+        'active_policies' => 'Active System Policies',
+        'audit_action_default' => 'System configuration updated',
+    ],
 ];

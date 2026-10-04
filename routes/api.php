@@ -43,6 +43,7 @@ use App\Http\Controllers\Api\Owner\LandingRoleController;
 use App\Http\Controllers\Api\Owner\LandingSectionController;
 use App\Http\Controllers\Api\Owner\PayrollController;
 use App\Http\Controllers\Api\Owner\SalaryAdvanceController;
+use App\Http\Controllers\Api\OwnerDashboardController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\PolicyController;
 use App\Http\Controllers\Api\SubmissionController;
@@ -354,7 +355,7 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
     });
 
     Route::get('/permissions', [PermissionController::class, 'index'])->middleware('permission:'.PermissionEnum::PERMISSION_VIEW_ALL->value);
-
+    Route::get('/owner/dashboard', OwnerDashboardController::class)->middleware('permission:'.PermissionEnum::OWNER_DASHBOARD_VIEW->value);
     Route::prefix('/financial')->group(function () {
         Route::get('/advances', [SalaryAdvanceController::class, 'index'])->middleware('permission:view advances');
         Route::post('/advances', [SalaryAdvanceController::class, 'store'])->middleware('permission:create advance');
