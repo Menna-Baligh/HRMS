@@ -47,4 +47,13 @@ return [
         'workload_summary_singular' => 'يتحمل :names نسبة :percentage% من إجمالي ضغط المهام الحالي.',
         'workload_summary_plural' => 'يتحمل :names نسبة :percentage% من إجمالي ضغط المهام الحالي.',
     ],
+    'employee' => [
+        'pending_tasks' => 'المهام المعلقة',
+        'high_priority_count' => ':count مهمة ذات أولوية عالية',
+        'normal_priority' => 'جميع المهام اعتيادية',
+        'next_deadline' => 'الموعد النهائي القادم',
+        'no_upcoming_deadlines' => 'لا توجد مواعيد تسليم قادمة',
+        'leave_balance' => 'رصيد الإجازات',
+        'annual_casual' => 'سنوي + عارض',
+    ],
 ];

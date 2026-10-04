@@ -3302,44 +3302,96 @@ paths:
                     properties:
                       status:
                         type: string
-                        example: On shift
+                        example: Off Shift
                       check_in_time:
                         type: string
                         nullable: true
-                        example: 09:05 AM
+                        example: null
                       check_out_time:
                         type: string
                         nullable: true
-                        example:
+                        example: null
                       worked_time:
                         type: string
-                        example: "08:15:30"
+                        example: "0h 0m 0s"
                       distance_meters:
                         type: number
                         format: float
                         nullable: true
-                        example: 25.5
+                        example: 442992.42
                       is_inside_radius:
                         type: boolean
-                        example: true
+                        example: false
                       can_check_in:
                         type: boolean
                         example: false
                       can_check_out:
                         type: boolean
-                        example: true
+                        example: false
+                      widgets:
+                        type: object
+                        properties:
+                          pending_tasks:
+                            type: object
+                            properties:
+                              count:
+                                type: integer
+                                example: 2
+                              label:
+                                type: string
+                                example: PENDING TASKS
+                              subtext:
+                                type: string
+                                example: 1 high priority
+                          next_deadline:
+                            type: object
+                            properties:
+                              date:
+                                type: string
+                                example: Oct 05
+                              task_title:
+                                type: string
+                                example: Implement Employee Attendance API
+                              label:
+                                type: string
+                                example: NEXT DEADLINE
+                          leave_balance:
+                            type: object
+                            properties:
+                              days:
+                                type: integer
+                                example: 40
+                              label:
+                                type: string
+                                example: LEAVE BALANCE
+                              subtext:
+                                type: string
+                                example: Annual + Casual
               example:
                 success: true
                 message: Today attendance retrieved successfully.
                 data:
-                  status: On shift
-                  check_in_time: 09:05 AM
-                  check_out_time:
-                  worked_time: "08:15:30"
-                  distance_meters: 25.5
-                  is_inside_radius: true
+                  status: Off Shift
+                  check_in_time: null
+                  check_out_time: null
+                  worked_time: "0h 0m 0s"
+                  distance_meters: 442992.42
+                  is_inside_radius: false
                   can_check_in: false
-                  can_check_out: true
+                  can_check_out: false
+                  widgets:
+                    pending_tasks:
+                      count: 2
+                      label: PENDING TASKS
+                      subtext: 1 high priority
+                    next_deadline:
+                      date: Oct 05
+                      task_title: Implement Employee Attendance API
+                      label: NEXT DEADLINE
+                    leave_balance:
+                      days: 40
+                      label: LEAVE BALANCE
+                      subtext: Annual + Casual
         "401":
           description: Unauthenticated
           content:

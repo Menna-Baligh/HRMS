@@ -47,4 +47,13 @@ return [
         'workload_summary_singular' => ':names is carrying :percentage% of current team workload.',
         'workload_summary_plural' => ':names are carrying :percentage% of current team workload.',
     ],
+    'employee' => [
+        'pending_tasks' => 'PENDING TASKS',
+        'high_priority_count' => ':count high priority',
+        'normal_priority' => 'All tasks normal priority',
+        'next_deadline' => 'NEXT DEADLINE',
+        'no_upcoming_deadlines' => 'No upcoming deadlines',
+        'leave_balance' => 'LEAVE BALANCE',
+        'annual_casual' => 'Annual + Casual',
+    ],
 ];

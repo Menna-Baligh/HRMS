@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\Attendance;
+use App\Models\LeaveBalance;
+use App\Models\Task;
 use App\Models\User;
 use Carbon\Carbon;
 use Exception;
@@ -119,6 +121,27 @@ class AttendanceService
             $workedSeconds = (int) abs($endTime->diffInSeconds($attendance->check_in));
         }
 
+        $activeTasks = Task::whereHas('assignedUsers', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })
+            ->whereIn('status', ['Pending', 'In Progress']);
+        $pendingTasksCount = (clone $activeTasks)->count();
+        $highPriorityCount = (clone $activeTasks)->where('priority', 'High')->count();
+
+        $nextTask = Task::whereHas('assignedUsers', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })
+            ->whereIn('status', ['Pending', 'In Progress'])
+            ->where('deadline', '>=', now())
+            ->orderBy('deadline', 'asc')
+            ->first();
+
+        $leaveBalance = LeaveBalance::where('user_id', $user->id)
+            ->where('year', now()->year)
+            ->selectRaw('SUM(allocated_days - used_days) as remaining')
+            ->first();
+        $totalLeaveBalance = $leaveBalance->remaining ?? 0;
+
         return [
             'has_checked_in' => (bool) ($attendance?->check_in),
             'has_checked_out' => (bool) ($attendance?->check_out),
@@ -128,6 +151,26 @@ class AttendanceService
             'worked_seconds' => $workedSeconds,
             'distance_meters' => $distance,
             'is_inside_radius' => $isInside,
+
+            'widgets' => [
+                'pending_tasks' => [
+                    'count' => $pendingTasksCount,
+                    'label' => __('dashboard.employee.pending_tasks'),
+                    'subtext' => $highPriorityCount > 0
+                        ? __('dashboard.employee.high_priority_count', ['count' => $highPriorityCount])
+                        : __('dashboard.employee.normal_priority'),
+                ],
+                'next_deadline' => [
+                    'date' => $nextTask?->deadline ? Carbon::parse($nextTask->deadline)->format('M d') : 'N/A',
+                    'task_title' => $nextTask?->title ?? __('dashboard.employee.no_upcoming_deadlines'),
+                    'label' => __('dashboard.employee.next_deadline'),
+                ],
+                'leave_balance' => [
+                    'days' => (int) $totalLeaveBalance,
+                    'label' => __('dashboard.employee.leave_balance'),
+                    'subtext' => __('dashboard.employee.annual_casual'),
+                ],
+            ],
         ];
     }
 
