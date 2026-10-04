@@ -171,6 +171,7 @@ enum PermissionEnum: string
     // Dashboard Permissions
     case HR_DASHBOARD_VIEW = 'hr.dashboard.view';
     case OWNER_DASHBOARD_VIEW = 'owner.dashboard.view';
+    case MANAGER_DASHBOARD_VIEW = 'manager.dashboard.view';
 
     public function defaultRoles(): array
     {
@@ -238,7 +239,8 @@ enum PermissionEnum: string
             self::AI_ATTENTION_SIGNAL,
             self::AI_TEAM_INSIGHT,
             self::GOAL_CREATE,
-            self::GOAL_UPDATE => ['Manager', 'HR', 'Owner'],
+            self::GOAL_UPDATE ,
+            self::MANAGER_DASHBOARD_VIEW => ['Manager', 'HR', 'Owner'],
 
             // All Roles (Owner, HR, Manager, Employee)
             self::EMPLOYEE_VIEW_PROFILE,

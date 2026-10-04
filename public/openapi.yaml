@@ -17206,6 +17206,94 @@ paths:
               example:
                 success: false
                 message: "Failed to fetch dashboard data."
+  /api/manager/dashboard:
+    get:
+      summary: Get Team Dashboard Data for (Manager)
+      description: Retrieves aggregated metrics, team KPIs, workload alert insights, and pending submission action queue for the authenticated manager.
+      operationId: getManagerDashboard
+      tags:
+        - Dashboards
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: App-Language
+          in: header
+          description: Preferred language for response messages (`ar` or `en`).
+          required: false
+          schema:
+            type: string
+            enum: [ar, en]
+            default: en
+            example: en
+      responses:
+        '200':
+          description: Team Dashboard data retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManagerDashboardSuccessResponse'
+              example:
+                success: true
+                message: "Team Dashboard data retrieved successfully."
+                data:
+                  kpis:
+                    direct_reports:
+                      label: "Direct Reports"
+                      value: 5
+                    active_tasks:
+                      label: "Active Tasks"
+                      value: 2
+                      subtext: "Across 5 team members"
+                    pending_submissions:
+                      label: "Pending Submissions"
+                      value: 2
+                      subtext: "Require your review"
+                    attendance_today:
+                      label: "Attendance Today"
+                      count: 0
+                      total: 5
+                      formatted: "0/5"
+                      late_count: 0
+                      subtext: "0 late check-in(s) today"
+                  widgets:
+                    workload_alert:
+                      has_alert: true
+                      type: "AI WORKLOAD ALERT"
+                      title: "Sprint overload detected"
+                      description: "Noran Baligh is carrying 100% of current team workload."
+                      action: "Rebalance Tasks"
+                    pending_action_queue:
+                      - id: 2
+                        title: "[TEST] Implement Leave Management API"
+                        submitted_by: "Noran Baligh"
+                        created_at: "3 hours ago"
+                        action_label: "Review"
+                      - id: 1
+                        title: "Implement Employee Attendance API"
+                        submitted_by: "Noran Baligh"
+                        created_at: "1 day ago"
+                        action_label: "Review"
+        '401':
+          description: Unauthenticated / Invalid token.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "Unauthenticated."
+        '403':
+          description: Unauthorized / Missing `manager.dashboard.view` permission.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "User does not have the right permissions."
+        '500':
+          description: Internal Server Error.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "Failed to fetch dashboard data."
 components:
   securitySchemes:
     bearerAuth:
@@ -20578,3 +20666,90 @@ components:
                     type: string
                   status:
                     type: string
+    ManagerDashboardSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Team Dashboard data retrieved successfully."
+        data:
+          type: object
+          properties:
+            kpis:
+              type: object
+              properties:
+                direct_reports:
+                  type: object
+                  properties:
+                    label:
+                      type: string
+                    value:
+                      type: integer
+                active_tasks:
+                  type: object
+                  properties:
+                    label:
+                      type: string
+                    value:
+                      type: integer
+                    subtext:
+                      type: string
+                pending_submissions:
+                  type: object
+                  properties:
+                    label:
+                      type: string
+                    value:
+                      type: integer
+                    subtext:
+                      type: string
+                attendance_today:
+                  type: object
+                  properties:
+                    label:
+                      type: string
+                    count:
+                      type: integer
+                    total:
+                      type: integer
+                    formatted:
+                      type: string
+                    late_count:
+                      type: integer
+                    subtext:
+                      type: string
+            widgets:
+              type: object
+              properties:
+                workload_alert:
+                  type: object
+                  properties:
+                    has_alert:
+                      type: boolean
+                    type:
+                      type: string
+                    title:
+                      type: string
+                    description:
+                      type: string
+                    action:
+                      type: string
+                      nullable: true
+                pending_action_queue:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      title:
+                        type: string
+                      submitted_by:
+                        type: string
+                      created_at:
+                        type: string
+                      action_label:
+                        type: string
