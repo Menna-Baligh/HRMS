@@ -20,16 +20,16 @@ return [
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
-    'https://hr-system.iptvdemo.serv5group.com',
-    'http://localhost:5173',
-    'http://127.0.0.1:5173',
-    'http://127.0.0.1:5174',
-    'http://localhost:5174',
-],
+        'https://hr-system.iptvdemo.serv5group.com',
+        'http://localhost:5173',
+        'http://127.0.0.1:5173',
+        'http://127.0.0.1:5174',
+        'http://localhost:5174',
+    ],
 
-'allowed_origins_patterns' => [
-    '#^https?://.*\.ngrok-free\.(app|dev)$#',
-],
+    'allowed_origins_patterns' => [
+        '#^https?://.*\.ngrok-free\.(app|dev)$#',
+    ],
 
     'allowed_headers' => ['*'],
 

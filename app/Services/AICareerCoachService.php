@@ -44,8 +44,8 @@ class AICareerCoachService
         try {
             $response = Http::timeout(15)
                 ->withHeaders([
-                    'X-Caller-ID' => $currentUser->employee_id ?? (string) $currentUser->id,
-                    'X-Role' => $aiRoleHeader,
+                    'X-Caller-Employee-ID' => $currentUser->employee_id ?? (string) $currentUser->id,
+                    'X-Caller-Role' => $aiRoleHeader,
                 ])->post("{$aiBaseUrl}/career-coach", $payload);
 
             if ($response->failed()) {
