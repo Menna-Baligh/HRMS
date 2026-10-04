@@ -3302,44 +3302,96 @@ paths:
                     properties:
                       status:
                         type: string
-                        example: On shift
+                        example: Off Shift
                       check_in_time:
                         type: string
                         nullable: true
-                        example: 09:05 AM
+                        example: null
                       check_out_time:
                         type: string
                         nullable: true
-                        example:
+                        example: null
                       worked_time:
                         type: string
-                        example: "08:15:30"
+                        example: "0h 0m 0s"
                       distance_meters:
                         type: number
                         format: float
                         nullable: true
-                        example: 25.5
+                        example: 442992.42
                       is_inside_radius:
                         type: boolean
-                        example: true
+                        example: false
                       can_check_in:
                         type: boolean
                         example: false
                       can_check_out:
                         type: boolean
-                        example: true
+                        example: false
+                      widgets:
+                        type: object
+                        properties:
+                          pending_tasks:
+                            type: object
+                            properties:
+                              count:
+                                type: integer
+                                example: 2
+                              label:
+                                type: string
+                                example: PENDING TASKS
+                              subtext:
+                                type: string
+                                example: 1 high priority
+                          next_deadline:
+                            type: object
+                            properties:
+                              date:
+                                type: string
+                                example: Oct 05
+                              task_title:
+                                type: string
+                                example: Implement Employee Attendance API
+                              label:
+                                type: string
+                                example: NEXT DEADLINE
+                          leave_balance:
+                            type: object
+                            properties:
+                              days:
+                                type: integer
+                                example: 40
+                              label:
+                                type: string
+                                example: LEAVE BALANCE
+                              subtext:
+                                type: string
+                                example: Annual + Casual
               example:
                 success: true
                 message: Today attendance retrieved successfully.
                 data:
-                  status: On shift
-                  check_in_time: 09:05 AM
-                  check_out_time:
-                  worked_time: "08:15:30"
-                  distance_meters: 25.5
-                  is_inside_radius: true
+                  status: Off Shift
+                  check_in_time: null
+                  check_out_time: null
+                  worked_time: "0h 0m 0s"
+                  distance_meters: 442992.42
+                  is_inside_radius: false
                   can_check_in: false
-                  can_check_out: true
+                  can_check_out: false
+                  widgets:
+                    pending_tasks:
+                      count: 2
+                      label: PENDING TASKS
+                      subtext: 1 high priority
+                    next_deadline:
+                      date: Oct 05
+                      task_title: Implement Employee Attendance API
+                      label: NEXT DEADLINE
+                    leave_balance:
+                      days: 40
+                      label: LEAVE BALANCE
+                      subtext: Annual + Casual
         "401":
           description: Unauthenticated
           content:
@@ -16440,7 +16492,7 @@ paths:
       tags:
         - Financials
       summary: List salary advance requests (All Roles) 📱
-      description: Retrieve a paginated list of salary advance requests. If the authenticated user has the `Owner` or `HR` role, all advance requests are returned. Regular employees only see their own advance requests. 
+      description: Retrieve a paginated list of salary advance requests. If the authenticated user has the `Owner` or `HR` role, all advance requests are returned. Regular employees only see their own advance requests.
       operationId: getFinancialAdvances
       security:
         - bearerAuth: []
@@ -16988,6 +17040,312 @@ paths:
         '500':
           $ref: '#/components/responses/500ServerError'
 
+
+# Dashboards
+  /api/hr/dashboard:
+    get:
+      summary: Get (HR) Dashboard Data
+      description: Retrieves aggregated metrics, KPIs, employee attention signals, and operational readiness stats for the HR dashboard.
+      operationId: getHrDashboard
+      tags:
+        - Dashboards
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: per_page
+          in: query
+          description: Number of items per page for employee attention signals.
+          required: false
+          schema:
+            type: integer
+            default: 10
+            example: 10
+        - name: App-Language
+          in: header
+          description: Preferred language for response messages (`ar` or `en`).
+          required: false
+          schema:
+            type: string
+            enum: [ar, en]
+            default: en
+            example: en
+      responses:
+        '200':
+          description: HR Dashboard data retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HrDashboardSuccessResponse'
+              example:
+                success: true
+                message: "HR Dashboard data retrieved successfully."
+                data:
+                  kpis:
+                    total_employees:
+                      label: "Total Active Employees"
+                      value: 7
+                    present_today:
+                      label: "Present Today"
+                      count: 0
+                      percentage: 0
+                      formatted: "0/7 (0%)"
+                    pending_reviews:
+                      label: "Pending Reviews"
+                      total: 2
+                      leaves_count: 1
+                      advances_count: 1
+                      formatted: "1 Leaves · 1 Advances"
+                    projected_payroll:
+                      label: "Projected Payroll"
+                      value: 105750
+                      currency: "EGP"
+                      breakdown:
+                        base_salaries: 105600
+                        bonuses: 2500
+                        deductions: 750
+                        advance_installments: 1600
+                  widgets:
+                    operational_readiness:
+                      attendance_verification: 0
+                      leave_approvals: 0
+                      evaluations_completion: 0
+                      payroll_reconciliation: 100
+                    employee_attention_signals:
+                      current_page: 1
+                      data:
+                        - id: 2
+                          user_id: 6
+                          user_name: "Noran Baligh"
+                          date: "2026-10-02T21:00:00.000000Z"
+                          type: "High Attention"
+                          reason: "Late arrival during this week."
+                      first_page_url: "https://hr-system.iptvdemo.serv5group.com/api/hr/dashboard?page=1"
+                      from: 1
+                      last_page: 1
+                      last_page_url: "https://hr-system.iptvdemo.serv5group.com/api/hr/dashboard?page=1"
+                      links:
+                        - url: null
+                          label: "&laquo; Previous"
+                          page: null
+                          active: false
+                        - url: "https://hr-system.iptvdemo.serv5group.com/api/hr/dashboard?page=1"
+                          label: "1"
+                          page: 1
+                          active: true
+                        - url: null
+                          label: "Next &raquo;"
+                          page: null
+                          active: false
+                      next_page_url: null
+                      path: "https://hr-system.iptvdemo.serv5group.com/api/hr/dashboard"
+                      per_page: 10
+                      prev_page_url: null
+                      to: 1
+                      total: 1
+        '401':
+          description: Unauthenticated / Invalid token.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "Unauthenticated."
+        '403':
+          description: Unauthorized / Missing `hr.dashboard.view` permission.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "User does not have the right permissions."
+        '500':
+          description: Internal Server Error.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "Failed to fetch dashboard data."
+
+  /api/owner/dashboard:
+    get:
+      summary: Get (Owner) Dashboard Data
+      description: Retrieves high-level workspace metrics, system governance stats, recent audit log activities, and recently active workspace users for the Owner portal.
+      operationId: getOwnerDashboard
+      tags:
+        - Dashboards
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: App-Language
+          in: header
+          description: Preferred language for response messages (`ar` or `en`).
+          required: false
+          schema:
+            type: string
+            enum: [ar, en]
+            default: en
+            example: en
+      responses:
+        '200':
+          description: Owner Dashboard data retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OwnerDashboardSuccessResponse'
+              example:
+                success: true
+                message: "Owner Dashboard data retrieved successfully."
+                data:
+                  kpis:
+                    total_users:
+                      label: "Total Users"
+                      value: 14
+                      subtext: "Across all active roles"
+                    branch_locations:
+                      label: "Branch Locations"
+                      value: 1
+                    review_completion:
+                      label: "Review Completion"
+                      value: 0
+                      formatted: "0%"
+                    active_policies:
+                      label: "Active System Policies"
+                      value: 1
+                  recent_activities:
+                    - id: 1
+                      user_name: "Menna Baligh Hamdy"
+                      action: "[TEST] Draft version created."
+                      timestamp: "2 hours ago"
+                      severity: "Success"
+                    - id: 2
+                      user_name: "Menna Baligh Hamdy"
+                      action: "[TEST] Version activated."
+                      timestamp: "2 hours ago"
+                      severity: "Info"
+                  quick_view_users:
+                    - id: 33
+                      name: "Menna Elharefa"
+                      job_title: "Owner"
+                      status: "active"
+                    - id: 32
+                      name: "mera"
+                      job_title: "front"
+                      status: "active"
+                    - id: 31
+                      name: "test per"
+                      job_title: "Flutter Developer"
+                      status: "inactive"
+                    - id: 30
+                      name: "test per"
+                      job_title: "Flutter Developer"
+                      status: "inactive"
+        '401':
+          description: Unauthenticated / Invalid token.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "Unauthenticated."
+        '403':
+          description: Unauthorized / Missing `owner.dashboard.view` permission.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "User does not have the right permissions."
+        '500':
+          description: Internal Server Error.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "Failed to fetch dashboard data."
+  /api/manager/dashboard:
+    get:
+      summary: Get Team Dashboard Data for (Manager)
+      description: Retrieves aggregated metrics, team KPIs, workload alert insights, and pending submission action queue for the authenticated manager.
+      operationId: getManagerDashboard
+      tags:
+        - Dashboards
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: App-Language
+          in: header
+          description: Preferred language for response messages (`ar` or `en`).
+          required: false
+          schema:
+            type: string
+            enum: [ar, en]
+            default: en
+            example: en
+      responses:
+        '200':
+          description: Team Dashboard data retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManagerDashboardSuccessResponse'
+              example:
+                success: true
+                message: "Team Dashboard data retrieved successfully."
+                data:
+                  kpis:
+                    direct_reports:
+                      label: "Direct Reports"
+                      value: 5
+                    active_tasks:
+                      label: "Active Tasks"
+                      value: 2
+                      subtext: "Across 5 team members"
+                    pending_submissions:
+                      label: "Pending Submissions"
+                      value: 2
+                      subtext: "Require your review"
+                    attendance_today:
+                      label: "Attendance Today"
+                      count: 0
+                      total: 5
+                      formatted: "0/5"
+                      late_count: 0
+                      subtext: "0 late check-in(s) today"
+                  widgets:
+                    workload_alert:
+                      has_alert: true
+                      type: "AI WORKLOAD ALERT"
+                      title: "Sprint overload detected"
+                      description: "Noran Baligh is carrying 100% of current team workload."
+                      action: "Rebalance Tasks"
+                    pending_action_queue:
+                      - id: 2
+                        title: "[TEST] Implement Leave Management API"
+                        submitted_by: "Noran Baligh"
+                        created_at: "3 hours ago"
+                        action_label: "Review"
+                      - id: 1
+                        title: "Implement Employee Attendance API"
+                        submitted_by: "Noran Baligh"
+                        created_at: "1 day ago"
+                        action_label: "Review"
+        '401':
+          description: Unauthenticated / Invalid token.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "Unauthenticated."
+        '403':
+          description: Unauthorized / Missing `manager.dashboard.view` permission.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "User does not have the right permissions."
+        '500':
+          description: Internal Server Error.
+          content:
+            application/json:
+              example:
+                success: false
+                message: "Failed to fetch dashboard data."
 components:
   securitySchemes:
     bearerAuth:
@@ -20177,3 +20535,273 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/PayrollEntry'
+    HrDashboardSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "HR Dashboard data retrieved successfully."
+        data:
+          type: object
+          properties:
+            kpis:
+              type: object
+              properties:
+                total_employees:
+                  type: object
+                  properties:
+                    label:
+                      type: string
+                    value:
+                      type: integer
+                present_today:
+                  type: object
+                  properties:
+                    label:
+                      type: string
+                    count:
+                      type: integer
+                    percentage:
+                      type: number
+                    formatted:
+                      type: string
+                pending_reviews:
+                  type: object
+                  properties:
+                    label:
+                      type: string
+                    total:
+                      type: integer
+                    leaves_count:
+                      type: integer
+                    advances_count:
+                      type: integer
+                    formatted:
+                      type: string
+                projected_payroll:
+                  type: object
+                  properties:
+                    label:
+                      type: string
+                    value:
+                      type: number
+                    currency:
+                      type: string
+                    breakdown:
+                      type: object
+                      properties:
+                        base_salaries:
+                          type: number
+                        bonuses:
+                          type: number
+                        deductions:
+                          type: number
+                        advance_installments:
+                          type: number
+            widgets:
+              type: object
+              properties:
+                operational_readiness:
+                  type: object
+                  properties:
+                    attendance_verification:
+                      type: integer
+                    leave_approvals:
+                      type: integer
+                    evaluations_completion:
+                      type: integer
+                    payroll_reconciliation:
+                      type: integer
+                employee_attention_signals:
+                  type: object
+                  properties:
+                    current_page:
+                      type: integer
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          user_id:
+                            type: integer
+                          user_name:
+                            type: string
+                          date:
+                            type: string
+                            format: date-time
+                          type:
+                            type: string
+                          reason:
+                            type: string
+                    per_page:
+                      type: integer
+                    total:
+                      type: integer
+    OwnerDashboardSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Owner Dashboard data retrieved successfully."
+        data:
+          type: object
+          properties:
+            kpis:
+              type: object
+              properties:
+                total_users:
+                  type: object
+                  properties:
+                    label:
+                      type: string
+                    value:
+                      type: integer
+                    subtext:
+                      type: string
+                branch_locations:
+                  type: object
+                  properties:
+                    label:
+                      type: string
+                    value:
+                      type: integer
+                review_completion:
+                  type: object
+                  properties:
+                    label:
+                      type: string
+                    value:
+                      type: integer
+                    formatted:
+                      type: string
+                active_policies:
+                  type: object
+                  properties:
+                    label:
+                      type: string
+                    value:
+                      type: integer
+            recent_activities:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  user_name:
+                    type: string
+                  action:
+                    type: string
+                  timestamp:
+                    type: string
+                  severity:
+                    type: string
+                    enum: [Success, Info, Warning]
+            quick_view_users:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  job_title:
+                    type: string
+                  status:
+                    type: string
+    ManagerDashboardSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Team Dashboard data retrieved successfully."
+        data:
+          type: object
+          properties:
+            kpis:
+              type: object
+              properties:
+                direct_reports:
+                  type: object
+                  properties:
+                    label:
+                      type: string
+                    value:
+                      type: integer
+                active_tasks:
+                  type: object
+                  properties:
+                    label:
+                      type: string
+                    value:
+                      type: integer
+                    subtext:
+                      type: string
+                pending_submissions:
+                  type: object
+                  properties:
+                    label:
+                      type: string
+                    value:
+                      type: integer
+                    subtext:
+                      type: string
+                attendance_today:
+                  type: object
+                  properties:
+                    label:
+                      type: string
+                    count:
+                      type: integer
+                    total:
+                      type: integer
+                    formatted:
+                      type: string
+                    late_count:
+                      type: integer
+                    subtext:
+                      type: string
+            widgets:
+              type: object
+              properties:
+                workload_alert:
+                  type: object
+                  properties:
+                    has_alert:
+                      type: boolean
+                    type:
+                      type: string
+                    title:
+                      type: string
+                    description:
+                      type: string
+                    action:
+                      type: string
+                      nullable: true
+                pending_action_queue:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      title:
+                        type: string
+                      submitted_by:
+                        type: string
+                      created_at:
+                        type: string
+                      action_label:
+                        type: string

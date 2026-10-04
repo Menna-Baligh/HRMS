@@ -31,4 +31,9 @@ class PolicyAudit extends Model
     {
         return $this->belongsTo(User::class, 'performed_by');
     }
+
+    public function performedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'performed_by');
+    }
 }

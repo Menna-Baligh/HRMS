@@ -24,6 +24,8 @@ class TodayAttendanceResource extends JsonResource
             'is_inside_radius' => $isInside,
             'can_check_in' => ! $hasCheckedIn && $isInside,
             'can_check_out' => $hasCheckedIn && ! $hasCheckedOut,
+
+            'widgets' => $this['widgets'],
         ];
     }
 

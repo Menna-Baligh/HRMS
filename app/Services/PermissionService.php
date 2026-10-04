@@ -2,15 +2,14 @@
 
 namespace App\Services;
 
-use App\Enums\PermissionEnum;
-use Illuminate\Support\Collection;
+use Spatie\Permission\Models\Permission;
 
 class PermissionService
 {
-    public function getAllPermissions(): Collection
+    public function getAllPermissions(): array
     {
-        return collect(PermissionEnum::cases())->map(function (PermissionEnum $permission) {
-            return $permission->label();
-        });
+        return Permission::where('guard_name', 'api')
+            ->pluck('name')
+            ->toArray();
     }
 }

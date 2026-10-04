@@ -73,4 +73,6 @@ return [
     'goal_completed_title' => 'تم إنجاز الهدف 🎉',
     'goal_completed_body' => 'قام الموظف :employee بإنجاز الهدف بالكامل: :title',
 
+    'deleted' => 'تم حذف الإشعار بنجاح.',
+
 ];

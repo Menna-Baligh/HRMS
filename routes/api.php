@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\GoalController;
 use App\Http\Controllers\Api\GoogleAuthController;
 use App\Http\Controllers\Api\HolidayController;
 use App\Http\Controllers\Api\HrAttendanceController;
+use App\Http\Controllers\Api\HrDashboardController;
 use App\Http\Controllers\Api\HrEvaluationSetupController;
 use App\Http\Controllers\Api\HrGoalController;
 use App\Http\Controllers\Api\HrPerformanceController;
@@ -32,6 +33,7 @@ use App\Http\Controllers\Api\LeaveRequestController;
 use App\Http\Controllers\Api\LeaveTypeController;
 use App\Http\Controllers\Api\ManagerAttendanceController;
 use App\Http\Controllers\Api\ManagerController;
+use App\Http\Controllers\Api\ManagerDashboardController;
 use App\Http\Controllers\Api\ManagerPerformanceController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\Owner\BonusController;
@@ -42,6 +44,7 @@ use App\Http\Controllers\Api\Owner\LandingRoleController;
 use App\Http\Controllers\Api\Owner\LandingSectionController;
 use App\Http\Controllers\Api\Owner\PayrollController;
 use App\Http\Controllers\Api\Owner\SalaryAdvanceController;
+use App\Http\Controllers\Api\OwnerDashboardController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\PolicyController;
 use App\Http\Controllers\Api\SubmissionController;
@@ -281,6 +284,7 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
         Route::get('/attendance/{employeeId}', [ManagerAttendanceController::class, 'show'])->middleware('permission:'.PermissionEnum::MANAGER_VIEW_ATTENDANCE->value);
         Route::get('/team-goals', [ManagerController::class, 'teamGoals'])->middleware('permission:'.PermissionEnum::MANAGER_VIEW_TEAM_GOALS->value);
         Route::get('/team-performance', [ManagerPerformanceController::class, 'teamDashboard'])->middleware('permission:'.PermissionEnum::MANAGER_PERFORMANCE_TEAM->value);
+        Route::get('/dashboard', ManagerDashboardController::class)->middleware('permission:'.PermissionEnum::MANAGER_DASHBOARD_VIEW->value);
     });
 
     Route::prefix('hr')->group(function () {
@@ -291,6 +295,7 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
         Route::get('/attendance/export', [HrAttendanceController::class, 'export'])->middleware('permission:'.PermissionEnum::HR_ATTENDANCE_EXPORT->value);
         Route::get('/goals', [HrGoalController::class, 'index'])->middleware('permission:'.PermissionEnum::HR_GOALS_OVERVIEW->value);
         Route::get('/company-performance', [HrPerformanceController::class, 'companyDashboard'])->middleware('permission:'.PermissionEnum::HR_PERFORMANCE_COMPANY->value);
+        Route::get('/dashboard', HrDashboardController::class)->middleware('permission:'.PermissionEnum::HR_DASHBOARD_VIEW->value);
     });
 
     Route::prefix('goals')->group(function () {
@@ -342,6 +347,7 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
         Route::patch('/{id}/read', [NotificationController::class, 'markAsRead']);
         Route::patch('/read-all', [NotificationController::class, 'markAllAsRead']);
         Route::delete('/clear-all', [NotificationController::class, 'clearAll']);
+        Route::delete('/{id}', [NotificationController::class, 'destroy']);
         Route::post('/fcm-token', [NotificationController::class, 'updateFcmToken']);
     });
 
@@ -351,7 +357,7 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
     });
 
     Route::get('/permissions', [PermissionController::class, 'index'])->middleware('permission:'.PermissionEnum::PERMISSION_VIEW_ALL->value);
-
+    Route::get('/owner/dashboard', OwnerDashboardController::class)->middleware('permission:'.PermissionEnum::OWNER_DASHBOARD_VIEW->value);
     Route::prefix('/financial')->group(function () {
         Route::get('/advances', [SalaryAdvanceController::class, 'index'])->middleware('permission:view advances');
         Route::post('/advances', [SalaryAdvanceController::class, 'store'])->middleware('permission:create advance');
