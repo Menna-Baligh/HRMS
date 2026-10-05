@@ -23,17 +23,29 @@ use App\Http\Controllers\Api\GoalController;
 use App\Http\Controllers\Api\GoogleAuthController;
 use App\Http\Controllers\Api\HolidayController;
 use App\Http\Controllers\Api\HrAttendanceController;
+use App\Http\Controllers\Api\HrDashboardController;
 use App\Http\Controllers\Api\HrEvaluationSetupController;
 use App\Http\Controllers\Api\HrGoalController;
 use App\Http\Controllers\Api\HrPerformanceController;
+use App\Http\Controllers\Api\LandingPageController;
 use App\Http\Controllers\Api\LeaveBalanceController;
 use App\Http\Controllers\Api\LeaveDecisionHistoryController;
 use App\Http\Controllers\Api\LeaveRequestController;
 use App\Http\Controllers\Api\LeaveTypeController;
 use App\Http\Controllers\Api\ManagerAttendanceController;
 use App\Http\Controllers\Api\ManagerController;
+use App\Http\Controllers\Api\ManagerDashboardController;
 use App\Http\Controllers\Api\ManagerPerformanceController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\Owner\BonusController;
+use App\Http\Controllers\Api\Owner\DeductionController;
+use App\Http\Controllers\Api\Owner\LandingFeatureController;
+use App\Http\Controllers\Api\Owner\LandingPlanController;
+use App\Http\Controllers\Api\Owner\LandingRoleController;
+use App\Http\Controllers\Api\Owner\LandingSectionController;
+use App\Http\Controllers\Api\Owner\PayrollController;
+use App\Http\Controllers\Api\Owner\SalaryAdvanceController;
+use App\Http\Controllers\Api\OwnerDashboardController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\PolicyController;
 use App\Http\Controllers\Api\SubmissionController;
@@ -72,18 +84,17 @@ Route::middleware('set.app.language')->prefix('auth')->group(function () {
 // holiday
 Route::prefix('holidays')->middleware(['auth:api', 'set.app.language'])->group(function () {
 
-        // All authenticated users with holiday.view permission can view holidays.
-        Route::get('/', [HolidayController::class, 'index'])->middleware('permission:' . PermissionEnum::HOLIDAY_VIEW->value);
+    // All authenticated users with holiday.view permission can view holidays.
+    Route::get('/', [HolidayController::class, 'index'])->middleware('permission:'.PermissionEnum::HOLIDAY_VIEW->value);
 
-        // Only users with holiday.manage permission can manage holidays.
-        Route::middleware('permission:' . PermissionEnum::HOLIDAY_MANAGE->value)->group(function () {
+    // Only users with holiday.manage permission can manage holidays.
+    Route::middleware('permission:'.PermissionEnum::HOLIDAY_MANAGE->value)->group(function () {
 
-                Route::post('/', [HolidayController::class, 'store']);
+        Route::post('/', [HolidayController::class, 'store']);
 
-                Route::put('/{holiday}', [HolidayController::class, 'update']);
+        Route::put('/{holiday}', [HolidayController::class, 'update']);
 
-                Route::delete('/{holiday}', [HolidayController::class, 'destroy']);
-            });
+        Route::delete('/{holiday}', [HolidayController::class, 'destroy']);
     });
 
 
@@ -110,8 +121,8 @@ Route::prefix('company-events')->middleware(['auth:api', 'set.app.language'])->g
 */
 Route::prefix('calendar')->middleware(['auth:api', 'set.app.language'])->group(function () {
 
-        Route::get('/', [CalendarController::class, 'index'])->middleware('permission:' . PermissionEnum::LEAVE_CALENDAR_VIEW->value);
-    });
+    Route::get('/', [CalendarController::class, 'index'])->middleware('permission:'.PermissionEnum::LEAVE_CALENDAR_VIEW->value);
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -153,7 +164,7 @@ Route::prefix('leaves')->middleware('auth:api', 'set.app.language')->group(funct
     // leave details
     Route::get('/leave-requests/{leaveRequest}', [LeaveRequestController::class, 'show']);
     // leave history
-    Route::get('/leave-requests', [LeaveRequestController::class, 'history'])->middleware('permission:' . PermissionEnum::LEAVE_VIEW_HISTORY->value);
+    Route::get('/leave-requests', [LeaveRequestController::class, 'history'])->middleware('permission:'.PermissionEnum::LEAVE_VIEW_HISTORY->value);
 });
      
     // audits
@@ -170,7 +181,7 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
 
     Route::prefix('tasks')->middleware('auth:api', 'set.app.language')->group(function () {
         // Task list
-        Route::get('/', [TaskController::class, 'index'])->middleware('permission:' . PermissionEnum::TASK_VIEW_ALL->value);
+        Route::get('/', [TaskController::class, 'index'])->middleware('permission:'.PermissionEnum::TASK_VIEW_ALL->value);
         // Create task
         Route::post('/', [TaskController::class, 'store']);
         // Update task
@@ -182,9 +193,9 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
         // Update task status
         Route::patch('/{task}/status', [TaskController::class, 'updateStatus']);
         // Task details
-        Route::get('/{task}', [TaskController::class, 'show'])->middleware('permission:' . PermissionEnum::TASK_VIEW->value);
+        Route::get('/{task}', [TaskController::class, 'show'])->middleware('permission:'.PermissionEnum::TASK_VIEW->value);
         // Task activity history
-        Route::get('/{task}/activities', [TaskController::class, 'activities'])->middleware('permission:' . PermissionEnum::TASK_ACTIVITIES_VIEW->value);
+        Route::get('/{task}/activities', [TaskController::class, 'activities'])->middleware('permission:'.PermissionEnum::TASK_ACTIVITIES_VIEW->value);
         // Submit a task
         Route::post('/{task}/submissions', [SubmissionController::class, 'store']);
         // Attach file to submission
@@ -203,12 +214,11 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
         Route::post('/submissions/{submission}/resubmit', [SubmissionController::class, 'resubmit']);
     });
 
-
-/*
-|--------------------------------------------------------------------------
-| policies Management Routes
-|--------------------------------------------------------------------------
-*/
+    /*
+    |--------------------------------------------------------------------------
+    | policies Management Routes
+    |--------------------------------------------------------------------------
+    */
     Route::prefix('policies')->middleware('auth:api')->group(function () {
 
         Route::post('/', [PolicyController::class, 'store'])->middleware('permission:policy.manage');
@@ -279,6 +289,7 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
         Route::get('/attendance/{employeeId}', [ManagerAttendanceController::class, 'show'])->middleware('permission:'.PermissionEnum::MANAGER_VIEW_ATTENDANCE->value);
         Route::get('/team-goals', [ManagerController::class, 'teamGoals'])->middleware('permission:'.PermissionEnum::MANAGER_VIEW_TEAM_GOALS->value);
         Route::get('/team-performance', [ManagerPerformanceController::class, 'teamDashboard'])->middleware('permission:'.PermissionEnum::MANAGER_PERFORMANCE_TEAM->value);
+        Route::get('/dashboard', ManagerDashboardController::class)->middleware('permission:'.PermissionEnum::MANAGER_DASHBOARD_VIEW->value);
     });
 
     Route::prefix('hr')->group(function () {
@@ -289,6 +300,7 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
         Route::get('/attendance/export', [HrAttendanceController::class, 'export'])->middleware('permission:'.PermissionEnum::HR_ATTENDANCE_EXPORT->value);
         Route::get('/goals', [HrGoalController::class, 'index'])->middleware('permission:'.PermissionEnum::HR_GOALS_OVERVIEW->value);
         Route::get('/company-performance', [HrPerformanceController::class, 'companyDashboard'])->middleware('permission:'.PermissionEnum::HR_PERFORMANCE_COMPANY->value);
+        Route::get('/dashboard', HrDashboardController::class)->middleware('permission:'.PermissionEnum::HR_DASHBOARD_VIEW->value);
     });
 
     Route::prefix('goals')->group(function () {
@@ -340,6 +352,7 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
         Route::patch('/{id}/read', [NotificationController::class, 'markAsRead']);
         Route::patch('/read-all', [NotificationController::class, 'markAllAsRead']);
         Route::delete('/clear-all', [NotificationController::class, 'clearAll']);
+        Route::delete('/{id}', [NotificationController::class, 'destroy']);
         Route::post('/fcm-token', [NotificationController::class, 'updateFcmToken']);
     });
 
@@ -349,7 +362,24 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
     });
 
     Route::get('/permissions', [PermissionController::class, 'index'])->middleware('permission:'.PermissionEnum::PERMISSION_VIEW_ALL->value);
+    Route::get('/owner/dashboard', OwnerDashboardController::class)->middleware('permission:'.PermissionEnum::OWNER_DASHBOARD_VIEW->value);
+    Route::prefix('/financial')->group(function () {
+        Route::get('/advances', [SalaryAdvanceController::class, 'index'])->middleware('permission:view advances');
+        Route::post('/advances', [SalaryAdvanceController::class, 'store'])->middleware('permission:create advance');
+        Route::put('/advances/{advance}/status', [SalaryAdvanceController::class, 'updateStatus'])->middleware('permission:manage advance status');
 
+        Route::get('/deductions', [DeductionController::class, 'index'])->middleware('permission:view deductions');
+        Route::post('/deductions', [DeductionController::class, 'store'])->middleware('permission:create deduction');
+
+        Route::get('/bonuses', [BonusController::class, 'index'])->middleware('permission:view bonuses');
+        Route::post('/bonuses', [BonusController::class, 'store'])->middleware('permission:create bonus');
+
+        Route::get('/payroll', [PayrollController::class, 'index'])->middleware('permission:view payroll');
+        Route::post('/payroll/finalize', [PayrollController::class, 'finalize'])->middleware('permission:run payroll');
+        Route::get('/payroll/{payroll}/payslip', [PayrollController::class, 'payslip'])->middleware('permission:view payroll');
+
+        Route::get('/my-salaries', [PayrollController::class, 'mySalaries']);
+    });
 });
 
 Route::middleware(['auth:api', 'set.app.language'])->post('/broadcasting/auth', function (Request $request) {
@@ -376,4 +406,13 @@ Route::prefix('ai')->middleware(['auth:api', 'set.app.language'])->group(functio
 
     Route::post('/policy-assistant', AIPolicyAssistantController::class)
         ->middleware('permission:'.PermissionEnum::AI_POLICY_ASSISTANT->value);
+});
+
+Route::get('/landing-page', [LandingPageController::class, 'index'])->middleware('set.app.language');
+Route::prefix('owner/landing-page')->middleware(['auth:api', 'role:Owner', 'set.app.language'])->group(function () {
+    Route::get('/sections', [LandingSectionController::class, 'index']);
+    Route::put('/sections/{key}', [LandingSectionController::class, 'update']);
+    Route::apiResource('features', LandingFeatureController::class);
+    Route::apiResource('roles', LandingRoleController::class);
+    Route::apiResource('plans', LandingPlanController::class);
 });

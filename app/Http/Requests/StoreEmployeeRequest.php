@@ -40,6 +40,7 @@ class StoreEmployeeRequest extends FormRequest
 
             'phone' => ['nullable', 'string', 'max:20', 'unique:users,phone'],
             'address' => ['nullable', 'string'],
+            'salary' => ['required', 'numeric', 'min:0'],
         ];
     }
 

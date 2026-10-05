@@ -38,7 +38,7 @@ class GoogleAuthController extends Controller
 
     public function callback(): RedirectResponse
     {
-        $frontendUrl = config('app.frontend_url');
+        $frontendUrl = config('app.frontend_url').'/admin/dashboard';
         try {
             $result = $this->googleAuthService->handleGoogleCallback();
 

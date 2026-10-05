@@ -71,4 +71,6 @@ return [
     'goal_progress_updated_body' => ':employee updated progress for goal ":title" to :value',
     'goal_completed_title' => 'Goal Completed 🎉',
     'goal_completed_body' => ':employee completed the goal: :title',
+
+    'deleted' => 'Notification deleted successfully.',
 ];
