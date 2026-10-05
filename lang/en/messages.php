@@ -8,4 +8,5 @@ return [
     'policy_audit_history_retrieved_successfully' => 'Policy audit history retrieved successfully.',
     'no_active_policy_version_found' => 'No active policy version found.',
     'policy_version_not_belong_to_policy' => 'The policy version does not belong to this policy.',
+    'policies_retrieved_successfully' => 'Policies retrieved successfully.',
 ];

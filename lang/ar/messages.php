@@ -8,4 +8,6 @@ return [
     'policy_audit_history_retrieved_successfully' => 'تم استرجاع سجل تغييرات سياسة الشركة بنجاح.',
     'no_active_policy_version_found' => 'لا يوجد إصدار نشط لهذه السياسة.',
     'policy_version_not_belong_to_policy' => 'إصدار السياسة لا ينتمي إلى هذه السياسة.',
+    'policies_retrieved_successfully' => 'تم جلب السياسات بنجاح.',
+
 ];

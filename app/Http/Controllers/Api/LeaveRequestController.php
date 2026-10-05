@@ -8,6 +8,7 @@ use App\Http\Requests\LeaveRequest\RejectLeaveRequestRequest;
 use App\Http\Requests\LeaveRequest\StoreLeaveAttachmentRequest;
 use App\Http\Requests\LeaveRequest\StoreLeaveRequest;
 use App\Models\LeaveRequest;
+use App\Http\Resources\Leaves\LeaveRequestResource;
 use App\Services\FileService;
 use App\Services\LeaveRequests\LeaveRequestService;
 use Illuminate\Http\JsonResponse;
@@ -134,7 +135,7 @@ class LeaveRequestController extends Controller
         );
 
         return ResponseHelper::success(
-            data: $leaveRequest,
+            data: new LeaveRequestResource($leaveRequest),
             message: __('leave_requests.details_retrieved_successfully')
         );
     }
