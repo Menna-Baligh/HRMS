@@ -17346,6 +17346,7 @@ paths:
               example:
                 success: false
                 message: "Failed to fetch dashboard data."
+
 # clear one notificatin
   /api/notifications/{id}:
     delete:
@@ -17381,6 +17382,7 @@ paths:
               - en
             default: en
           example: en
+          
       responses:
         "200":
           description: Notification deleted successfully.
@@ -17468,7 +17470,7 @@ paths:
                 success: false
                 message: Failed to delete notification.
 
-    /api/audits:
+  /api/audits:
     get:
       summary: Get audit logs | allowed for HR, Owner 📱
       operationId: getAuditLogs
@@ -17511,8 +17513,6 @@ paths:
           description: Audit logs retrieved successfully.
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/AuditResponse'
               example:
                 success: true
                 message: Audit logs retrieved successfully.
