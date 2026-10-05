@@ -96,7 +96,7 @@ Route::prefix('holidays')->middleware(['auth:api', 'set.app.language'])->group(f
 
         Route::delete('/{holiday}', [HolidayController::class, 'destroy']);
     });
-
+});
 
 // company events
 Route::prefix('company-events')->middleware(['auth:api', 'set.app.language'])->group(function () {
@@ -166,7 +166,7 @@ Route::prefix('leaves')->middleware('auth:api', 'set.app.language')->group(funct
     // leave history
     Route::get('/leave-requests', [LeaveRequestController::class, 'history'])->middleware('permission:'.PermissionEnum::LEAVE_VIEW_HISTORY->value);
 });
-     
+
     // audits
     Route::prefix('audits')->middleware(['auth:api', 'set.app.language'])->group(function () {
         Route::get('/', [AuditController::class, 'index'])->middleware('permission:' . PermissionEnum::AUDIT_VIEW->value);
