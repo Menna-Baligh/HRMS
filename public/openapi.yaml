@@ -17396,7 +17396,8 @@ paths:
                     type: string
                     example: Notification deleted successfully.
                   data:
-                    type: "null"
+                    type: string
+                    nullable: true
                     example: null
               example:
                 success: true
