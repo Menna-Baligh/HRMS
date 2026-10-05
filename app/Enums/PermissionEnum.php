@@ -151,6 +151,9 @@ enum PermissionEnum: string
     // 15. DropDown
     case VIEW_MANAGERS_DROPDOWN = 'department.view-managers-dropdown';
 
+    // 16
+    case AUDIT_VIEW = 'audit.view';
+
     // Advances Permissions
     case VIEW_ADVANCES = 'view advances';
     case CREATE_ADVANCE = 'create advance';
@@ -204,6 +207,12 @@ enum PermissionEnum: string
             self::POLICY_VERSION_CREATE,
             self::POLICY_VERSION_ACTIVATE,
             self::POLICY_AUDIT_VIEW,
+            self::HOLIDAY_MANAGE => ['HR', 'Owner'],
+            self::VIEW_MANAGERS_DROPDOWN => ['HR', 'Owner'],
+            self::VIEW_MANAGERS_DROPDOWN,
+            self::HR_ATTENDANCE_MANAGE_EXCEPTIONS => ['HR', 'Owner'],
+            self::AUDIT_VIEW,
+
             self::HOLIDAY_MANAGE ,
             self::VIEW_MANAGERS_DROPDOWN ,
             self::HR_ATTENDANCE_MANAGE_EXCEPTIONS,

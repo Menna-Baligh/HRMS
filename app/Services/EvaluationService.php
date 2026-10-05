@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\AuditAction;
 use App\Enums\EvaluationPeriodStatus;
 use App\Enums\EvaluationStatus;
 use App\Models\Evaluation;
@@ -10,16 +11,22 @@ use App\Models\EvaluationEvidence;
 use App\Models\EvaluationPeriod;
 use App\Models\EvaluationScore;
 use App\Models\User;
+use App\Services\AuditService;
 use Exception;
 use Illuminate\Support\Facades\DB;
 
 class EvaluationService
 {
+
+    public function __construct(
+        protected AuditService $auditService
+    ) {}
     public function saveDraft(int $evaluatorUserId, array $data, ?Evaluation $evaluation = null): Evaluation
     {
         return DB::transaction(function () use ($evaluatorUserId, $data, $evaluation) {
             $evaluator = User::findOrFail($evaluatorUserId);
             $targetUserId = $evaluation ? $evaluation->user_id : $data['user_id'];
+            $isNewEvaluation = $evaluation === null;
 
             if (! $evaluator->hasAnyRole(['HR', 'Owner'])) {
                 $isDirectReport = User::where('id', $targetUserId)
@@ -74,8 +81,8 @@ class EvaluationService
                         'goal_id' => $goalId,
                     ]);
                 }
-            }
-            $action = $evaluation->wasRecentlyCreated ? 'created_draft' : 'updated_draft';
+            } 
+            $action = $isNewEvaluation ? 'created_draft' : 'updated_draft';
 
             EvaluationAuditLog::create([
                 'evaluation_id' => $evaluation->id,
@@ -86,6 +93,23 @@ class EvaluationService
                     'feedback_provided' => ! empty($data['feedback']),
                 ],
             ]);
+
+            // audit
+            $this->auditService->record(
+                actor: $evaluator,
+                action: $isNewEvaluation
+                    ? AuditAction::EVALUATION_CREATED
+                    : AuditAction::EVALUATION_UPDATED,
+                entity: $evaluation,
+                metadata: [
+                    'user_id' => $evaluation->user_id,
+                    'evaluator_id' => $evaluation->evaluator_id,
+                    'period_id' => $evaluation->period_id,
+                    'status' => $evaluation->status->value,
+                    'scores_count' => count($data['scores'] ?? []),
+                    'feedback_provided' => ! empty($data['feedback']),
+                ],
+            );
 
             return $evaluation->fresh(['scores.category', 'evidence.goal']);
         });

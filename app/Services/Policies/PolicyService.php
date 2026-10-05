@@ -2,16 +2,22 @@
 
 namespace App\Services\Policies;
 
+use App\Enums\AuditAction;
 use App\Enums\PolicyStatus;
 use App\Enums\PolicyVersionStatus;
 use App\Models\Policy;
 use App\Models\PolicyAudit;
 use App\Models\PolicyVersion;
 use App\Models\User;
+use App\Services\AuditService;
 use Illuminate\Support\Facades\DB;
 
 class PolicyService
 {
+
+    public function __construct(
+        protected AuditService $auditService
+    ) {}
     public function create(User $user, array $policyData, string $content): Policy
     {
         return DB::transaction(function () use ($user, $policyData, $content) {
@@ -23,7 +29,7 @@ class PolicyService
                 'created_by' => $user->id,
             ]);
 
-            PolicyVersion::create([
+            $version = PolicyVersion::create([
                 'policy_id' => $policy->id,
                 'version' => 1,
                 'content' => $content,
@@ -31,6 +37,17 @@ class PolicyService
                 'effective_date' => null,
                 'created_by' => $user->id,
             ]);
+            $this->auditService->record(
+                actor: $user,
+                action: AuditAction::POLICY_CREATED,
+                entity: $policy,
+                metadata: [
+                    'title' => $policy->title,
+                    'status' => $policy->status->value,
+                    'version_id' => $version->id,
+                    'version' => $version->version,
+                ],
+            );
 
             return $policy->load('versions');
         });
@@ -42,7 +59,7 @@ class PolicyService
 
             $nextVersion = ((int) $policy->versions()->max('version')) + 1;
 
-            return PolicyVersion::create([
+            $version =  PolicyVersion::create([
                 'policy_id' => $policy->id,
                 'version' => $nextVersion,
                 'content' => $content,
@@ -50,6 +67,18 @@ class PolicyService
                 'effective_date' => null,
                 'created_by' => $user->id,
             ]);
+            $this->auditService->record(
+                actor: $user,
+                action: AuditAction::POLICY_UPDATED,
+                entity: $policy,
+                metadata: [
+                    'change' => 'version_created',
+                    'version_id' => $version->id,
+                    'version' => $version->version,
+                    'status' => $version->status->value,
+                ],
+            );
+            return $version;
         });
     }
 
@@ -92,7 +121,18 @@ class PolicyService
                 'new_status' => PolicyVersionStatus::Active->value,
                 'description' => "Policy version {$version->version} was activated.",
             ]);
-
+            $this->auditService->record(
+                actor: $user,
+                action: AuditAction::POLICY_ACTIVATED,
+                entity: $policy,
+                metadata: [
+                    'policy_version_id' => $version->id,
+                    'version' => $version->version,
+                    'old_status' => $oldStatus,
+                    'new_status' => PolicyVersionStatus::Active->value,
+                    'effective_date' => $version->effective_date?->toDateString(),
+                ],
+            );
             return $version->refresh();
         });
     }
