@@ -37,6 +37,7 @@ class UserResource extends JsonResource
                     ? __('employment_types.'.strtolower(str_replace(' ', '-', $this->employment_type)))
                     : null,
                 'start_date' => $this->start_date?->format('Y-m-d'),
+                'salary' => (float) ($this->salary ?? 0.00),
             ]),
 
             'status' => $this->status ? __('statuses.'.$this->status) : null,

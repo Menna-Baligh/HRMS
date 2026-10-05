@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Helpers\ResponseHelper;
 use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
@@ -65,9 +66,9 @@ class RoleMiddleware
             return $next($request);
         }
 
-        return response()->json(
-            ['message' => 'Forbidden.'],
-            Response::HTTP_FORBIDDEN
+        return ResponseHelper::error(
+            message: 'You are not authorized to perform this action.',
+            statusCode: Response::HTTP_FORBIDDEN
         );
     }
 }

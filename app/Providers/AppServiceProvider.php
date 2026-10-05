@@ -15,6 +15,7 @@ use App\Policies\LeaveRequestPolicy;
 use App\Policies\LeaveTypePolicy;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -42,5 +43,9 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(LeaveRequestSubmitted::class, SendLeaveSubmittedNotification::class);
         Event::listen(LeaveRequestApproved::class, SendLeaveApprovedNotification::class);
         Event::listen(LeaveRequestRejected::class, SendLeaveRejectedNotification::class);
+
+        if (str_contains(config('app.url'), 'ngrok-free.dev')) {
+            URL::forceScheme('https');
+        }
     }
 }
