@@ -17346,6 +17346,127 @@ paths:
               example:
                 success: false
                 message: "Failed to fetch dashboard data."
+# clear one notificatin
+  /api/notifications/{id}:
+    delete:
+      summary: Delete a single notification 📱
+      description: Deletes a specific notification by its ID for the authenticated user.
+      operationId: deleteNotification
+      tags:
+        - Notifications
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The unique ID of the notification to delete.
+          schema:
+            type: string
+          example: "1"
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en
+            default: en
+          example: en
+      responses:
+        "200":
+          description: Notification deleted successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Notification deleted successfully.
+                  data:
+                    type: "null"
+                    example: null
+              example:
+                success: true
+                message: Notification deleted successfully.
+                data: null
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated
+              example:
+                success: false
+                message: Unauthenticated
+        "403":
+          description: Unauthorized to delete this notification
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthorized to access this notification.
+              example:
+                success: false
+                message: Unauthorized to access this notification.
+        "404":
+          description: Notification not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Notification not found.
+              example:
+                success: false
+                message: Notification not found.
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Failed to delete notification.
+              example:
+                success: false
+                message: Failed to delete notification.
+
 components:
   securitySchemes:
     bearerAuth:
