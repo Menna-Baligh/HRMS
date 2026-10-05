@@ -2,15 +2,16 @@
 
 namespace App\Services\Tasks;
 
+use App\Enums\AuditAction;
 use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
 use App\Enums\UserRole;
 use App\Jobs\SendNotificationJob;
-use App\Models\Employee;
 use App\Models\Task;
 use App\Models\TaskActivity;
 use App\Models\TaskAssignment;
 use App\Models\User;
+use App\Services\AuditService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -20,6 +21,10 @@ use Illuminate\Validation\ValidationException;
 
 class TaskService
 {
+
+    public function __construct(
+        protected AuditService $auditService
+    ) {}
     /**
      * Create a new task.
      */
@@ -43,6 +48,19 @@ class TaskService
                 userId: Auth::id(),
                 action: 'created',
                 description: 'Task created.'
+            );
+
+            // audit 
+            $this->auditService->record(
+                actor: Auth::user(),
+                action: AuditAction::TASK_CREATED,
+                entity: $task,
+                metadata: [
+                    'title' => $task->title,
+                    'priority' => $task->priority->value,
+                    'status' => $task->status->value,
+                    'deadline' => $task->deadline?->toDateTimeString(),
+                ],
             );
 
             return $task;
@@ -90,6 +108,17 @@ class TaskService
                 description: 'Task details updated.'
             );
 
+            // audit 
+            $this->auditService->record(
+                actor: Auth::user(),
+                action: AuditAction::TASK_UPDATED,
+                entity: $task,
+                metadata: [
+                    'old_values' => $oldValues,
+                    'new_values' => $newValues,
+                ],
+            );
+
             return $task->refresh();
         });
     }
@@ -123,6 +152,18 @@ class TaskService
                 userId: Auth::id(),
                 action: 'assigned',
                 description: "Task assigned to user #{$user->id}."
+            );
+
+            // audit 
+            $this->auditService->record(
+                actor: Auth::user(),
+                action: AuditAction::TASK_ASSIGNED,
+                entity: $task,
+                metadata: [
+                    'assigned_user_id' => $user->id,
+                    'assigned_by' => Auth::id(),
+                    'assignment_id' => $assignment->id,
+                ],
             );
 
             return $assignment;
@@ -187,6 +228,18 @@ class TaskService
                 description: __('tasks.progress_updated')
             );
 
+            // audit 
+            $this->auditService->record(
+                actor: $user,
+                action: AuditAction::TASK_PROGRESS_UPDATED,
+                entity: $task,
+                metadata: [
+                    'old_progress' => (int) $oldProgress,
+                    'new_progress' => $progress,
+                    'user_id' => $user->id,
+                ],
+            );
+
             return $task->refresh();
         });
     }
@@ -245,6 +298,18 @@ class TaskService
                 oldValue: $oldStatus->value,
                 newValue: $status->value,
                 description: __('tasks.status_updated')
+            );
+
+            // audit 
+            $this->auditService->record(
+                actor: $user,
+                action: AuditAction::TASK_STATUS_CHANGED,
+                entity: $task,
+                metadata: [
+                    'old_status' => $oldStatus->value,
+                    'new_status' => $status->value,
+                    'user_id' => $user->id,
+                ],
             );
 
             return $task->refresh();

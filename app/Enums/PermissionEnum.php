@@ -152,6 +152,10 @@ enum PermissionEnum: string
     // 15. DropDown
     case VIEW_MANAGERS_DROPDOWN = 'department.view-managers-dropdown';
 
+    // 16
+    case AUDIT_VIEW = 'audit.view';
+
+
     public function defaultRoles(): array
     {
         return match ($this) {
@@ -187,6 +191,8 @@ enum PermissionEnum: string
             self::VIEW_MANAGERS_DROPDOWN => ['HR', 'Owner'],
             self::VIEW_MANAGERS_DROPDOWN,
             self::HR_ATTENDANCE_MANAGE_EXCEPTIONS => ['HR', 'Owner'],
+            self::AUDIT_VIEW,
+
 
             // Manager, HR & Owner
             self::MANAGER_VIEW_EMPLOYEES,

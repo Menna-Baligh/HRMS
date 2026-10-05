@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\AIPolicyAssistantController;
 use App\Http\Controllers\Api\AISkillGapController;
 use App\Http\Controllers\Api\AITeamInsightController;
 use App\Http\Controllers\Api\AttendanceController;
+use App\Http\Controllers\Api\AuditController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CalendarController;
 use App\Http\Controllers\Api\CompanyEventController;
@@ -84,7 +85,7 @@ Route::prefix('holidays')->middleware(['auth:api', 'set.app.language'])->group(f
                 Route::delete('/{holiday}', [HolidayController::class, 'destroy']);
             });
     });
-});
+
 
 // company events
 Route::prefix('company-events')->middleware(['auth:api', 'set.app.language'])->group(function () {
@@ -154,7 +155,11 @@ Route::prefix('leaves')->middleware('auth:api', 'set.app.language')->group(funct
     // leave history
     Route::get('/leave-requests', [LeaveRequestController::class, 'history'])->middleware('permission:' . PermissionEnum::LEAVE_VIEW_HISTORY->value);
 });
-
+     
+    // audits
+    Route::prefix('audits')->middleware(['auth:api', 'set.app.language'])->group(function () {
+        Route::get('/', [AuditController::class, 'index'])->middleware('permission:' . PermissionEnum::AUDIT_VIEW->value);
+    });
 /*
 |--------------------------------------------------------------------------
 | Task Management Routes

@@ -277,4 +277,12 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(PolicyVersion::class, 'created_by');
     }
+
+    /**
+    * Audit events performed by the user.
+    */
+    public function audits(): HasMany
+    {
+        return $this->hasMany(Audit::class, 'actor_id');
+    }
 }
