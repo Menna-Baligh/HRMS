@@ -26,7 +26,7 @@ class LeaveRequest extends Model
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
-        'days' => 'decimal:2',
+        'days' => 'integer',
         'reviewed_at' => 'datetime',
         'status' => LeaveStatus::class,
     ];
