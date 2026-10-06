@@ -9,22 +9,23 @@ use Illuminate\Support\Facades\Schema;
 class FixAutoIncrement extends Command
 {
     protected $signature = 'db:fix-auto-increment';
-    protected $description = 'Fix AUTO_INCREMENT for all tables with an id column';
+    protected $description = 'Fix AUTO_INCREMENT for numeric id columns across all tables';
 
     public function handle()
     {
         Schema::disableForeignKeyConstraints();
 
-        // جلب جميع الجداول التي تمتلك عمود id وبدون auto_increment
+        // جلب الجداول الرقمية فقط (INT / BIGINT) التي تحتوي على id وبدون auto_increment
         $columns = DB::select("
             SELECT TABLE_NAME, DATA_TYPE
             FROM INFORMATION_SCHEMA.COLUMNS
             WHERE TABLE_SCHEMA = DATABASE()
             AND COLUMN_NAME = 'id'
+            AND DATA_TYPE IN ('int', 'bigint', 'mediumint', 'smallint', 'tinyint')
             AND EXTRA NOT LIKE '%auto_increment%'
         ");
 
-        if (empty($columns)) {$this->info('جميع الجداول سليمة وتحتوي على AUTO_INCREMENT بالفعل! 🎉');
+        if (empty($columns)) {$this->info('جميع الجداول الرقمية سليمة وتحتوي على AUTO_INCREMENT بالفعل! 🎉');
             Schema::enableForeignKeyConstraints();
             return;
         }
@@ -35,15 +36,18 @@ class FixAutoIncrement extends Command
 
             $this->info("جاري إصلاح الجدول: {$table} ...");
 
-            if ($type === 'bigint') {
-                DB::statement("ALTER TABLE `{$table}` MODIFY COLUMN `id` BIGINT UNSIGNED AUTO_INCREMENT;");
-            } else {
-                DB::statement("ALTER TABLE `{$table}` MODIFY COLUMN `id` INT UNSIGNED AUTO_INCREMENT;");
+            try {
+                if ($type === 'bigint') {
+                    DB::statement("ALTER TABLE `{$table}` MODIFY COLUMN `id` BIGINT UNSIGNED AUTO_INCREMENT;");
+                } else {
+                    DB::statement("ALTER TABLE `{$table}` MODIFY COLUMN `id` INT UNSIGNED AUTO_INCREMENT;");
+                }
+            } catch (\Exception $e) {$this->error("تعذر إصلاح الجدول {$table}: " . $e->getMessage());
             }
         }
 
         Schema::enableForeignKeyConstraints();
 
-        $this->info('تم إصلاح جميع الجداول بنجاح! 🚀');
+        $this->info('تمت عملية فحص وإصلاح كافة الجداول بنجاح! 🚀');
     }
 }
