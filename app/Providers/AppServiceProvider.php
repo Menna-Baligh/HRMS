@@ -15,8 +15,12 @@ use App\Policies\LeaveRequestPolicy;
 use App\Policies\LeaveTypePolicy;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\Mailer\Bridge\Brevo\Transport\BrevoTransportFactory;
+use Symfony\Component\Mailer\Transport\Dsn;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -47,5 +51,11 @@ class AppServiceProvider extends ServiceProvider
         if (str_contains(config('app.url'), 'ngrok-free.dev')) {
             URL::forceScheme('https');
         }
+
+        Mail::extend('brevo', function (array $config = []) {
+            $key = $config['key'] ?? env('BREVO_KEY');
+            $client = HttpClient::create();
+            return (new BrevoTransportFactory(null, $client))->create(new Dsn('brevo+api', 'default', $key));
+        });
     }
 }
