@@ -1,1 +1,2 @@
 web: mkdir -p storage/app && echo "$FIREBASE_CREDENTIALS" | base64 -d > storage/app/firebase-credentials.json && php artisan migrate --force && php artisan db:seed --class=RolesAndPermissionsSeeder --force && php artisan permission:cache-reset && php artisan config:cache && php artisan route:cache && php artisan view:cache && (php artisan reverb:start --host=0.0.0.0 --port=8090 &) && (php artisan queue:work --tries=3 --timeout=0 &) && php artisan serve --host=0.0.0.0 --port=$PORT
+release: php artisan storage:link --force
