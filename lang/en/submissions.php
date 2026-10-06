@@ -14,5 +14,6 @@ return [
     'resubmitted_successfully' => 'Submission resubmitted successfully.',
     'only_changes_requested_can_be_resubmitted' => 'Only submissions with requested changes can be resubmitted.',
     'not_submission_owner' => 'You are not the owner of this submission.',
+    'submission_created_successfully' => 'Submission created successfully',
 
 ];

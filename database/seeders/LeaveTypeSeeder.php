@@ -16,6 +16,7 @@ class LeaveTypeSeeder extends Seeder
                 'is_active' => true,
                 'requires_balance' => true,
                 'requires_attachment' => false,
+                'default_days'=>21,
             ],
             [
                 'name' => 'Sick Leave',
@@ -23,6 +24,8 @@ class LeaveTypeSeeder extends Seeder
                 'is_active' => true,
                 'requires_balance' => true,
                 'requires_attachment' => true,
+                'default_days'=>21,
+
             ],
             [
                 'name' => 'Emergency Leave',
@@ -30,6 +33,8 @@ class LeaveTypeSeeder extends Seeder
                 'is_active' => true,
                 'requires_balance' => true,
                 'requires_attachment' => false,
+                'default_days'=>21,
+
             ],
             [
                 'name' => 'Unpaid Leave',
@@ -37,6 +42,8 @@ class LeaveTypeSeeder extends Seeder
                 'is_active' => true,
                 'requires_balance' => false,
                 'requires_attachment' => false,
+                'default_days'=>21,
+
             ],
         ];
 

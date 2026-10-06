@@ -102,8 +102,7 @@ enum PermissionEnum: string
     case LEAVE_REQUEST_VIEW_OWN = 'leave_request.view_own';
     case LEAVE_REQUEST_CREATE = 'leave_request.create';
     case LEAVE_REQUEST_CANCEL = 'leave_request.cancel';
-    case LEAVE_APPROVE_MANAGER = 'leave.approve_manager';
-    case LEAVE_APPROVE_HR = 'leave.approve_hr';
+    case LEAVE_APPROVE = 'leave.approve';
     case LEAVE_REJECT = 'leave.reject';
     case LEAVE_VIEW_HISTORY = 'leave.view_history';
     case LEAVE_QUEUE_MANAGER = 'leave.queue_manager';
@@ -199,7 +198,6 @@ enum PermissionEnum: string
             self::HR_PERFORMANCE_COMPANY,
             self::PERMISSION_VIEW_ALL,
             self::LEAVE_TYPE_MANAGE,
-            self::LEAVE_APPROVE_HR,
             self::LEAVE_REJECT,
             self::LEAVE_QUEUE_HR,
             self::COMPANY_EVENT_MANAGE,
@@ -242,7 +240,7 @@ enum PermissionEnum: string
             self::EVALUATION_COMPLETE,
             self::EVALUATION_VIEW_MANAGER,
             self::MANAGER_PERFORMANCE_TEAM,
-            self::LEAVE_APPROVE_MANAGER,
+            self::LEAVE_APPROVE => ['Manager', 'HR', 'Owner'],
             self::LEAVE_QUEUE_MANAGER,
             self::AI_EVALUATION_DRAFT,
             self::AI_ATTENTION_SIGNAL,

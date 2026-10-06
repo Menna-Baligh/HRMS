@@ -17,9 +17,9 @@ return new class extends Migration
             // Only active leave types can be used in leave requests
             $table->boolean('is_active')->default(true);
             // Determines whether this leave type requires a balance
-            $table->boolean('requires_balance')->default(true)->comment('If true, a leave balance must exist and have enough days.');
+            $table->boolean('requires_balance')->default(true);
             // Determines whether an attachment is required
-            $table->boolean('requires_attachment')->default(false)->comment('If true, the employee must upload an attachment.');
+            $table->boolean('requires_attachment')->default(false);
             $table->timestamps();
         });
     }

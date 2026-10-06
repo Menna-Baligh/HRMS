@@ -14,5 +14,6 @@ return [
     'resubmitted_successfully' => 'تم إعادة إرسال التسليم بنجاح.',
     'only_changes_requested_can_be_resubmitted' => 'يمكن إعادة إرسال التسليمات التي تم طلب تعديلات عليها فقط.',
     'not_submission_owner' => 'أنت لست صاحب هذا التسليم.',
+    'submission_created_successfully' => 'تم إنشاء التسليم بنجاح.',
 
 ];

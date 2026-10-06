@@ -56,21 +56,13 @@ class LeaveRequestService
                     __('leave_requests.overlap')
                 );
             }
-    
+  
 
-            // dd([
-            //     'user_id' => $user->id,
-            //     'user_name' => $user->name,
-            //     'user_email' => $user->email,
-            //     'user_role' => $user->role?->value ?? $user->role,
-            //     'leave_type_id' => $leaveType->id,
-            //     'year' => $startDate->year,
-            //     'balance' => \App\Models\LeaveBalance::where('user_id', $user->id)
-            //         ->where('leave_type_id', $leaveType->id)
-            //         ->where('year', $startDate->year)
-            //         ->first(),
-            // ]);
-
+            // create balance 
+            $this->leaveBalanceService->createBalancesForUser(
+                user: $user,
+                year: $startDate->year
+            );
 
             $this->leaveBalanceService->validateBalance(
                 user: $user,
