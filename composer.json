@@ -23,7 +23,8 @@
         "maatwebsite/excel": "^4.0",
         "scalar/laravel": "^0.4.0",
         "spatie/laravel-permission": "^8.3",
-        "tymon/jwt-auth": "^2.3"
+        "tymon/jwt-auth": "^2.3",
+        "ext-gd": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -100,9 +101,7 @@
         }
 
     },
-    "platform": {
-        "ext-gd": "8.3"
-    },
+
     "minimum-stability": "stable",
     "prefer-stable": true
 }
