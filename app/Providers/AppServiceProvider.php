@@ -52,6 +52,10 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
+        if (config('app.env') === 'production') {
+            URL::forceScheme('https');
+        }
+
         Mail::extend('brevo', function (array $config = []) {
             $key = $config['key'] ?? env('BREVO_KEY');
             $client = HttpClient::create();
