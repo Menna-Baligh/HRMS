@@ -10,6 +10,9 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
+        "ext-gd": "*",
+        "ext-pcntl": "*",
+        "ext-zip": "*",
         "barryvdh/laravel-dompdf": "^3.1",
         "ichtrojan/laravel-otp": "^2.0",
         "knuckleswtf/scribe": "^5.11",
@@ -23,6 +26,8 @@
         "maatwebsite/excel": "^4.0",
         "scalar/laravel": "^0.4.0",
         "spatie/laravel-permission": "^8.3",
+        "symfony/brevo-mailer": "7.2",
+        "symfony/http-client": "^7.4",
         "tymon/jwt-auth": "^2.3"
     },
     "require-dev": {
@@ -93,11 +98,14 @@
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true,
+        "platform-check": false,
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
         }
+
     },
+
     "minimum-stability": "stable",
     "prefer-stable": true
 }
