@@ -37,10 +37,11 @@ class AITeamInsightService
         $aiBaseUrl = config('services.ai.base_url', 'http://127.0.0.1:8000/api');
 
         try {
-            $response = Http::timeout(15)
+            $response =  Http::timeout(60)
+                ->connectTimeout(10)
                 ->withHeaders([
-                    'X-Caller-ID' => $currentUser->employee_id ?? (string) $currentUser->id,
-                    'X-Role' => $aiRoleHeader,
+                    'X-Caller-Employee-ID' => $currentUser->employee_id ?? (string) $currentUser->id,
+                    'X-Caller-Role' => $aiRoleHeader,
                 ])
                 ->post("{$aiBaseUrl}/team-insight", $payload);
 

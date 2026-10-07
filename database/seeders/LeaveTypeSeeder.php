@@ -16,7 +16,7 @@ class LeaveTypeSeeder extends Seeder
                 'is_active' => true,
                 'requires_balance' => true,
                 'requires_attachment' => false,
-                'default_days'=>21,
+                'default_days' => 21,
             ],
             [
                 'name' => 'Sick Leave',
@@ -24,7 +24,7 @@ class LeaveTypeSeeder extends Seeder
                 'is_active' => true,
                 'requires_balance' => true,
                 'requires_attachment' => true,
-                'default_days'=>21,
+                'default_days' => 21,
 
             ],
             [
@@ -33,7 +33,7 @@ class LeaveTypeSeeder extends Seeder
                 'is_active' => true,
                 'requires_balance' => true,
                 'requires_attachment' => false,
-                'default_days'=>21,
+                'default_days' => 21,
 
             ],
             [
@@ -42,7 +42,7 @@ class LeaveTypeSeeder extends Seeder
                 'is_active' => true,
                 'requires_balance' => false,
                 'requires_attachment' => false,
-                'default_days'=>21,
+                'default_days' => 21,
 
             ],
         ];

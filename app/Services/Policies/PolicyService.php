@@ -14,10 +14,10 @@ use Illuminate\Support\Facades\DB;
 
 class PolicyService
 {
-
     public function __construct(
         protected AuditService $auditService
     ) {}
+
     public function create(User $user, array $policyData, string $content): Policy
     {
         return DB::transaction(function () use ($user, $policyData, $content) {
@@ -59,7 +59,7 @@ class PolicyService
 
             $nextVersion = ((int) $policy->versions()->max('version')) + 1;
 
-            $version =  PolicyVersion::create([
+            $version = PolicyVersion::create([
                 'policy_id' => $policy->id,
                 'version' => $nextVersion,
                 'content' => $content,
@@ -78,6 +78,7 @@ class PolicyService
                     'status' => $version->status->value,
                 ],
             );
+
             return $version;
         });
     }
@@ -133,6 +134,7 @@ class PolicyService
                     'effective_date' => $version->effective_date?->toDateString(),
                 ],
             );
+
             return $version->refresh();
         });
     }

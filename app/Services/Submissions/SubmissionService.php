@@ -33,16 +33,16 @@ class SubmissionService
     public function create(Task $task, array $data): Submission
     {
         $submission = DB::transaction(function () use ($task, $data) {
-    
+
             $user = $this->getAuthenticatedEmployee();
-    
+
             $this->ensureTaskCanBeSubmitted($task);
-    
+
             $this->ensureUserAssignedToTask(
                 task: $task,
                 user: $user
             );
-    
+
             $existingSubmission = Submission::where('task_id', $task->id)
                 ->where('user_id', $user->id)
                 ->whereIn('status', [
@@ -50,13 +50,13 @@ class SubmissionService
                     SubmissionStatus::APPROVED->value,
                 ])
                 ->exists();
-    
+
             if ($existingSubmission) {
                 throw ValidationException::withMessages([
                     'submission' => 'You already have an active submission for this task.',
                 ]);
             }
-    
+
             $submission = Submission::create([
                 'task_id' => $task->id,
                 'user_id' => $user->id,
@@ -64,7 +64,7 @@ class SubmissionService
                 'status' => SubmissionStatus::PENDING_REVIEW,
                 'submitted_at' => now(),
             ]);
-    
+
             /*
              * Record the submission creation in the unified audit log.
              */
@@ -78,10 +78,10 @@ class SubmissionService
                     'status' => SubmissionStatus::PENDING_REVIEW->value,
                 ],
             );
-    
+
             return $submission;
         });
-    
+
         if ($task->creator) {
             SendNotificationJob::dispatch(
                 user: $task->creator,
@@ -97,7 +97,7 @@ class SubmissionService
                 ]
             );
         }
-    
+
         return $submission;
     }
 
@@ -235,21 +235,21 @@ class SubmissionService
     public function approve(Submission $submission): Submission
     {
         $submission = DB::transaction(function () use ($submission) {
-    
+
             $this->ensureReviewerCanAccess($submission);
-    
+
             $this->ensureSubmissionCanBeReviewed($submission);
-    
+
             $submission->update([
                 'status' => SubmissionStatus::APPROVED,
             ]);
-    
+
             $this->createReview(
                 submission: $submission,
                 action: 'approved',
                 feedback: null
             );
-    
+
             /*
              * Record the submission approval in the unified audit log.
              */
@@ -263,10 +263,10 @@ class SubmissionService
                     'reviewer_id' => Auth::id(),
                 ],
             );
-    
+
             return $submission->refresh();
         });
-    
+
         if ($submission->user) {
             SendNotificationJob::dispatch(
                 user: $submission->user,
@@ -281,7 +281,7 @@ class SubmissionService
                 ]
             );
         }
-    
+
         return $submission;
     }
 
@@ -310,8 +310,8 @@ class SubmissionService
 
             /*
              * Record the submission approval in the unified audit log.
-             */         
-               $this->auditService->record(
+             */
+            $this->auditService->record(
                 actor: Auth::user(),
                 action: AuditAction::SUBMISSION_REJECTED,
                 entity: $submission,
@@ -367,10 +367,10 @@ class SubmissionService
                 action: 'changes_requested',
                 feedback: $feedback
             );
-            
-             /*
-             * Record the submission approval in the unified audit log.
-             */  
+
+            /*
+            * Record the submission approval in the unified audit log.
+            */
             $this->auditService->record(
                 actor: Auth::user(),
                 action: AuditAction::SUBMISSION_CHANGES_REQUESTED,

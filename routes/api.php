@@ -167,10 +167,10 @@ Route::prefix('leaves')->middleware('auth:api', 'set.app.language')->group(funct
     Route::get('/leave-requests', [LeaveRequestController::class, 'history'])->middleware('permission:'.PermissionEnum::LEAVE_VIEW_HISTORY->value);
 });
 
-    // audits
-    Route::prefix('audits')->middleware(['auth:api', 'set.app.language'])->group(function () {
-        Route::get('/', [AuditController::class, 'index'])->middleware('permission:' . PermissionEnum::AUDIT_VIEW->value);
-    });
+// audits
+Route::prefix('audits')->middleware(['auth:api', 'set.app.language'])->group(function () {
+    Route::get('/', [AuditController::class, 'index'])->middleware('permission:'.PermissionEnum::AUDIT_VIEW->value);
+});
 /*
 |--------------------------------------------------------------------------
 | Task Management Routes
@@ -337,11 +337,11 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
         Route::post('/leave-types', [LeaveTypeController::class, 'store'])->middleware('permission:'.PermissionEnum::LEAVE_REQUEST_CREATE->value);
         Route::get('/leave-types', [LeaveTypeController::class, 'index'])->middleware('permission:'.PermissionEnum::LEAVE_BALANCE_VIEW->value);
         Route::put('/leave-types/{leaveType}', [LeaveTypeController::class, 'update'])->middleware('permission:'.PermissionEnum::LEAVE_REQUEST_CREATE->value);
-        Route::patch('/leave-types/{leaveType}/activate', [LeaveTypeController::class, 'activate'])->middleware('permission:' . PermissionEnum::LEAVE_APPROVE->value);
-        Route::patch('/leave-types/{leaveType}/deactivate', [LeaveTypeController::class, 'deactivate'])->middleware('permission:' . PermissionEnum::LEAVE_APPROVE->value);
+        Route::patch('/leave-types/{leaveType}/activate', [LeaveTypeController::class, 'activate'])->middleware('permission:'.PermissionEnum::LEAVE_APPROVE->value);
+        Route::patch('/leave-types/{leaveType}/deactivate', [LeaveTypeController::class, 'deactivate'])->middleware('permission:'.PermissionEnum::LEAVE_APPROVE->value);
         Route::get('/leave-balances', [LeaveBalanceController::class, 'index'])->middleware('permission:'.PermissionEnum::LEAVE_BALANCE_VIEW->value);
         Route::post('/leave-requests', [LeaveRequestController::class, 'store'])->middleware('permission:'.PermissionEnum::LEAVE_REQUEST_CREATE->value);
-        Route::patch('/leave-requests/{leaveRequest}/approve', [LeaveRequestController::class, 'approve'])->middleware('permission:' . PermissionEnum::LEAVE_APPROVE->value);
+        Route::patch('/leave-requests/{leaveRequest}/approve', [LeaveRequestController::class, 'approve'])->middleware('permission:'.PermissionEnum::LEAVE_APPROVE->value);
         Route::patch('/leave-requests/{leaveRequest}/reject', [LeaveRequestController::class, 'reject'])->middleware('permission:'.PermissionEnum::LEAVE_REJECT->value);
         Route::get('/leave-requests', [LeaveRequestController::class, 'history'])->middleware('permission:'.PermissionEnum::LEAVE_VIEW_HISTORY->value);
     });
