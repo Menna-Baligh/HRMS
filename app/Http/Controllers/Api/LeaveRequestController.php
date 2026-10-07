@@ -167,42 +167,57 @@ class LeaveRequestController extends Controller
         );
     }
 
-    public function storeAttachment(StoreLeaveAttachmentRequest $request, int $leaveRequest): JsonResponse
-    {
-        try {
-            $leaveRequestModel = LeaveRequest::findOrFail($leaveRequest);
+public function storeAttachment(StoreLeaveAttachmentRequest $request,int $leaveRequest): JsonResponse {
+    $leaveRequestModel = LeaveRequest::find($leaveRequest);
 
-            $user = $request->user();
+    if ($leaveRequestModel === null) {
+        return ResponseHelper::error(
+            errors: null,
+            message: __('leave_requests.not_found'),
+            statusCode: 404
+        );
+    }
 
-            if ($leaveRequestModel->user_id !== $user->id) {
-                return ResponseHelper::error(
-                    errors: null,
-                    message: __('leave_requests.unauthorized_attachment'),
-                    statusCode: 403
-                );
-            }
+    try {
+        $user = $request->user();
 
-            $file = $this->fileService->uploadFile(
-                file: $request->file('file'),
-                user: $user,
-                fileable: $leaveRequestModel
-            );
-
-            return ResponseHelper::success(
-                data: $file,
-                message: __('leave_requests.attachment_uploaded_successfully'),
-                statusCode: 201
-            );
-        } catch (\Throwable $exception) {
-            Log::error(
-                'Leave attachment upload error: '.$exception->getMessage()
-            );
-
+        if ($leaveRequestModel->user_id !== $user->id) {
             return ResponseHelper::error(
                 errors: null,
-                message: __('leave_requests.attachment_upload_failed'),
-                statusCode: 500
+                message: __('leave_requests.unauthorized_attachment'),
+                statusCode: 403
             );
         }
+
+        $file = $this->fileService->uploadFile(
+            file: $request->file('file'),
+            user: $user,
+            fileable: $leaveRequestModel
+        );
+
+        return ResponseHelper::success(
+            data: $file,
+            message: __('leave_requests.attachment_uploaded_successfully'),
+            statusCode: 201
+        );
+
+    } catch (\Throwable $exception) {
+        Log::error(
+            'Leave attachment upload error',
+            [
+                'message' => $exception->getMessage(),
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'leave_request_id' => $leaveRequest,
+                'user_id' => $request->user()?->id,
+            ]
+        );
+
+        return ResponseHelper::error(
+            errors: null,
+            message: __('leave_requests.attachment_upload_failed'),
+            statusCode: 500
+        );
     }
+}
 }

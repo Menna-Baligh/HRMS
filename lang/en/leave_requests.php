@@ -18,4 +18,5 @@ return [
     'details_retrieved_successfully' => 'Leave request details retrieved successfully.',
     'manager_queue_retrieved_successfully' => 'Pending leave requests retrieved successfully.',
     'hr_queue_retrieved_successfully' => 'Pending leave requests retrieved successfully.',
+    'not_found' => 'Leave request not found.',
 ];
