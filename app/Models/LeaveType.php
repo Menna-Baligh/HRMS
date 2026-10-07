@@ -17,7 +17,7 @@ class LeaveType extends Model
     ];
 
     protected $casts = [
-        'default_days' => 'decimal:2',
+        'default_days' => 'float',
         'is_active' => 'boolean',
         'requires_balance' => 'boolean',
         'requires_attachment' => 'boolean',
