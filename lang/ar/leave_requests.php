@@ -17,4 +17,5 @@ return [
     'details_retrieved_successfully' => 'تم استرجاع تفاصيل طلب الإجازة بنجاح.',
     'manager_queue_retrieved_successfully' => 'تم استرجاع طلبات الإجازات المعلقة بنجاح.',
     'hr_queue_retrieved_successfully' => 'تم استرجاع طلبات الإجازات المعلقة بنجاح.',
+    'not_found' => 'طلب الإجازة غير موجود.',
 ];
