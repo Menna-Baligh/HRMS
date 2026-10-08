@@ -6,7 +6,9 @@ use App\Mail\EmployeeInvitationMail;
 use App\Models\CompanyLocation;
 use App\Models\Department;
 use App\Models\User;
+use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\Response;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -199,5 +201,20 @@ class EmployeeService
             })
             ->latest()
             ->paginate($perPage);
+    }
+
+    public function deleteEmployee(int $id, User $currentUser): bool
+    {
+        $employee = User::find($id);
+
+        if (! $employee) {
+            throw new Exception(__('employees.not_found'), Response::HTTP_NOT_FOUND);
+        }
+
+        if ($employee->id === $currentUser->id) {
+            throw new Exception(__('employees.cannot_delete_self'), Response::HTTP_FORBIDDEN);
+        }
+
+        return (bool) $employee->delete();
     }
 }
