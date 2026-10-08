@@ -27,20 +27,20 @@ class LeaveRequestService
         return DB::transaction(function () use ($user, $data) {
             $startDate = Carbon::parse($data['start_date'])->startOfDay();
             $endDate = Carbon::parse($data['end_date'])->startOfDay();
-    
+
             $days = $startDate->diffInDays($endDate) + 1;
-    
+
             $leaveType = LeaveType::query()
                 ->whereKey($data['leave_type_id'])
                 ->where('is_active', true)
                 ->first();
-    
+
             if (! $leaveType) {
                 throw new RuntimeException(
                     __('leave_requests.leave_type_inactive')
                 );
             }
-    
+
             $hasOverlap = LeaveRequest::query()
                 ->where('user_id', $user->id)
                 ->whereIn('status', [
@@ -50,15 +50,14 @@ class LeaveRequestService
                 ->where('start_date', '<=', $endDate)
                 ->where('end_date', '>=', $startDate)
                 ->exists();
-    
+
             if ($hasOverlap) {
                 throw new RuntimeException(
                     __('leave_requests.overlap')
                 );
             }
-  
 
-            // create balance 
+            // create balance
             $this->leaveBalanceService->createBalancesForUser(
                 user: $user,
                 year: $startDate->year
@@ -70,7 +69,7 @@ class LeaveRequestService
                 requestedDays: $days,
                 year: $startDate->year
             );
-    
+
             $leaveRequest = LeaveRequest::create([
                 'user_id' => $user->id,
                 'leave_type_id' => $leaveType->id,
@@ -80,8 +79,8 @@ class LeaveRequestService
                 'reason' => $data['reason'] ?? null,
                 'status' => LeaveStatus::Pending->value,
             ]);
-    
-              // record audit
+
+            // record audit
             $this->auditService->record(
                 actor: $user,
                 action: AuditAction::LEAVE_CREATED,
@@ -94,7 +93,7 @@ class LeaveRequestService
                     'days' => $days,
                 ],
             );
-    
+
             return $leaveRequest;
         });
     }
@@ -166,31 +165,31 @@ class LeaveRequestService
         });
     }
 
-    public function reject(LeaveRequest $leaveRequest,int $reviewerId,string $rejectionReason): LeaveRequest {
-        return DB::transaction(function () use ($leaveRequest,$reviewerId,$rejectionReason,) 
-        {
+    public function reject(LeaveRequest $leaveRequest, int $reviewerId, string $rejectionReason): LeaveRequest
+    {
+        return DB::transaction(function () use ($leaveRequest, $reviewerId, $rejectionReason) {
             $leaveRequest = LeaveRequest::query()
                 ->lockForUpdate()
                 ->findOrFail($leaveRequest->id);
-    
+
             if ($leaveRequest->status !== LeaveStatus::Pending) {
                 throw new RuntimeException(
                     __('leave_requests.only_pending_reject')
                 );
             }
-    
+
             // Get the reviewer who rejected the leave request.
             $reviewer = User::findOrFail($reviewerId);
-    
+
             $previousStatus = $leaveRequest->status->value;
-    
+
             $leaveRequest->update([
                 'status' => LeaveStatus::Rejected->value,
                 'rejection_reason' => $rejectionReason,
                 'reviewed_by' => $reviewerId,
                 'reviewed_at' => now(),
             ]);
-    
+
             LeaveDecision::create([
                 'leave_request_id' => $leaveRequest->id,
                 'reviewer_id' => $reviewerId,
@@ -199,7 +198,7 @@ class LeaveRequestService
                 'reason' => $rejectionReason,
                 'decided_at' => now(),
             ]);
-    
+
             // Record the rejection in the unified audit log.
             $this->auditService->record(
                 actor: $reviewer,
@@ -212,7 +211,7 @@ class LeaveRequestService
                     'rejection_reason' => $rejectionReason,
                 ],
             );
-    
+
             return $leaveRequest->fresh([
                 'user',
                 'leaveType',

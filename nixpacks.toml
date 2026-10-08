@@ -1,2 +1,15 @@
 [phases.setup]
-nixPkgs = ['...', 'php83Extensions.pcntl', 'php83Extensions.zip', 'php83Extensions.gd']
+nixPkgs = [
+    'php83',
+    'php83Packages.composer',
+    'php83Extensions.pcntl',
+    'php83Extensions.zip',
+    'php83Extensions.gd',
+    'php83Extensions.redis',
+    'php83Extensions.pdo_mysql'
+]
+
+[phases.build]
+cmds = [
+    'composer install --ignore-platform-req=ext-redis --no-dev --optimize-autoloader'
+]

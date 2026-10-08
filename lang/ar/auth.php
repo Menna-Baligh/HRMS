@@ -55,4 +55,8 @@ return [
     'unauthenticated' => 'غير مصرح لك بالدخول، يرجى تسجيل الدخول أولاً.',
     'unauthorized_action' => 'ليس لديك الصلاحيات الكافية للقيام بهذا الإجراء.',
     'resource_not_found' => 'العنصر المطلوب غير موجود.',
+    'biometric_enabled_success' => 'تم تفعيل الدخول بالبصمة بنجاح.',
+    'biometric_invalid_token' => 'رمز البصمة غير صالحة أو تم إلغاؤها.',
+    'biometric_disabled_success' => 'تم إلغاء تفعيل الدخول بالبصمة بنجاح.',
+
 ];

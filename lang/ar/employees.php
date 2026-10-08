@@ -21,4 +21,7 @@ return [
     'account_activated' => 'تم تفعيل حساب الموظف بنجاح.',
     'account_deactivated' => 'تم إلغاء تفعيل حساب الموظف بنجاح.',
     'failed_to_change_status' => 'فشل في تغيير حالة حساب الموظف.',
+    'cannot_delete_self' => 'لا يمكنك حذف حسابك الشخصي.',
+    'deleted_success' => 'تم حذف حساب الموظف بنجاح.',
+    'delete_failed' => 'حدث خطأ أثناء محاولة حذف الموظف.',
 ];

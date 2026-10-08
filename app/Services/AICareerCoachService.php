@@ -42,7 +42,8 @@ class AICareerCoachService
         };
 
         try {
-            $response = Http::timeout(15)
+            $response = Http::timeout(60)
+                ->connectTimeout(10)
                 ->withHeaders([
                     'X-Caller-Employee-ID' => $currentUser->employee_id ?? (string) $currentUser->id,
                     'X-Caller-Role' => $aiRoleHeader,

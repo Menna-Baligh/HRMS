@@ -11,16 +11,15 @@ use App\Models\EvaluationEvidence;
 use App\Models\EvaluationPeriod;
 use App\Models\EvaluationScore;
 use App\Models\User;
-use App\Services\AuditService;
 use Exception;
 use Illuminate\Support\Facades\DB;
 
 class EvaluationService
 {
-
     public function __construct(
         protected AuditService $auditService
     ) {}
+
     public function saveDraft(int $evaluatorUserId, array $data, ?Evaluation $evaluation = null): Evaluation
     {
         return DB::transaction(function () use ($evaluatorUserId, $data, $evaluation) {
@@ -81,7 +80,7 @@ class EvaluationService
                         'goal_id' => $goalId,
                     ]);
                 }
-            } 
+            }
             $action = $isNewEvaluation ? 'created_draft' : 'updated_draft';
 
             EvaluationAuditLog::create([

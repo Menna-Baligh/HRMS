@@ -26,26 +26,29 @@ class AttendanceService
             throw new Exception('DUPLICATE_CHECKIN');
         }
 
-        $location = $user->companyLocation;
-        if (! $location || ! $location->is_active) {
-            throw new Exception('LOCATION_NOT_CONFIGURED');
-        }
+        $isException = false;
+        $exceptionReasons = [];
 
-        $isInside = $this->geofenceService->isWithinRadius(
-            $lat, $lng, $location->latitude, $location->longitude, $location->radius
-        );
+        $location = $user->companyLocation;
+
+        if (! $location || ! $location->is_active) {
+            $isException = true;
+            $exceptionReasons[] = 'Company location is not configured or inactive.';
+        } else {
+            $isInside = $this->geofenceService->isWithinRadius(
+                $lat, $lng, $location->latitude, $location->longitude, $location->radius
+            );
+
+            if (! $isInside) {
+                $isException = true;
+                $exceptionReasons[] = 'Check-in recorded outside company geofence radius.';
+            }
+        }
 
         $gracePeriodEnd = Carbon::parse('09:15:00');
         $shiftEnd = Carbon::parse('17:00:00');
 
         $now = now();
-        $isException = false;
-        $exceptionReasons = [];
-
-        if (! $isInside) {
-            $isException = true;
-            $exceptionReasons[] = 'Check-in recorded outside company geofence radius.';
-        }
 
         if ($now->lte($gracePeriodEnd)) {
             $status = 'Present';
@@ -59,7 +62,7 @@ class AttendanceService
 
         return Attendance::create([
             'user_id' => $user->id,
-            'company_location_id' => $location->id,
+            'company_location_id' => $location?->id,
             'date' => $today,
             'check_in' => $now,
             'check_in_lat' => $lat,

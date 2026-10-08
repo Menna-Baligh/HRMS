@@ -7,8 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\LeaveRequest\RejectLeaveRequestRequest;
 use App\Http\Requests\LeaveRequest\StoreLeaveAttachmentRequest;
 use App\Http\Requests\LeaveRequest\StoreLeaveRequest;
-use App\Models\LeaveRequest;
 use App\Http\Resources\Leaves\LeaveRequestResource;
+use App\Models\LeaveRequest;
 use App\Services\FileService;
 use App\Services\LeaveRequests\LeaveRequestService;
 use Illuminate\Http\JsonResponse;
@@ -169,9 +169,17 @@ class LeaveRequestController extends Controller
 
     public function storeAttachment(StoreLeaveAttachmentRequest $request, int $leaveRequest): JsonResponse
     {
-        try {
-            $leaveRequestModel = LeaveRequest::findOrFail($leaveRequest);
+        $leaveRequestModel = LeaveRequest::find($leaveRequest);
 
+        if ($leaveRequestModel === null) {
+            return ResponseHelper::error(
+                errors: null,
+                message: __('leave_requests.not_found'),
+                statusCode: 404
+            );
+        }
+
+        try {
             $user = $request->user();
 
             if ($leaveRequestModel->user_id !== $user->id) {
@@ -193,9 +201,17 @@ class LeaveRequestController extends Controller
                 message: __('leave_requests.attachment_uploaded_successfully'),
                 statusCode: 201
             );
+
         } catch (\Throwable $exception) {
             Log::error(
-                'Leave attachment upload error: '.$exception->getMessage()
+                'Leave attachment upload error',
+                [
+                    'message' => $exception->getMessage(),
+                    'file' => $exception->getFile(),
+                    'line' => $exception->getLine(),
+                    'leave_request_id' => $leaveRequest,
+                    'user_id' => $request->user()?->id,
+                ]
             );
 
             return ResponseHelper::error(
