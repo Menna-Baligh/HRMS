@@ -50,6 +50,7 @@ use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\PolicyController;
 use App\Http\Controllers\Api\SubmissionController;
 use App\Http\Controllers\Api\TaskController;
+use App\Http\Controllers\Auth\BiometricAuthController;
 use App\Http\Controllers\CompanyLocations\CompanyLocationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
@@ -70,9 +71,11 @@ Route::middleware('set.app.language')->prefix('auth')->group(function () {
     Route::post('/forgot-password/verify-otp', [AuthController::class, 'verifyForgotPasswordOtp'])->middleware('throttle:5,1');
     Route::post('/forgot-password/reset', [AuthController::class, 'resetPassword'])->middleware('throttle:5,1');
     Route::post('/forgot-password/resend-otp', [AuthController::class, 'resendOtp'])->middleware('throttle:5,1');
+    Route::post('/biometric-login', [BiometricAuthController::class, 'loginWithBiometrics']);
 
     Route::middleware('auth:api')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
+        Route::post('/toggle-biometrics', [BiometricAuthController::class, 'toggleBiometrics']);
     });
 
     Route::prefix('google')->group(function () {

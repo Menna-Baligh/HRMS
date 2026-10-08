@@ -48,6 +48,7 @@ class User extends Authenticatable implements JWTSubject
         'manager_id',
         'address',
         'salary',
+        'biometric_token',
     ];
 
     /**
