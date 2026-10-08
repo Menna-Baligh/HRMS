@@ -21,4 +21,7 @@ return [
     'account_activated' => 'Employee account has been activated successfully.',
     'account_deactivated' => 'Employee account has been deactivated successfully.',
     'failed_to_change_status' => 'Failed to change employee account status.',
+    'cannot_delete_self' => 'You cannot delete your own account.',
+    'deleted_success' => 'Employee deleted successfully.',
+    'delete_failed' => 'Failed to delete employee.',
 ];

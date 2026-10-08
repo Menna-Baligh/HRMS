@@ -174,6 +174,8 @@ enum PermissionEnum: string
     case HR_DASHBOARD_VIEW = 'hr.dashboard.view';
     case OWNER_DASHBOARD_VIEW = 'owner.dashboard.view';
     case MANAGER_DASHBOARD_VIEW = 'manager.dashboard.view';
+    // Delete Employee Permission
+    case EMPLOYEE_DELETE = 'employee.delete';
 
     public function defaultRoles(): array
     {
@@ -205,15 +207,10 @@ enum PermissionEnum: string
             self::POLICY_VERSION_CREATE,
             self::POLICY_VERSION_ACTIVATE,
             self::POLICY_AUDIT_VIEW,
-            self::HOLIDAY_MANAGE => ['HR', 'Owner'],
-            self::VIEW_MANAGERS_DROPDOWN => ['HR', 'Owner'],
-            self::VIEW_MANAGERS_DROPDOWN,
-            self::HR_ATTENDANCE_MANAGE_EXCEPTIONS => ['HR', 'Owner'],
-            self::AUDIT_VIEW,
-
             self::HOLIDAY_MANAGE ,
-            self::VIEW_MANAGERS_DROPDOWN ,
-            self::HR_ATTENDANCE_MANAGE_EXCEPTIONS,
+            self::VIEW_MANAGERS_DROPDOWN,
+            self::HR_ATTENDANCE_MANAGE_EXCEPTIONS ,
+            self::AUDIT_VIEW,
             self::MANAGE_ADVANCE_STATUS,
             self::CREATE_DEDUCTION,
             self::CREATE_BONUS,
@@ -240,14 +237,15 @@ enum PermissionEnum: string
             self::EVALUATION_COMPLETE,
             self::EVALUATION_VIEW_MANAGER,
             self::MANAGER_PERFORMANCE_TEAM,
-            self::LEAVE_APPROVE => ['Manager', 'HR', 'Owner'],
+            self::LEAVE_APPROVE ,
             self::LEAVE_QUEUE_MANAGER,
             self::AI_EVALUATION_DRAFT,
             self::AI_ATTENTION_SIGNAL,
             self::AI_TEAM_INSIGHT,
             self::GOAL_CREATE,
             self::GOAL_UPDATE ,
-            self::MANAGER_DASHBOARD_VIEW => ['Manager', 'HR', 'Owner'],
+            self::MANAGER_DASHBOARD_VIEW,
+            self::EMPLOYEE_DELETE => ['Manager', 'HR', 'Owner'],
 
             // All Roles (Owner, HR, Manager, Employee)
             self::EMPLOYEE_VIEW_PROFILE,

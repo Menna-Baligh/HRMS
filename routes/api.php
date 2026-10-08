@@ -244,6 +244,7 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
         Route::get('/{id}', [EmployeeController::class, 'show'])->middleware('permission:'.PermissionEnum::EMPLOYEE_VIEW_PROFILE->value);
         Route::patch('/{id}/hr-fields', [EmployeeController::class, 'updateHrFields'])->middleware('permission:'.PermissionEnum::EMPLOYEE_EDIT_HR_FIELDS->value);
         Route::patch('/{id}/change-account-status', [EmployeeController::class, 'changeAccountStatus'])->middleware('permission:'.PermissionEnum::EMPLOYEE_CHANGE_ACCOUNT_STATUS->value);
+        Route::delete('/{id}', [EmployeeController::class, 'destroy'])->middleware('permission:'.PermissionEnum::EMPLOYEE_DELETE->value);
     });
 
     Route::prefix('departments')->group(function () {

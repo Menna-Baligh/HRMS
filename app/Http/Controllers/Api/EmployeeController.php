@@ -211,4 +211,25 @@ class EmployeeController extends Controller
             );
         }
     }
+
+    public function destroy(Request $request, string $id): JsonResponse
+    {
+        try {
+            $this->employeeService->deleteEmployee((int) $id, $request->user());
+
+            return ResponseHelper::success(
+                data: null,
+                message: __('employees.deleted_success')
+            );
+        } catch (Throwable $e) {
+            $statusCode = $e->getCode() >= 400 && $e->getCode() < 600
+                ? $e->getCode()
+                : Response::HTTP_INTERNAL_SERVER_ERROR;
+
+            return ResponseHelper::error(
+                message: $e->getMessage() ?: __('employees.delete_failed'),
+                statusCode: $statusCode
+            );
+        }
+    }
 }
