@@ -31,12 +31,12 @@ class LeaveRequest extends Model
         'status' => LeaveStatus::class,
     ];
 
-//     protected $appends = ['image'];
+    //     protected $appends = ['image'];
 
-// public function getImageAttribute()
-// {
-//     return $this->files->first();
-// }
+    // public function getImageAttribute()
+    // {
+    //     return $this->files->first();
+    // }
 
     public function user(): BelongsTo
     {

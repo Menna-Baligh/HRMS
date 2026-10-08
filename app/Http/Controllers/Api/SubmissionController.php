@@ -32,7 +32,7 @@ class SubmissionController extends Controller
 
         return ResponseHelper::success(
             $submission,
-            __('submissions.submission_created_successfully'),201
+            __('submissions.submission_created_successfully'), 201
         );
     }
 

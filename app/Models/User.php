@@ -48,6 +48,7 @@ class User extends Authenticatable implements JWTSubject
         'manager_id',
         'address',
         'salary',
+        'biometric_token',
     ];
 
     /**
@@ -280,12 +281,13 @@ class User extends Authenticatable implements JWTSubject
     }
 
     /**
-    * Audit events performed by the user.
-    */
+     * Audit events performed by the user.
+     */
     public function audits(): HasMany
     {
         return $this->hasMany(Audit::class, 'actor_id');
     }
+
     public function salaryAdvances(): HasMany
     {
         return $this->hasMany(SalaryAdvance::class);

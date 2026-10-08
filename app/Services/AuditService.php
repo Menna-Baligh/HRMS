@@ -12,7 +12,8 @@ class AuditService
     /**
      * Record a critical system action.
      */
-    public function record(?User $actor,AuditAction $action,Model $entity,array $metadata = [],): Audit {
+    public function record(?User $actor, AuditAction $action, Model $entity, array $metadata = []): Audit
+    {
         return Audit::create([
             'actor_id' => $actor?->id,
             'action' => $action,
@@ -21,35 +22,36 @@ class AuditService
             'metadata' => $metadata,
         ]);
     }
-     // search
+
+    // search
     public function search(array $filters = [])
     {
         return Audit::query()->with('actor:id,name')->when(
-                !empty($filters['actor_id']),fn ($query) => $query->where('actor_id',$filters['actor_id'])
-            )
+            ! empty($filters['actor_id']), fn ($query) => $query->where('actor_id', $filters['actor_id'])
+        )
             ->when(
-                !empty($filters['action']),
+                ! empty($filters['action']),
                 fn ($query) => $query->where(
                     'action',
                     $filters['action']
                 )
             )
             ->when(
-                !empty($filters['entity_type']),
+                ! empty($filters['entity_type']),
                 fn ($query) => $query->where(
                     'entity_type',
                     $filters['entity_type']
                 )
             )
             ->when(
-                !empty($filters['entity_id']),
+                ! empty($filters['entity_id']),
                 fn ($query) => $query->where(
                     'entity_id',
                     $filters['entity_id']
                 )
             )
             ->when(
-                !empty($filters['date_from']),
+                ! empty($filters['date_from']),
                 fn ($query) => $query->whereDate(
                     'created_at',
                     '>=',
@@ -57,7 +59,7 @@ class AuditService
                 )
             )
             ->when(
-                !empty($filters['date_to']),
+                ! empty($filters['date_to']),
                 fn ($query) => $query->whereDate(
                     'created_at',
                     '<=',

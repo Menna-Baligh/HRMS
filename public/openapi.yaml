@@ -17560,6 +17560,319 @@ paths:
                 message: Something went wrong.
                 data: null
   
+
+  /api/auth/toggle-biometrics:
+    post:
+      summary: Toggle Biometric Authentication (Enable / Disable) 📱
+      description: Toggles biometric authentication status for the authenticated user. If disabled, generates and returns a unique UUID biometric token. If enabled, revokes the token and disables biometrics.
+      operationId: toggleBiometrics
+      tags:
+        - Authentication
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en
+            default: en
+          example: en
+      responses:
+        "200":
+          description: Biometric status toggled successfully (Shows both Enable and Disable examples).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Biometric authentication enabled successfully.
+                  data:
+                    type: object
+                    properties:
+                      is_enabled:
+                        type: boolean
+                        example: true
+                      biometric_token:
+                        type: string
+                        nullable: true
+                        example: "52b41e0e-3237-44dc-8d21-1d5d80f481da"
+              examples:
+                Enabled:
+                  summary: Biometrics Enabled
+                  value:
+                    success: true
+                    message: Biometric authentication enabled successfully.
+                    data:
+                      is_enabled: true
+                      biometric_token: "52b41e0e-3237-44dc-8d21-1d5d80f481da"
+                Disabled:
+                  summary: Biometrics Disabled
+                  value:
+                    success: true
+                    message: Biometric authentication disabled successfully.
+                    data:
+                      is_enabled: false
+                      biometric_token: null
+        "401":
+          description: Unauthenticated / Invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+              example:
+                success: false
+                message: Unauthenticated.
+        "500":
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Authentication failed.
+              example:
+                success: false
+                message: Authentication failed.
+
+  /api/auth/biometric-login:
+    post:
+      summary: Login via Biometric Token 📱
+      description: Authenticates user using device-stored biometric UUID token and returns fresh JWT access token credentials.
+      operationId: biometricLogin
+      tags:
+        - Authentication
+      parameters:
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en
+            default: en
+          example: en
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - biometric_token
+              properties:
+                biometric_token:
+                  type: string
+                  example: "52b41e0e-3237-44dc-8d21-1d5d80f481da"
+      responses:
+        "200":
+          description: Logged in successfully via biometrics.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Logged in successfully.
+                  data:
+                    type: object
+                    properties:
+                      access_token:
+                        type: string
+                      token_type:
+                        type: string
+                        example: bearer
+                      expires_in:
+                        type: string
+                        example: "24 hours"
+                      user:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 6
+                          name:
+                            type: string
+                            example: Noran Baligh
+                          email:
+                            type: string
+                            example: noran@gmail.com
+                          phone:
+                            type: string
+                            example: "01019018137"
+                          employee_code:
+                            type: string
+                            example: EMP-2026-24271
+                          job_title:
+                            type: string
+                            example: Frontend Developer
+                          employment_type:
+                            type: string
+                            example: Part-time
+                          start_date:
+                            type: string
+                            example: "2026-09-01"
+                          salary:
+                            type: number
+                            example: 8000
+                          status:
+                            type: string
+                            example: Active
+                          address:
+                            type: string
+                            example: Mansoura
+                          avatar_url:
+                            type: string
+                            nullable: true
+                            example: "https://127.0.0.1:8000/api/files/22/download"
+                          role:
+                            type: string
+                            example: Employee
+                          role_label:
+                            type: string
+                            example: Employee
+                          locale:
+                            type: string
+                            example: en
+                          permissions:
+                            type: array
+                            items:
+                              type: string
+                          created_at:
+                            type: string
+                            example: "2026-09-27 12:59:57"
+              example:
+                success: true
+                message: Logged in successfully.
+                data:
+                  access_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                  token_type: bearer
+                  expires_in: "24 hours"
+                  user:
+                    id: 6
+                    name: Noran Baligh
+                    email: noran@gmail.com
+                    phone: "01019018137"
+                    employee_code: EMP-2026-24271
+                    job_title: Frontend Developer
+                    employment_type: Part-time
+                    start_date: "2026-09-01"
+                    salary: 8000
+                    status: Active
+                    address: Mansoura
+                    avatar_url: "https://127.0.0.1:8000/api/files/22/download"
+                    role: Employee
+                    role_label: Employee
+                    locale: en
+                    permissions:
+                      - View Profile
+                      - Update Profile
+                      - Check-in / Check-out
+                      - View Own Leave Requests
+                    created_at: "2026-09-27 12:59:57"
+        "401":
+          description: Invalid or revoked biometric token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Invalid or expired biometric token.
+              example:
+                success: false
+                message: Invalid or expired biometric token.
+        "403":
+          description: Account is inactive or suspended.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Your account is inactive. Please contact HR.
+              example:
+                success: false
+                message: Your account is inactive. Please contact HR.
+        "422":
+          description: Validation error for missing biometric_token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: The biometric token field is required.
+              example:
+                success: false
+                message: The biometric token field is required.
+        "500":
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Authentication failed.
+              example:
+                success: false
+                message: Authentication failed.
 components:
   securitySchemes:
     bearerAuth:
