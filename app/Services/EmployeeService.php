@@ -80,7 +80,7 @@ class EmployeeService
     {
         do {
             $code = 'EMP-'.date('Y').'-'.mt_rand(10000, 99999);
-        } while (User::withTrashed()->where('employee_id', $code)->exists());
+        } while (User::where('employee_id', $code)->exists());
 
         return $code;
     }
