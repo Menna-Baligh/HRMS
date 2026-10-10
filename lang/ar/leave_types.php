@@ -8,4 +8,13 @@ return [
     'deactivated_successfully' => 'تم إلغاء تفعيل نوع الإجازة بنجاح.',
     'balance_not_found' => 'رصيد الإجازة غير موجود.',
     'insufficient_balance' => 'رصيد الإجازة غير كافٍ.',
+    'annual_leave' => 'إجازة سنوية',
+    'sick_leave' => 'إجازة مرضية',
+    'emergency_leave' => 'إجازة طارئة',
+    'names' => [
+    'annual_leave' => 'إجازة سنوية',
+    'sick_leave' => 'إجازة مرضية',
+    'casual_leave' => 'إجازة عارضة',
+    'unpaid_leave' => 'إجازة بدون أجر',
+],
 ];

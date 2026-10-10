@@ -20,5 +20,6 @@ return [
 
     'radius_invalid' => 'Radius must be greater than zero.',
     'no_fields_to_update' => 'Please provide at least one field to update.',
+    'inactive_retrieved' => 'Company location retrieved, but it is currently inactive.',
 
 ];
