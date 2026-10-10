@@ -53,7 +53,7 @@ return [
             'credentials' => (function () {
                 $credentials = env('FIREBASE_CREDENTIALS');
 
-                if (!$credentials) {
+                if (! $credentials) {
                     return null;
                 }
 

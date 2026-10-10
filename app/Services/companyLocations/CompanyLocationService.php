@@ -112,15 +112,19 @@ class CompanyLocationService
 
    /**
  * Get the company's location, whether active or inactive.
- */
-/**
- * Get active company location.
- */
-public function getActiveLocation(): CompanyLocation
+ */public function getActiveLocation(): CompanyLocation
 {
-    return CompanyLocation::query()
-        ->where('is_active', true)
-        ->firstOrFail();
+    // Retrieve the existing company location regardless of its status.
+    $location = CompanyLocation::query()->first();
+
+    // Return 404 only when no company location exists at all.
+    if (! $location) {
+        throw new \Illuminate\Database\Eloquent\ModelNotFoundException(
+            'Company location not found.'
+        );
+    }
+
+    return $location;
 }
 
     /**

@@ -28,20 +28,20 @@ class LeaveRequestService
         $leaveRequest = DB::transaction(function () use ($user, $data) {
             $startDate = Carbon::parse($data['start_date'])->startOfDay();
             $endDate = Carbon::parse($data['end_date'])->startOfDay();
-    
+
             $days = $startDate->diffInDays($endDate) + 1;
-    
+
             $leaveType = LeaveType::query()
                 ->whereKey($data['leave_type_id'])
                 ->where('is_active', true)
                 ->first();
-    
+
             if (! $leaveType) {
                 throw new RuntimeException(
                     __('leave_requests.leave_type_inactive')
                 );
             }
-    
+
             $hasOverlap = LeaveRequest::query()
                 ->where('user_id', $user->id)
                 ->whereIn('status', [
@@ -51,7 +51,7 @@ class LeaveRequestService
                 ->where('start_date', '<=', $endDate)
                 ->where('end_date', '>=', $startDate)
                 ->exists();
-    
+
             if ($hasOverlap) {
                 throw new RuntimeException(
                     __('leave_requests.overlap')
@@ -70,7 +70,7 @@ class LeaveRequestService
                 requestedDays: $days,
                 year: $startDate->year
             );
-    
+
             $leaveRequest = LeaveRequest::create([
                 'user_id' => $user->id,
                 'leave_type_id' => $leaveType->id,
@@ -81,7 +81,7 @@ class LeaveRequestService
                 'status' => LeaveStatus::Pending->value,
             ]);
     
-            // Record audit.
+              // record audit
             $this->auditService->record(
                 actor: $user,
                 action: AuditAction::LEAVE_CREATED,
@@ -181,96 +181,103 @@ class LeaveRequestService
             return $leaveRequest;
     }
 
-    public function approve(LeaveRequest $leaveRequest,int $reviewerId): LeaveRequest {
-        $leaveRequest = DB::transaction(function () use (
-            $leaveRequest,
-            $reviewerId
-        ) {
-            $leaveRequest = LeaveRequest::query()
-                ->lockForUpdate()
-                ->findOrFail($leaveRequest->id);
+public function approve(
+    LeaveRequest $leaveRequest,
+    int $reviewerId
+): LeaveRequest {
+    $leaveRequest = DB::transaction(function () use (
+        $leaveRequest,
+        $reviewerId
+    ) {
+        $leaveRequest = LeaveRequest::query()
+            ->lockForUpdate()
+            ->findOrFail($leaveRequest->id);
 
-            if ($leaveRequest->status !== LeaveStatus::Pending) {
-                throw new RuntimeException(
-                    __('leave_requests.only_pending_approve')
-                );
-            }
-
-            $user = $leaveRequest->user;
-            $leaveType = $leaveRequest->leaveType;
-
-            $previousStatus = $leaveRequest->status->value;
-
-            // Deduct the approved leave days from the employee's balance.
-            $this->leaveBalanceService->deductBalance(
-                user: $user,
-                leaveType: $leaveType,
-                days: (float) $leaveRequest->days,
-                year: $leaveRequest->start_date->year
+        if ($leaveRequest->status !== LeaveStatus::Pending) {
+            throw new RuntimeException(
+                __('leave_requests.only_pending_approve')
             );
+        }
 
-            // Update the leave request status.
-            $leaveRequest->update([
-                'status' => LeaveStatus::Approved->value,
-                'reviewed_by' => $reviewerId,
-                'reviewed_at' => now(),
-            ]);
+        $user = $leaveRequest->user;
+        $leaveType = $leaveRequest->leaveType;
+        $previousStatus = $leaveRequest->status->value;
 
-            // Store the approval decision.
-            LeaveDecision::create([
-                'leave_request_id' => $leaveRequest->id,
-                'reviewer_id' => $reviewerId,
-                'previous_status' => $previousStatus,
-                'decision' => LeaveStatus::Approved->value,
-                'reason' => null,
-                'decided_at' => now(),
-            ]);
-
-            // Record the approval in the audit log.
-            $this->auditService->record(
-                actor: User::findOrFail($reviewerId),
-                action: AuditAction::LEAVE_APPROVED,
-                entity: $leaveRequest,
-                metadata: [
-                    'old_status' => $previousStatus,
-                    'new_status' => LeaveStatus::Approved->value,
-                    'reviewer_id' => $reviewerId,
-                    'days' => (float) $leaveRequest->days,
-                ],
-            );
-
-            return $leaveRequest->fresh([
-                'user',
-                'leaveType',
-                'reviewer',
-                'decisions.reviewer',
-            ]);
-        });
-
-        // Notify the employee after the approval transaction commits.
-        SendNotificationJob::dispatch(
-            user: $leaveRequest->user,
-            type: 'leave_request_approved',
-            titleKey: 'notifications.leave_request_approved_title',
-            bodyKey: 'notifications.leave_request_approved_body',
-            parameters: [
-                        'leave_type' => $this->translateLeaveTypeName(
-                            $leaveRequest->leaveType->name,
-                            $leaveRequest->user->locale ?: 'ar'
-                        ),        
-                         'start_date' => $leaveRequest->start_date->toDateString(),
-                         'end_date' => $leaveRequest->end_date->toDateString(),
-            ],
-            metadata: [
-                'screen' => 'leave_request_details',
-                'leave_request_id' => $leaveRequest->id,
-                'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
-            ]
+        // Deduct the approved leave days from the employee's balance.
+        $this->leaveBalanceService->deductBalance(
+            user: $user,
+            leaveType: $leaveType,
+            days: (float) $leaveRequest->days,
+            year: $leaveRequest->start_date->year
         );
 
-        return $leaveRequest;
-    }
-public function reject( LeaveRequest $leaveRequest,int $reviewerId,string $rejectionReason): LeaveRequest {
+        // Update the leave request status.
+        $leaveRequest->update([
+            'status' => LeaveStatus::Approved->value,
+            'reviewed_by' => $reviewerId,
+            'reviewed_at' => now(),
+        ]);
+
+        // Store the approval decision.
+        LeaveDecision::create([
+            'leave_request_id' => $leaveRequest->id,
+            'reviewer_id' => $reviewerId,
+            'previous_status' => $previousStatus,
+            'decision' => LeaveStatus::Approved->value,
+            'reason' => null,
+            'decided_at' => now(),
+        ]);
+
+        // Record the approval in the audit log.
+        $this->auditService->record(
+            actor: User::findOrFail($reviewerId),
+            action: AuditAction::LEAVE_APPROVED,
+            entity: $leaveRequest,
+            metadata: [
+                'old_status' => $previousStatus,
+                'new_status' => LeaveStatus::Approved->value,
+                'reviewer_id' => $reviewerId,
+                'days' => (float) $leaveRequest->days,
+            ],
+        );
+
+        return $leaveRequest->fresh([
+            'user',
+            'leaveType',
+            'reviewer',
+            'decisions.reviewer',
+        ]);
+    });
+
+    // Notify the employee only after the approval transaction commits.
+    SendNotificationJob::dispatch(
+        user: $leaveRequest->user,
+        type: 'leave_request_approved',
+        titleKey: 'notifications.leave_request_approved_title',
+        bodyKey: 'notifications.leave_request_approved_body',
+        parameters: [
+            'leave_type' => $this->translateLeaveTypeName(
+                $leaveRequest->leaveType->name,
+                $leaveRequest->user->locale ?: 'ar'
+            ),
+            'start_date' => $leaveRequest->start_date->toDateString(),
+            'end_date' => $leaveRequest->end_date->toDateString(),
+        ],
+        metadata: [
+            'screen' => 'leave_request_details',
+            'leave_request_id' => $leaveRequest->id,
+            'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+        ]
+    );
+
+    return $leaveRequest;
+}
+
+public function reject(
+    LeaveRequest $leaveRequest,
+    int $reviewerId,
+    string $rejectionReason
+): LeaveRequest {
     $leaveRequest = DB::transaction(function () use (
         $leaveRequest,
         $reviewerId,
@@ -286,6 +293,7 @@ public function reject( LeaveRequest $leaveRequest,int $reviewerId,string $rejec
             );
         }
 
+        // Get the reviewer who rejected the leave request.
         $reviewer = User::findOrFail($reviewerId);
         $previousStatus = $leaveRequest->status->value;
 
@@ -296,6 +304,7 @@ public function reject( LeaveRequest $leaveRequest,int $reviewerId,string $rejec
             'reviewed_at' => now(),
         ]);
 
+        // Store the rejection decision.
         LeaveDecision::create([
             'leave_request_id' => $leaveRequest->id,
             'reviewer_id' => $reviewerId,
@@ -326,23 +335,23 @@ public function reject( LeaveRequest $leaveRequest,int $reviewerId,string $rejec
         ]);
     });
 
-    // Notify the employee after the rejection transaction commits.
+    // Notify the employee only after the rejection transaction commits.
     SendNotificationJob::dispatch(
         user: $leaveRequest->user,
         type: 'leave_request_rejected',
         titleKey: 'notifications.leave_request_rejected_title',
         bodyKey: 'notifications.leave_request_rejected_body',
         parameters: [
-                'leave_type' => $this->translateLeaveTypeName(
-                    $leaveRequest->leaveType->name,
-                    $leaveRequest->user->locale ?: 'ar'
-                ),   
+            'leave_type' => $this->translateLeaveTypeName(
+                $leaveRequest->leaveType->name,
+                $leaveRequest->user->locale ?: 'ar'
+            ),
             'start_date' => $leaveRequest->start_date->toDateString(),
             'end_date' => $leaveRequest->end_date->toDateString(),
             'reason' => $this->translateRejectionReason(
-                    $rejectionReason,
-                    $leaveRequest->user->locale ?: 'ar'
-                ),
+                $rejectionReason,
+                $leaveRequest->user->locale ?: 'ar'
+            ),
         ],
         metadata: [
             'screen' => 'leave_request_details',

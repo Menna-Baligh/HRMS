@@ -21,10 +21,10 @@ use Illuminate\Validation\ValidationException;
 
 class TaskService
 {
-
     public function __construct(
         protected AuditService $auditService
     ) {}
+
     /**
      * Create a new task.
      */
@@ -50,7 +50,7 @@ class TaskService
                 description: 'Task created.'
             );
 
-            // audit 
+            // audit
             $this->auditService->record(
                 actor: Auth::user(),
                 action: AuditAction::TASK_CREATED,
@@ -108,7 +108,7 @@ class TaskService
                 description: 'Task details updated.'
             );
 
-            // audit 
+            // audit
             $this->auditService->record(
                 actor: Auth::user(),
                 action: AuditAction::TASK_UPDATED,
@@ -154,7 +154,7 @@ class TaskService
                 description: "Task assigned to user #{$user->id}."
             );
 
-            // audit 
+            // audit
             $this->auditService->record(
                 actor: Auth::user(),
                 action: AuditAction::TASK_ASSIGNED,
@@ -228,7 +228,7 @@ class TaskService
                 description: __('tasks.progress_updated')
             );
 
-            // audit 
+            // audit
             $this->auditService->record(
                 actor: $user,
                 action: AuditAction::TASK_PROGRESS_UPDATED,
@@ -300,7 +300,7 @@ class TaskService
                 description: __('tasks.status_updated')
             );
 
-            // audit 
+            // audit
             $this->auditService->record(
                 actor: $user,
                 action: AuditAction::TASK_STATUS_CHANGED,
