@@ -9282,11 +9282,11 @@ paths:
               properties:
                 employee_id:
                   type: string
-                  example: EMP-2026-001
+                  example: EMP-2026-24271
                 period:
                   type: string
                   nullable: true
-                  example: 2026-Q3
+                  example: 2026-Q4
       responses:
         "200":
           description: Career coach guidance retrieved successfully.
@@ -9309,7 +9309,7 @@ paths:
                         example: success
                       employee_id:
                         type: string
-                        example: EMP-2026-001
+                        example: EMP-2026-24271
                       development_focus:
                         type: string
                         example: "Prioritize: System Design"
@@ -9407,10 +9407,10 @@ paths:
               properties:
                 employee_id:
                   type: string
-                  example: EMP-2026-001
+                  example: EMP-2026-24271
                 period:
                   type: string
-                  example: 2026-Q3
+                  example: 2026-Q4
       responses:
         "200":
           description: Performance insight retrieved successfully or insufficient data.
@@ -9435,9 +9435,9 @@ paths:
                     message: Performance insight retrieved successfully.
                     data:
                       status: success
-                      employee_id: EMP-2026-001
+                      employee_id: EMP-2026-24271
                       verified_facts:
-                        target_period: 2026-Q3
+                        target_period: 2026-Q4
                         metrics_by_period: []
                       calculated_trends: {}
                       interpretation: {}
@@ -9508,10 +9508,10 @@ paths:
               properties:
                 employee_id:
                   type: string
-                  example: EMP-2026-001
+                  example: EMP-2026-24271
                 period:
                   type: string
-                  example: 2026-Q3
+                  example: 2026-Q4
                 evaluation_scores:
                   type: object
                   example:
@@ -9542,10 +9542,10 @@ paths:
                         example: success
                       employee_id:
                         type: string
-                        example: EMP-2026-001
+                        example: EMP-2026-24271
                       period:
                         type: string
-                        example: 2026-Q3
+                        example: 2026-Q4
                       evaluation_narrative:
                         type: string
                         example: Draft narrative for manager review.
@@ -9625,11 +9625,11 @@ paths:
               properties:
                 employee_id:
                   type: string
-                  example: EMP-2026-001
+                  example: EMP-2026-24271
                 period:
                   type: string
                   nullable: true
-                  example: 2026-Q3
+                  example: 2026-Q4
                 target_role:
                   type: string
                   nullable: true
@@ -9665,7 +9665,7 @@ paths:
                         example: success
                       employee_id:
                         type: string
-                        example: EMP-2026-001
+                        example: EMP-2026-24271
                       target_role:
                         type: string
                         example: Senior Backend Engineer
@@ -9739,10 +9739,10 @@ paths:
               properties:
                 employee_id:
                   type: string
-                  example: EMP-2026-001
+                  example: EMP-2026-24271
                 target_period:
                   type: string
-                  example: 2026-Q3
+                  example: 2026-Q4
       responses:
         "200":
           description: Attention signal retrieved successfully.
@@ -9765,10 +9765,10 @@ paths:
                         example: success
                       employee_id:
                         type: string
-                        example: EMP-2026-001
+                        example: EMP-2026-24271
                       target_period:
                         type: string
-                        example: 2026-Q3
+                        example: 2026-Q4
                       comparison_period:
                         type: string
                         example: 2026-Q2
@@ -9858,7 +9858,7 @@ paths:
                   example: Engineering
                 period:
                   type: string
-                  example: 2026-Q3
+                  example: 2026-Q4
       responses:
         "200":
           description: Team insight summary retrieved successfully.
@@ -9962,7 +9962,7 @@ paths:
               properties:
                 employee_id:
                   type: string
-                  example: EMP-2026-001
+                  example: EMP-2026-24271
                 question:
                   type: string
                   minLength: 3
@@ -17467,7 +17467,7 @@ paths:
               - en
             default: en
           example: en
-          
+
       responses:
         "200":
           description: Notification deleted successfully.
@@ -17644,7 +17644,7 @@ paths:
                 success: false
                 message: Something went wrong.
                 data: null
-  
+
 
   /api/auth/toggle-biometrics:
     post:
@@ -17958,7 +17958,7 @@ paths:
               example:
                 success: false
                 message: Authentication failed.
-  
+
 
 
 components:
