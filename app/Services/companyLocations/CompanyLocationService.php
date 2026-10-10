@@ -113,19 +113,14 @@ class CompanyLocationService
    /**
  * Get the company's location, whether active or inactive.
  */
+/**
+ * Get active company location.
+ */
 public function getActiveLocation(): CompanyLocation
 {
-    // Retrieve the existing company location regardless of its status.
-    $location = CompanyLocation::query()->first();
-
-    // Return 404 only when no company location exists at all.
-    if (! $location) {
-        throw new \Illuminate\Database\Eloquent\ModelNotFoundException(
-            'Company location not found.'
-        );
-    }
-
-    return $location;
+    return CompanyLocation::query()
+        ->where('is_active', true)
+        ->firstOrFail();
 }
 
     /**
@@ -155,14 +150,17 @@ public function getActiveLocation(): CompanyLocation
     /**
      * Validate attendance radius.
      */
-    private function validateRadius(float $radius): void
-    {
-        if ($radius <= 0) {
-            throw ValidationException::withMessages([
-                'radius' => [
-                    __('company_location.radius_invalid'),
-                ],
-            ]);
-        }
+   /**
+ * Validate attendance radius.
+ */
+private function validateRadius(float $radius): void
+{
+    if ($radius <= 0) {
+        throw ValidationException::withMessages([
+            'radius' => [
+                __('company_location.radius_invalid'),
+            ],
+        ]);
     }
+}
 }
