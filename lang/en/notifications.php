@@ -36,6 +36,31 @@ return [
     'leave_rejected_title' => 'Leave Request Rejected',
     'leave_rejected_body' => 'Your leave request for :date has been rejected.',
 
+    'leave_request_created_title' =>'New Leave Request',
+
+    'leave_request_created_body' =>':employee_name submitted a :leave_type request.',
+
+    'leave_request_approved_title' =>'Leave Request Approved',
+
+    'leave_request_approved_body' =>'Your :leave_type request from :start_date to :end_date has been approved.',
+
+    'leave_request_rejected_title' =>'Leave Request Rejected',
+    'leave_request_rejected' => [
+        'title' => 'Leave Request Rejected',
+        'body' => 'Your :leave_type leave request from :start_date to :end_date was rejected. Reason: :reason',
+    ],
+
+    'leave_request_approved' => [
+        'title' => 'Leave Request Approved',
+        'body' => 'Your :leave_type leave request from :start_date to :end_date was approved.',
+    ],
+
+    'leave_rejection_reasons' => [
+    'no_leave_balance' => 'You do not have sufficient leave balance',
+],
+
+    'leave_request_rejected_body' =>'Your :leave_type request from :start_date to :end_date has been rejected. Reason: :reason',
+
     'account_activated_title' => 'Account Activated',
     'account_activated_body' => 'Your account has been activated successfully. Welcome aboard!',
     'account_deactivated_title' => 'Account Deactivated',

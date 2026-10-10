@@ -27,9 +27,7 @@ class CompanyLocationService
             (float) $data['longitude']
         );
 
-        $this->validateRadius(
-            (float) $data['radius']
-        );
+        $this->validateRadius((float) $data['radius']);
 
         return CompanyLocation::create([
             'name' => $data['name'],
@@ -54,7 +52,6 @@ class CompanyLocationService
      */
     public function update(int $id, array $data): CompanyLocation
     {
-        // Get the existing location from database.
         $location = $this->getLocation($id);
 
         // Validate coordinates if latitude or longitude is updated.
@@ -70,15 +67,12 @@ class CompanyLocationService
 
         // Validate radius if it is updated.
         if (isset($data['radius'])) {
-            $this->validateRadius(
-                (float) $data['radius']
-            );
+            $this->validateRadius((float) $data['radius']);
         }
 
         // Update only the values sent in the request.
         $location->update($data);
 
-        // Return the updated record.
         return $location->fresh();
     }
 
@@ -115,7 +109,8 @@ class CompanyLocationService
      */
     public function getActiveLocation(): CompanyLocation
     {
-        return CompanyLocation::where('is_active', true)
+        return CompanyLocation::query()
+            ->where('is_active', true)
             ->firstOrFail();
     }
 

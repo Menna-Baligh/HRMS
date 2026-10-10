@@ -66,7 +66,7 @@ class NotificationService
 
             $this->messaging->send($message);
 
-            \Log::info("FCM Notification sent successfully to user: {$user->id}");
+            Log::info("FCM Notification sent successfully to user: {$user->id}");
 
         } catch (NotFound $e) {
             $user->update(['fcm_token' => null]);

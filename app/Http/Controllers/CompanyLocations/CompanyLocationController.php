@@ -71,7 +71,7 @@ class CompanyLocationController extends Controller
     }
 
     /**
-     * Get active company location.
+     * Get the company's location and its current status.
      */
     public function activeLocation()
     {
@@ -79,7 +79,9 @@ class CompanyLocationController extends Controller
 
         return ResponseHelper::success(
             data: $location,
-            message: __('company_location.active_retrieved')
+            message: $location->is_active
+                ? __('company_location.active_retrieved')
+                : __('company_location.inactive_retrieved')
         );
     }
 }
