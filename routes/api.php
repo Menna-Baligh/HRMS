@@ -76,6 +76,7 @@ Route::middleware('set.app.language')->prefix('auth')->group(function () {
     Route::middleware('auth:api')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::post('/toggle-biometrics', [BiometricAuthController::class, 'toggleBiometrics']);
+        Route::post('/refresh', [AuthController::class, 'refresh']);
     });
 
     Route::prefix('google')->group(function () {
@@ -159,7 +160,7 @@ Route::prefix('leaves')->middleware('auth:api', 'set.app.language')->group(funct
     // Leave Decision History
     Route::get('/leave-requests/{leaveRequest}/decisions', [LeaveDecisionHistoryController::class, 'index']);
     // approve leave
-     Route::patch('/leave-requests/{leaveRequest}/approve', [LeaveRequestController::class, 'approve']);
+    Route::patch('/leave-requests/{leaveRequest}/approve', [LeaveRequestController::class, 'approve']);
     // reject leave
     Route::patch('/leave-requests/{leaveRequest}/reject', [LeaveRequestController::class, 'reject']);
     // leave attachments
@@ -389,9 +390,6 @@ Route::middleware(['auth:api', 'check.active', 'set.app.language'])->group(funct
 Route::middleware(['auth:api', 'set.app.language'])->post('/broadcasting/auth', function (Request $request) {
     return Broadcast::auth($request);
 });
-
-
-
 
 Route::prefix('ai')->middleware(['auth:api', 'set.app.language'])->group(function () {
     Route::post('/career-coach', AICareerCoachController::class)

@@ -12,9 +12,9 @@ return [
     'sick_leave' => 'Sick Leave',
     'emergency_leave' => 'Emergency Leave',
     'names' => [
-    'annual_leave' => 'Annual Leave',
-    'sick_leave' => 'Sick Leave',
-    'casual_leave' => 'Casual Leave',
-    'unpaid_leave' => 'Unpaid Leave',
-],
+        'annual_leave' => 'Annual Leave',
+        'sick_leave' => 'Sick Leave',
+        'casual_leave' => 'Casual Leave',
+        'unpaid_leave' => 'Unpaid Leave',
+    ],
 ];
