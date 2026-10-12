@@ -31,7 +31,7 @@ class GoalService
                 titleKey: 'notifications.goal_created_title',
                 bodyKey: 'notifications.goal_created_body',
                 parameters: [
-                    'employee' => $targetUser->name,
+                    'creator' => $creator->name,
                     'title' => $goal->title,
                 ],
                 metadata: ['goal_id' => $goal->id, 'screen' => 'goal_details']

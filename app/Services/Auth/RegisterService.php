@@ -13,8 +13,9 @@ class RegisterService
 
     public function register(array $data): array
     {
+        $ownerCode = $this->generateOwnerCode();
         $user = User::create([
-
+            'employee_id' => $ownerCode,
             'name' => $data['name'],
             'email' => $data['email'],
             'phone' => $data['phone'] ?? null,
@@ -41,5 +42,29 @@ class RegisterService
             'user' => new UserResource($user),
         ];
 
+    }
+    protected function generateOwnerCode(): string
+    {
+        $lastOwner = User::where('role', 'Owner')
+            ->where('employee_id', 'LIKE', 'OWN-%')
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if (! $lastOwner) {
+            $nextNumber = 1;
+        } else {
+            $lastNumber = (int) preg_replace('/[^0-9]/', '', $lastOwner->employee_id);
+            $nextNumber = $lastNumber + 1;
+        }
+
+        do {
+            $code = 'OWN-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+            $exists = User::where('employee_id', $code)->exists();
+            if ($exists) {
+                $nextNumber++;
+            }
+        } while ($exists);
+
+        return $code;
     }
 }
