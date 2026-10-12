@@ -15,12 +15,14 @@ return new class extends Migration
         });
 
         // Convert existing employee_id values to their related user_id.
-        DB::statement('
-            UPDATE leave_requests
-            INNER JOIN employees
-                ON employees.id = leave_requests.employee_id
-            SET leave_requests.user_id = employees.user_id
-        ');
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement('
+                UPDATE leave_requests
+                INNER JOIN employees
+                    ON employees.id = leave_requests.employee_id
+                SET leave_requests.user_id = employees.user_id
+            ');
+        }
 
         // Make user_id required after migration of existing data.
         Schema::table('leave_requests', function (Blueprint $table) {
@@ -35,7 +37,9 @@ return new class extends Migration
         // Remove the old employee relationship.
         Schema::table('leave_requests', function (Blueprint $table) {
             $table->dropForeign(['employee_id']);
+            $table->dropIndex(['employee_id', 'status']);
             $table->dropColumn('employee_id');
+            $table->index(['user_id', 'status']);
         });
     }
 

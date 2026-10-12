@@ -4,6 +4,7 @@ use App\Enums\LeaveStatus;
 use App\Models\LeaveRequest;
 use App\Models\LeaveType;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -34,7 +35,7 @@ test('manager sees only their team requests in manager queue', function () {
     $mgrTokenA = tokenFor($managerA);
 
     $response = $this->withHeader('Authorization', "Bearer {$mgrTokenA}")
-        ->getJson('/api/v1/manager/leave-requests');
+        ->getJson('/api/leaves/leave-requests/manager/pending');
     $response->assertStatus(200)
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.user.id', $teamMemberA->id);
@@ -56,12 +57,12 @@ test('manager cannot approve request of employee outside their team', function (
     $mgrTokenA = tokenFor($managerA);
 
     $response = $this->withHeader('Authorization', "Bearer {$mgrTokenA}")
-        ->postJson("/api/v1/leave-requests/{$request->id}/approve-manager");
+        ->patchJson("/api/leaves/leave-requests/{$request->id}/approve");
 
     $response->assertStatus(403);
 });
 
-test('hr sees all requests across all employees with filters', function () {
+test('hr sees all pending requests across all employees', function () {
     $hr = User::factory()->hr()->create();
     $emp1 = User::factory()->create();
     $emp2 = User::factory()->create();
@@ -78,29 +79,14 @@ test('hr sees all requests across all employees with filters', function () {
     LeaveRequest::factory()->create([
         'user_id' => $emp2->id,
         'leave_type_id' => $typeB->id,
-        'status' => LeaveStatus::Approved,
+        'status' => LeaveStatus::Pending,
     ]);
 
     $hrToken = tokenFor($hr);
 
-    // 1. HR sees both without filter
     $allRes = $this->withHeader('Authorization', "Bearer {$hrToken}")
-        ->getJson('/api/v1/hr/leave-requests');
+        ->getJson('/api/leaves/leave-requests/hr/pending');
     $allRes->assertStatus(200)->assertJsonCount(2, 'data');
-
-    // 2. Filter by status=pending
-    $pendingRes = $this->withHeader('Authorization', "Bearer {$hrToken}")
-        ->getJson('/api/v1/hr/leave-requests?status=pending');
-    $pendingRes->assertStatus(200)
-        ->assertJsonCount(1, 'data')
-        ->assertJsonPath('data.0.user.id', $emp1->id);
-
-    // 3. Filter by user_id
-    $userRes = $this->withHeader('Authorization', "Bearer {$hrToken}")
-        ->getJson("/api/v1/hr/leave-requests?user_id={$emp2->id}");
-    $userRes->assertStatus(200)
-        ->assertJsonCount(1, 'data')
-        ->assertJsonPath('data.0.leave_type.id', $typeB->id);
 });
 
 test('regular employee cannot access manager or hr queue', function () {
@@ -109,11 +95,12 @@ test('regular employee cannot access manager or hr queue', function () {
 
     // Manager queue forbidden
     $mgrRes = $this->withHeader('Authorization', "Bearer {$empToken}")
-        ->getJson('/api/v1/manager/leave-requests');
+        ->getJson('/api/leaves/leave-requests/manager/pending');
     $mgrRes->assertStatus(403);
 
     // HR queue forbidden
     $hrRes = $this->withHeader('Authorization', "Bearer {$empToken}")
-        ->getJson('/api/v1/hr/leave-requests');
+        ->getJson('/api/leaves/leave-requests/hr/pending');
     $hrRes->assertStatus(403);
 });
+

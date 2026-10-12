@@ -4,6 +4,7 @@ namespace App\Services\LeaveRequests;
 
 use App\Enums\AuditAction;
 use App\Enums\LeaveStatus;
+use App\Enums\UserRole;
 use App\Jobs\SendNotificationJob;
 use App\Models\LeaveDecision;
 use App\Models\LeaveRequest;
@@ -105,9 +106,7 @@ class LeaveRequestService
          * Notify the employee's manager after the leave request
          * has been successfully created and the transaction has committed.
          */
-        $manager = User::find($user->manager_id);
-
-        // Notify employee's manager.
+        // Notify employee's manager if exists.
         if ($user->manager_id) {
             $manager = User::find($user->manager_id);
 
@@ -122,7 +121,8 @@ class LeaveRequestService
                         'leave_type' => $this->translateLeaveTypeName(
                             $leaveRequest->leaveType->name,
                             $manager->locale ?: 'ar'
-                        ),                        ],
+                        ),
+                    ],
                     metadata: [
                         'screen' => 'leave_request_review',
                         'leave_request_id' => $leaveRequest->id,
@@ -133,7 +133,11 @@ class LeaveRequestService
         }
 
         // Notify all HR users.
-        $hrUsers = User::role('HR', 'api')->get();
+        $hrUsers = User::where('role', UserRole::HR->value)
+            ->orWhere(function ($q) {
+                $q->whereHas('roles', fn ($r) => $r->where('name', 'HR'));
+            })
+            ->get();
 
         foreach ($hrUsers as $hr) {
             SendNotificationJob::dispatch(
@@ -145,8 +149,9 @@ class LeaveRequestService
                     'employee_name' => $user->name,
                     'leave_type' => $this->translateLeaveTypeName(
                         $leaveRequest->leaveType->name,
-                        $manager->locale ?: 'ar'
-                    ),                    ],
+                        $hr->locale ?: 'ar'
+                    ),
+                ],
                 metadata: [
                     'screen' => 'leave_request_review',
                     'leave_request_id' => $leaveRequest->id,
@@ -156,7 +161,11 @@ class LeaveRequestService
         }
 
         // Notify all Owner users.
-        $owners = User::role('Owner', 'api')->get();
+        $owners = User::where('role', UserRole::Owner->value)
+            ->orWhere(function ($q) {
+                $q->whereHas('roles', fn ($r) => $r->where('name', 'Owner'));
+            })
+            ->get();
 
         foreach ($owners as $owner) {
             SendNotificationJob::dispatch(
@@ -168,8 +177,9 @@ class LeaveRequestService
                     'employee_name' => $user->name,
                     'leave_type' => $this->translateLeaveTypeName(
                         $leaveRequest->leaveType->name,
-                        $manager->locale ?: 'ar'
-                    ),                    ],
+                        $owner->locale ?: 'ar'
+                    ),
+                ],
                 metadata: [
                     'screen' => 'leave_request_review',
                     'leave_request_id' => $leaveRequest->id,

@@ -21,6 +21,8 @@ return [
 
     'allowed_origins' => [
         'https://hr-system.iptvdemo.serv5group.com',
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
         'http://localhost:5173',
         'http://127.0.0.1:5173',
         'http://127.0.0.1:5174',

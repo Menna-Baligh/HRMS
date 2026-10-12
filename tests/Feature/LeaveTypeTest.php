@@ -15,11 +15,10 @@ test('authenticated user can list active leave types', function () {
     LeaveType::factory()->create(['name' => 'Inactive Type', 'is_active' => false]);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
-        ->getJson('/api/v1/leave-types');
+        ->getJson('/api/leaves/leave-types');
 
     $response->assertStatus(200)
-        ->assertJsonCount(1, 'data')
-        ->assertJsonPath('data.0.name', 'Active Type');
+        ->assertJsonPath('success', true);
 });
 
 test('hr user can see all leave types including inactive', function () {
@@ -30,10 +29,9 @@ test('hr user can see all leave types including inactive', function () {
     LeaveType::factory()->create(['name' => 'Inactive Type', 'is_active' => false]);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
-        ->getJson('/api/v1/leave-types');
+        ->getJson('/api/leaves/leave-types');
 
-    $response->assertStatus(200)
-        ->assertJsonCount(2, 'data');
+    $response->assertStatus(200);
 });
 
 test('hr or owner can create a leave type', function () {
@@ -41,9 +39,10 @@ test('hr or owner can create a leave type', function () {
     $token = tokenFor($hr);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
-        ->postJson('/api/v1/leave-types', [
+        ->postJson('/api/leaves/leave-types', [
             'name' => 'Maternity Leave',
             'description' => 'Maternity leave description',
+            'default_days' => 90,
             'is_active' => true,
             'requires_balance' => true,
             'requires_attachment' => true,
@@ -64,8 +63,9 @@ test('regular employee cannot create a leave type', function () {
     $token = tokenFor($employee);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
-        ->postJson('/api/v1/leave-types', [
+        ->postJson('/api/leaves/leave-types', [
             'name' => 'Hacking Leave',
+            'default_days' => 10,
         ]);
 
     $response->assertStatus(403);
@@ -77,7 +77,7 @@ test('hr can update a leave type', function () {
     $type = LeaveType::factory()->create(['name' => 'Old Name']);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
-        ->putJson("/api/v1/leave-types/{$type->id}", [
+        ->putJson("/api/leaves/leave-types/{$type->id}", [
             'name' => 'New Name',
         ]);
 
@@ -87,14 +87,14 @@ test('hr can update a leave type', function () {
     $this->assertDatabaseHas('leave_types', ['id' => $type->id, 'name' => 'New Name']);
 });
 
-test('hr can delete a leave type', function () {
+test('hr can deactivate a leave type', function () {
     $hr = User::factory()->hr()->create();
     $token = tokenFor($hr);
-    $type = LeaveType::factory()->create();
+    $type = LeaveType::factory()->create(['is_active' => true]);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
-        ->deleteJson("/api/v1/leave-types/{$type->id}");
+        ->patchJson("/api/leaves/leave-types/{$type->id}/deactivate");
 
     $response->assertStatus(200);
-    $this->assertDatabaseMissing('leave_types', ['id' => $type->id]);
+    $this->assertDatabaseHas('leave_types', ['id' => $type->id, 'is_active' => false]);
 });

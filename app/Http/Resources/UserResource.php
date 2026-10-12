@@ -19,6 +19,8 @@ class UserResource extends JsonResource
         $roleValue = $this->role instanceof \BackedEnum ? $this->role->value : $this->role;
 
         $isOwner = $this->hasRole('Owner') || $roleValue === 'Owner';
+        $authUser = $request->user();
+        $canViewSalary = $authUser && ($authUser->isHrOrAbove() || $authUser->id === $this->id);
 
         $avatarFile = $this->relationLoaded('files')
             ? $this->files->sortByDesc('created_at')->first()
@@ -37,7 +39,7 @@ class UserResource extends JsonResource
                     ? __('employment_types.'.strtolower(str_replace(' ', '-', $this->employment_type)))
                     : null,
                 'start_date' => $this->start_date?->format('Y-m-d'),
-                'salary' => (float) ($this->salary ?? 0.00),
+                'salary' => $this->when($canViewSalary, (float) ($this->salary ?? 0.00)),
             ]),
 
             'status' => $this->status ? __('statuses.'.$this->status) : null,
