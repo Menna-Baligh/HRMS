@@ -109,9 +109,8 @@ class CompanyLocationService
      */
     public function getActiveLocation(): CompanyLocation
     {
-        return CompanyLocation::query()
-            ->where('is_active', true)
-            ->firstOrFail();
+        return CompanyLocation::query()->firstOrFail();
+
     }
 
     /**
