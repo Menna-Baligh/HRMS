@@ -38,11 +38,15 @@ class GoogleAuthController extends Controller
 
     public function callback(): RedirectResponse
     {
-        $frontendUrl = config('app.frontend_url').'/admin/dashboard';
+        $frontendUrl = config('app.frontend_url') . '/admin/dashboard';
+        
         try {
             $result = $this->googleAuthService->handleGoogleCallback();
 
-            return redirect()->to("{$frontendUrl}#token={$result['access_token']}");
+            $userData = urlencode(json_encode($result['user']));
+            $token = $result['access_token'];
+
+            return redirect()->to("{$frontendUrl}#token={$token}&user={$userData}");
         } catch (ValidationException $e) {
             return redirect()->to("{$frontendUrl}?message=not_authorized");
         } catch (Throwable $e) {

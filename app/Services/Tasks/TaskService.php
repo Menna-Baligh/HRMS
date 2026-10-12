@@ -244,78 +244,76 @@ class TaskService
         });
     }
 
+
     /**
      * Update task status by the assigned Employee user.
      */
-    /**
-     * Update task status by the assigned Employee user.
-     */
-    public function updateStatus(Task $task, TaskStatus $status): Task
-    {
-        return DB::transaction(function () use ($task, $status) {
+  /**
+ * Update task status.
+ *
+ * Employees can update tasks assigned to them.
+ * Managers can update tasks they created or assigned.
+ * HR and Owner can update any task.
+ */
+public function updateStatus(Task $task, TaskStatus $status): Task
+{
+    return DB::transaction(function () use ($task, $status) {
+        $user = Auth::user();
 
-            $user = Auth::user();
-
-            // Only Employee users can update task status.
-            if ($user->role !== UserRole::Employee) {
-                throw ValidationException::withMessages([
-                    'user' => __('tasks.must_be_employee'),
-                ]);
-            }
-
-            // The authenticated Employee must be assigned to this task.
-            $this->ensureUserAssignedToTask(
-                task: $task,
-                userId: $user->id
+        if (! $user instanceof User) {
+            throw new AuthorizationException(
+                __('auth.unauthenticated')
             );
+        }
 
-            // Closed tasks cannot be updated.
-            if ($task->status === TaskStatus::CLOSED) {
-                throw ValidationException::withMessages([
-                    'task' => __('tasks.closed_cannot_update'),
-                ]);
-            }
+        // Ensure the user is allowed to update this task.
+        $this->ensureCanUpdateTaskStatus($task, $user);
 
-            $oldStatus = $task->status;
-
-            // Validate the status transition.
-            $this->validateStatusTransition(
-                task: $task,
-                oldStatus: $oldStatus,
-                newStatus: $status
-            );
-
-            // Update task status.
-            $task->update([
-                'status' => $status->value,
+        // Closed tasks cannot be updated.
+        if ($task->status === TaskStatus::CLOSED) {
+            throw ValidationException::withMessages([
+                'task' => __('tasks.closed_cannot_update'),
             ]);
+        }
 
-            // Log status change.
-            $this->logActivity(
-                task: $task,
-                userId: $user->id,
-                action: 'status_changed',
-                oldValue: $oldStatus->value,
-                newValue: $status->value,
-                description: __('tasks.status_updated')
-            );
+        $oldStatus = $task->status;
 
-            // audit
-            $this->auditService->record(
-                actor: $user,
-                action: AuditAction::TASK_STATUS_CHANGED,
-                entity: $task,
-                metadata: [
-                    'old_status' => $oldStatus->value,
-                    'new_status' => $status->value,
-                    'user_id' => $user->id,
-                ],
-            );
+        // Validate the requested status transition.
+        $this->validateStatusTransition(
+            task: $task,
+            oldStatus: $oldStatus,
+            newStatus: $status
+        );
 
-            return $task->refresh();
-        });
-    }
+        $task->update([
+            'status' => $status->value,
+        ]);
 
+        // Record the status change in task activity history.
+        $this->logActivity(
+            task: $task,
+            userId: $user->id,
+            action: 'status_changed',
+            oldValue: $oldStatus->value,
+            newValue: $status->value,
+            description: __('tasks.status_updated')
+        );
+
+        // Record the status change in the audit log.
+        $this->auditService->record(
+            actor: $user,
+            action: AuditAction::TASK_STATUS_CHANGED,
+            entity: $task,
+            metadata: [
+                'old_status' => $oldStatus->value,
+                'new_status' => $status->value,
+                'user_id' => $user->id,
+            ],
+        );
+
+        return $task->refresh();
+    });
+}
     /**
      * Get task details.
      */
@@ -646,4 +644,44 @@ class TaskService
             'description' => $description,
         ]);
     }
+
+    /**
+ * Ensure the user is allowed to update the task status.
+ */
+private function ensureCanUpdateTaskStatus(
+    Task $task,
+    User $user
+): void {
+    // HR and Owner can update any task.
+    if ($user->isHR() || $user->isOwner()) {
+        return;
+    }
+
+    // Employees can update only tasks assigned to them.
+    if ($user->isEmployee()) {
+        $this->ensureUserAssignedToTask(
+            task: $task,
+            userId: $user->id
+        );
+
+        return;
+    }
+
+    // Managers can update tasks they created or assigned.
+    if ($user->isManager()) {
+        $isTaskCreator = (int) $task->created_by === (int) $user->id;
+
+        $isAssignedByManager = $task->assignments()
+            ->where('assigned_by', $user->id)
+            ->exists();
+
+        if ($isTaskCreator || $isAssignedByManager) {
+            return;
+        }
+    }
+
+    throw new AuthorizationException(
+        'You are not authorized to update this task status.'
+    );
+}
 }
