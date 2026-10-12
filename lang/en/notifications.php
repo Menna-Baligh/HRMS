@@ -36,15 +36,15 @@ return [
     'leave_rejected_title' => 'Leave Request Rejected',
     'leave_rejected_body' => 'Your leave request for :date has been rejected.',
 
-    'leave_request_created_title' =>'New Leave Request',
+    'leave_request_created_title' => 'New Leave Request',
 
-    'leave_request_created_body' =>':employee_name submitted a :leave_type request.',
+    'leave_request_created_body' => ':employee_name submitted a :leave_type request.',
 
-    'leave_request_approved_title' =>'Leave Request Approved',
+    'leave_request_approved_title' => 'Leave Request Approved',
 
-    'leave_request_approved_body' =>'Your :leave_type request from :start_date to :end_date has been approved.',
+    'leave_request_approved_body' => 'Your :leave_type request from :start_date to :end_date has been approved.',
 
-    'leave_request_rejected_title' =>'Leave Request Rejected',
+    'leave_request_rejected_title' => 'Leave Request Rejected',
     'leave_request_rejected' => [
         'title' => 'Leave Request Rejected',
         'body' => 'Your :leave_type leave request from :start_date to :end_date was rejected. Reason: :reason',
@@ -56,10 +56,10 @@ return [
     ],
 
     'leave_rejection_reasons' => [
-    'no_leave_balance' => 'You do not have sufficient leave balance',
-],
+        'no_leave_balance' => 'You do not have sufficient leave balance',
+    ],
 
-    'leave_request_rejected_body' =>'Your :leave_type request from :start_date to :end_date has been rejected. Reason: :reason',
+    'leave_request_rejected_body' => 'Your :leave_type request from :start_date to :end_date has been rejected. Reason: :reason',
 
     'account_activated_title' => 'Account Activated',
     'account_activated_body' => 'Your account has been activated successfully. Welcome aboard!',
@@ -91,7 +91,7 @@ return [
     'submission_changes_body' => 'Changes were requested for task ":title". Feedback: :feedback',
 
     'goal_created_title' => 'New Goal Created',
-    'goal_created_body' => ':employee created a new goal: :title',
+    'goal_created_body' => ':creator created a new goal for you: :title',
     'goal_progress_updated_title' => 'Goal Progress Updated',
     'goal_progress_updated_body' => ':employee updated progress for goal ":title" to :value',
     'goal_completed_title' => 'Goal Completed 🎉',

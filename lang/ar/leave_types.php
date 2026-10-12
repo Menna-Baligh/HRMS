@@ -12,9 +12,9 @@ return [
     'sick_leave' => 'إجازة مرضية',
     'emergency_leave' => 'إجازة طارئة',
     'names' => [
-    'annual_leave' => 'إجازة سنوية',
-    'sick_leave' => 'إجازة مرضية',
-    'casual_leave' => 'إجازة عارضة',
-    'unpaid_leave' => 'إجازة بدون أجر',
-],
+        'annual_leave' => 'إجازة سنوية',
+        'sick_leave' => 'إجازة مرضية',
+        'casual_leave' => 'إجازة عارضة',
+        'unpaid_leave' => 'إجازة بدون أجر',
+    ],
 ];

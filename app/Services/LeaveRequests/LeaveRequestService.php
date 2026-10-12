@@ -57,13 +57,13 @@ class LeaveRequestService
                     __('leave_requests.overlap')
                 );
             }
-    
+
             // Create balance if it does not exist.
             $this->leaveBalanceService->createBalancesForUser(
                 user: $user,
                 year: $startDate->year
             );
-    
+
             $this->leaveBalanceService->validateBalance(
                 user: $user,
                 leaveType: $leaveType,
@@ -80,8 +80,8 @@ class LeaveRequestService
                 'reason' => $data['reason'] ?? null,
                 'status' => LeaveStatus::Pending->value,
             ]);
-    
-              // record audit
+
+            // record audit
             $this->auditService->record(
                 actor: $user,
                 action: AuditAction::LEAVE_CREATED,
@@ -94,13 +94,13 @@ class LeaveRequestService
                     'days' => $days,
                 ],
             );
-    
+
             return $leaveRequest->fresh([
                 'user',
                 'leaveType',
             ]);
         });
-    
+
         /*
          * Notify the employee's manager after the leave request
          * has been successfully created and the transaction has committed.
@@ -275,95 +275,95 @@ public function approve(LeaveRequest $leaveRequest,int $reviewerId): LeaveReques
     return $leaveRequest;
 }
 
-public function reject(
-    LeaveRequest $leaveRequest,
-    int $reviewerId,
-    string $rejectionReason
-): LeaveRequest {
-    $leaveRequest = DB::transaction(function () use (
-        $leaveRequest,
-        $reviewerId,
-        $rejectionReason
-    ) {
-        $leaveRequest = LeaveRequest::query()
-            ->lockForUpdate()
-            ->findOrFail($leaveRequest->id);
+    public function reject(
+        LeaveRequest $leaveRequest,
+        int $reviewerId,
+        string $rejectionReason
+    ): LeaveRequest {
+        $leaveRequest = DB::transaction(function () use (
+            $leaveRequest,
+            $reviewerId,
+            $rejectionReason
+        ) {
+            $leaveRequest = LeaveRequest::query()
+                ->lockForUpdate()
+                ->findOrFail($leaveRequest->id);
 
-        if ($leaveRequest->status !== LeaveStatus::Pending) {
-            throw new RuntimeException(
-                __('leave_requests.only_pending_reject')
-            );
-        }
+            if ($leaveRequest->status !== LeaveStatus::Pending) {
+                throw new RuntimeException(
+                    __('leave_requests.only_pending_reject')
+                );
+            }
 
-        // Get the reviewer who rejected the leave request.
-        $reviewer = User::findOrFail($reviewerId);
-        $previousStatus = $leaveRequest->status->value;
+            // Get the reviewer who rejected the leave request.
+            $reviewer = User::findOrFail($reviewerId);
+            $previousStatus = $leaveRequest->status->value;
 
-        $leaveRequest->update([
-            'status' => LeaveStatus::Rejected->value,
-            'rejection_reason' => $rejectionReason,
-            'reviewed_by' => $reviewerId,
-            'reviewed_at' => now(),
-        ]);
-
-        // Store the rejection decision.
-        LeaveDecision::create([
-            'leave_request_id' => $leaveRequest->id,
-            'reviewer_id' => $reviewerId,
-            'previous_status' => $previousStatus,
-            'decision' => LeaveStatus::Rejected->value,
-            'reason' => $rejectionReason,
-            'decided_at' => now(),
-        ]);
-
-        // Record the rejection in the audit log.
-        $this->auditService->record(
-            actor: $reviewer,
-            action: AuditAction::LEAVE_REJECTED,
-            entity: $leaveRequest,
-            metadata: [
-                'old_status' => $previousStatus,
-                'new_status' => LeaveStatus::Rejected->value,
-                'reviewer_id' => $reviewerId,
+            $leaveRequest->update([
+                'status' => LeaveStatus::Rejected->value,
                 'rejection_reason' => $rejectionReason,
+                'reviewed_by' => $reviewerId,
+                'reviewed_at' => now(),
+            ]);
+
+            // Store the rejection decision.
+            LeaveDecision::create([
+                'leave_request_id' => $leaveRequest->id,
+                'reviewer_id' => $reviewerId,
+                'previous_status' => $previousStatus,
+                'decision' => LeaveStatus::Rejected->value,
+                'reason' => $rejectionReason,
+                'decided_at' => now(),
+            ]);
+
+            // Record the rejection in the audit log.
+            $this->auditService->record(
+                actor: $reviewer,
+                action: AuditAction::LEAVE_REJECTED,
+                entity: $leaveRequest,
+                metadata: [
+                    'old_status' => $previousStatus,
+                    'new_status' => LeaveStatus::Rejected->value,
+                    'reviewer_id' => $reviewerId,
+                    'rejection_reason' => $rejectionReason,
+                ],
+            );
+
+            return $leaveRequest->fresh([
+                'user',
+                'leaveType',
+                'reviewer',
+                'decisions.reviewer',
+            ]);
+        });
+
+        // Notify the employee only after the rejection transaction commits.
+        SendNotificationJob::dispatch(
+            user: $leaveRequest->user,
+            type: 'leave_request_rejected',
+            titleKey: 'notifications.leave_request_rejected_title',
+            bodyKey: 'notifications.leave_request_rejected_body',
+            parameters: [
+                'leave_type' => $this->translateLeaveTypeName(
+                    $leaveRequest->leaveType->name,
+                    $leaveRequest->user->locale ?: 'ar'
+                ),
+                'start_date' => $leaveRequest->start_date->toDateString(),
+                'end_date' => $leaveRequest->end_date->toDateString(),
+                'reason' => $this->translateRejectionReason(
+                    $rejectionReason,
+                    $leaveRequest->user->locale ?: 'ar'
+                ),
             ],
+            metadata: [
+                'screen' => 'leave_request_details',
+                'leave_request_id' => $leaveRequest->id,
+                'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+            ]
         );
 
-        return $leaveRequest->fresh([
-            'user',
-            'leaveType',
-            'reviewer',
-            'decisions.reviewer',
-        ]);
-    });
-
-    // Notify the employee only after the rejection transaction commits.
-    SendNotificationJob::dispatch(
-        user: $leaveRequest->user,
-        type: 'leave_request_rejected',
-        titleKey: 'notifications.leave_request_rejected_title',
-        bodyKey: 'notifications.leave_request_rejected_body',
-        parameters: [
-            'leave_type' => $this->translateLeaveTypeName(
-                $leaveRequest->leaveType->name,
-                $leaveRequest->user->locale ?: 'ar'
-            ),
-            'start_date' => $leaveRequest->start_date->toDateString(),
-            'end_date' => $leaveRequest->end_date->toDateString(),
-            'reason' => $this->translateRejectionReason(
-                $rejectionReason,
-                $leaveRequest->user->locale ?: 'ar'
-            ),
-        ],
-        metadata: [
-            'screen' => 'leave_request_details',
-            'leave_request_id' => $leaveRequest->id,
-            'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
-        ]
-    );
-
-    return $leaveRequest;
-}
+        return $leaveRequest;
+    }
 
     public function getUserHistory(
         User $user,
@@ -454,49 +454,48 @@ public function reject(
             ->get();
     }
 
-
     private function translateRejectionReason(
         string $reason,
         string $locale
     ): string {
         $normalizedReason = strtolower(trim($reason));
-    
+
         $reasonKey = match ($normalizedReason) {
             'you dont have leave balance',
             "you don't have leave balance",
             'no_leave_balance' => 'no_leave_balance',
-    
+
             default => null,
         };
-    
+
         if ($reasonKey === null) {
             return $reason;
         }
-    
+
         return __("notifications.leave_rejection_reasons.{$reasonKey}", [], $locale);
     }
 
     /**
- * Translate predefined leave type names based on the recipient's locale.
- */
-private function translateLeaveTypeName(
-    string $name,
-    string $locale
-): string {
-    $normalizedName = strtolower(trim($name));
+     * Translate predefined leave type names based on the recipient's locale.
+     */
+    private function translateLeaveTypeName(
+        string $name,
+        string $locale
+    ): string {
+        $normalizedName = strtolower(trim($name));
 
-    $translationKey = match ($normalizedName) {
-        'annual leave' => 'annual_leave',
-        'sick leave' => 'sick_leave',
-        'casual leave' => 'casual_leave',
-        'unpaid leave' => 'unpaid_leave',
-        default => null,
-    };
+        $translationKey = match ($normalizedName) {
+            'annual leave' => 'annual_leave',
+            'sick leave' => 'sick_leave',
+            'casual leave' => 'casual_leave',
+            'unpaid leave' => 'unpaid_leave',
+            default => null,
+        };
 
-    if ($translationKey === null) {
-        return $name;
+        if ($translationKey === null) {
+            return $name;
+        }
+
+        return __("leave_types.names.{$translationKey}", [], $locale);
     }
-
-    return __("leave_types.names.{$translationKey}", [], $locale);
-}
 }

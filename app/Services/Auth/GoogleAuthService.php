@@ -2,6 +2,7 @@
 
 namespace App\Services\Auth;
 
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Validation\ValidationException;
 use Laravel\Socialite\Facades\Socialite;
@@ -30,6 +31,7 @@ class GoogleAuthService
 
         if (! $user) {
             $user = User::create([
+                'employee_id' => $this->generateOwnerCode(),
                 'name' => $googleUser->getName(),
                 'email' => $googleUser->getEmail(),
                 'role' => 'Owner',
@@ -39,19 +41,52 @@ class GoogleAuthService
             ]);
             $user->assignRole('Owner');
         } else {
-            $user->update([
+            $updateData = [
                 'provider' => 'google',
                 'provider_id' => $googleUser->getId(),
-            ]);
+            ];
+
+            if (empty($user->employee_id)) {
+                $updateData['employee_id'] = $this->generateOwnerCode();
+            }
+
+            $user->update($updateData);
         }
 
         $token = auth('api')->login($user);
 
+        $user->load(['department', 'companyLocation', 'manager', 'files']);
+
         return [
             'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => (int) auth('api')->factory()->getTTL() / 60 .' hours',
-            'user' => $user,
+            'token_type'   => 'bearer',
+            'expires_in'   => auth('api')->factory()->getTTL() / 60 . ' hours',
+            'user'         => new UserResource($user),
         ];
+    }
+
+    protected function generateOwnerCode(): string
+    {
+        $lastOwner = User::where('role', 'Owner')
+            ->where('employee_id', 'LIKE', 'OWN-%')
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if (! $lastOwner) {
+            $nextNumber = 1;
+        } else {
+            $lastNumber = (int) preg_replace('/[^0-9]/', '', $lastOwner->employee_id);
+            $nextNumber = $lastNumber + 1;
+        }
+
+        do {
+            $code = 'OWN-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+            $exists = User::where('employee_id', $code)->exists();
+            if ($exists) {
+                $nextNumber++;
+            }
+        } while ($exists);
+
+        return $code;
     }
 }

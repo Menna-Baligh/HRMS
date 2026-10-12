@@ -134,4 +134,16 @@ class AuthController extends Controller
             );
         }
     }
+
+    public function refresh()
+    {
+        return ResponseHelper::success(
+            data: [
+                'access_token' => auth('api')->refresh(),
+                'token_type' => 'bearer',
+                'expires_in' => auth('api')->factory()->getTTL() / 60 .' hours',
+            ],
+            message: __('auth.token_refreshed')
+        );
+    }
 }

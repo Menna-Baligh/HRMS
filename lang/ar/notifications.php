@@ -37,11 +37,9 @@ return [
     'leave_rejected_title' => 'رفض طلب الإجازة',
     'leave_rejected_body' => 'نأسف لإبلاغك بأنه تم رفض طلب إجازتك بتاريخ :date.',
 
-    
-
     'leave_request_created_title' => 'طلب إجازة جديد',
 
-    'leave_request_created_body' =>'قام :employee_name بتقديم طلب إجازة من نوع :leave_type.',
+    'leave_request_created_body' => 'قام :employee_name بتقديم طلب إجازة من نوع :leave_type.',
 
     'leave_request_rejected' => [
         'title' => 'تم رفض طلب الإجازة',
@@ -50,21 +48,21 @@ return [
 
     ],
     'leave_rejection_reasons' => [
-    'no_leave_balance' => 'لا يوجد لديك رصيد إجازات كافٍ',
-],
+        'no_leave_balance' => 'لا يوجد لديك رصيد إجازات كافٍ',
+    ],
 
     'leave_request_approved' => [
         'title' => 'تمت الموافقة على طلب الإجازة',
         'body' => 'تمت الموافقة على طلب إجازتك من نوع :leave_type من :start_date إلى :end_date.',
     ],
 
-    'leave_request_approved_title' =>'تمت الموافقة على طلب الإجازة',
+    'leave_request_approved_title' => 'تمت الموافقة على طلب الإجازة',
 
-    'leave_request_approved_body' =>'تمت الموافقة على طلب إجازتك من نوع :leave_type من :start_date إلى :end_date.',
+    'leave_request_approved_body' => 'تمت الموافقة على طلب إجازتك من نوع :leave_type من :start_date إلى :end_date.',
 
-    'leave_request_rejected_title' =>'تم رفض طلب الإجازة',
+    'leave_request_rejected_title' => 'تم رفض طلب الإجازة',
 
-    'leave_request_rejected_body' =>'تم رفض طلب إجازتك من نوع :leave_type من :start_date إلى :end_date. السبب: :reason',
+    'leave_request_rejected_body' => 'تم رفض طلب إجازتك من نوع :leave_type من :start_date إلى :end_date. السبب: :reason',
 
     'account_activated_title' => 'تم تفعيل الحساب',
     'account_activated_body' => 'تم تفعيل حسابك بنجاح. أهلاً بك معنا في الفريق!',
@@ -96,7 +94,7 @@ return [
     'submission_changes_body' => 'تم طلب تعديلات على تسليمتك للمهمة ":title". الملاحظات: :feedback',
 
     'goal_created_title' => 'تم إنشاء هدف جديد',
-    'goal_created_body' => 'قام الموظف :employee بإنشاء هدف جديد: :title',
+    'goal_created_body' => 'قام :creator بإنشاء هدف جديد لك: :title',
     'goal_progress_updated_title' => 'تم تحديث تقدم الهدف',
     'goal_progress_updated_body' => 'قام الموظف :employee بتحديث تقدم الهدف ":title" إلى :value',
     'goal_completed_title' => 'تم إنجاز الهدف 🎉',
