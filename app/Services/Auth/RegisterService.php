@@ -46,17 +46,25 @@ class RegisterService
     protected function generateOwnerCode(): string
     {
         $lastOwner = User::where('role', 'Owner')
-            ->whereNotNull('employee_id')
+            ->where('employee_id', 'LIKE', 'OWN-%')
             ->orderBy('id', 'desc')
             ->first();
 
         if (! $lastOwner) {
-            return 'OWN-0001';
+            $nextNumber = 1;
+        } else {
+            $lastNumber = (int) preg_replace('/[^0-9]/', '', $lastOwner->employee_id);
+            $nextNumber = $lastNumber + 1;
         }
 
-        $lastNumber = (int) filter_var($lastOwner->employee_id, FILTER_SANITIZE_NUMBER_INT);
-        $nextNumber = $lastNumber + 1;
+        do {
+            $code = 'OWN-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+            $exists = User::where('employee_id', $code)->exists();
+            if ($exists) {
+                $nextNumber++;
+            }
+        } while ($exists);
 
-        return 'OWN-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        return $code;
     }
 }
