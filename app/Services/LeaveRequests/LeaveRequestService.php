@@ -186,10 +186,7 @@ class LeaveRequestService
 
     }
 
-public function approve(
-    LeaveRequest $leaveRequest,
-    int $reviewerId
-): LeaveRequest {
+public function approve(LeaveRequest $leaveRequest,int $reviewerId): LeaveRequest {
     $leaveRequest = DB::transaction(function () use (
         $leaveRequest,
         $reviewerId

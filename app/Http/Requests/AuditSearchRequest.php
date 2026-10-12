@@ -48,6 +48,13 @@ class AuditSearchRequest extends FormRequest
                 'date',
                 'after_or_equal:date_from',
             ],
+
+            'per_page' => [
+                'sometimes',
+                'integer',
+                'min:1',
+                'max:100',
+            ],
         ];
     }
 }

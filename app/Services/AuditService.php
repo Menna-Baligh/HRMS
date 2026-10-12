@@ -24,49 +24,49 @@ class AuditService
     }
 
     // search
-    public function search(array $filters = [])
-    {
-        return Audit::query()->with('actor:id,name')->when(
-            ! empty($filters['actor_id']), fn ($query) => $query->where('actor_id', $filters['actor_id'])
+   
+/**
+ * Search audit records using the provided filters.
+ */
+public function search(array $filters = [])
+{
+    return Audit::query()
+        ->with('actor:id,name')
+        ->when(
+            ! empty($filters['actor_id']),
+            fn ($query) => $query->where('actor_id', $filters['actor_id'])
         )
-            ->when(
-                ! empty($filters['action']),
-                fn ($query) => $query->where(
-                    'action',
-                    $filters['action']
-                )
+        ->when(
+            ! empty($filters['action']),
+            fn ($query) => $query->where('action', $filters['action'])
+        )
+        ->when(
+            ! empty($filters['entity_type']),
+            fn ($query) => $query->where('entity_type', $filters['entity_type'])
+        )
+        ->when(
+            ! empty($filters['entity_id']),
+            fn ($query) => $query->where('entity_id', $filters['entity_id'])
+        )
+        ->when(
+            ! empty($filters['date_from']),
+            fn ($query) => $query->whereDate(
+                'created_at',
+                '>=',
+                $filters['date_from']
             )
-            ->when(
-                ! empty($filters['entity_type']),
-                fn ($query) => $query->where(
-                    'entity_type',
-                    $filters['entity_type']
-                )
+        )
+        ->when(
+            ! empty($filters['date_to']),
+            fn ($query) => $query->whereDate(
+                'created_at',
+                '<=',
+                $filters['date_to']
             )
-            ->when(
-                ! empty($filters['entity_id']),
-                fn ($query) => $query->where(
-                    'entity_id',
-                    $filters['entity_id']
-                )
-            )
-            ->when(
-                ! empty($filters['date_from']),
-                fn ($query) => $query->whereDate(
-                    'created_at',
-                    '>=',
-                    $filters['date_from']
-                )
-            )
-            ->when(
-                ! empty($filters['date_to']),
-                fn ($query) => $query->whereDate(
-                    'created_at',
-                    '<=',
-                    $filters['date_to']
-                )
-            )
-            ->latest()
-            ->get();
-    }
+        )
+        ->latest('created_at')
+        ->paginate((int) ($filters['per_page'] ?? 15))
+        ->withQueryString();
+}
+
 }
