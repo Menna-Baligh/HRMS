@@ -285,7 +285,7 @@ enum PermissionEnum: string
             self::CREATE_ADVANCE,
             self::VIEW_ADVANCES,
             self::VIEW_DEDUCTIONS,
-            self::VIEW_BONUSES, => ['Owner', 'HR', 'Manager', 'Employee'],
+            self::VIEW_BONUSES => ['Owner', 'HR', 'Manager', 'Employee'],
 
             // Employee Only
             self::GOAL_VIEW_OWN,
