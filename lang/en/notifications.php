@@ -91,7 +91,7 @@ return [
     'submission_changes_body' => 'Changes were requested for task ":title". Feedback: :feedback',
 
     'goal_created_title' => 'New Goal Created',
-    'goal_created_body' => ':employee created a new goal: :title',
+    'goal_created_body' => ':creator created a new goal for you: :title',
     'goal_progress_updated_title' => 'Goal Progress Updated',
     'goal_progress_updated_body' => ':employee updated progress for goal ":title" to :value',
     'goal_completed_title' => 'Goal Completed 🎉',

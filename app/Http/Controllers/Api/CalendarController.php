@@ -30,7 +30,7 @@ class CalendarController extends Controller
 
         return ResponseHelper::success(
             data: $events,
-            message: 'Calendar events retrieved successfully.'
-        );
+            message: __('calendar.retrieved_successfully')
+                );
     }
 }

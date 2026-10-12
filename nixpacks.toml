@@ -13,3 +13,5 @@ nixPkgs = [
 cmds = [
     'composer install --ignore-platform-req=ext-redis --no-dev --optimize-autoloader'
 ]
+[start]
+cmd = 'php artisan schedule:work'

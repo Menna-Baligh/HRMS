@@ -31,9 +31,8 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'phone' => $this->phone,
-
+            'employee_code' => $this->employee_id,
             $this->mergeWhen(! $isOwner, [
-                'employee_code' => $this->employee_id,
                 'job_title' => $this->job_title,
                 'employment_type' => $this->employment_type
                     ? __('employment_types.'.strtolower(str_replace(' ', '-', $this->employment_type)))
