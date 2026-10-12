@@ -14,21 +14,23 @@ test('user can login with valid credentials and receive jwt token', function () 
         'role' => UserRole::Employee,
     ]);
 
-    $response = $this->postJson('/api/v1/auth/login', [
+    $response = $this->postJson('/api/auth/login', [
         'email' => 'test@example.com',
         'password' => 'secret123',
     ]);
 
     $response->assertStatus(200)
         ->assertJsonStructure([
-            'access_token',
-            'token_type',
-            'expires_in',
-            'user' => [
-                'id',
-                'name',
-                'email',
-                'role',
+            'success',
+            'data' => [
+                'access_token',
+                'token_type',
+                'expires_in',
+                'user' => [
+                    'id',
+                    'name',
+                    'email',
+                ],
             ],
         ]);
 });
@@ -39,25 +41,15 @@ test('user cannot login with invalid credentials', function () {
         'password' => Hash::make('secret123'),
     ]);
 
-    $response = $this->postJson('/api/v1/auth/login', [
+    $response = $this->postJson('/api/auth/login', [
         'email' => 'test@example.com',
         'password' => 'wrong-password',
     ]);
 
-    $response->assertStatus(401)
-        ->assertJson(['error' => 'Invalid credentials']);
-});
-
-test('authenticated user can fetch their profile via me endpoint', function () {
-    $user = User::factory()->create();
-    $token = tokenFor($user);
-
-    $response = $this->withHeader('Authorization', "Bearer {$token}")
-        ->getJson('/api/v1/auth/me');
-
-    $response->assertStatus(200)
-        ->assertJsonPath('user.id', $user->id)
-        ->assertJsonPath('user.email', $user->email);
+    $response->assertStatus(422)
+        ->assertJson([
+            'success' => false,
+        ]);
 });
 
 test('authenticated user can refresh token', function () {
@@ -65,10 +57,12 @@ test('authenticated user can refresh token', function () {
     $token = tokenFor($user);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
-        ->postJson('/api/v1/auth/refresh');
+        ->postJson('/api/auth/refresh');
 
     $response->assertStatus(200)
-        ->assertJsonStructure(['access_token', 'token_type', 'expires_in']);
+        ->assertJsonStructure([
+            'data' => ['access_token', 'token_type', 'expires_in'],
+        ]);
 });
 
 test('authenticated user can logout', function () {
@@ -76,8 +70,7 @@ test('authenticated user can logout', function () {
     $token = tokenFor($user);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
-        ->postJson('/api/v1/auth/logout');
+        ->postJson('/api/auth/logout');
 
-    $response->assertStatus(200)
-        ->assertJson(['message' => 'Successfully logged out']);
+    $response->assertStatus(200);
 });

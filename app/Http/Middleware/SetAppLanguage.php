@@ -23,8 +23,9 @@ class SetAppLanguage
 
         App::setLocale($locale);
 
-        if ($user && $user->locale !== $locale) {
-            $user->update(['locale' => $locale]);
+        $explicitLocale = $request->query('lang') ?? $request->query('locale');
+        if ($user && $explicitLocale && in_array($explicitLocale, ['ar', 'en']) && $user->locale !== $explicitLocale) {
+            $user->update(['locale' => $explicitLocale]);
         }
 
         return $next($request);

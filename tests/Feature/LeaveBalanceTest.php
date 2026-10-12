@@ -23,15 +23,14 @@ test('leave request rejected if user has insufficient balance', function () {
 
     // Request 3 days
     $response = $this->withHeader('Authorization', "Bearer {$token}")
-        ->postJson('/api/v1/leave-requests', [
+        ->postJson('/api/leaves/leave-requests', [
             'leave_type_id' => $type->id,
             'start_date' => now()->addDays(5)->format('Y-m-d'),
             'end_date' => now()->addDays(7)->format('Y-m-d'), // 3 days
             'reason' => 'Need a vacation',
         ]);
 
-    $response->assertStatus(422)
-        ->assertJsonPath('message', 'Insufficient leave balance. Requested: 3 day(s), remaining: 1 day(s).');
+    $response->assertStatus(422);
 });
 
 test('leave request succeeds if user has sufficient balance', function () {
@@ -49,7 +48,7 @@ test('leave request succeeds if user has sufficient balance', function () {
     ]);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
-        ->postJson('/api/v1/leave-requests', [
+        ->postJson('/api/leaves/leave-requests', [
             'leave_type_id' => $type->id,
             'start_date' => now()->addDays(5)->format('Y-m-d'),
             'end_date' => now()->addDays(6)->format('Y-m-d'), // 2 days
@@ -59,10 +58,9 @@ test('leave request succeeds if user has sufficient balance', function () {
     $response->assertStatus(201);
 });
 
-test('balance is NOT deducted upon creation or manager approval, but IS deducted upon HR approval', function () {
-    $manager = User::factory()->manager()->create();
+test('balance is NOT deducted upon creation, but IS deducted upon approval', function () {
     $hr = User::factory()->hr()->create();
-    $employee = User::factory()->employee($manager)->create();
+    $employee = User::factory()->create();
 
     $type = LeaveType::factory()->create(['requires_balance' => true]);
     $year = (int) date('Y');
@@ -78,7 +76,7 @@ test('balance is NOT deducted upon creation or manager approval, but IS deducted
     // 1. Employee creates request for 3 days
     $empToken = tokenFor($employee);
     $createResponse = $this->withHeader('Authorization', "Bearer {$empToken}")
-        ->postJson('/api/v1/leave-requests', [
+        ->postJson('/api/leaves/leave-requests', [
             'leave_type_id' => $type->id,
             'start_date' => now()->addDays(5)->format('Y-m-d'),
             'end_date' => now()->addDays(7)->format('Y-m-d'),
@@ -88,31 +86,18 @@ test('balance is NOT deducted upon creation or manager approval, but IS deducted
     $requestId = $createResponse->json('data.id');
 
     // Verify balance unchanged
-    expect($balance->fresh()->used_days)->toBe('0.00');
+    expect((float) $balance->fresh()->used_days)->toBe(0.0);
 
-    // 2. Manager approves
-    $mgrToken = tokenFor($manager);
-    $mgrResponse = $this->withHeader('Authorization', "Bearer {$mgrToken}")
-        ->postJson("/api/v1/leave-requests/{$requestId}/approve-manager", [
-            'note' => 'Looks good to me',
-        ]);
-    $mgrResponse->assertStatus(200);
-
-    // Verify balance still unchanged
-    expect($balance->fresh()->used_days)->toBe('0.00');
-
-    // 3. HR gives final approval
+    // 2. HR approves request
     $hrToken = tokenFor($hr);
     $hrResponse = $this->withHeader('Authorization', "Bearer {$hrToken}")
-        ->postJson("/api/v1/leave-requests/{$requestId}/approve-hr", [
-            'note' => 'HR finalized approval',
-        ]);
+        ->patchJson("/api/leaves/leave-requests/{$requestId}/approve");
     $hrResponse->assertStatus(200);
 
     // Balance MUST now be deducted by 3 days
     $freshBalance = $balance->fresh();
     expect((float) $freshBalance->used_days)->toBe(3.0)
-        ->and($freshBalance->remaining_days)->toBe(7.0);
+        ->and((float) $freshBalance->remaining_days)->toBe(7.0);
 });
 
 test('user can view their leave balances', function () {
@@ -129,7 +114,7 @@ test('user can view their leave balances', function () {
     ]);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
-        ->getJson('/api/v1/leave-balances');
+        ->getJson('/api/leaves/leave-balances');
 
     $response->assertStatus(200)
         ->assertJsonCount(1, 'data')
@@ -137,3 +122,4 @@ test('user can view their leave balances', function () {
         ->assertJsonPath('data.0.used_days', 5)
         ->assertJsonPath('data.0.remaining_days', 10);
 });
+

@@ -26,11 +26,10 @@ class LeaveRequestFactory extends Factory
             'status' => LeaveStatus::Pending,
             'start_date' => $startDate,
             'end_date' => $endDate,
-            'requested_days' => 3.00,
+            'days' => 3.00,
             'reason' => fake()->sentence(),
-            'attachment_path' => null,
-            'manager_id' => null,
-            'hr_id' => null,
+            'reviewed_by' => null,
+            'reviewed_at' => null,
             'rejection_reason' => null,
         ];
     }
@@ -39,16 +38,16 @@ class LeaveRequestFactory extends Factory
     {
         return $this->state(fn () => [
             'status' => LeaveStatus::ApprovedByManager,
-            'manager_id' => $manager?->id ?? User::factory()->manager(),
+            'reviewed_by' => $manager?->id ?? User::factory(),
         ]);
     }
 
-    public function approved(?User $manager = null, ?User $hr = null): static
+    public function approved(?User $reviewer = null): static
     {
         return $this->state(fn () => [
             'status' => LeaveStatus::Approved,
-            'manager_id' => $manager?->id ?? User::factory()->manager(),
-            'hr_id' => $hr?->id ?? User::factory()->hr(),
+            'reviewed_by' => $reviewer?->id ?? User::factory(),
+            'reviewed_at' => now(),
         ]);
     }
 
