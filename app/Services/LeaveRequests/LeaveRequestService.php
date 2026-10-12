@@ -105,39 +105,12 @@ class LeaveRequestService
          * Notify the employee's manager after the leave request
          * has been successfully created and the transaction has committed.
          */
-        $manager = User::find($user->manager_id);
-    
-       // Notify employee's manager.
-            if ($user->manager_id) {
-                $manager = User::find($user->manager_id);
+        if ($user->manager_id) {
+            $manager = User::find($user->manager_id);
 
-                if ($manager) {
-                    SendNotificationJob::dispatch(
-                        user: $manager,
-                        type: 'leave_request_created',
-                        titleKey: 'notifications.leave_request_created_title',
-                        bodyKey: 'notifications.leave_request_created_body',
-                        parameters: [
-                            'employee_name' => $user->name,
-                            'leave_type' => $this->translateLeaveTypeName(
-                                $leaveRequest->leaveType->name,
-                                $manager->locale ?: 'ar'
-                            ),                        ],
-                        metadata: [
-                            'screen' => 'leave_request_review',
-                            'leave_request_id' => $leaveRequest->id,
-                            'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
-                        ]
-                    );
-                }
-            }
-
-            // Notify all HR users.
-            $hrUsers = User::role('HR', 'api')->get();
-
-            foreach ($hrUsers as $hr) {
+            if ($manager && $manager->status === 'active') {
                 SendNotificationJob::dispatch(
-                    user: $hr,
+                    user: $manager,
                     type: 'leave_request_created',
                     titleKey: 'notifications.leave_request_created_title',
                     bodyKey: 'notifications.leave_request_created_body',
@@ -146,7 +119,8 @@ class LeaveRequestService
                         'leave_type' => $this->translateLeaveTypeName(
                             $leaveRequest->leaveType->name,
                             $manager->locale ?: 'ar'
-                        ),                    ],
+                        ),
+                    ],
                     metadata: [
                         'screen' => 'leave_request_review',
                         'leave_request_id' => $leaveRequest->id,
@@ -154,31 +128,62 @@ class LeaveRequestService
                     ]
                 );
             }
+        }
 
-            // Notify all Owner users.
-            $owners = User::role('Owner', 'api')->get();
+        // Notify all active HR users using each recipient's locale.
+        $hrUsers = User::role('HR', 'api')
+            ->where('status', 'active')
+            ->get();
 
-            foreach ($owners as $owner) {
-                SendNotificationJob::dispatch(
-                    user: $owner,
-                    type: 'leave_request_created',
-                    titleKey: 'notifications.leave_request_created_title',
-                    bodyKey: 'notifications.leave_request_created_body',
-                    parameters: [
-                        'employee_name' => $user->name,
-                        'leave_type' => $this->translateLeaveTypeName(
-                            $leaveRequest->leaveType->name,
-                            $manager->locale ?: 'ar'
-                        ),                    ],
-                    metadata: [
-                        'screen' => 'leave_request_review',
-                        'leave_request_id' => $leaveRequest->id,
-                        'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
-                    ]
-                );
-            }
+        foreach ($hrUsers as $hr) {
+            SendNotificationJob::dispatch(
+                user: $hr,
+                type: 'leave_request_created',
+                titleKey: 'notifications.leave_request_created_title',
+                bodyKey: 'notifications.leave_request_created_body',
+                parameters: [
+                    'employee_name' => $user->name,
+                    'leave_type' => $this->translateLeaveTypeName(
+                        $leaveRequest->leaveType->name,
+                        $hr->locale ?: 'ar'
+                    ),
+                ],
+                metadata: [
+                    'screen' => 'leave_request_review',
+                    'leave_request_id' => $leaveRequest->id,
+                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                ]
+            );
+        }
 
-            return $leaveRequest;
+        // Notify all active Owner users using each recipient's locale.
+        $owners = User::role('Owner', 'api')
+            ->where('status', 'active')
+            ->get();
+
+        foreach ($owners as $owner) {
+            SendNotificationJob::dispatch(
+                user: $owner,
+                type: 'leave_request_created',
+                titleKey: 'notifications.leave_request_created_title',
+                bodyKey: 'notifications.leave_request_created_body',
+                parameters: [
+                    'employee_name' => $user->name,
+                    'leave_type' => $this->translateLeaveTypeName(
+                        $leaveRequest->leaveType->name,
+                        $owner->locale ?: 'ar'
+                    ),
+                ],
+                metadata: [
+                    'screen' => 'leave_request_review',
+                    'leave_request_id' => $leaveRequest->id,
+                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                ]
+            );
+        }
+
+        return $leaveRequest;
+
     }
 
 public function approve(
