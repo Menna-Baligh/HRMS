@@ -499,9 +499,10 @@ class SubmissionService
      */
     private function ensureSubmissionCanBeReviewed(Submission $submission): void
     {
-        if (
-            $submission->status !== SubmissionStatus::PENDING_REVIEW
-        ) {
+        if (! in_array($submission->status, [
+            SubmissionStatus::PENDING_REVIEW,
+            SubmissionStatus::CHANGES_REQUESTED,
+        ], true)) {
             throw ValidationException::withMessages([
                 'submission' => __('submissions.not_waiting_for_review'),
             ]);
