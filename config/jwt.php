@@ -105,8 +105,8 @@ return [
     |
     */
 
-    // 'ttl' => env('JWT_TTL', 1440),
-    'ttl' => env('JWT_TTL', 2), // only for testing
+    'ttl' => env('JWT_TTL', 1440),
+    // 'ttl' => env('JWT_TTL', 2), // only for testing
 
 
     /*
