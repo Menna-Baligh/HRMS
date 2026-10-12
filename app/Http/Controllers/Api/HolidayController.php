@@ -56,7 +56,7 @@ class HolidayController extends Controller
 
         return ResponseHelper::success(
             data: $holiday,
-            message: 'Holiday updated successfully.'
+            message: __('holidays.updated_successfully')
         );
     }
 
@@ -69,7 +69,7 @@ class HolidayController extends Controller
 
         return ResponseHelper::success(
             data: null,
-            message: 'Holiday deleted successfully.'
+            message: __('holidays.deleted_successfully')
         );
     }
 }

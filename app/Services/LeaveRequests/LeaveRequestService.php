@@ -105,13 +105,10 @@ class LeaveRequestService
          * Notify the employee's manager after the leave request
          * has been successfully created and the transaction has committed.
          */
-        $manager = User::find($user->manager_id);
-
-        // Notify employee's manager.
         if ($user->manager_id) {
             $manager = User::find($user->manager_id);
 
-            if ($manager) {
+            if ($manager && $manager->status === 'active') {
                 SendNotificationJob::dispatch(
                     user: $manager,
                     type: 'leave_request_created',
@@ -122,7 +119,8 @@ class LeaveRequestService
                         'leave_type' => $this->translateLeaveTypeName(
                             $leaveRequest->leaveType->name,
                             $manager->locale ?: 'ar'
-                        ),                        ],
+                        ),
+                    ],
                     metadata: [
                         'screen' => 'leave_request_review',
                         'leave_request_id' => $leaveRequest->id,
@@ -132,8 +130,10 @@ class LeaveRequestService
             }
         }
 
-        // Notify all HR users.
-        $hrUsers = User::role('HR', 'api')->get();
+        // Notify all active HR users using each recipient's locale.
+        $hrUsers = User::role('HR', 'api')
+            ->where('status', 'active')
+            ->get();
 
         foreach ($hrUsers as $hr) {
             SendNotificationJob::dispatch(
@@ -145,8 +145,9 @@ class LeaveRequestService
                     'employee_name' => $user->name,
                     'leave_type' => $this->translateLeaveTypeName(
                         $leaveRequest->leaveType->name,
-                        $manager->locale ?: 'ar'
-                    ),                    ],
+                        $hr->locale ?: 'ar'
+                    ),
+                ],
                 metadata: [
                     'screen' => 'leave_request_review',
                     'leave_request_id' => $leaveRequest->id,
@@ -155,8 +156,10 @@ class LeaveRequestService
             );
         }
 
-        // Notify all Owner users.
-        $owners = User::role('Owner', 'api')->get();
+        // Notify all active Owner users using each recipient's locale.
+        $owners = User::role('Owner', 'api')
+            ->where('status', 'active')
+            ->get();
 
         foreach ($owners as $owner) {
             SendNotificationJob::dispatch(
@@ -168,8 +171,9 @@ class LeaveRequestService
                     'employee_name' => $user->name,
                     'leave_type' => $this->translateLeaveTypeName(
                         $leaveRequest->leaveType->name,
-                        $manager->locale ?: 'ar'
-                    ),                    ],
+                        $owner->locale ?: 'ar'
+                    ),
+                ],
                 metadata: [
                     'screen' => 'leave_request_review',
                     'leave_request_id' => $leaveRequest->id,
@@ -179,29 +183,8 @@ class LeaveRequestService
         }
 
         return $leaveRequest;
+
     }
-
-    public function approve(
-        LeaveRequest $leaveRequest,
-        int $reviewerId
-    ): LeaveRequest {
-        $leaveRequest = DB::transaction(function () use (
-            $leaveRequest,
-            $reviewerId
-        ) {
-            $leaveRequest = LeaveRequest::query()
-                ->lockForUpdate()
-                ->findOrFail($leaveRequest->id);
-
-            if ($leaveRequest->status !== LeaveStatus::Pending) {
-                throw new RuntimeException(
-                    __('leave_requests.only_pending_approve')
-                );
-            }
-
-            $user = $leaveRequest->user;
-            $leaveType = $leaveRequest->leaveType;
-            $previousStatus = $leaveRequest->status->value;
 
             // Deduct the approved leave days from the employee's balance.
             $this->leaveBalanceService->deductBalance(
