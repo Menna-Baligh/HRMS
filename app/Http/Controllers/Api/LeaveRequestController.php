@@ -57,11 +57,21 @@ class LeaveRequestController extends Controller
         int $leaveRequest
     ): JsonResponse {
         try {
-            $leaveRequestModel = LeaveRequest::findOrFail($leaveRequest);
+            $leaveRequestModel = LeaveRequest::with('user')->findOrFail($leaveRequest);
+            $user = $request->user();
+
+            $canApprove = $user->isHrOrAbove() || ($user->isManager() && $leaveRequestModel->user?->manager_id === $user->id);
+            if (! $canApprove) {
+                return ResponseHelper::error(
+                    null,
+                    __('auth.unauthorized_action'),
+                    403
+                );
+            }
 
             $leaveRequest = $this->leaveRequestService->approve(
                 leaveRequest: $leaveRequestModel,
-                reviewerId: $request->user()->id
+                reviewerId: $user->id
             );
 
             return ResponseHelper::success(
@@ -83,11 +93,21 @@ class LeaveRequestController extends Controller
         int $leaveRequest
     ): JsonResponse {
         try {
-            $leaveRequestModel = LeaveRequest::findOrFail($leaveRequest);
+            $leaveRequestModel = LeaveRequest::with('user')->findOrFail($leaveRequest);
+            $user = $request->user();
+
+            $canReject = $user->isHrOrAbove() || ($user->isManager() && $leaveRequestModel->user?->manager_id === $user->id);
+            if (! $canReject) {
+                return ResponseHelper::error(
+                    null,
+                    __('auth.unauthorized_action'),
+                    403
+                );
+            }
 
             $leaveRequest = $this->leaveRequestService->reject(
                 leaveRequest: $leaveRequestModel,
-                reviewerId: $request->user()->id,
+                reviewerId: $user->id,
                 rejectionReason: $request->validated('rejection_reason')
             );
 
@@ -126,9 +146,19 @@ class LeaveRequestController extends Controller
         );
     }
 
-    public function show(int $leaveRequest): JsonResponse
+    public function show(Request $request, int $leaveRequest): JsonResponse
     {
-        $leaveRequestModel = LeaveRequest::findOrFail($leaveRequest);
+        $leaveRequestModel = LeaveRequest::with('user')->findOrFail($leaveRequest);
+        $user = $request->user();
+
+        $canView = $user->isHrOrAbove() || ($user->isManager() && $leaveRequestModel->user?->manager_id === $user->id) || $user->id === $leaveRequestModel->user_id;
+        if (! $canView) {
+            return ResponseHelper::error(
+                null,
+                __('auth.unauthorized_action'),
+                403
+            );
+        }
 
         $leaveRequest = $this->leaveRequestService->getDetails(
             leaveRequest: $leaveRequestModel

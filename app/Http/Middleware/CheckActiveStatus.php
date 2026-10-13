@@ -18,7 +18,7 @@ class CheckActiveStatus
     {
         $user = auth('api')->user();
 
-        if ($user && $user->employee && $user->employee->status === 'inactive') {
+        if ($user && $user->status === 'inactive') {
             auth('api')->logout();
 
             return ResponseHelper::error(

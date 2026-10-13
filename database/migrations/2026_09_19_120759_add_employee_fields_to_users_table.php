@@ -25,27 +25,29 @@ return new class extends Migration
             }
         });
 
-        DB::statement('
-            UPDATE users u
-            JOIN employees e ON u.id = e.user_id
-            SET 
-                u.employee_id = e.employee_id,
-                u.job_title = e.job_title,
-                u.employment_type = e.employment_type,
-                u.start_date = e.start_date,
-                u.status = e.status,
-                u.department_id = e.department_id,
-                u.company_location_id = e.company_location_id,
-                u.address = e.address
-        ');
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement('
+                UPDATE users u
+                JOIN employees e ON u.id = e.user_id
+                SET 
+                    u.employee_id = e.employee_id,
+                    u.job_title = e.job_title,
+                    u.employment_type = e.employment_type,
+                    u.start_date = e.start_date,
+                    u.status = e.status,
+                    u.department_id = e.department_id,
+                    u.company_location_id = e.company_location_id,
+                    u.address = e.address
+            ');
 
-        DB::statement('
-            UPDATE users u
-            JOIN employees e ON u.id = e.user_id
-            JOIN employees m ON e.manager_id = m.id
-            SET u.manager_id = m.user_id
-            WHERE e.manager_id IS NOT NULL
-        ');
+            DB::statement('
+                UPDATE users u
+                JOIN employees e ON u.id = e.user_id
+                JOIN employees m ON e.manager_id = m.id
+                SET u.manager_id = m.user_id
+                WHERE e.manager_id IS NOT NULL
+            ');
+        }
     }
 
     public function down(): void

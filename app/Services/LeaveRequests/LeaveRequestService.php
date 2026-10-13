@@ -4,6 +4,7 @@ namespace App\Services\LeaveRequests;
 
 use App\Enums\AuditAction;
 use App\Enums\LeaveStatus;
+use App\Enums\UserRole;
 use App\Jobs\SendNotificationJob;
 use App\Models\LeaveDecision;
 use App\Models\LeaveRequest;
@@ -105,6 +106,7 @@ class LeaveRequestService
          * Notify the employee's manager after the leave request
          * has been successfully created and the transaction has committed.
          */
+        // Notify employee's manager if exists.
         if ($user->manager_id) {
             $manager = User::find($user->manager_id);
 
