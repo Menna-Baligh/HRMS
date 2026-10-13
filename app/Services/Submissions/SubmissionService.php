@@ -456,7 +456,7 @@ class SubmissionService
 
         if (! $user->isEmployee()) {
             throw ValidationException::withMessages([
-                'user' => 'Only employees can submit tasks.',
+                'user' => __('submissions.only_employees_can_submit'),
             ]);
         }
 

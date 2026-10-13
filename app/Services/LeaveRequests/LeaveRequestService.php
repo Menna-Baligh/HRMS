@@ -110,7 +110,7 @@ class LeaveRequestService
         if ($user->manager_id) {
             $manager = User::find($user->manager_id);
 
-            if ($manager) {
+            if ($manager && $manager->status === 'active') {
                 SendNotificationJob::dispatch(
                     user: $manager,
                     type: 'leave_request_created',
@@ -132,11 +132,9 @@ class LeaveRequestService
             }
         }
 
-        // Notify all HR users.
-        $hrUsers = User::where('role', UserRole::HR->value)
-            ->orWhere(function ($q) {
-                $q->whereHas('roles', fn ($r) => $r->where('name', 'HR'));
-            })
+        // Notify all active HR users using each recipient's locale.
+        $hrUsers = User::role('HR', 'api')
+            ->where('status', 'active')
             ->get();
 
         foreach ($hrUsers as $hr) {
@@ -160,11 +158,9 @@ class LeaveRequestService
             );
         }
 
-        // Notify all Owner users.
-        $owners = User::where('role', UserRole::Owner->value)
-            ->orWhere(function ($q) {
-                $q->whereHas('roles', fn ($r) => $r->where('name', 'Owner'));
-            })
+        // Notify all active Owner users using each recipient's locale.
+        $owners = User::role('Owner', 'api')
+            ->where('status', 'active')
             ->get();
 
         foreach ($owners as $owner) {
@@ -189,99 +185,97 @@ class LeaveRequestService
         }
 
         return $leaveRequest;
+
     }
 
-    public function approve(
-        LeaveRequest $leaveRequest,
-        int $reviewerId
-    ): LeaveRequest {
-        $leaveRequest = DB::transaction(function () use (
-            $leaveRequest,
-            $reviewerId
-        ) {
-            $leaveRequest = LeaveRequest::query()
-                ->lockForUpdate()
-                ->findOrFail($leaveRequest->id);
+public function approve(LeaveRequest $leaveRequest,int $reviewerId): LeaveRequest {
+    $leaveRequest = DB::transaction(function () use (
+        $leaveRequest,
+        $reviewerId
+    ) {
+        $leaveRequest = LeaveRequest::query()
+            ->lockForUpdate()
+            ->findOrFail($leaveRequest->id);
 
-            if ($leaveRequest->status !== LeaveStatus::Pending) {
-                throw new RuntimeException(
-                    __('leave_requests.only_pending_approve')
-                );
-            }
-
-            $user = $leaveRequest->user;
-            $leaveType = $leaveRequest->leaveType;
-            $previousStatus = $leaveRequest->status->value;
-
-            // Deduct the approved leave days from the employee's balance.
-            $this->leaveBalanceService->deductBalance(
-                user: $user,
-                leaveType: $leaveType,
-                days: (float) $leaveRequest->days,
-                year: $leaveRequest->start_date->year
+        if ($leaveRequest->status !== LeaveStatus::Pending) {
+            throw new RuntimeException(
+                __('leave_requests.only_pending_approve')
             );
+        }
 
-            // Update the leave request status.
-            $leaveRequest->update([
-                'status' => LeaveStatus::Approved->value,
-                'reviewed_by' => $reviewerId,
-                'reviewed_at' => now(),
-            ]);
+        $user = $leaveRequest->user;
+        $leaveType = $leaveRequest->leaveType;
+        $previousStatus = $leaveRequest->status->value;
 
-            // Store the approval decision.
-            LeaveDecision::create([
-                'leave_request_id' => $leaveRequest->id,
-                'reviewer_id' => $reviewerId,
-                'previous_status' => $previousStatus,
-                'decision' => LeaveStatus::Approved->value,
-                'reason' => null,
-                'decided_at' => now(),
-            ]);
-
-            // Record the approval in the audit log.
-            $this->auditService->record(
-                actor: User::findOrFail($reviewerId),
-                action: AuditAction::LEAVE_APPROVED,
-                entity: $leaveRequest,
-                metadata: [
-                    'old_status' => $previousStatus,
-                    'new_status' => LeaveStatus::Approved->value,
-                    'reviewer_id' => $reviewerId,
-                    'days' => (float) $leaveRequest->days,
-                ],
-            );
-
-            return $leaveRequest->fresh([
-                'user',
-                'leaveType',
-                'reviewer',
-                'decisions.reviewer',
-            ]);
-        });
-
-        // Notify the employee only after the approval transaction commits.
-        SendNotificationJob::dispatch(
-            user: $leaveRequest->user,
-            type: 'leave_request_approved',
-            titleKey: 'notifications.leave_request_approved_title',
-            bodyKey: 'notifications.leave_request_approved_body',
-            parameters: [
-                'leave_type' => $this->translateLeaveTypeName(
-                    $leaveRequest->leaveType->name,
-                    $leaveRequest->user->locale ?: 'ar'
-                ),
-                'start_date' => $leaveRequest->start_date->toDateString(),
-                'end_date' => $leaveRequest->end_date->toDateString(),
-            ],
-            metadata: [
-                'screen' => 'leave_request_details',
-                'leave_request_id' => $leaveRequest->id,
-                'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
-            ]
+        // Deduct the approved leave days from the employee's balance.
+        $this->leaveBalanceService->deductBalance(
+            user: $user,
+            leaveType: $leaveType,
+            days: (float) $leaveRequest->days,
+            year: $leaveRequest->start_date->year
         );
 
-        return $leaveRequest;
-    }
+        // Update the leave request status.
+        $leaveRequest->update([
+            'status' => LeaveStatus::Approved->value,
+            'reviewed_by' => $reviewerId,
+            'reviewed_at' => now(),
+        ]);
+
+        // Store the approval decision.
+        LeaveDecision::create([
+            'leave_request_id' => $leaveRequest->id,
+            'reviewer_id' => $reviewerId,
+            'previous_status' => $previousStatus,
+            'decision' => LeaveStatus::Approved->value,
+            'reason' => null,
+            'decided_at' => now(),
+        ]);
+
+        // Record the approval in the audit log.
+        $this->auditService->record(
+            actor: User::findOrFail($reviewerId),
+            action: AuditAction::LEAVE_APPROVED,
+            entity: $leaveRequest,
+            metadata: [
+                'old_status' => $previousStatus,
+                'new_status' => LeaveStatus::Approved->value,
+                'reviewer_id' => $reviewerId,
+                'days' => (float) $leaveRequest->days,
+            ],
+        );
+
+        return $leaveRequest->fresh([
+            'user',
+            'leaveType',
+            'reviewer',
+            'decisions.reviewer',
+        ]);
+    });
+
+    // Notify the employee only after the approval transaction commits.
+    SendNotificationJob::dispatch(
+        user: $leaveRequest->user,
+        type: 'leave_request_approved',
+        titleKey: 'notifications.leave_request_approved_title',
+        bodyKey: 'notifications.leave_request_approved_body',
+        parameters: [
+            'leave_type' => $this->translateLeaveTypeName(
+                $leaveRequest->leaveType->name,
+                $leaveRequest->user->locale ?: 'ar'
+            ),
+            'start_date' => $leaveRequest->start_date->toDateString(),
+            'end_date' => $leaveRequest->end_date->toDateString(),
+        ],
+        metadata: [
+            'screen' => 'leave_request_details',
+            'leave_request_id' => $leaveRequest->id,
+            'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+        ]
+    );
+
+    return $leaveRequest;
+}
 
     public function reject(
         LeaveRequest $leaveRequest,
