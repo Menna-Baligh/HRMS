@@ -55,4 +55,5 @@ return [
     'biometric_invalid_token' => 'Invalid or expired biometric token.',
     'biometric_disabled_success' => 'Biometric authentication disabled successfully.',
     'token_refreshed' => 'Token refreshed successfully.',
+    'invalid_refresh_token' => 'Invalid or expired refresh token.',
 ];

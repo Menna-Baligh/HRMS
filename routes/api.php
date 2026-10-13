@@ -72,11 +72,11 @@ Route::middleware('set.app.language')->prefix('auth')->group(function () {
     Route::post('/forgot-password/reset', [AuthController::class, 'resetPassword'])->middleware('throttle:5,1');
     Route::post('/forgot-password/resend-otp', [AuthController::class, 'resendOtp'])->middleware('throttle:5,1');
     Route::post('/biometric-login', [BiometricAuthController::class, 'loginWithBiometrics']);
+    Route::post('/refresh', [AuthController::class, 'refresh']);
 
     Route::middleware('auth:api')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::post('/toggle-biometrics', [BiometricAuthController::class, 'toggleBiometrics']);
-        Route::post('/refresh', [AuthController::class, 'refresh']);
     });
 
     Route::prefix('google')->group(function () {

@@ -9,6 +9,10 @@ use Laravel\Socialite\Facades\Socialite;
 
 class GoogleAuthService
 {
+    public function __construct(
+        protected RefreshTokenService $refreshTokenService
+    ) {}
+
     public function getGoogleRedirectUrl(): string
     {
         return Socialite::driver('google')
@@ -55,13 +59,17 @@ class GoogleAuthService
 
         $token = auth('api')->login($user);
 
+        $refreshToken = $this->refreshTokenService->createRefreshToken($user);
+
         $user->load(['department', 'companyLocation', 'manager', 'files']);
 
         return [
-            'access_token' => $token,
-            'token_type'   => 'bearer',
-            'expires_in'   => auth('api')->factory()->getTTL() / 60 . ' hours',
-            'user'         => new UserResource($user),
+            'access_token'       => $token,
+            'refresh_token'      => $refreshToken,
+            'token_type'         => 'bearer',
+            'expires_in'         => '15 minutes',
+            'refresh_expires_in' => '30 days',
+            'user'               => new UserResource($user),
         ];
     }
 

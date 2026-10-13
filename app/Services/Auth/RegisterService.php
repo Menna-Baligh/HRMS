@@ -9,21 +9,25 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class RegisterService
 {
-    public function __construct(protected OtpService $otpService) {}
+    public function __construct(
+        protected OtpService $otpService,
+        protected RefreshTokenService $refreshTokenService
+    ) {}
 
     public function register(array $data): array
     {
         $ownerCode = $this->generateOwnerCode();
+
         $user = User::create([
             'employee_id' => $ownerCode,
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'phone' => $data['phone'] ?? null,
-            'avatar' => $data['avatar'] ?? null,
-            'provider' => $data['provider'] ?? null,
+            'name'        => $data['name'],
+            'email'       => $data['email'],
+            'phone'       => $data['phone'] ?? null,
+            'avatar'      => $data['avatar'] ?? null,
+            'provider'    => $data['provider'] ?? null,
             'provider_id' => $data['provider_id'] ?? null,
-            'password' => Hash::make($data['password']),
-            'role' => 'Owner',
+            'password'    => Hash::make($data['password']),
+            'role'        => 'Owner',
         ]);
 
         $user->assignRole('Owner');
@@ -35,14 +39,19 @@ class RegisterService
         $token = JWTAuth::fromUser($user);
         $user = $user->fresh();
 
-        return [
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => (auth('api')->factory()->getTTL() / 60).' hours',
-            'user' => new UserResource($user),
-        ];
+        // Generate Refresh Token
+        $refreshToken = $this->refreshTokenService->createRefreshToken($user);
 
+        return [
+            'access_token'       => $token,
+            'refresh_token'      => $refreshToken,
+            'token_type'         => 'bearer',
+            'expires_in'         => '15 minutes',
+            'refresh_expires_in' => '30 days',
+            'user'               => new UserResource($user),
+        ];
     }
+
     protected function generateOwnerCode(): string
     {
         $lastOwner = User::where('role', 'Owner')
