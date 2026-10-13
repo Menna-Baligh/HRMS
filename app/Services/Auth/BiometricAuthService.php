@@ -9,6 +9,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class BiometricAuthService
 {
+    public function __construct(
+        protected RefreshTokenService $refreshTokenService
+    ) {}
+
     public function toggleBiometrics(User $user): array
     {
         if ($user->biometric_token) {
@@ -50,11 +54,15 @@ class BiometricAuthService
 
         $token = auth('api')->login($user);
 
+        $refreshToken = $this->refreshTokenService->createRefreshToken($user);
+
         return [
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth('api')->factory()->getTTL() / 60 .' hours',
-            'user' => auth('api')->user(),
+            'access_token'       => $token,
+            'refresh_token'      => $refreshToken,
+            'token_type'         => 'bearer',
+            'expires_in'         => '15 minutes',
+            'refresh_expires_in' => '30 days',
+            'user'               => auth('api')->user(),
         ];
     }
 }

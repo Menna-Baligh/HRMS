@@ -14,9 +14,11 @@ use App\Http\Resources\UserResource;
 use App\Services\Auth\ForgotPasswordService;
 use App\Services\Auth\LoginService;
 use App\Services\Auth\LogoutService;
+use App\Services\Auth\RefreshTokenService;
 use App\Services\Auth\RegisterService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
@@ -27,7 +29,8 @@ class AuthController extends Controller
         protected RegisterService $registerService,
         protected ForgotPasswordService $forgotPasswordService,
         protected LoginService $loginService,
-        protected LogoutService $logoutService
+        protected LogoutService $logoutService,
+        protected RefreshTokenService $refreshTokenService
 
     ) {}
 
@@ -122,7 +125,11 @@ class AuthController extends Controller
     public function logout(): JsonResponse
     {
         try {
-            $this->logoutService->logout();
+            if (auth('api')->check()) {
+                $userId = auth('api')->id();
+                $this->refreshTokenService->revokeUserTokens($userId);
+                auth('api')->logout();
+            }
 
             return ResponseHelper::success(message: __('auth.logout_success'));
         } catch (Throwable $e) {
@@ -135,15 +142,32 @@ class AuthController extends Controller
         }
     }
 
-    public function refresh()
+    public function refresh(Request $request): JsonResponse
     {
-        return ResponseHelper::success(
-            data: [
-                'access_token' => auth('api')->refresh(),
-                'token_type' => 'bearer',
-                'expires_in' => auth('api')->factory()->getTTL() / 60 .' hours',
-            ],
-            message: __('auth.token_refreshed')
-        );
+        $request->validate([
+            'refresh_token' => 'required|string',
+        ]);
+
+        try {
+            $result = $this->refreshTokenService->rotateRefreshToken($request->input('refresh_token'));
+
+            return ResponseHelper::success(
+                data: [
+                    'access_token'       => $result['access_token'],
+                    'refresh_token'      => $result['refresh_token'],
+                    'token_type'         => 'bearer',
+                    'expires_in'         => '15 minutes',
+                    'refresh_expires_in' => '30 days',
+                ],
+                message: __('auth.token_refreshed')
+            );
+        } catch (\Exception $e) {
+            $statusCode = $e->getCode() == 403 ? 403 : 401;
+
+            return ResponseHelper::error(
+                message: $e->getMessage() ?: __('auth.invalid_refresh_token'),
+                statusCode: $statusCode
+            );
+        }
     }
 }

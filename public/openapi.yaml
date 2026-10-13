@@ -28,34 +28,34 @@ paths:
       summary: Login (This route is allowed for all roles) 📱
       operationId: login
       tags:
-      - Authentication
+        - Authentication
       parameters:
-      - in: header
-        name: Accept
-        required: true
-        schema:
-          type: string
-          default: application/json
-        example: application/json
-      - in: header
-        name: Accept-Language
-        required: false
-        schema:
-          type: string
-          enum:
-          - ar
-          - en
-      - in: query
-        name: lang
-        required: false
-        description: Language for response translation (e.g. ar, en)
-        schema:
-          type: string
-          enum:
-          - ar
-          - en
-          default: en
-        example: en
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en
+        - in: query
+          name: lang
+          required: false
+          description: Language for response translation (e.g. ar, en)
+          schema:
+            type: string
+            enum:
+              - ar
+              - en
+            default: en
+          example: en
       requestBody:
         required: true
         content:
@@ -63,8 +63,8 @@ paths:
             schema:
               type: object
               required:
-              - email
-              - password
+                - email
+                - password
               properties:
                 email:
                   type: string
@@ -92,12 +92,19 @@ paths:
                     properties:
                       access_token:
                         type: string
+                        example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
+                      refresh_token:
+                        type: string
+                        example: a8f9c1b2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0
                       token_type:
                         type: string
                         example: bearer
                       expires_in:
                         type: string
-                        example: 24 hours
+                        example: "15 minutes"
+                      refresh_expires_in:
+                        type: string
+                        example: "30 days"
                       user:
                         type: object
                         properties:
@@ -139,7 +146,7 @@ paths:
                           address:
                             type: string
                             nullable: true
-                            example:
+                            example: Mansoura
                           avatar_url:
                             type: string
                             nullable: true
@@ -159,34 +166,11 @@ paths:
                             items:
                               type: string
                             example:
-                            - View Profile
-                            - Update Profile
-                            - View Departments
-                            - Update Task Progress
-                            - Update Task Status
-                            - Create Submission
-                            - Attach File to Submission
-                            - View Submission
-                            - Resubmit Submission
-                            - View Active Locations
-                            - Check-in / Check-out
-                            - View Personal Attendance History
-                            - View Own Goals
-                            - Create Goal
-                            - Update Goal
-                            - Update Goal Progress
-                            - Complete Goal
-                            - View Personal Evaluation
-                            - Personal Performance Dashboard
-                            - View Leave Types
-                            - View Leave Balances
-                            - View Own Leave Requests
-                            - Create Leave Request
-                            - Cancel Leave Request
-                            - View Leave History
-                            - View Leave Calendar
-                            - Download Files
-                            - Delete Files
+                              - View Profile
+                              - Update Profile
+                              - View Departments
+                              - Update Task Progress
+                              - Check-in / Check-out
                           created_at:
                             type: string
                             example: 2026-09-20 18:28:17
@@ -194,9 +178,11 @@ paths:
                 success: true
                 message: Logged in successfully.
                 data:
-                  access_token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3ODk5MjU5MjgsImV4cCI6MTc5MDAxMjMyOCwibmJmIjoxNzg5OTI1OTI4LCJqdGkiOijjRFgybTV4OEVWUU9sM3JGIiwic3ViIjoiNiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjciLCJyb2xlIjoiRW1wbG95ZWUifQ.4DnPJEF0SlWspAYc4y6aHE8g_A9O_Hgh-je4bLDvVSM
+                  access_token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
+                  refresh_token: a8f9c1b2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0
                   token_type: bearer
-                  expires_in: 24 hours
+                  expires_in: "15 minutes"
+                  refresh_expires_in: "30 days"
                   user:
                     id: 6
                     name: Noran Baligh
@@ -207,40 +193,17 @@ paths:
                     employment_type: Part-time
                     start_date: 2026-09-01
                     status: Active
-                    address:
+                    address: Mansoura
                     avatar_url: http://127.0.0.1:8000/api/files/2/download
                     role: Employee
                     role_label: Employee
                     locale: en
                     permissions:
-                    - View Profile
-                    - Update Profile
-                    - View Departments
-                    - Update Task Progress
-                    - Update Task Status
-                    - Create Submission
-                    - Attach File to Submission
-                    - View Submission
-                    - Resubmit Submission
-                    - View Active Locations
-                    - Check-in / Check-out
-                    - View Personal Attendance History
-                    - View Own Goals
-                    - Create Goal
-                    - Update Goal
-                    - Update Goal Progress
-                    - Complete Goal
-                    - View Personal Evaluation
-                    - Personal Performance Dashboard
-                    - View Leave Types
-                    - View Leave Balances
-                    - View Own Leave Requests
-                    - Create Leave Request
-                    - Cancel Leave Request
-                    - View Leave History
-                    - View Leave Calendar
-                    - Download Files
-                    - Delete Files
+                      - View Profile
+                      - Update Profile
+                      - View Departments
+                      - Update Task Progress
+                      - Check-in / Check-out
                     created_at: 2026-09-20 18:28:17
         "403":
           description: Forbidden (e.g. Account inactive)
@@ -8705,34 +8668,34 @@ paths:
       summary: Register a new user (Only For Role Owner)
       operationId: registerUser
       tags:
-      - Authentication
+        - Authentication
       parameters:
-      - in: header
-        name: Accept
-        required: true
-        schema:
-          type: string
-          default: application/json
-        example: application/json
-      - in: header
-        name: Accept-Language
-        required: false
-        schema:
-          type: string
-          enum:
-          - ar
-          - en
-      - in: query
-        name: lang
-        required: false
-        description: Language for response translation (e.g. ar, en)
-        schema:
-          type: string
-          enum:
-          - ar
-          - en
-          default: en
-        example: en
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+            enum:
+              - ar
+              - en
+        - in: query
+          name: lang
+          required: false
+          description: Language for response translation (e.g. ar, en)
+          schema:
+            type: string
+            enum:
+              - ar
+              - en
+            default: en
+          example: en
       requestBody:
         required: true
         content:
@@ -8740,10 +8703,10 @@ paths:
             schema:
               type: object
               required:
-              - name
-              - email
-              - password
-              - password_confirmation
+                - name
+                - email
+                - password
+                - password_confirmation
               properties:
                 name:
                   type: string
@@ -8785,12 +8748,18 @@ paths:
                       access_token:
                         type: string
                         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                      refresh_token:
+                        type: string
+                        example: a8f9c1b2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0
                       token_type:
                         type: string
                         example: bearer
                       expires_in:
                         type: string
-                        example: 24 hours
+                        example: "15 minutes"
+                      refresh_expires_in:
+                        type: string
+                        example: "30 days"
                       user:
                         type: object
                         properties:
@@ -8807,18 +8776,21 @@ paths:
                           phone:
                             type: string
                             nullable: true
-                            example:
+                            example: null
+                          employee_code:
+                            type: string
+                            example: OWN-0001
                           status:
                             type: string
                             example: Active
                           address:
                             type: string
                             nullable: true
-                            example:
+                            example: null
                           avatar_url:
                             type: string
                             nullable: true
-                            example:
+                            example: null
                           role:
                             type: string
                             example: Owner
@@ -8839,96 +8811,27 @@ paths:
                 success: true
                 message: User registered successfully.
                 data:
-                  access_token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2F1dGgvcmVnaXN0ZXIiLCJpYXQiOjE3OTAwNjM0MjMsImV4cCI6MTc5MDE0OTgyMywibmJmIjoxNzkwMDYzNDIzLCJqdGkiOiJwZ1FrZjQxbUxoWkhXNXBsIiwic3ViIjoiMTQiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3Iiwicm9sZSI6Ik93bmVyIn0.hMOfMgoUIH1r6paG087NNzPj5RIIR5FzycX-ckrNA64
+                  access_token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
+                  refresh_token: a8f9c1b2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0
                   token_type: bearer
-                  expires_in: 24 hours
+                  expires_in: "15 minutes"
+                  refresh_expires_in: "30 days"
                   user:
                     id: 14
                     name: Menna
                     email: mennabaligh@gmail.com
-                    phone:
+                    phone: null
+                    employee_code: OWN-0001
                     status: Active
-                    address:
-                    avatar_url:
+                    address: null
+                    avatar_url: null
                     role: Owner
                     role_label: System Owner
                     locale: en
                     permissions:
-                    - Create Employee
-                    - Edit HR Fields
-                    - Change Account Status
-                    - View All Employees
-                    - View Profile
-                    - Update Profile
-                    - View Departments
-                    - Create Department
-                    - Edit Department
-                    - Change Department Status
-                    - View Team Employees
-                    - View Team Attendance
-                    - View Team Goals
-                    - Create Task
-                    - Update Task
-                    - Assign Task
-                    - Update Task Progress
-                    - Update Task Status
-                    - Create Submission
-                    - Attach File to Submission
-                    - View Submission Queue
-                    - View Submission
-                    - Approve Submission
-                    - Reject Submission
-                    - Request Changes on Submission
-                    - Resubmit Submission
-                    - Create Company Location
-                    - Update Company Location
-                    - Deactivate Location
-                    - Activate Location
-                    - View Active Locations
-                    - Check-in / Check-out
-                    - View Personal Attendance History
-                    - View Daily Attendance
-                    - View Attendance Exceptions
-                    - View Attendance Summary
-                    - Export Attendance Reports
-                    - View Own Goals
-                    - Create Goal
-                    - Update Goal
-                    - Update Goal Progress
-                    - Complete Goal
-                    - Company Goals Overview
-                    - Manage Evaluation Setup
-                    - Create Evaluation
-                    - Update Evaluation
-                    - Complete Evaluation
-                    - View Manager Evaluations
-                    - View Personal Evaluation
-                    - Company Performance
-                    - Team Performance
-                    - Personal Performance Dashboard
-                    - View Leave Types
-                    - Manage Leave Types
-                    - View Leave Balances
-                    - View Own Leave Requests
-                    - Create Leave Request
-                    - Cancel Leave Request
-                    - Manager Approve Leave
-                    - HR Approve Leave
-                    - Reject Leave Request
-                    - View Leave History
-                    - Team Leave Queue
-                    - HR Leave Queue
-                    - View Leave Calendar
-                    - View All Permissions
-                    - Download Files
-                    - Delete Files
-                    - Use AI Career Coach
-                    - View AI Performance Insight
-                    - Generate AI Evaluation Draft
-                    - Analyze AI Skill-Gap & Development
-                    - View AI Employee Attention Signal
-                    - View AI Team Insight Summary
-                    - Use AI HR Policy Assistant
+                      - Create Employee
+                      - Edit HR Fields
+                      - Change Account Status
                     created_at: 2026-09-22 10:50:23
         "422":
           $ref: "#/components/responses/422RegistrationValidationError"
@@ -17750,7 +17653,7 @@ paths:
   /api/auth/biometric-login:
     post:
       summary: Login via Biometric Token 📱
-      description: Authenticates user using device-stored biometric UUID token and returns fresh JWT access token credentials.
+      description: Authenticates user using device-stored biometric UUID token and returns fresh JWT access and refresh credentials.
       operationId: biometricLogin
       tags:
         - Authentication
@@ -17803,12 +17706,19 @@ paths:
                     properties:
                       access_token:
                         type: string
+                        example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                      refresh_token:
+                        type: string
+                        example: "a8f9c1b2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0"
                       token_type:
                         type: string
                         example: bearer
                       expires_in:
                         type: string
-                        example: "24 hours"
+                        example: "15 minutes"
+                      refresh_expires_in:
+                        type: string
+                        example: "30 days"
                       user:
                         type: object
                         properties:
@@ -17870,8 +17780,10 @@ paths:
                 message: Logged in successfully.
                 data:
                   access_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                  refresh_token: "a8f9c1b2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0"
                   token_type: bearer
-                  expires_in: "24 hours"
+                  expires_in: "15 minutes"
+                  refresh_expires_in: "30 days"
                   user:
                     id: 6
                     name: Noran Baligh
@@ -17962,23 +17874,43 @@ paths:
   /api/auth/refresh:
     post:
       summary: Refresh Access Token 📱
-      description: Generates a new JWT access token using the current token provided in the Authorization header.
+      description: Generates a new JWT access token and rotates the refresh token using a valid refresh token provided in the request body.
+      operationId: refreshToken
       tags:
         - Authentication
-      security:
-        - bearerAuth: []
       parameters:
-        - in: query
-          name: lang
+        - in: header
+          name: Accept
+          required: true
           schema:
             type: string
-            enum: [en, ar]
-            default: en
+            default: application/json
+          example: application/json
+        - in: header
+          name: Accept-Language
           required: false
-          description: Language for the response messages
+          schema:
+            type: string
+            enum:
+              - ar
+              - en
+            default: en
+          example: en
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refresh_token
+              properties:
+                refresh_token:
+                  type: string
+                  example: "a8f9c1b2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0"
       responses:
         '200':
-          description: Token refreshed successfully
+          description: Token refreshed and rotated successfully.
           content:
             application/json:
               schema:
@@ -17996,14 +17928,20 @@ paths:
                       access_token:
                         type: string
                         example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
+                      refresh_token:
+                        type: string
+                        example: z9y8x7w6v5u4t3s2r1q0p9o8n7m6l5k4j3i2h1g0
                       token_type:
                         type: string
                         example: bearer
                       expires_in:
                         type: string
-                        example: 24 hours
+                        example: "15 minutes"
+                      refresh_expires_in:
+                        type: string
+                        example: "30 days"
         '401':
-          description: Unauthorized or Invalid Token
+          description: Invalid, expired, or revoked refresh token.
           content:
             application/json:
               schema:
@@ -18014,8 +17952,20 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: Unauthenticated.
-
+                    example: Invalid or expired refresh token.
+        '422':
+          description: Validation error for missing refresh_token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: The refresh token field is required.
 components:
   securitySchemes:
     bearerAuth:

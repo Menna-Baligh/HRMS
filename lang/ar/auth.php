@@ -59,4 +59,5 @@ return [
     'biometric_invalid_token' => 'رمز البصمة غير صالحة أو تم إلغاؤها.',
     'biometric_disabled_success' => 'تم إلغاء تفعيل الدخول بالبصمة بنجاح.',
     'token_refreshed' => 'تم تحديث الرمز بنجاح.',
+    'invalid_refresh_token' => 'رمز تحديث غير صالح أو منتهي الصلاحية.',
 ];
