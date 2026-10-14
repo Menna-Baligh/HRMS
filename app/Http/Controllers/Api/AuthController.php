@@ -155,6 +155,7 @@ class AuthController extends Controller
                 data: [
                     'access_token'       => $result['access_token'],
                     'refresh_token'      => $result['refresh_token'],
+                    'biometric_token'    => $result['biometric_token'],
                     'token_type'         => 'bearer',
                     'expires_in'         => '15 minutes',
                     'refresh_expires_in' => '30 days',
