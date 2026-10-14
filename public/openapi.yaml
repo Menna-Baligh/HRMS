@@ -17874,7 +17874,7 @@ paths:
   /api/auth/refresh:
     post:
       summary: Refresh Access Token 📱
-      description: Generates a new JWT access token and rotates the refresh token using a valid refresh token provided in the request body.
+      description: Generates a new JWT access token and rotates the refresh token. Also rotates the biometric_token if biometrics are enabled for the user.
       operationId: refreshToken
       tags:
         - Authentication
@@ -17931,6 +17931,10 @@ paths:
                       refresh_token:
                         type: string
                         example: z9y8x7w6v5u4t3s2r1q0p9o8n7m6l5k4j3i2h1g0
+                      biometric_token:
+                        type: string
+                        nullable: true
+                        example: "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"
                       token_type:
                         type: string
                         example: bearer
@@ -17940,32 +17944,6 @@ paths:
                       refresh_expires_in:
                         type: string
                         example: "30 days"
-        '401':
-          description: Invalid, expired, or revoked refresh token.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Invalid or expired refresh token.
-        '422':
-          description: Validation error for missing refresh_token.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: The refresh token field is required.
 components:
   securitySchemes:
     bearerAuth:

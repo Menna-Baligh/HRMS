@@ -9,7 +9,7 @@ use Exception;
 
 class RefreshTokenService
 {
-    protected int $ttlDays = 30; 
+    protected int $ttlDays = 30;
 
 
     public function createRefreshToken(User $user): string
@@ -44,9 +44,12 @@ class RefreshTokenService
                 $newAccessToken = auth('api')->tokenById($user->id);
                 $newRefreshToken = $this->createRefreshToken($user);
 
+                $biometricToken = $this->handleBiometricRotation($user);
+
                 return [
                     'access_token'       => $newAccessToken,
                     'refresh_token'      => $newRefreshToken,
+                    'biometric_token'    => $biometricToken,
                     'token_type'         => 'bearer',
                     'expires_in'         => '15 minutes',
                     'refresh_expires_in' => '30 days',
@@ -68,14 +71,31 @@ class RefreshTokenService
         $newAccessToken = auth('api')->tokenById($user->id);
         $newRefreshToken = $this->createRefreshToken($user);
 
+        $biometricToken = $this->handleBiometricRotation($user);
+
         return [
             'access_token'       => $newAccessToken,
             'refresh_token'      => $newRefreshToken,
+            'biometric_token'    => $biometricToken,
             'token_type'         => 'bearer',
             'expires_in'         => '15 minutes',
             'refresh_expires_in' => '30 days',
             'user'               => $user,
         ];
+    }
+
+    protected function handleBiometricRotation(User $user): ?string
+    {
+        if (! empty($user->biometric_token)) {
+            $newBiometricToken = (string) Str::uuid();
+            $user->forceFill([
+                'biometric_token' => $newBiometricToken,
+            ])->save();
+
+            return $newBiometricToken;
+        }
+
+        return null;
     }
 
     public function revokeUserTokens(int $userId): void
